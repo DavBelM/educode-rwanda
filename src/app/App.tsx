@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Dashboard from './Dashboard';
 import TeacherDashboard from './TeacherDashboard';
+import CodingWorkspace from './CodingWorkspace';
 import LandingPage from './LandingPage';
 import LoginPage from './LoginPage';
 import SignupPage from './SignupPage';
@@ -11,10 +12,12 @@ import PrivacyPolicyPage from './PrivacyPolicyPage';
 import { useAuth } from '../lib/auth';
 
 type PublicView = 'landing' | 'login' | 'signup' | 'school-signup' | 'about' | 'contact' | 'privacy';
+type StudentView = 'dashboard' | 'workspace';
 
 export default function App() {
   const { user, profile, loading } = useAuth();
   const [view, setView] = useState<PublicView>('landing');
+  const [studentView, setStudentView] = useState<StudentView>('dashboard');
 
   if (loading) {
     return (
@@ -29,10 +32,11 @@ export default function App() {
     );
   }
 
-  // Authenticated users go straight to their dashboard
+  // Authenticated users
   if (user && profile) {
     if (profile.user_type === 'teacher') return <TeacherDashboard />;
-    return <Dashboard />;
+    if (studentView === 'workspace') return <CodingWorkspace onBack={() => setStudentView('dashboard')} />;
+    return <Dashboard onStartCoding={() => setStudentView('workspace')} />;
   }
 
   // Public pages
