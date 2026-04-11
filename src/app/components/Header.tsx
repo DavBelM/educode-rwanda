@@ -1,4 +1,5 @@
-import { Save, Send } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { Save, Send, LogOut, User } from 'lucide-react';
 import { useAuth } from '../../lib/auth';
 
 interface HeaderProps {
@@ -13,10 +14,24 @@ interface HeaderProps {
 export function Header({ language, onLanguageToggle, subtitle, hideAssignmentInfo = false, showWorkspaceActions = false, onBack }: HeaderProps) {
   const isKinyarwanda = language === 'KIN';
   const defaultSubtitle = subtitle || (isKinyarwanda ? 'Ikibanza cyo gutoza kode' : 'Student Coding Workspace');
-  const { profile } = useAuth();
+  const { profile, signOut } = useAuth();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
   const initials = profile?.full_name
     ? profile.full_name.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)
     : '?';
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
 
   return (
     <header className="flex items-center justify-between px-6 py-4 bg-white border-b border-gray-200">
@@ -121,9 +136,51 @@ export function Header({ language, onLanguageToggle, subtitle, hideAssignmentInf
           </button>
         </div>
 
-        {/* Profile/User Badge */}
-        <div className="hidden xl:flex w-10 h-10 rounded-full bg-[#f1f5f9] border-2 border-[#0ea5e9] items-center justify-center text-[#0ea5e9] font-semibold text-sm" style={{ fontFamily: 'Inter, sans-serif' }}>
-          {initials}
+        {/* Profile dropdown */}
+        <div className="relative" ref={menuRef}>
+          <button
+            onClick={() => setMenuOpen(prev => !prev)}
+            className="w-10 h-10 rounded-full bg-[#f1f5f9] border-2 border-[#0ea5e9] flex items-center justify-center text-[#0ea5e9] font-semibold text-sm hover:bg-[#e0f2fe] transition-all"
+            style={{ fontFamily: 'Inter, sans-serif' }}
+          >
+            {initials}
+          </button>
+
+          {menuOpen && (
+            <div className="absolute right-0 top-12 w-56 bg-white border border-gray-200 rounded-xl shadow-lg z-50 overflow-hidden">
+              {/* User info */}
+              <div className="px-4 py-3 border-b border-gray-100">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-full bg-[#e0f2fe] flex items-center justify-center text-[#0ea5e9] font-bold text-sm">
+                    {initials}
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-[#1e293b]">{profile?.full_name ?? 'Student'}</p>
+                    <p className="text-xs text-gray-500 capitalize">{profile?.user_type?.replace('_', ' ') ?? ''}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Menu items */}
+              <div className="py-1">
+                <button
+                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                  style={{ fontFamily: 'Inter, sans-serif' }}
+                >
+                  <User size={16} className="text-gray-400" />
+                  {isKinyarwanda ? 'Umwirondoro' : 'Profile'}
+                </button>
+                <button
+                  onClick={() => signOut()}
+                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                  style={{ fontFamily: 'Inter, sans-serif' }}
+                >
+                  <LogOut size={16} />
+                  {isKinyarwanda ? 'Sohoka' : 'Log Out'}
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </header>
