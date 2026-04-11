@@ -69,15 +69,15 @@ export default function LoginPage({ onSuccess }: { onSuccess?: () => void }) {
           </div>
         </div>
 
-        {/* Quote */}
+        {/* Tagline */}
         <div className="relative z-10">
           <p className="text-lg font-semibold mb-2">
-            5,000+ {isKinyarwanda ? 'abanyeshuri biga programming mu Kinyarwanda' : 'students learning to code in Kinyarwanda'}
+            {isKinyarwanda ? 'Wige programming mu rurimi rwawe' : 'Learn programming in your language'}
           </p>
           <p className="text-sm text-gray-400">
             {isKinyarwanda
-              ? 'Kwiga programming mu rurimi rwawe'
-              : 'Learn programming in your language'}
+              ? 'Ibisobanuro mu Kinyarwanda. Buri kosa risobanurwa.'
+              : 'Error explanations in Kinyarwanda. Built for Rwanda.'}
           </p>
         </div>
       </div>
