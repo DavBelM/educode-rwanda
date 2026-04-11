@@ -1,26 +1,38 @@
-import React from 'react';
 import { Save, Send } from 'lucide-react';
+import { useAuth } from '../../lib/auth';
 
 interface HeaderProps {
   language: 'EN' | 'KIN';
   onLanguageToggle: () => void;
   subtitle?: string;
   hideAssignmentInfo?: boolean;
+  showWorkspaceActions?: boolean;
+  onBack?: () => void;
 }
 
-export function Header({ language, onLanguageToggle, subtitle, hideAssignmentInfo = false }: HeaderProps) {
+export function Header({ language, onLanguageToggle, subtitle, hideAssignmentInfo = false, showWorkspaceActions = false, onBack }: HeaderProps) {
   const isKinyarwanda = language === 'KIN';
   const defaultSubtitle = subtitle || (isKinyarwanda ? 'Ikibanza cyo gutoza kode' : 'Student Coding Workspace');
+  const { profile } = useAuth();
+  const initials = profile?.full_name
+    ? profile.full_name.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)
+    : '?';
 
   return (
     <header className="flex items-center justify-between px-6 py-4 bg-white border-b border-gray-200">
-      {/* Logo */}
+      {/* Logo / Back */}
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-[#0ea5e9]">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M8 6H16M8 12H16M8 18H13" stroke="white" strokeWidth="2" strokeLinecap="round"/>
-          </svg>
-        </div>
+        {onBack ? (
+          <button onClick={onBack} className="w-10 h-10 rounded-lg flex items-center justify-center bg-gray-100 hover:bg-gray-200 transition-all">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="#1e293b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          </button>
+        ) : (
+          <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-[#0ea5e9]">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M8 6H16M8 12H16M8 18H13" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+            </svg>
+          </div>
+        )}
         <div>
           <h1 className="text-xl font-semibold text-[#1e293b]" style={{ fontFamily: 'Inter, sans-serif' }}>
             EduCode Rwanda
@@ -49,23 +61,25 @@ export function Header({ language, onLanguageToggle, subtitle, hideAssignmentInf
 
       {/* Right Side: Save, Submit, Language Toggle */}
       <div className="flex items-center gap-3">
-        {/* Save Button */}
-        <button
-          className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-lg border-2 border-gray-300 text-gray-700 hover:bg-gray-50 transition-all"
-          style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600 }}
-        >
-          <Save size={16} />
-          <span className="hidden lg:inline">{isKinyarwanda ? 'Bika' : 'Save'}</span>
-        </button>
-
-        {/* Submit Button */}
-        <button
-          className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-lg border-2 border-[#10b981] text-[#10b981] hover:bg-[#f0fdf4] transition-all"
-          style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600 }}
-        >
-          <Send size={16} />
-          <span className="hidden lg:inline">{isKinyarwanda ? 'Ohereza' : 'Submit'}</span>
-        </button>
+        {/* Save + Submit — workspace only */}
+        {showWorkspaceActions && (
+          <>
+            <button
+              className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-lg border-2 border-gray-300 text-gray-700 hover:bg-gray-50 transition-all"
+              style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600 }}
+            >
+              <Save size={16} />
+              <span className="hidden lg:inline">{isKinyarwanda ? 'Bika' : 'Save'}</span>
+            </button>
+            <button
+              className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-lg border-2 border-[#10b981] text-[#10b981] hover:bg-[#f0fdf4] transition-all"
+              style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600 }}
+            >
+              <Send size={16} />
+              <span className="hidden lg:inline">{isKinyarwanda ? 'Ohereza' : 'Submit'}</span>
+            </button>
+          </>
+        )}
 
         {/* Language Toggle Pill */}
         <div
@@ -109,7 +123,7 @@ export function Header({ language, onLanguageToggle, subtitle, hideAssignmentInf
 
         {/* Profile/User Badge */}
         <div className="hidden xl:flex w-10 h-10 rounded-full bg-[#f1f5f9] border-2 border-[#0ea5e9] items-center justify-center text-[#0ea5e9] font-semibold text-sm" style={{ fontFamily: 'Inter, sans-serif' }}>
-          MS
+          {initials}
         </div>
       </div>
     </header>

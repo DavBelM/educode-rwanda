@@ -8,7 +8,11 @@ import { MobileAssignmentCard } from './components/MobileAssignmentCard';
 import { executeCode } from '../lib/code-executor';
 import { analyzeFeedback, formatFeedbackForUI } from '../lib/feedback-engine';
 
-export default function CodingWorkspace() {
+interface Props {
+  onBack?: () => void;
+}
+
+export default function CodingWorkspace({ onBack }: Props) {
   const [language, setLanguage] = useState<'EN' | 'KIN'>('EN');
   const [code, setCode] = useState(`// Welcome to EduCode Rwanda!
 // Assignment: Variables Practice - Calculate Total Price
@@ -77,7 +81,7 @@ console.log("Total Price: " + totalPrice + " RWF");
 
   return (
     <div className="h-screen flex flex-col bg-[#f8fafc]" style={{ fontFamily: 'Inter, sans-serif' }}>
-      <Header language={language} onLanguageToggle={toggleLanguage} />
+      <Header language={language} onLanguageToggle={toggleLanguage} showWorkspaceActions onBack={onBack} />
 
       {/* Desktop Layout */}
       <div className="hidden lg:flex flex-1 overflow-hidden">
