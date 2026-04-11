@@ -48,5 +48,11 @@ export default function App() {
   if (view === 'contact') return <ContactPage />;
   if (view === 'privacy') return <PrivacyPolicyPage />;
 
-  return <LandingPage />;
+  return (
+    <LandingPage
+      onLogin={() => setView('login')}
+      onSignup={() => setView('signup')}
+      onSchoolSignup={() => setView('school-signup')}
+    />
+  );
 }
