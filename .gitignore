@@ -3,3 +3,10 @@ dist/
 .env
 .env.local
 .env.*.local
+
+# Project planning docs (not part of the codebase)
+PART_1_PROJECT_OVERVIEW.md
+PART_2_AI_ML_STRATEGY.md
+PART_3_DEVELOPMENT_ROADMAP.md
+default_shadcn_theme.css
+src/imports/
