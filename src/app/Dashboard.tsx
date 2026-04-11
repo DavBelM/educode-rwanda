@@ -5,10 +5,13 @@ import { ProgressOverview } from './components/dashboard/ProgressOverview';
 import { AssignmentCard } from './components/dashboard/AssignmentCard';
 import { AIInsights } from './components/dashboard/AIInsights';
 import { AchievementBadges } from './components/dashboard/AchievementBadges';
+import { useAuth } from '../lib/auth';
 
 export default function Dashboard() {
   const [language, setLanguage] = useState<'EN' | 'KIN'>('EN');
+  const { profile } = useAuth();
   const dashboardState: 'full' | 'new-student' | 'high-achiever' = 'full';
+  const studentName = profile?.full_name ?? 'Student';
 
   const toggleLanguage = () => {
     setLanguage(prev => prev === 'EN' ? 'KIN' : 'EN');
@@ -21,7 +24,7 @@ export default function Dashboard() {
     switch (dashboardState) {
       case 'new-student':
         return {
-          studentName: 'Jean Mugisha',
+          studentName,
           progress: 0,
           assignmentsCompleted: 0,
           assignmentsTotal: 16,
@@ -54,7 +57,7 @@ export default function Dashboard() {
 
       case 'high-achiever':
         return {
-          studentName: 'Jean Mugisha',
+          studentName,
           progress: 95,
           assignmentsCompleted: 15,
           assignmentsTotal: 16,
@@ -100,7 +103,7 @@ export default function Dashboard() {
 
       default: // 'full'
         return {
-          studentName: 'Jean Mugisha',
+          studentName,
           progress: 75,
           assignmentsCompleted: 12,
           assignmentsTotal: 16,
