@@ -30,8 +30,8 @@ export default function LoginPage({ onSuccess }: { onSuccess?: () => void }) {
       return;
     }
 
+    // Keep spinner running — App.tsx will navigate once profile loads
     onSuccess?.();
-    setLoading(false);
   };
 
   return (
