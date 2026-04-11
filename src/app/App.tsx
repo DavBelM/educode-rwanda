@@ -32,9 +32,9 @@ export default function App() {
     );
   }
 
-  // Authenticated users
-  if (user && profile) {
-    if (profile.user_type === 'teacher') return <TeacherDashboard />;
+  // Authenticated users — route on user alone, profile may still be loading
+  if (user) {
+    if (profile?.user_type === 'teacher') return <TeacherDashboard />;
     if (studentView === 'workspace') return <CodingWorkspace onBack={() => setStudentView('dashboard')} />;
     return <Dashboard onStartCoding={() => setStudentView('workspace')} />;
   }
