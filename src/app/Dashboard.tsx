@@ -1,17 +1,14 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Header } from './components/Header';
 import { HeroBanner } from './components/dashboard/HeroBanner';
 import { ProgressOverview } from './components/dashboard/ProgressOverview';
-import { AssignmentCard, Assignment } from './components/dashboard/AssignmentCard';
+import { AssignmentCard } from './components/dashboard/AssignmentCard';
 import { AIInsights } from './components/dashboard/AIInsights';
 import { AchievementBadges } from './components/dashboard/AchievementBadges';
-import { DashboardStateSelector } from './components/dashboard/DashboardStateSelector';
-
-type DashboardState = 'full' | 'new-student' | 'high-achiever';
 
 export default function Dashboard() {
   const [language, setLanguage] = useState<'EN' | 'KIN'>('EN');
-  const [dashboardState, setDashboardState] = useState<DashboardState>('full');
+  const dashboardState: 'full' | 'new-student' | 'high-achiever' = 'full';
 
   const toggleLanguage = () => {
     setLanguage(prev => prev === 'EN' ? 'KIN' : 'EN');
@@ -181,9 +178,6 @@ export default function Dashboard() {
         subtitle={isKinyarwanda ? 'Ikibanza cy\'abanyeshuri' : 'Student Dashboard'}
         hideAssignmentInfo={true}
       />
-
-      {/* State Selector */}
-      <DashboardStateSelector currentState={dashboardState} onStateChange={setDashboardState} />
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">

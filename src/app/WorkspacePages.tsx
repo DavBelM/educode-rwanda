@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { SubmissionConfirmation } from './components/workspace/SubmissionConfirmation';
 import { ResultsPage } from './components/workspace/ResultsPage';
 import { AssignmentInstructions } from './components/workspace/AssignmentInstructions';
@@ -7,48 +7,8 @@ import { SubmissionHistory } from './components/workspace/SubmissionHistory';
 
 type WorkspacePageType = 'instructions' | 'confirmation' | 'results' | 'help' | 'history';
 
-interface PageSelectorProps {
-  currentPage: WorkspacePageType;
-  onPageChange: (page: WorkspacePageType) => void;
-}
-
-function WorkspacePageSelector({ currentPage, onPageChange }: PageSelectorProps) {
-  const pages = [
-    { id: 'instructions' as const, label: 'Instructions', color: '#0ea5e9' },
-    { id: 'confirmation' as const, label: 'Confirmation', color: '#10b981' },
-    { id: 'results' as const, label: 'Results', color: '#8b5cf6' },
-    { id: 'help' as const, label: 'Help', color: '#f59e0b' },
-    { id: 'history' as const, label: 'History', color: '#64748b' }
-  ];
-
-  return (
-    <div className="fixed bottom-6 right-6 bg-white rounded-lg shadow-2xl border-2 border-gray-200 p-3 z-50 hidden lg:block">
-      <p className="text-xs font-semibold text-gray-500 mb-2" style={{ fontFamily: 'Inter, sans-serif' }}>
-        Workspace Pages
-      </p>
-      <div className="flex flex-col gap-2">
-        {pages.map((page) => (
-          <button
-            key={page.id}
-            onClick={() => onPageChange(page.id)}
-            className="px-4 py-2 rounded-lg text-xs font-medium transition-all text-left"
-            style={{
-              backgroundColor: currentPage === page.id ? page.color : 'transparent',
-              color: currentPage === page.id ? 'white' : page.color,
-              border: `2px solid ${page.color}`,
-              fontFamily: 'Inter, sans-serif'
-            }}
-          >
-            {page.label}
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 export default function WorkspacePages() {
-  const [language, setLanguage] = useState<'EN' | 'KIN'>('EN');
+  const [language] = useState<'EN' | 'KIN'>('EN');
   const [currentPage, setCurrentPage] = useState<WorkspacePageType>('instructions');
 
   const isKinyarwanda = language === 'KIN';
@@ -164,8 +124,6 @@ const quantity = 0;
 
   return (
     <>
-      <WorkspacePageSelector currentPage={currentPage} onPageChange={setCurrentPage} />
-
       {currentPage === 'instructions' && (
         <AssignmentInstructions
           language={language}

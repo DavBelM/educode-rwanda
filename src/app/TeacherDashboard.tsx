@@ -1,53 +1,14 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { TeacherHeader } from './components/teacher/TeacherHeader';
 import { MetricCard } from './components/teacher/MetricCard';
-import { StudentProgressTable, Student } from './components/teacher/StudentProgressTable';
+import { StudentProgressTable } from './components/teacher/StudentProgressTable';
 import { TeacherAIInsights } from './components/teacher/TeacherAIInsights';
 import { Users, TrendingUp, FileText, AlertTriangle, Download, MessageSquare } from 'lucide-react';
 
-type DashboardState = 'main' | 'high-alert' | 'success';
-
-interface StateSelector {
-  currentState: DashboardState;
-  onStateChange: (state: DashboardState) => void;
-}
-
-function TeacherDashboardStateSelector({ currentState, onStateChange }: StateSelector) {
-  const states = [
-    { id: 'main' as const, label: 'Main Dashboard', color: '#0ea5e9' },
-    { id: 'high-alert' as const, label: 'High Alert', color: '#ef4444' },
-    { id: 'success' as const, label: 'Success State', color: '#10b981' }
-  ];
-
-  return (
-    <div className="fixed bottom-6 right-6 bg-white rounded-lg shadow-2xl border-2 border-gray-200 p-3 z-50 hidden lg:block">
-      <p className="text-xs font-semibold text-gray-500 mb-2" style={{ fontFamily: 'Inter, sans-serif' }}>
-        Teacher Dashboard States
-      </p>
-      <div className="flex flex-col gap-2">
-        {states.map((state) => (
-          <button
-            key={state.id}
-            onClick={() => onStateChange(state.id)}
-            className="px-4 py-2 rounded-lg text-xs font-medium transition-all text-left"
-            style={{
-              backgroundColor: currentState === state.id ? state.color : 'transparent',
-              color: currentState === state.id ? 'white' : state.color,
-              border: `2px solid ${state.color}`,
-              fontFamily: 'Inter, sans-serif'
-            }}
-          >
-            {state.label}
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-}
 
 export default function TeacherDashboard() {
   const [language, setLanguage] = useState<'EN' | 'KIN'>('EN');
-  const [dashboardState, setDashboardState] = useState<DashboardState>('main');
+  const dashboardState: 'main' | 'high-alert' | 'success' = 'main';
 
   const toggleLanguage = () => {
     setLanguage(prev => prev === 'EN' ? 'KIN' : 'EN');
@@ -169,9 +130,6 @@ export default function TeacherDashboard() {
     <div className="min-h-screen bg-[#f8fafc]" style={{ fontFamily: 'Inter, sans-serif' }}>
       {/* Header */}
       <TeacherHeader language={language} onLanguageToggle={toggleLanguage} notificationCount={1} />
-
-      {/* State Selector */}
-      <TeacherDashboardStateSelector currentState={dashboardState} onStateChange={setDashboardState} />
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">

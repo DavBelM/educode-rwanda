@@ -1,10 +1,9 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Header } from './components/Header';
 import { CodeEditor } from './components/CodeEditor';
 import { AIFeedbackPanel } from './components/AIFeedbackPanel';
 import { OutputConsole } from './components/OutputConsole';
 import { RunCodeButton } from './components/RunCodeButton';
-import { StateSelector } from './components/StateSelector';
 import { MobileAssignmentCard } from './components/MobileAssignmentCard';
 
 type DemoState = 'empty' | 'success' | 'error' | 'loading';
@@ -110,9 +109,6 @@ console.log("Total Price: " + totalPrice + " RWF");
   return (
     <div className="h-screen flex flex-col bg-[#f8fafc]" style={{ fontFamily: 'Inter, sans-serif' }}>
       <Header language={language} onLanguageToggle={toggleLanguage} />
-
-      {/* Demo State Selector */}
-      <StateSelector currentState={demoState} onStateChange={setDemoState} />
 
       {/* Desktop Layout */}
       <div className="hidden lg:flex flex-1 overflow-hidden">
