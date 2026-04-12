@@ -24,7 +24,7 @@ export default function App() {
   const [studentView, setStudentView] = useState<StudentView>('dashboard');
   const [language, setLanguage] = useState<'EN' | 'KIN'>('EN');
   const [openAssignment, setOpenAssignment] = useState<Assignment | null>(null);
-  const [openLesson, setOpenLesson] = useState<{ lesson: CourseLesson; courseTitle: string } | null>(null);
+  const [openLesson, setOpenLesson] = useState<{ lesson: CourseLesson; courseTitle: string; allLessons: CourseLesson[] } | null>(null);
 
   if (loading) {
     return (
@@ -61,8 +61,8 @@ export default function App() {
         <CoursesPage
           language={language}
           onBack={() => setStudentView('dashboard')}
-          onOpenLesson={(lesson, courseTitle) => {
-            setOpenLesson({ lesson, courseTitle });
+          onOpenLesson={(lesson, courseTitle, allLessons) => {
+            setOpenLesson({ lesson, courseTitle, allLessons });
             setStudentView('lesson');
           }}
         />
@@ -70,13 +70,17 @@ export default function App() {
     }
 
     if (studentView === 'lesson' && openLesson) {
+      const currentIdx = openLesson.allLessons.findIndex(l => l.id === openLesson.lesson.id);
+      const nextLesson = openLesson.allLessons[currentIdx + 1] ?? null;
       return (
         <LessonViewer
           lesson={openLesson.lesson}
           courseTitle={openLesson.courseTitle}
           language={language}
+          nextLesson={nextLesson}
           onBack={() => setStudentView('courses')}
           onCompleted={() => setStudentView('courses')}
+          onNextLesson={(next) => setOpenLesson({ ...openLesson, lesson: next })}
         />
       );
     }
