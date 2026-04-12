@@ -120,7 +120,7 @@ export default function Dashboard({ onStartCoding }: { onStartCoding?: () => voi
           <div className="lg:col-span-6">
             <div className="rounded-2xl p-6" style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.06)' }}>
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-sm font-semibold" style={{ fontFamily: 'Inter, sans-serif', color: '#94a3b8', letterSpacing: '0.05em', textTransform: 'uppercase', fontSize: '11px' }}>
+                <h2 className="text-base font-bold" style={{ fontFamily: 'Inter, sans-serif', color: '#f1f5f9' }}>
                   {isKinyarwanda ? 'Ibisabwa' : 'Active Assignments'}
                 </h2>
                 {data.assignments.length > 0 && (
