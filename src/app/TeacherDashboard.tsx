@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Users, FileText, Plus, Copy, Check, X, ChevronDown, BookOpen, Code2, Loader } from 'lucide-react';
+import { Users, FileText, Plus, Copy, Check, X, ChevronDown, BookOpen, Code2, Loader, Trophy, Medal } from 'lucide-react';
 import { Header } from './components/Header';
 import {
   createClass, getTeacherClasses, getClassAssignments, createAssignment, getClassStudentCount,
-  getAssignmentSubmissions, getAssignmentSubmissionCounts,
-  type Class, type Assignment, type Question, type Submission
+  getAssignmentSubmissions, getAssignmentSubmissionCounts, gradeSubmission, getClassLeaderboard,
+  type Class, type Assignment, type Question, type Submission, type LeaderboardEntry
 } from '../lib/db';
 
 // ─── Create Class Modal ────────────────────────────────────────────────────────
@@ -116,6 +116,7 @@ function CreateAssignmentModal({ language, classes, onClose, onCreate }: {
   const [description, setDescription] = useState('');
   const [descriptionKin, setDescriptionKin] = useState('');
   const [difficulty, setDifficulty] = useState<'beginner' | 'intermediate' | 'advanced'>('beginner');
+  const [totalMarks, setTotalMarks] = useState(10);
   const [dueDate, setDueDate] = useState('');
   const [questions, setQuestions] = useState<Question[]>([{ id: '1', text: '', text_kin: '' }]);
   const [loading, setLoading] = useState(false);
@@ -144,6 +145,7 @@ function CreateAssignmentModal({ language, classes, onClose, onCreate }: {
       descriptionKin: descriptionKin.trim(),
       assignmentType,
       difficulty,
+      totalMarks,
       questions: assignmentType === 'theoretical' ? questions.filter(q => q.text.trim()) : undefined,
       dueDate: dueDate || undefined,
     });
@@ -281,6 +283,24 @@ function CreateAssignmentModal({ language, classes, onClose, onCreate }: {
                   placeholder={isKin ? 'Sobanura umushinga mu Kinyarwanda...' : 'Instructions in Kinyarwanda...'}
                   rows={2}
                   className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none resize-none"
+                  style={{ background: '#0d0f14', border: '1px solid rgba(255,255,255,0.08)', color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}
+                  onFocus={e => (e.target.style.border = '1px solid rgba(0,212,170,0.4)')}
+                  onBlur={e => (e.target.style.border = '1px solid rgba(255,255,255,0.08)')}
+                />
+              </div>
+
+              {/* Total Marks */}
+              <div>
+                <label className="block text-sm font-semibold mb-2" style={{ color: '#94a3b8', fontFamily: 'Inter, sans-serif' }}>
+                  {isKin ? 'Amanota Yose (urugero: /20)' : 'Total Marks (e.g. /20)'}
+                </label>
+                <input
+                  type="number"
+                  min={1}
+                  max={200}
+                  value={totalMarks}
+                  onChange={e => setTotalMarks(Math.max(1, Number(e.target.value)))}
+                  className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none"
                   style={{ background: '#0d0f14', border: '1px solid rgba(255,255,255,0.08)', color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}
                   onFocus={e => (e.target.style.border = '1px solid rgba(0,212,170,0.4)')}
                   onBlur={e => (e.target.style.border = '1px solid rgba(255,255,255,0.08)')}
@@ -458,16 +478,45 @@ function SubmissionsPanel({ assignment, language, onClose }: {
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState<string | null>(null);
+  const [markInputs, setMarkInputs] = useState<Record<string, string>>({});
+  const [grading, setGrading] = useState<Record<string, boolean>>({});
+  const [gradeError, setGradeError] = useState<Record<string, string>>({});
 
   useEffect(() => {
     getAssignmentSubmissions(assignment.id).then(({ data }) => {
       setSubmissions(data);
+      // Pre-fill mark inputs from already-graded submissions
+      const prefilled: Record<string, string> = {};
+      for (const s of data) {
+        if (s.marks_earned !== null && s.marks_earned !== undefined) {
+          prefilled[s.id] = String(s.marks_earned);
+        }
+      }
+      setMarkInputs(prefilled);
       setLoading(false);
     });
   }, [assignment.id]);
 
   const title = isKin ? (assignment.title_kin || assignment.title) : assignment.title;
   const questions = assignment.questions ?? [];
+  const totalMarks = assignment.total_marks ?? 10;
+
+  const handleGrade = async (subId: string) => {
+    const val = Number(markInputs[subId]);
+    if (isNaN(val) || val < 0 || val > totalMarks) {
+      setGradeError(prev => ({ ...prev, [subId]: `0 – ${totalMarks}` }));
+      return;
+    }
+    setGrading(prev => ({ ...prev, [subId]: true }));
+    setGradeError(prev => ({ ...prev, [subId]: '' }));
+    const { error } = await gradeSubmission(subId, val);
+    if (error) {
+      setGradeError(prev => ({ ...prev, [subId]: error }));
+    } else {
+      setSubmissions(prev => prev.map(s => s.id === subId ? { ...s, marks_earned: val } : s));
+    }
+    setGrading(prev => ({ ...prev, [subId]: false }));
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }}>
@@ -524,17 +573,24 @@ function SubmissionsPanel({ assignment, language, onClose }: {
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="px-2 py-0.5 rounded-full text-xs font-semibold" style={{ background: 'rgba(0,212,170,0.1)', color: '#00d4aa', border: '1px solid rgba(0,212,170,0.2)' }}>
-                      ✓ {isKin ? 'Byatanzwe' : 'Submitted'}
-                    </span>
+                    {sub.marks_earned !== null && sub.marks_earned !== undefined ? (
+                      <span className="px-2.5 py-0.5 rounded-full text-xs font-bold" style={{ background: 'rgba(245,158,11,0.12)', color: '#f59e0b', border: '1px solid rgba(245,158,11,0.25)' }}>
+                        {sub.marks_earned}/{totalMarks}
+                      </span>
+                    ) : (
+                      <span className="px-2 py-0.5 rounded-full text-xs font-semibold" style={{ background: 'rgba(0,212,170,0.1)', color: '#00d4aa', border: '1px solid rgba(0,212,170,0.2)' }}>
+                        ✓ {isKin ? 'Byatanzwe' : 'Submitted'}
+                      </span>
+                    )}
                     <ChevronDown size={14} style={{ color: '#475569', transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
                   </div>
                 </button>
 
-                {/* Answers */}
-                {isOpen && assignment.assignment_type === 'theoretical' && sub.text_answers && (
+                {/* Answers + Grade */}
+                {isOpen && (
                   <div className="px-4 pb-4 space-y-3" style={{ borderTop: '1px solid rgba(255,255,255,0.04)' }}>
-                    {questions.map((q, i) => {
+                    {/* Answers (theoretical) */}
+                    {assignment.assignment_type === 'theoretical' && sub.text_answers && questions.map((q, i) => {
                       const answer = (sub.text_answers ?? []).find(a => a.question_id === q.id)?.answer ?? '';
                       const qText = isKin ? (q.text_kin || q.text) : q.text;
                       return (
@@ -548,6 +604,42 @@ function SubmissionsPanel({ assignment, language, onClose }: {
                         </div>
                       );
                     })}
+
+                    {/* Grading row */}
+                    <div className="pt-3 flex items-center gap-3" style={{ borderTop: '1px solid rgba(255,255,255,0.04)' }}>
+                      <label className="text-xs font-semibold shrink-0" style={{ color: '#94a3b8', fontFamily: 'Inter, sans-serif' }}>
+                        {isKin ? `Amanota (/${totalMarks})` : `Grade (/${totalMarks})`}
+                      </label>
+                      <input
+                        type="number"
+                        min={0}
+                        max={totalMarks}
+                        value={markInputs[sub.id] ?? ''}
+                        onChange={e => setMarkInputs(prev => ({ ...prev, [sub.id]: e.target.value }))}
+                        placeholder={`0 – ${totalMarks}`}
+                        className="w-24 px-3 py-1.5 rounded-lg text-sm text-center focus:outline-none"
+                        style={{ background: '#0d0f14', border: gradeError[sub.id] ? '1px solid rgba(239,68,68,0.5)' : '1px solid rgba(255,255,255,0.08)', color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}
+                        onFocus={e => (e.target.style.border = '1px solid rgba(0,212,170,0.4)')}
+                        onBlur={e => (e.target.style.border = gradeError[sub.id] ? '1px solid rgba(239,68,68,0.5)' : '1px solid rgba(255,255,255,0.08)')}
+                      />
+                      <button
+                        onClick={() => handleGrade(sub.id)}
+                        disabled={grading[sub.id] || !markInputs[sub.id]}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all disabled:opacity-40"
+                        style={{ background: '#00d4aa', color: '#0d0f14', fontFamily: 'Inter, sans-serif' }}
+                      >
+                        {grading[sub.id] ? <Loader size={12} className="animate-spin" /> : <Check size={12} />}
+                        {isKin ? 'Saba' : 'Save'}
+                      </button>
+                      {gradeError[sub.id] && (
+                        <span className="text-xs" style={{ color: '#f87171', fontFamily: 'Inter, sans-serif' }}>{gradeError[sub.id]}</span>
+                      )}
+                      {sub.marks_earned !== null && sub.marks_earned !== undefined && !gradeError[sub.id] && (
+                        <span className="text-xs" style={{ color: '#00d4aa', fontFamily: 'Inter, sans-serif' }}>
+                          ✓ {sub.marks_earned}/{totalMarks} {isKin ? 'byabitswe' : 'saved'}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 )}
               </div>
@@ -610,6 +702,68 @@ function AssignmentRow({ assignment, submissionCount, language, onClick }: {
   );
 }
 
+// ─── Leaderboard ──────────────────────────────────────────────────────────────
+
+function Leaderboard({ classId, language }: { classId: string; language: 'EN' | 'KIN' }) {
+  const isKin = language === 'KIN';
+  const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getClassLeaderboard(classId).then(data => { setEntries(data); setLoading(false); });
+  }, [classId]);
+
+  const rankIcon = (rank: number) => {
+    if (rank === 1) return <Trophy size={14} style={{ color: '#f59e0b' }} />;
+    if (rank === 2) return <Medal size={14} style={{ color: '#94a3b8' }} />;
+    if (rank === 3) return <Medal size={14} style={{ color: '#cd7c2e' }} />;
+    return <span className="text-xs font-bold" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>#{rank}</span>;
+  };
+
+  return (
+    <div className="rounded-2xl p-6" style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.06)' }}>
+      <div className="flex items-center gap-2 mb-5">
+        <Trophy size={16} style={{ color: '#f59e0b' }} />
+        <h2 className="text-base font-bold" style={{ color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}>
+          {isKin ? 'Urutonde rw\'Amanota' : 'Class Leaderboard'}
+        </h2>
+      </div>
+
+      {loading ? (
+        <div className="flex justify-center py-6"><Loader size={18} className="animate-spin" style={{ color: '#00d4aa' }} /></div>
+      ) : entries.length === 0 ? (
+        <p className="text-sm text-center py-6" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
+          {isKin ? 'Nta manota yashyizweho' : 'No grades yet'}
+        </p>
+      ) : (
+        <div className="space-y-2">
+          {entries.map((e, i) => {
+            const initials = e.full_name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+            const isTop = e.rank <= 3;
+            return (
+              <div key={e.student_id} className="flex items-center gap-3 px-3 py-2.5 rounded-xl" style={{ background: isTop ? 'rgba(245,158,11,0.04)' : 'rgba(255,255,255,0.02)', border: isTop ? '1px solid rgba(245,158,11,0.12)' : '1px solid rgba(255,255,255,0.04)' }}>
+                <div className="w-6 flex items-center justify-center shrink-0">{rankIcon(e.rank)}</div>
+                <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0" style={{ background: 'rgba(0,212,170,0.1)', color: '#00d4aa', border: '1px solid rgba(0,212,170,0.2)' }}>
+                  {initials}
+                </div>
+                <p className="flex-1 text-sm font-semibold truncate" style={{ color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}>{e.full_name}</p>
+                <div className="text-right shrink-0">
+                  <p className="text-sm font-bold" style={{ color: isTop ? '#f59e0b' : '#f1f5f9', fontFamily: 'Inter, sans-serif' }}>
+                    {e.total_marks_earned} pts
+                  </p>
+                  {e.submissions_graded > 0 && (
+                    <p className="text-xs" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>{e.percentage}%</p>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── Main Dashboard ────────────────────────────────────────────────────────────
 
 export default function TeacherDashboard() {
@@ -664,6 +818,7 @@ export default function TeacherDashboard() {
   }, [selectedClassId]);
 
   const totalStudents = classes.reduce((sum, c) => sum + (c.studentCount ?? 0), 0);
+  const totalSubmissions = Object.values(submissionCounts).reduce((s, n) => s + n, 0);
 
   return (
     <div className="min-h-screen" style={{ fontFamily: 'Inter, sans-serif', background: '#0d0f14' }}>
@@ -688,7 +843,7 @@ export default function TeacherDashboard() {
                 { label: isKin ? 'Amasomo' : 'Classes', value: classes.length, color: '#00d4aa' },
                 { label: isKin ? 'Abanyeshuri' : 'Students', value: totalStudents, color: '#8b5cf6' },
                 { label: isKin ? 'Imishinga Yose' : 'Assignments', value: classes.reduce((s, c) => s + (c.assignmentCount ?? 0), 0), color: '#f59e0b' },
-                { label: isKin ? 'Byatanzwe' : 'Submissions', value: '-', color: '#0ea5e9' },
+                { label: isKin ? 'Byatanzwe' : 'Submissions', value: totalSubmissions, color: '#0ea5e9' },
               ].map((stat, i) => (
                 <div key={i} className="rounded-2xl p-5" style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.06)' }}>
                   <p className="text-2xl font-bold mb-1" style={{ color: stat.color, fontFamily: 'Inter, sans-serif' }}>{stat.value}</p>
@@ -745,7 +900,7 @@ export default function TeacherDashboard() {
               </div>
 
               {/* Assignments column */}
-              <div className="lg:col-span-7">
+              <div className="lg:col-span-4">
                 <div className="rounded-2xl p-6" style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.06)' }}>
                   <div className="flex items-center justify-between mb-5">
                     <h2 className="text-base font-bold" style={{ color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}>
@@ -792,6 +947,21 @@ export default function TeacherDashboard() {
                     </div>
                   )}
                 </div>
+              </div>
+
+              {/* Leaderboard column */}
+              <div className="lg:col-span-3">
+                {selectedClassId
+                  ? <Leaderboard classId={selectedClassId} language={language} />
+                  : (
+                    <div className="rounded-2xl p-6 text-center" style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.06)' }}>
+                      <Trophy size={24} className="mx-auto mb-2" style={{ color: '#334155' }} />
+                      <p className="text-sm" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
+                        {isKin ? 'Hitamo ishuri' : 'Select a class'}
+                      </p>
+                    </div>
+                  )
+                }
               </div>
             </div>
           </div>

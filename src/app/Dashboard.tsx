@@ -6,12 +6,15 @@ import { AssignmentCard } from './components/dashboard/AssignmentCard';
 import { AIInsights } from './components/dashboard/AIInsights';
 import { AchievementBadges } from './components/dashboard/AchievementBadges';
 import { useAuth } from '../lib/auth';
-import { getStudentAssignments, getStudentClasses, getClassWithInviteCode, joinClass, getSubmittedAssignmentIds, type Assignment } from '../lib/db';
-import { Users, ArrowRight, Loader, X } from 'lucide-react';
+import { getStudentAssignments, getStudentClasses, getClassWithInviteCode, joinClass, getSubmittedAssignmentIds, getStudentGrades, recordDailyLogin, getStreak, type Assignment } from '../lib/db';
+import { Users, ArrowRight, Loader, X, BookOpen } from 'lucide-react';
 
 interface Props {
+  language: 'EN' | 'KIN';
+  onLanguageChange: (lang: 'EN' | 'KIN') => void;
   onStartCoding?: () => void;
   onOpenAssignment?: (assignment: Assignment) => void;
+  onOpenCourses?: () => void;
 }
 
 // ─── Join Class Modal ──────────────────────────────────────────────────────────
@@ -109,34 +112,53 @@ function JoinClassModal({ language, onClose, onJoined }: {
 
 // ─── Main Dashboard ────────────────────────────────────────────────────────────
 
-export default function Dashboard({ onStartCoding, onOpenAssignment }: Props) {
-  const [language, setLanguage] = useState<'EN' | 'KIN'>('EN');
+export default function Dashboard({ language, onLanguageChange, onStartCoding, onOpenAssignment, onOpenCourses }: Props) {
   const { profile } = useAuth();
   const studentName = profile?.full_name ?? 'Student';
   const isKinyarwanda = language === 'KIN';
 
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [submittedIds, setSubmittedIds] = useState<Set<string>>(new Set());
-  const [hasClass, setHasClass] = useState<boolean | null>(null); // null = loading
+  const [gradeMap, setGradeMap] = useState<Record<string, string>>({});
+  const [totalEarned, setTotalEarned] = useState(0);
+  const [totalPossible, setTotalPossible] = useState(0);
+  const [streak, setStreak] = useState(0);
+  const [hasClass, setHasClass] = useState<boolean | null>(null);
   const [showJoinModal, setShowJoinModal] = useState(false);
   const [loadingAssignments, setLoadingAssignments] = useState(true);
 
   const loadAssignments = async () => {
     setLoadingAssignments(true);
-    const [{ data: classes }, { data: asgns }, submitted] = await Promise.all([
+    const [{ data: classes }, { data: asgns }, submitted, grades, currentStreak] = await Promise.all([
       getStudentClasses(),
       getStudentAssignments(),
       getSubmittedAssignmentIds(),
+      getStudentGrades(),
+      getStreak(),
     ]);
+    setStreak(currentStreak);
     setHasClass(classes.length > 0);
     setAssignments(asgns);
     setSubmittedIds(submitted);
+
+    // Calculate real progress from graded assignments
+    const graded = grades.filter(g => g.marks_earned !== null);
+    setTotalEarned(graded.reduce((s, g) => s + (g.marks_earned ?? 0), 0));
+    setTotalPossible(graded.reduce((s, g) => s + g.total_marks, 0));
+
+    // Build grade badge map: assignmentId -> "15/20"
+    const map: Record<string, string> = {};
+    for (const g of graded) {
+      map[g.assignment_id] = `${g.marks_earned}/${g.total_marks}`;
+    }
+    setGradeMap(map);
+
     setLoadingAssignments(false);
   };
 
-  useEffect(() => { loadAssignments(); }, []);
+  useEffect(() => { recordDailyLogin(); loadAssignments(); }, []);
 
-  const toggleLanguage = () => setLanguage(prev => prev === 'EN' ? 'KIN' : 'EN');
+  const toggleLanguage = () => onLanguageChange(language === 'EN' ? 'KIN' : 'EN');
 
   // Map a DB assignment to the AssignmentCard shape
   const toCardAssignment = (a: Assignment) => {
@@ -175,6 +197,7 @@ export default function Dashboard({ onStartCoding, onOpenAssignment }: Props) {
       testsCompleted: isSubmitted ? (a.questions?.length ?? 1) : 0,
       testsTotal: a.assignment_type === 'theoretical' ? (a.questions?.length ?? 1) : 5,
       status: isSubmitted ? 'completed' as const : 'not-started' as const,
+      grade: gradeMap[a.id],
     };
   };
 
@@ -186,16 +209,29 @@ export default function Dashboard({ onStartCoding, onOpenAssignment }: Props) {
     }
   };
 
-  // Placeholder data for non-assignment sections (will be replaced with real data later)
+  // Compute level from total XP (marks earned)
+  const getLevel = (xp: number): string => {
+    if (xp >= 100) return 'Advanced';
+    if (xp >= 50)  return 'Intermediate II';
+    if (xp >= 25)  return 'Intermediate I';
+    if (xp >= 10)  return 'Beginner II';
+    return 'Beginner I';
+  };
+
+  const progressPct = totalPossible > 0 ? Math.round((totalEarned / totalPossible) * 100) : 0;
+
   const insights = [
     { text: isKinyarwanda ? 'Wiga cyane loops - uzazikenera mu mashusho' : "Practice more with loops - you'll need them in projects", isPositive: false },
     { text: isKinyarwanda ? 'Suzuma syntax ya functions' : 'Review function syntax', isPositive: false },
     { text: isKinyarwanda ? 'Urakora neza kuri variables! ✅' : 'Great progress on variables! ✅', isPositive: true },
   ];
+
+  // Real badges derived from actual activity
   const badges = [
-    { id: '1', name: isKinyarwanda ? 'Umushinga wa mbere' : 'First Assignment', icon: 'award', earned: true },
-    { id: '2', name: isKinyarwanda ? 'Iminsi 5' : '5-Day Streak', icon: 'flame', earned: true },
-    { id: '3', name: isKinyarwanda ? 'Ibizamini 10' : '10 Tests Passed', icon: 'check', earned: true },
+    { id: '1', name: isKinyarwanda ? 'Umushinga wa mbere' : 'First Submit',  icon: 'award',  earned: submittedIds.size >= 1 },
+    { id: '2', name: isKinyarwanda ? `Iminsi ${streak}` : `${streak}d Streak`, icon: 'flame', earned: streak >= 1 },
+    { id: '3', name: isKinyarwanda ? 'Amanota 10+' : '10+ XP',              icon: 'star',   earned: totalEarned >= 10 },
+    { id: '4', name: isKinyarwanda ? 'Igihembo cy\'Iterambere' : 'High Score', icon: 'trophy', earned: progressPct >= 80 },
   ];
 
   return (
@@ -215,12 +251,12 @@ export default function Dashboard({ onStartCoding, onOpenAssignment }: Props) {
           <div className="lg:col-span-3">
             <ProgressOverview
               language={language}
-              progress={0}
-              assignmentsCompleted={0}
+              progress={progressPct}
+              assignmentsCompleted={submittedIds.size}
               assignmentsTotal={assignments.length}
-              streak={0}
-              xpPoints={0}
-              level="Beginner I"
+              streak={streak}
+              xpPoints={totalEarned}
+              level={getLevel(totalEarned)}
             />
           </div>
 
@@ -231,16 +267,28 @@ export default function Dashboard({ onStartCoding, onOpenAssignment }: Props) {
                 <h2 className="text-base font-bold" style={{ color: '#f1f5f9' }}>
                   {isKinyarwanda ? 'Ibisabwa' : 'Active Assignments'}
                 </h2>
-                <button
-                  onClick={() => setShowJoinModal(true)}
-                  className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg transition-all"
-                  style={{ color: '#00d4aa', background: 'rgba(0,212,170,0.08)', border: '1px solid rgba(0,212,170,0.2)' }}
-                  onMouseEnter={e => (e.currentTarget.style.background = 'rgba(0,212,170,0.15)')}
-                  onMouseLeave={e => (e.currentTarget.style.background = 'rgba(0,212,170,0.08)')}
-                >
-                  <Users size={12} />
-                  {isKinyarwanda ? 'Injira mu Somo' : 'Join Class'}
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => onOpenCourses?.()}
+                    className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg transition-all"
+                    style={{ color: '#8b5cf6', background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.2)' }}
+                    onMouseEnter={e => (e.currentTarget.style.background = 'rgba(139,92,246,0.15)')}
+                    onMouseLeave={e => (e.currentTarget.style.background = 'rgba(139,92,246,0.08)')}
+                  >
+                    <BookOpen size={12} />
+                    {isKinyarwanda ? 'Amasomo' : 'Courses'}
+                  </button>
+                  <button
+                    onClick={() => setShowJoinModal(true)}
+                    className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg transition-all"
+                    style={{ color: '#00d4aa', background: 'rgba(0,212,170,0.08)', border: '1px solid rgba(0,212,170,0.2)' }}
+                    onMouseEnter={e => (e.currentTarget.style.background = 'rgba(0,212,170,0.15)')}
+                    onMouseLeave={e => (e.currentTarget.style.background = 'rgba(0,212,170,0.08)')}
+                  >
+                    <Users size={12} />
+                    {isKinyarwanda ? 'Injira mu Somo' : 'Join Class'}
+                  </button>
+                </div>
               </div>
 
               {loadingAssignments ? (
