@@ -1,24 +1,25 @@
+import { useState } from 'react';
 import CodeMirror from '@uiw/react-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
+import { html } from '@codemirror/lang-html';
 import { vscodeDark } from '@uiw/codemirror-theme-vscode';
 import { EditorView, Decoration, ViewPlugin, ViewUpdate } from '@codemirror/view';
 import { RangeSetBuilder } from '@codemirror/state';
 
 interface CodeEditorProps {
-  code: string;
-  onChange: (code: string) => void;
+  jsCode: string;
+  htmlCode: string;
+  onJsChange: (code: string) => void;
+  onHtmlChange: (code: string) => void;
   language: 'EN' | 'KIN';
   errorLine?: number;
 }
 
-// Plugin that highlights a specific line in red
 function errorLinePlugin(line: number) {
   return ViewPlugin.fromClass(
     class {
       decorations;
-      constructor(view: EditorView) {
-        this.decorations = this.build(view, line);
-      }
+      constructor(view: EditorView) { this.decorations = this.build(view, line); }
       update(update: ViewUpdate) {
         if (update.docChanged || update.viewportChanged) {
           this.decorations = this.build(update.view, line);
@@ -47,52 +48,97 @@ function errorLinePlugin(line: number) {
   );
 }
 
-export function CodeEditor({ code, onChange, language, errorLine }: CodeEditorProps) {
-  const isKinyarwanda = language === 'KIN';
+type Tab = 'js' | 'html';
 
-  const extensions = [
+export function CodeEditor({ jsCode, htmlCode, onJsChange, onHtmlChange, language, errorLine }: CodeEditorProps) {
+  const isKinyarwanda = language === 'KIN';
+  const [activeTab, setActiveTab] = useState<Tab>('js');
+
+  const jsExtensions = [
     javascript(),
     EditorView.lineWrapping,
-    ...(errorLine ? [errorLinePlugin(errorLine)] : []),
+    ...(errorLine && activeTab === 'js' ? [errorLinePlugin(errorLine)] : []),
+  ];
+
+  const htmlExtensions = [
+    html(),
+    EditorView.lineWrapping,
   ];
 
   return (
     <div className="h-full flex flex-col bg-[#1e1e2e]">
-      {/* Toolbar */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700 shrink-0">
-        <div className="flex items-center gap-3">
-          <span className="text-sm font-medium text-gray-300" style={{ fontFamily: 'Inter, sans-serif' }}>
-            {isKinyarwanda ? 'Wandika kode yawe' : 'Code Editor'}
-          </span>
-          <div className="flex gap-2 ml-2">
-            <div className="w-3 h-3 rounded-full bg-red-500" />
-            <div className="w-3 h-3 rounded-full bg-yellow-500" />
-            <div className="w-3 h-3 rounded-full bg-green-500" />
-          </div>
+      {/* Tabs + label row */}
+      <div className="flex items-center justify-between border-b border-gray-700 shrink-0">
+        <div className="flex">
+          <button
+            onClick={() => setActiveTab('js')}
+            className={`px-4 py-3 text-sm font-medium transition-colors border-b-2 ${
+              activeTab === 'js'
+                ? 'border-[#0ea5e9] text-[#0ea5e9] bg-[#1e1e2e]'
+                : 'border-transparent text-gray-400 hover:text-gray-200'
+            }`}
+            style={{ fontFamily: 'JetBrains Mono, monospace' }}
+          >
+            script.js
+          </button>
+          <button
+            onClick={() => setActiveTab('html')}
+            className={`px-4 py-3 text-sm font-medium transition-colors border-b-2 ${
+              activeTab === 'html'
+                ? 'border-[#f97316] text-[#f97316] bg-[#1e1e2e]'
+                : 'border-transparent text-gray-400 hover:text-gray-200'
+            }`}
+            style={{ fontFamily: 'JetBrains Mono, monospace' }}
+          >
+            index.html
+          </button>
         </div>
-        <span className="text-xs text-gray-400 px-2 py-1 bg-gray-800 rounded" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
-          JavaScript
+        <span className="text-xs text-gray-400 px-3 py-1 bg-gray-800 rounded mr-3" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
+          {activeTab === 'js' ? 'JavaScript' : 'HTML'}
         </span>
       </div>
 
       {/* Editor */}
       <div className="flex-1 overflow-auto">
-        <CodeMirror
-          value={code}
-          onChange={onChange}
-          theme={vscodeDark}
-          extensions={extensions}
-          height="100%"
-          style={{ height: '100%', fontSize: '14px' }}
-          basicSetup={{
-            lineNumbers: true,
-            highlightActiveLine: true,
-            highlightActiveLineGutter: true,
-            foldGutter: false,
-            dropCursor: false,
-            allowMultipleSelections: false,
-          }}
-        />
+        {activeTab === 'js' ? (
+          <CodeMirror
+            key="js"
+            value={jsCode}
+            onChange={onJsChange}
+            theme={vscodeDark}
+            extensions={jsExtensions}
+            height="100%"
+            style={{ height: '100%', fontSize: '14px' }}
+            basicSetup={{
+              lineNumbers: true,
+              highlightActiveLine: true,
+              highlightActiveLineGutter: true,
+              foldGutter: false,
+              dropCursor: false,
+              allowMultipleSelections: false,
+            }}
+            placeholder={isKinyarwanda ? '// Andika JavaScript yawe hano...' : '// Write your JavaScript here...'}
+          />
+        ) : (
+          <CodeMirror
+            key="html"
+            value={htmlCode}
+            onChange={onHtmlChange}
+            theme={vscodeDark}
+            extensions={htmlExtensions}
+            height="100%"
+            style={{ height: '100%', fontSize: '14px' }}
+            basicSetup={{
+              lineNumbers: true,
+              highlightActiveLine: true,
+              highlightActiveLineGutter: true,
+              foldGutter: false,
+              dropCursor: false,
+              allowMultipleSelections: false,
+            }}
+            placeholder="<!-- Add your HTML elements here -->"
+          />
+        )}
       </div>
     </div>
   );
