@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
-import { Eye, EyeOff, Lock, Mail, Smartphone, Globe, ArrowRight } from 'lucide-react';
+import { Eye, EyeOff, Lock, Mail, ArrowRight } from 'lucide-react';
 import { useAuth } from '../lib/auth';
 
-export default function LoginPage({ onSuccess }: { onSuccess?: () => void }) {
+export default function LoginPage({ onSuccess, onSignupClick }: { onSuccess?: () => void; onSignupClick?: () => void }) {
   const { signIn } = useAuth();
   const [language, setLanguage] = useState<'EN' | 'KIN'>('EN');
   const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -14,7 +13,7 @@ export default function LoginPage({ onSuccess }: { onSuccess?: () => void }) {
 
   const isKinyarwanda = language === 'KIN';
 
-  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleLogin = async (e: React.BaseSyntheticEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
@@ -30,51 +29,50 @@ export default function LoginPage({ onSuccess }: { onSuccess?: () => void }) {
       return;
     }
 
-    // Keep spinner running — App.tsx will navigate once profile loads
+    // Keep spinner running — App.tsx will navigate once auth state changes
     onSuccess?.();
   };
 
   return (
-    <div className="min-h-screen flex" style={{ fontFamily: 'Inter, sans-serif' }}>
-      {/* Left Side - Hero */}
+    <div className="min-h-screen flex" style={{ fontFamily: 'Inter, sans-serif', background: '#0d0f14' }}>
+
+      {/* Left Side - Brand panel */}
       <div
-        className="hidden lg:flex lg:w-2/5 flex-col justify-between p-12 text-white relative overflow-hidden"
-        style={{ background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)' }}
+        className="hidden lg:flex lg:w-2/5 flex-col justify-between p-12 relative overflow-hidden"
+        style={{ background: '#13161e', borderRight: '1px solid rgba(255,255,255,0.06)' }}
       >
+        {/* Ambient glows */}
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-80 h-80 rounded-full pointer-events-none" style={{ background: 'radial-gradient(ellipse, rgba(0,212,170,0.08) 0%, transparent 70%)', filter: 'blur(40px)' }} />
+        <div className="absolute bottom-1/4 left-0 w-64 h-64 rounded-full pointer-events-none" style={{ background: 'radial-gradient(ellipse, rgba(139,92,246,0.07) 0%, transparent 70%)', filter: 'blur(40px)' }} />
+
         {/* Logo */}
-        <div className="flex items-center gap-2 relative z-10">
-          <span className="text-3xl">🇷🇼</span>
-          <span className="text-2xl font-bold">EduCode Rwanda</span>
+        <div className="flex items-center gap-3 relative z-10">
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: '#0ea5e9' }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M8 6H16M8 12H16M8 18H13" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+            </svg>
+          </div>
+          <span className="text-xl font-bold" style={{ color: '#f1f5f9' }}>EduCode Rwanda</span>
         </div>
 
-        {/* Center Illustration */}
+        {/* Center visual */}
         <div className="flex-1 flex items-center justify-center relative z-10">
-          <div className="relative">
-            {/* Abstract coding pattern */}
-            <div className="absolute inset-0 opacity-20">
-              <div className="w-64 h-64 border-4 border-[#8b5cf6] rounded-full animate-pulse" />
-              <div className="absolute top-10 left-10 w-40 h-40 border-4 border-[#0ea5e9] rounded-full animate-pulse" style={{ animationDelay: '1s' }} />
-              <div className="absolute bottom-10 right-10 w-32 h-32 border-4 border-[#10b981] rounded-full animate-pulse" style={{ animationDelay: '2s' }} />
-            </div>
-
-            {/* Code symbols */}
-            <div className="relative text-center">
-              <div className="text-8xl font-mono text-[#8b5cf6] mb-4">&lt;/&gt;</div>
-              <div className="flex items-center justify-center gap-4 text-4xl">
-                <span className="text-[#0ea5e9]">{ }</span>
-                <span className="text-[#10b981]">[ ]</span>
-                <span className="text-[#fbbf24]">( )</span>
-              </div>
+          <div className="text-center">
+            <div className="text-8xl font-mono mb-6" style={{ color: '#8b5cf6', textShadow: '0 0 40px rgba(139,92,246,0.3)' }}>&lt;/&gt;</div>
+            <div className="flex items-center justify-center gap-5 text-3xl font-mono">
+              <span style={{ color: '#00d4aa' }}>{'{ }'}</span>
+              <span style={{ color: '#0ea5e9' }}>{'[ ]'}</span>
+              <span style={{ color: '#f59e0b' }}>{'( )'}</span>
             </div>
           </div>
         </div>
 
         {/* Tagline */}
         <div className="relative z-10">
-          <p className="text-lg font-semibold mb-2">
+          <p className="text-base font-semibold mb-2" style={{ color: '#f1f5f9' }}>
             {isKinyarwanda ? 'Wige programming mu rurimi rwawe' : 'Learn programming in your language'}
           </p>
-          <p className="text-sm text-gray-400">
+          <p className="text-sm" style={{ color: '#475569' }}>
             {isKinyarwanda
               ? 'Ibisobanuro mu Kinyarwanda. Buri kosa risobanurwa.'
               : 'Error explanations in Kinyarwanda. Built for Rwanda.'}
@@ -83,179 +81,179 @@ export default function LoginPage({ onSuccess }: { onSuccess?: () => void }) {
       </div>
 
       {/* Right Side - Form */}
-      <div className="flex-1 flex items-center justify-center p-8 bg-white">
+      <div className="flex-1 flex items-center justify-center p-8" style={{ background: '#0d0f14' }}>
         <div className="w-full max-w-md">
+
           {/* Mobile Logo */}
-          <div className="lg:hidden flex items-center justify-center gap-2 mb-8">
-            <span className="text-3xl">🇷🇼</span>
-            <span className="text-2xl font-bold text-[#1e293b]">EduCode Rwanda</span>
+          <div className="lg:hidden flex items-center justify-center gap-3 mb-8">
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: '#0ea5e9' }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path d="M8 6H16M8 12H16M8 18H13" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+              </svg>
+            </div>
+            <span className="text-xl font-bold" style={{ color: '#f1f5f9' }}>EduCode Rwanda</span>
           </div>
 
           {/* Language Toggle */}
           <div className="flex justify-end mb-8">
-            <div className="flex items-center gap-1 border border-gray-300 rounded-lg p-1">
+            <div className="flex items-center rounded-lg overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.08)' }}>
               <button
                 onClick={() => setLanguage('EN')}
-                className={`px-3 py-1 rounded text-sm font-semibold transition-all ${
-                  language === 'EN' ? 'bg-[#0ea5e9] text-white' : 'text-gray-600'
-                }`}
-              >
-                EN
-              </button>
+                className="px-3 py-1.5 text-xs font-bold transition-all"
+                style={{
+                  background: language === 'EN' ? 'rgba(0,212,170,0.15)' : 'transparent',
+                  color: language === 'EN' ? '#00d4aa' : '#475569',
+                  borderRight: '1px solid rgba(255,255,255,0.08)',
+                }}
+              >EN</button>
               <button
                 onClick={() => setLanguage('KIN')}
-                className={`px-3 py-1 rounded text-sm font-semibold transition-all ${
-                  language === 'KIN' ? 'bg-[#0ea5e9] text-white' : 'text-gray-600'
-                }`}
-              >
-                KIN
-              </button>
+                className="px-3 py-1.5 text-xs font-bold transition-all"
+                style={{
+                  background: language === 'KIN' ? 'rgba(0,212,170,0.15)' : 'transparent',
+                  color: language === 'KIN' ? '#00d4aa' : '#475569',
+                }}
+              >KIN</button>
             </div>
           </div>
 
           {/* Heading */}
-          <h1 className="text-3xl font-bold text-[#1e293b] mb-2">
-            {isKinyarwanda ? 'Mwaramutse! Murakaza Neza' : 'Mwaramutse! Welcome Back'}
+          <h1 className="text-3xl font-bold mb-2" style={{ color: '#f1f5f9', letterSpacing: '-0.01em' }}>
+            {isKinyarwanda ? 'Mwaramutse! Murakaza Neza' : 'Welcome Back'}
           </h1>
-          <p className="text-gray-600 mb-8">
+          <p className="mb-8 text-sm" style={{ color: '#64748b' }}>
             {isKinyarwanda ? 'Injira kugirango ukomeze kwiga' : 'Log in to continue learning'}
           </p>
 
           {/* Form */}
-          <form onSubmit={handleLogin} className="space-y-6">
-            {/* Email/Phone Input */}
+          <form onSubmit={handleLogin} className="space-y-5">
+
+            {/* Email */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                {isKinyarwanda ? 'Email cyangwa Telefoni' : 'Email or Phone'}
+              <label className="block text-sm font-semibold mb-2" style={{ color: '#94a3b8' }}>
+                {isKinyarwanda ? 'Email' : 'Email'}
               </label>
               <div className="relative">
-                <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: '#475569' }} />
                 <input
                   type="text"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder={isKinyarwanda ? 'jean@example.com' : 'jean@example.com'}
-                  className={`w-full pl-12 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 transition-all ${
-                    error ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-[#0ea5e9]'
-                  }`}
-                  style={{ height: '48px' }}
+                  placeholder="jean@example.com"
+                  className="w-full pl-11 pr-4 py-3 rounded-xl text-sm transition-all focus:outline-none"
+                  style={{
+                    height: '48px',
+                    background: '#13161e',
+                    border: error ? '1px solid rgba(239,68,68,0.5)' : '1px solid rgba(255,255,255,0.08)',
+                    color: '#f1f5f9',
+                  }}
+                  onFocus={e => { if (!error) e.target.style.border = '1px solid rgba(0,212,170,0.4)'; }}
+                  onBlur={e => { if (!error) e.target.style.border = '1px solid rgba(255,255,255,0.08)'; }}
                 />
               </div>
             </div>
 
-            {/* Password Input */}
+            {/* Password */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-sm font-semibold mb-2" style={{ color: '#94a3b8' }}>
                 {isKinyarwanda ? 'Ijambo ryibanga' : 'Password'}
               </label>
               <div className="relative">
-                <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: '#475569' }} />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className={`w-full pl-12 pr-12 py-3 border rounded-lg focus:outline-none focus:ring-2 transition-all ${
-                    error ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-[#0ea5e9]'
-                  }`}
-                  style={{ height: '48px' }}
+                  className="w-full pl-11 pr-12 py-3 rounded-xl text-sm transition-all focus:outline-none"
+                  style={{
+                    height: '48px',
+                    background: '#13161e',
+                    border: error ? '1px solid rgba(239,68,68,0.5)' : '1px solid rgba(255,255,255,0.08)',
+                    color: '#f1f5f9',
+                  }}
+                  onFocus={e => { if (!error) e.target.style.border = '1px solid rgba(0,212,170,0.4)'; }}
+                  onBlur={e => { if (!error) e.target.style.border = '1px solid rgba(255,255,255,0.08)'; }}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 transition-colors"
+                  style={{ color: '#475569' }}
+                  onMouseEnter={e => (e.currentTarget.style.color = '#94a3b8')}
+                  onMouseLeave={e => (e.currentTarget.style.color = '#475569')}
                 >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
             </div>
 
-            {/* Error Message */}
+            {/* Error */}
             {error && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+              <div className="p-3 rounded-xl text-sm" style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#f87171' }}>
                 {error}
               </div>
             )}
 
-            {/* Remember Me & Forgot Password */}
-            <div className="flex items-center justify-between">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
-                  className="w-4 h-4 text-[#0ea5e9] border-gray-300 rounded focus:ring-[#0ea5e9]"
-                />
-                <span className="text-sm text-gray-700">
-                  {isKinyarwanda ? 'Nzibuke' : 'Remember me'}
-                </span>
-              </label>
-              <a href="#" className="text-sm text-[#0ea5e9] hover:underline font-semibold">
+            {/* Forgot password */}
+            <div className="flex justify-end">
+              <button type="button" className="text-xs font-semibold transition-colors" style={{ color: '#475569' }}
+                onMouseEnter={e => (e.currentTarget.style.color = '#00d4aa')}
+                onMouseLeave={e => (e.currentTarget.style.color = '#475569')}
+              >
                 {isKinyarwanda ? 'Wibagiwe ijambo ryibanga?' : 'Forgot Password?'}
-              </a>
+              </button>
             </div>
 
             {/* Login Button */}
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 bg-[#0ea5e9] text-white rounded-lg font-bold text-lg hover:bg-[#0284c7] transition-all shadow-md flex items-center justify-center gap-2 disabled:opacity-50"
-              style={{ height: '48px' }}
+              className="w-full rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all disabled:opacity-50"
+              style={{ height: '48px', background: '#00d4aa', color: '#0d0f14', boxShadow: '0 0 20px rgba(0,212,170,0.25)' }}
+              onMouseEnter={e => { if (!loading) (e.currentTarget as HTMLButtonElement).style.background = '#00bfa0'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = '#00d4aa'; }}
             >
               {loading ? (
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" style={{ borderColor: '#0d0f14', borderTopColor: 'transparent' }} />
               ) : (
                 <>
                   {isKinyarwanda ? 'Injira' : 'Log In'}
-                  <ArrowRight className="w-5 h-5" />
+                  <ArrowRight className="w-4 h-4" />
                 </>
               )}
             </button>
 
             {/* Divider */}
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-300" />
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-gray-500">
-                  {isKinyarwanda ? 'CYANGWA' : 'OR'}
-                </span>
-              </div>
-            </div>
-
-            {/* Alternative Login Methods */}
-            <div className="space-y-3">
-              <button
-                type="button"
-                className="w-full py-3 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-all flex items-center justify-center gap-2"
-              >
-                <Smartphone className="w-5 h-5" />
-                {isKinyarwanda ? 'Injira ukoresheje Telefoni' : 'Login with Phone'}
-              </button>
-              <button
-                type="button"
-                className="w-full py-3 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-all flex items-center justify-center gap-2"
-              >
-                <Globe className="w-5 h-5" />
-                {isKinyarwanda ? 'Injira ukoresheje Google' : 'Login with Google'}
-              </button>
+            <div className="relative flex items-center">
+              <div className="flex-1" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }} />
+              <span className="px-3 text-xs" style={{ color: '#334155' }}>
+                {isKinyarwanda ? 'CYANGWA' : 'OR'}
+              </span>
+              <div className="flex-1" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }} />
             </div>
 
             {/* Sign Up Link */}
-            <div className="text-center">
-              <span className="text-gray-600">
+            <div className="text-center text-sm">
+              <span style={{ color: '#475569' }}>
                 {isKinyarwanda ? 'Ntabwo ufite konti?' : "Don't have an account?"}{' '}
               </span>
-              <a href="#" className="text-[#0ea5e9] font-semibold hover:underline">
+              <button
+                type="button"
+                onClick={onSignupClick}
+                className="font-semibold transition-colors"
+                style={{ color: '#00d4aa' }}
+                onMouseEnter={e => (e.currentTarget.style.color = '#00bfa0')}
+                onMouseLeave={e => (e.currentTarget.style.color = '#00d4aa')}
+              >
                 {isKinyarwanda ? 'Iyandikishe' : 'Sign Up'}
-              </a>
+              </button>
             </div>
           </form>
 
-          {/* Security Badge */}
-          <div className="mt-8 flex items-center justify-center gap-2 text-sm text-gray-500">
-            <Lock className="w-4 h-4" />
+          {/* Security badge */}
+          <div className="mt-8 flex items-center justify-center gap-2 text-xs" style={{ color: '#334155' }}>
+            <Lock className="w-3 h-3" />
             <span>
               {isKinyarwanda
                 ? 'Amakuru yawe arafite umutekano kandi yasobanuwe'

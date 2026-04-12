@@ -2,6 +2,7 @@ import { useState } from 'react';
 import Dashboard from './Dashboard';
 import TeacherDashboard from './TeacherDashboard';
 import CodingWorkspace from './CodingWorkspace';
+import TheoreticalAssignment from './TheoreticalAssignment';
 import LandingPage from './LandingPage';
 import LoginPage from './LoginPage';
 import SignupPage from './SignupPage';
@@ -10,21 +11,23 @@ import AboutPage from './AboutPage';
 import ContactPage from './ContactPage';
 import PrivacyPolicyPage from './PrivacyPolicyPage';
 import { useAuth } from '../lib/auth';
+import type { Assignment } from '../lib/db';
 
 type PublicView = 'landing' | 'login' | 'signup' | 'school-signup' | 'about' | 'contact' | 'privacy';
-type StudentView = 'dashboard' | 'workspace';
+type StudentView = 'dashboard' | 'workspace' | 'theoretical';
 
 export default function App() {
   const { user, profile, loading } = useAuth();
   const [view, setView] = useState<PublicView>('landing');
   const [studentView, setStudentView] = useState<StudentView>('dashboard');
+  const [openAssignment, setOpenAssignment] = useState<Assignment | null>(null);
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#f8fafc]">
+      <div className="min-h-screen flex items-center justify-center" style={{ background: '#0d0f14', fontFamily: 'Inter, sans-serif' }}>
         <div className="flex flex-col items-center gap-4">
-          <div className="w-10 h-10 border-4 border-[#0ea5e9] border-t-transparent rounded-full animate-spin" />
-          <p className="text-gray-500 font-medium" style={{ fontFamily: 'Inter, sans-serif' }}>
+          <div className="w-10 h-10 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: '#00d4aa', borderTopColor: 'transparent' }} />
+          <p className="text-sm font-medium" style={{ color: '#475569' }}>
             Loading EduCode Rwanda...
           </p>
         </div>
@@ -36,11 +39,25 @@ export default function App() {
   if (user) {
     if (profile?.user_type === 'teacher') return <TeacherDashboard />;
     if (studentView === 'workspace') return <CodingWorkspace onBack={() => setStudentView('dashboard')} />;
-    return <Dashboard onStartCoding={() => setStudentView('workspace')} />;
+    if (studentView === 'theoretical' && openAssignment) {
+      return (
+        <TheoreticalAssignment
+          assignment={openAssignment}
+          language="EN"
+          onBack={() => { setStudentView('dashboard'); setOpenAssignment(null); }}
+        />
+      );
+    }
+    return (
+      <Dashboard
+        onStartCoding={() => setStudentView('workspace')}
+        onOpenAssignment={(a) => { setOpenAssignment(a); setStudentView('theoretical'); }}
+      />
+    );
   }
 
   // Public pages
-  if (view === 'login') return <LoginPage onSuccess={() => {}} />;
+  if (view === 'login') return <LoginPage onSuccess={() => {}} onSignupClick={() => setView('signup')} />;
   if (view === 'signup') return (
     <SignupPage
       onSuccess={() => setView('login')}
