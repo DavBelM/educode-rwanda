@@ -7,8 +7,10 @@ interface Props {
   lesson: CourseLesson;
   courseTitle: string;
   language: 'EN' | 'KIN';
+  nextLesson: CourseLesson | null;
   onBack: () => void;
   onCompleted: (xpEarned: number) => void;
+  onNextLesson: (lesson: CourseLesson) => void;
 }
 
 // ─── Content Renderer ─────────────────────────────────────────────────────────
@@ -261,7 +263,7 @@ function QuizLesson({ lesson, language, onComplete, completing }: {
 
 // ─── Lesson Viewer Root ───────────────────────────────────────────────────────
 
-export default function LessonViewer({ lesson, courseTitle, language, onBack, onCompleted }: Props) {
+export default function LessonViewer({ lesson, courseTitle, language, nextLesson, onBack, onCompleted, onNextLesson }: Props) {
   const isKin = language === 'KIN';
   const [completing, setCompleting] = useState(false);
   const [done, setDone] = useState(false);
@@ -300,11 +302,28 @@ export default function LessonViewer({ lesson, courseTitle, language, onBack, on
             <Zap size={20} fill="#f59e0b" />
             <span className="text-xl font-bold" style={{ fontFamily: 'Inter, sans-serif' }}>+{lesson.xp_reward} XP</span>
           </div>
-          <button onClick={() => onCompleted(lesson.xp_reward)}
-            className="px-6 py-3 rounded-xl font-semibold text-sm"
-            style={{ background: '#00d4aa', color: '#0d0f14', fontFamily: 'Inter, sans-serif' }}>
-            {isKin ? 'Garuka ku Isomo' : 'Back to Course'}
-          </button>
+          <div className="flex flex-col gap-3 w-full">
+            {nextLesson && (
+              <button
+                onClick={() => onNextLesson(nextLesson)}
+                className="w-full px-6 py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2"
+                style={{ background: '#00d4aa', color: '#0d0f14', fontFamily: 'Inter, sans-serif' }}
+                onMouseEnter={e => (e.currentTarget.style.background = '#00bfa0')}
+                onMouseLeave={e => (e.currentTarget.style.background = '#00d4aa')}
+              >
+                {isKin ? 'Isomo Rikurikira' : 'Next Lesson'} →
+              </button>
+            )}
+            <button
+              onClick={() => onCompleted(lesson.xp_reward)}
+              className="w-full px-6 py-3 rounded-xl font-semibold text-sm"
+              style={{ background: nextLesson ? 'rgba(255,255,255,0.05)' : '#00d4aa',
+                color: nextLesson ? '#64748b' : '#0d0f14', fontFamily: 'Inter, sans-serif',
+                border: nextLesson ? '1px solid rgba(255,255,255,0.08)' : 'none' }}
+            >
+              {isKin ? 'Garuka ku Isomo' : 'Back to Course'}
+            </button>
+          </div>
         </div>
       </div>
     );

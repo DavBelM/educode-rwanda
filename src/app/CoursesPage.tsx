@@ -8,7 +8,7 @@ import {
 interface Props {
   language: 'EN' | 'KIN';
   onBack: () => void;
-  onOpenLesson: (lesson: CourseLesson, courseTitle: string) => void;
+  onOpenLesson: (lesson: CourseLesson, courseTitle: string, allLessons: CourseLesson[]) => void;
 }
 
 const LESSON_TYPE = {
@@ -101,7 +101,7 @@ function CourseDetail({ course, language, onBack, onOpenLesson }: {
   course: Course;
   language: 'EN' | 'KIN';
   onBack: () => void;
-  onOpenLesson: (lesson: CourseLesson) => void;
+  onOpenLesson: (lesson: CourseLesson, allLessons: CourseLesson[]) => void;
 }) {
   const isKin = language === 'KIN';
   const [modules, setModules] = useState<CourseModule[]>([]);
@@ -114,8 +114,9 @@ function CourseDetail({ course, language, onBack, onOpenLesson }: {
     );
   }, [course.id]);
 
-  const totalLessons = modules.reduce((s, m) => s + m.lessons.length, 0);
-  const completedCount = modules.reduce((s, m) => s + m.lessons.filter(l => completedIds.has(l.id)).length, 0);
+  const allLessons = modules.flatMap(m => m.lessons);
+  const totalLessons = allLessons.length;
+  const completedCount = allLessons.filter(l => completedIds.has(l.id)).length;
   const pct = totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0;
   const courseTitle = isKin && course.title_kin ? course.title_kin : course.title;
 
@@ -181,7 +182,7 @@ function CourseDetail({ course, language, onBack, onOpenLesson }: {
                     return (
                       <div
                         key={lesson.id}
-                        onClick={() => onOpenLesson(lesson)}
+                        onClick={() => onOpenLesson(lesson, allLessons)}
                         className="flex items-center gap-3 px-5 py-3 cursor-pointer transition-all"
                         style={{ borderTop: li > 0 ? '1px solid rgba(255,255,255,0.04)' : 'none' }}
                         onMouseEnter={e => (e.currentTarget as HTMLDivElement).style.background = 'rgba(255,255,255,0.02)'}
@@ -260,7 +261,7 @@ export default function CoursesPage({ language, onBack, onOpenLesson }: Props) {
             course={selectedCourse}
             language={language}
             onBack={() => setSelectedCourse(null)}
-            onOpenLesson={(lesson) => onOpenLesson(lesson, selectedCourse.title)}
+            onOpenLesson={(lesson, allLessons) => onOpenLesson(lesson, selectedCourse.title, allLessons)}
           />
         ) : (
           <CourseCatalog courses={courses} language={language} onSelect={setSelectedCourse} />
