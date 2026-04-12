@@ -1,73 +1,69 @@
-import React from 'react';
 import { Award, Flame, CheckCircle, Star, Trophy, Target } from 'lucide-react';
 
-interface Badge {
-  id: string;
-  name: string;
-  icon: string;
-  earned: boolean;
-}
+interface Badge { id: string; name: string; icon: string; earned: boolean; }
 
 interface AchievementBadgesProps {
   language: 'EN' | 'KIN';
   badges: Badge[];
 }
 
+const iconMap: Record<string, React.ReactNode> = {
+  award:  <Award size={22} />,
+  flame:  <Flame size={22} />,
+  check:  <CheckCircle size={22} />,
+  star:   <Star size={22} />,
+  trophy: <Trophy size={22} />,
+  target: <Target size={22} />,
+};
+
 export function AchievementBadges({ language, badges }: AchievementBadgesProps) {
   const isKinyarwanda = language === 'KIN';
 
-  const getIcon = (iconName: string) => {
-    const iconMap: { [key: string]: React.ReactNode } = {
-      award: <Award size={24} />,
-      flame: <Flame size={24} />,
-      check: <CheckCircle size={24} />,
-      star: <Star size={24} />,
-      trophy: <Trophy size={24} />,
-      target: <Target size={24} />
-    };
-    return iconMap[iconName] || <Award size={24} />;
-  };
-
   return (
-    <div className="bg-white rounded-xl shadow-xl border border-gray-100 p-6">
-      <h2 className="text-xl font-bold text-[#1e293b] mb-6" style={{ fontFamily: 'Inter, sans-serif' }}>
-        {isKinyarwanda ? 'Ibihembo / Recent Achievements' : 'Recent Achievements'}
-      </h2>
+    <div className="rounded-2xl p-6" style={{
+      background: '#13161e',
+      border: '1px solid rgba(255,255,255,0.06)',
+    }}>
+      <div className="flex items-center justify-between mb-5">
+        <p className="text-sm font-semibold" style={{ fontFamily: 'Inter, sans-serif', color: '#94a3b8', letterSpacing: '0.05em', textTransform: 'uppercase', fontSize: '11px' }}>
+          {isKinyarwanda ? 'Ibihembo' : 'Achievements'}
+        </p>
+        <button className="text-xs font-semibold" style={{ color: '#00d4aa', fontFamily: 'Inter, sans-serif' }}>
+          {isKinyarwanda ? 'Reba Byose' : 'View all'} →
+        </button>
+      </div>
 
-      {/* Badges Row */}
-      <div className="flex gap-4 mb-6 overflow-x-auto pb-2">
+      <div className="flex gap-3 overflow-x-auto pb-1">
         {badges.map((badge) => (
-          <div key={badge.id} className="flex flex-col items-center gap-2 min-w-[80px]">
+          <div key={badge.id} className="flex flex-col items-center gap-2 min-w-[64px]">
             <div
-              className={`w-16 h-16 rounded-full flex items-center justify-center shadow-lg ${
-                badge.earned
-                  ? 'bg-gradient-to-br from-[#fbbf24] to-[#f59e0b]'
-                  : 'bg-gray-200'
-              }`}
+              className="w-14 h-14 rounded-2xl flex items-center justify-center transition-all"
+              style={badge.earned
+                ? {
+                    background: 'linear-gradient(135deg, rgba(245,158,11,0.2), rgba(251,191,36,0.1))',
+                    border: '1px solid rgba(245,158,11,0.35)',
+                    color: '#f59e0b',
+                    boxShadow: '0 0 14px rgba(245,158,11,0.15)',
+                  }
+                : {
+                    background: 'rgba(255,255,255,0.03)',
+                    border: '1px solid rgba(255,255,255,0.06)',
+                    color: '#334155',
+                  }
+              }
             >
-              <div className={badge.earned ? 'text-white' : 'text-gray-400'}>
-                {getIcon(badge.icon)}
-              </div>
+              {iconMap[badge.icon] ?? <Award size={22} />}
             </div>
-            <p
-              className={`text-xs text-center ${
-                badge.earned ? 'text-[#1e293b] font-medium' : 'text-gray-400'
-              }`}
-              style={{ fontFamily: 'Inter, sans-serif' }}
-            >
+            <p className="text-xs text-center leading-tight" style={{
+              fontFamily: 'Inter, sans-serif',
+              color: badge.earned ? '#94a3b8' : '#334155',
+              maxWidth: '60px'
+            }}>
               {badge.name}
             </p>
           </div>
         ))}
       </div>
-
-      {/* View All Link */}
-      <button
-        className="text-[#0ea5e9] font-semibold text-sm hover:underline"
-        style={{ fontFamily: 'Inter, sans-serif' }}
-      >
-        {isKinyarwanda ? 'Reba Byose' : 'View All Badges'} →
-      </button>
     </div>
   );
 }

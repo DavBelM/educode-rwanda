@@ -87,7 +87,7 @@ export default function Dashboard({ onStartCoding }: { onStartCoding?: () => voi
   };
 
   return (
-    <div className="min-h-screen bg-[#f8fafc]" style={{ fontFamily: 'Inter, sans-serif' }}>
+    <div className="min-h-screen" style={{ fontFamily: 'Inter, sans-serif', background: '#0d0f14' }}>
       {/* Header */}
       <Header
         language={language}
@@ -118,13 +118,13 @@ export default function Dashboard({ onStartCoding }: { onStartCoding?: () => voi
 
           {/* Column 2: Active Assignments */}
           <div className="lg:col-span-6">
-            <div className="bg-white rounded-xl shadow-xl border border-gray-100 p-6">
+            <div className="rounded-2xl p-6" style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.06)' }}>
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-[#1e293b]" style={{ fontFamily: 'Inter, sans-serif' }}>
-                  {isKinyarwanda ? 'Ibisabwa / Assignments' : 'Active Assignments'}
+                <h2 className="text-sm font-semibold" style={{ fontFamily: 'Inter, sans-serif', color: '#94a3b8', letterSpacing: '0.05em', textTransform: 'uppercase', fontSize: '11px' }}>
+                  {isKinyarwanda ? 'Ibisabwa' : 'Active Assignments'}
                 </h2>
                 {data.assignments.length > 0 && (
-                  <button className="text-[#0ea5e9] font-semibold text-sm hover:underline" style={{ fontFamily: 'Inter, sans-serif' }}>
+                  <button className="text-xs font-semibold" style={{ fontFamily: 'Inter, sans-serif', color: '#00d4aa' }}>
                     {isKinyarwanda ? 'Reba Byose' : 'View All'} →
                   </button>
                 )}

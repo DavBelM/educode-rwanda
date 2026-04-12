@@ -34,7 +34,7 @@ export function Header({ language, onLanguageToggle, subtitle, hideAssignmentInf
   }, []);
 
   return (
-    <header className="flex items-center justify-between px-6 py-4 bg-white border-b border-gray-200">
+    <header className="flex items-center justify-between px-6 py-4" style={{ background: '#13161e', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
       {/* Logo / Back */}
       <div className="flex items-center gap-3">
         {onBack ? (
@@ -49,10 +49,10 @@ export function Header({ language, onLanguageToggle, subtitle, hideAssignmentInf
           </div>
         )}
         <div>
-          <h1 className="text-xl font-semibold text-[#1e293b]" style={{ fontFamily: 'Inter, sans-serif' }}>
+          <h1 className="text-xl font-semibold" style={{ fontFamily: 'Inter, sans-serif', color: '#f1f5f9' }}>
             EduCode Rwanda
           </h1>
-          <p className="text-sm text-gray-500" style={{ fontFamily: 'Inter, sans-serif' }}>
+          <p className="text-sm" style={{ fontFamily: 'Inter, sans-serif', color: '#475569' }}>
             {defaultSubtitle}
           </p>
         </div>
@@ -106,14 +106,14 @@ export function Header({ language, onLanguageToggle, subtitle, hideAssignmentInf
         >
           <button
             onClick={() => language === 'KIN' && onLanguageToggle()}
-            className="flex-1 h-full px-3 transition-all border-2"
+            className="flex-1 h-full px-3 transition-all"
             style={{
-              backgroundColor: language === 'EN' ? '#0ea5e9' : 'transparent',
-              color: language === 'EN' ? 'white' : '#64748b',
-              borderColor: language === 'EN' ? '#0ea5e9' : '#e2e8f0',
+              backgroundColor: language === 'EN' ? 'rgba(0,212,170,0.15)' : 'transparent',
+              color: language === 'EN' ? '#00d4aa' : '#475569',
+              border: language === 'EN' ? '1px solid rgba(0,212,170,0.3)' : '1px solid rgba(255,255,255,0.06)',
               fontFamily: 'Inter, sans-serif',
               fontWeight: 700,
-              fontSize: '14px',
+              fontSize: '13px',
               borderRadius: '8px 0 0 8px'
             }}
           >
@@ -121,14 +121,15 @@ export function Header({ language, onLanguageToggle, subtitle, hideAssignmentInf
           </button>
           <button
             onClick={() => language === 'EN' && onLanguageToggle()}
-            className="flex-1 h-full px-3 transition-all border-2 border-l-0"
+            className="flex-1 h-full px-3 transition-all"
             style={{
-              backgroundColor: language === 'KIN' ? '#0ea5e9' : 'transparent',
-              color: language === 'KIN' ? 'white' : '#64748b',
-              borderColor: language === 'KIN' ? '#0ea5e9' : '#e2e8f0',
+              backgroundColor: language === 'KIN' ? 'rgba(0,212,170,0.15)' : 'transparent',
+              color: language === 'KIN' ? '#00d4aa' : '#475569',
+              border: language === 'KIN' ? '1px solid rgba(0,212,170,0.3)' : '1px solid rgba(255,255,255,0.06)',
+              borderLeft: 'none',
               fontFamily: 'Inter, sans-serif',
               fontWeight: 700,
-              fontSize: '14px',
+              fontSize: '13px',
               borderRadius: '0 8px 8px 0'
             }}
           >
@@ -140,42 +141,40 @@ export function Header({ language, onLanguageToggle, subtitle, hideAssignmentInf
         <div className="relative" ref={menuRef}>
           <button
             onClick={() => setMenuOpen(prev => !prev)}
-            className="w-10 h-10 rounded-full bg-[#f1f5f9] border-2 border-[#0ea5e9] flex items-center justify-center text-[#0ea5e9] font-semibold text-sm hover:bg-[#e0f2fe] transition-all"
-            style={{ fontFamily: 'Inter, sans-serif' }}
+            className="w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm transition-all"
+            style={{ background: 'rgba(0,212,170,0.12)', border: '1px solid rgba(0,212,170,0.3)', color: '#00d4aa', fontFamily: 'Inter, sans-serif' }}
           >
             {initials}
           </button>
 
           {menuOpen && (
-            <div className="absolute right-0 top-12 w-56 bg-white border border-gray-200 rounded-xl shadow-lg z-50 overflow-hidden">
+            <div className="absolute right-0 top-12 w-56 rounded-xl z-50 overflow-hidden" style={{ background: '#1a1e2a', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 8px 32px rgba(0,0,0,0.4)' }}>
               {/* User info */}
-              <div className="px-4 py-3 border-b border-gray-100">
+              <div className="px-4 py-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-full bg-[#e0f2fe] flex items-center justify-center text-[#0ea5e9] font-bold text-sm">
+                  <div className="w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm" style={{ background: 'rgba(0,212,170,0.15)', color: '#00d4aa', border: '1px solid rgba(0,212,170,0.25)' }}>
                     {initials}
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-[#1e293b]">{profile?.full_name ?? 'Student'}</p>
-                    <p className="text-xs text-gray-500 capitalize">{profile?.user_type?.replace('_', ' ') ?? ''}</p>
+                    <p className="text-sm font-semibold" style={{ color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}>{profile?.full_name ?? 'Student'}</p>
+                    <p className="text-xs capitalize" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>{profile?.user_type?.replace('_', ' ') ?? ''}</p>
                   </div>
                 </div>
               </div>
 
-              {/* Menu items */}
               <div className="py-1">
-                <button
-                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                  style={{ fontFamily: 'Inter, sans-serif' }}
+                <button className="w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors" style={{ color: '#94a3b8', fontFamily: 'Inter, sans-serif' }}
+                  onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.04)')}
+                  onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                 >
-                  <User size={16} className="text-gray-400" />
+                  <User size={15} style={{ color: '#475569' }} />
                   {isKinyarwanda ? 'Umwirondoro' : 'Profile'}
                 </button>
-                <button
-                  onClick={() => signOut()}
-                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
-                  style={{ fontFamily: 'Inter, sans-serif' }}
+                <button onClick={() => signOut()} className="w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors" style={{ color: '#ef4444', fontFamily: 'Inter, sans-serif' }}
+                  onMouseEnter={e => (e.currentTarget.style.background = 'rgba(239,68,68,0.08)')}
+                  onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                 >
-                  <LogOut size={16} />
+                  <LogOut size={15} />
                   {isKinyarwanda ? 'Sohoka' : 'Log Out'}
                 </button>
               </div>
