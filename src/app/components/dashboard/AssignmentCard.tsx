@@ -1,4 +1,3 @@
-import React from 'react';
 import { ArrowRight } from 'lucide-react';
 
 export interface Assignment {
@@ -19,98 +18,81 @@ interface AssignmentCardProps {
   onClick?: () => void;
 }
 
+const statusStyles = {
+  submitted:  { bg: 'rgba(16,185,129,0.1)',  text: '#10b981', border: 'rgba(16,185,129,0.25)' },
+  'due-soon': { bg: 'rgba(245,158,11,0.1)',  text: '#f59e0b', border: 'rgba(245,158,11,0.25)' },
+  overdue:    { bg: 'rgba(239,68,68,0.1)',   text: '#ef4444', border: 'rgba(239,68,68,0.25)' },
+};
+
+const difficultyStyles = {
+  Beginner:     { bg: 'rgba(0,212,170,0.1)',   text: '#00d4aa', border: 'rgba(0,212,170,0.2)' },
+  Intermediate: { bg: 'rgba(245,158,11,0.1)',  text: '#f59e0b', border: 'rgba(245,158,11,0.2)' },
+  Advanced:     { bg: 'rgba(139,92,246,0.1)',  text: '#8b5cf6', border: 'rgba(139,92,246,0.2)' },
+};
+
 export function AssignmentCard({ assignment, language, onClick }: AssignmentCardProps) {
   const isKinyarwanda = language === 'KIN';
-
-  const getDueStatusColor = () => {
-    switch (assignment.dueStatus) {
-      case 'submitted':
-        return { bg: '#f0fdf4', text: '#10b981', border: '#10b981' };
-      case 'due-soon':
-        return { bg: '#fef3c7', text: '#f59e0b', border: '#f59e0b' };
-      case 'overdue':
-        return { bg: '#fef2f2', text: '#ef4444', border: '#ef4444' };
-    }
-  };
-
-  const getDifficultyColor = () => {
-    switch (assignment.difficulty) {
-      case 'Beginner':
-        return { bg: '#dbeafe', text: '#0ea5e9' };
-      case 'Intermediate':
-        return { bg: '#fef3c7', text: '#f59e0b' };
-      case 'Advanced':
-        return { bg: '#fce7f3', text: '#ec4899' };
-    }
-  };
-
-  const statusColor = getDueStatusColor();
-  const difficultyColor = getDifficultyColor();
+  const due = statusStyles[assignment.dueStatus];
+  const diff = difficultyStyles[assignment.difficulty];
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-5 hover:border-[#0ea5e9] hover:shadow-lg transition-all cursor-pointer" onClick={onClick}>
-      {/* Title */}
-      <h3 className="text-lg font-bold text-[#1e293b] mb-2" style={{ fontFamily: 'Inter, sans-serif' }}>
+    <div
+      onClick={onClick}
+      className="rounded-xl p-5 cursor-pointer transition-all group"
+      style={{
+        background: '#13161e',
+        border: '1px solid rgba(255,255,255,0.06)',
+      }}
+      onMouseEnter={e => {
+        (e.currentTarget as HTMLDivElement).style.border = '1px solid rgba(0,212,170,0.2)';
+        (e.currentTarget as HTMLDivElement).style.boxShadow = '0 0 20px rgba(0,212,170,0.06)';
+      }}
+      onMouseLeave={e => {
+        (e.currentTarget as HTMLDivElement).style.border = '1px solid rgba(255,255,255,0.06)';
+        (e.currentTarget as HTMLDivElement).style.boxShadow = 'none';
+      }}
+    >
+      <h3 className="text-base font-semibold mb-1" style={{ fontFamily: 'Inter, sans-serif', color: '#f1f5f9' }}>
         {assignment.title}
       </h3>
-
-      {/* Description */}
-      <p className="text-sm text-gray-600 mb-4" style={{ fontFamily: 'Inter, sans-serif' }}>
+      <p className="text-sm mb-4" style={{ fontFamily: 'Inter, sans-serif', color: '#475569' }}>
         {assignment.description}
       </p>
 
-      {/* Badges Row */}
+      {/* Badges */}
       <div className="flex items-center gap-2 mb-4 flex-wrap">
-        <span
-          className="px-3 py-1 rounded-full text-xs font-semibold"
-          style={{
-            backgroundColor: statusColor.bg,
-            color: statusColor.text,
-            border: `1px solid ${statusColor.border}`,
-            fontFamily: 'Inter, sans-serif'
-          }}
-        >
+        <span className="px-2.5 py-1 rounded-full text-xs font-semibold" style={{ background: due.bg, color: due.text, border: `1px solid ${due.border}` }}>
           {assignment.dueText}
         </span>
-        <span
-          className="px-3 py-1 rounded-full text-xs font-semibold"
-          style={{
-            backgroundColor: difficultyColor.bg,
-            color: difficultyColor.text,
-            fontFamily: 'Inter, sans-serif'
-          }}
-        >
+        <span className="px-2.5 py-1 rounded-full text-xs font-semibold" style={{ background: diff.bg, color: diff.text, border: `1px solid ${diff.border}` }}>
           {assignment.difficulty}
         </span>
       </div>
 
-      {/* Progress Row */}
+      {/* Progress + action */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          {/* Progress Dots */}
           <div className="flex gap-1">
             {Array.from({ length: assignment.testsTotal }, (_, i) => (
               <div
                 key={i}
-                className="w-2 h-2 rounded-full"
-                style={{
-                  backgroundColor: i < assignment.testsCompleted ? '#10b981' : '#e2e8f0'
-                }}
+                className="w-2 h-2 rounded-full transition-all"
+                style={{ background: i < assignment.testsCompleted ? '#00d4aa' : 'rgba(255,255,255,0.1)' }}
               />
             ))}
           </div>
-          <span className="text-xs text-gray-600" style={{ fontFamily: 'Inter, sans-serif' }}>
-            {assignment.testsCompleted}/{assignment.testsTotal} {isKinyarwanda ? 'byatsinze' : 'tests passed'}
+          <span className="text-xs" style={{ fontFamily: 'Inter, sans-serif', color: '#475569' }}>
+            {assignment.testsCompleted}/{assignment.testsTotal} {isKinyarwanda ? 'byatsinze' : 'passed'}
           </span>
         </div>
 
-        {/* Action Button */}
-        <button
-          className="flex items-center gap-1 text-[#0ea5e9] font-semibold text-sm hover:gap-2 transition-all"
-          style={{ fontFamily: 'Inter, sans-serif' }}
-        >
-          {assignment.status === 'not-started' ? (isKinyarwanda ? 'Tangira' : 'Start') : (isKinyarwanda ? 'Komeza' : 'Continue')}
-          <ArrowRight size={16} />
+        <button className="flex items-center gap-1 text-sm font-semibold transition-all" style={{ color: '#00d4aa', fontFamily: 'Inter, sans-serif' }}>
+          {assignment.status === 'not-started'
+            ? (isKinyarwanda ? 'Tangira' : 'Start')
+            : assignment.status === 'completed'
+            ? (isKinyarwanda ? 'Reba' : 'Review')
+            : (isKinyarwanda ? 'Komeza' : 'Continue')}
+          <ArrowRight size={14} />
         </button>
       </div>
     </div>
