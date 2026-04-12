@@ -6,7 +6,7 @@ import { AssignmentCard } from './components/dashboard/AssignmentCard';
 import { AIInsights } from './components/dashboard/AIInsights';
 import { AchievementBadges } from './components/dashboard/AchievementBadges';
 import { useAuth } from '../lib/auth';
-import { getStudentAssignments, getStudentClasses, getClassWithInviteCode, joinClass, type Assignment } from '../lib/db';
+import { getStudentAssignments, getStudentClasses, getClassWithInviteCode, joinClass, getSubmittedAssignmentIds, type Assignment } from '../lib/db';
 import { Users, ArrowRight, Loader, X } from 'lucide-react';
 
 interface Props {
@@ -116,18 +116,21 @@ export default function Dashboard({ onStartCoding, onOpenAssignment }: Props) {
   const isKinyarwanda = language === 'KIN';
 
   const [assignments, setAssignments] = useState<Assignment[]>([]);
+  const [submittedIds, setSubmittedIds] = useState<Set<string>>(new Set());
   const [hasClass, setHasClass] = useState<boolean | null>(null); // null = loading
   const [showJoinModal, setShowJoinModal] = useState(false);
   const [loadingAssignments, setLoadingAssignments] = useState(true);
 
   const loadAssignments = async () => {
     setLoadingAssignments(true);
-    const [{ data: classes }, { data: asgns }] = await Promise.all([
+    const [{ data: classes }, { data: asgns }, submitted] = await Promise.all([
       getStudentClasses(),
       getStudentAssignments(),
+      getSubmittedAssignmentIds(),
     ]);
     setHasClass(classes.length > 0);
     setAssignments(asgns);
+    setSubmittedIds(submitted);
     setLoadingAssignments(false);
   };
 
@@ -160,16 +163,18 @@ export default function Dashboard({ onStartCoding, onOpenAssignment }: Props) {
 
     const capDiff = (d: string) => d.charAt(0).toUpperCase() + d.slice(1) as 'Beginner' | 'Intermediate' | 'Advanced';
 
+    const isSubmitted = submittedIds.has(a.id);
+
     return {
       id: a.id,
       title: isKinyarwanda ? (a.title_kin || a.title) : a.title,
       description: isKinyarwanda ? (a.description_kin || a.description || '') : (a.description || ''),
-      dueStatus,
-      dueText,
+      dueStatus: (isSubmitted ? 'submitted' : dueStatus) as 'submitted' | 'due-soon' | 'overdue',
+      dueText: isSubmitted ? (isKinyarwanda ? 'Byatanzwe' : 'Submitted') : dueText,
       difficulty: capDiff(a.difficulty),
-      testsCompleted: 0,
-      testsTotal: a.assignment_type === 'theoretical' ? (a.questions?.length ?? 0) : 5,
-      status: 'not-started' as const,
+      testsCompleted: isSubmitted ? (a.questions?.length ?? 1) : 0,
+      testsTotal: a.assignment_type === 'theoretical' ? (a.questions?.length ?? 1) : 5,
+      status: isSubmitted ? 'completed' as const : 'not-started' as const,
     };
   };
 
