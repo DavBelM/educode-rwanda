@@ -10,6 +10,7 @@ export interface Assignment {
   testsCompleted: number;
   testsTotal: number;
   status: 'not-started' | 'in-progress' | 'completed';
+  grade?: string; // e.g. "15/20"
 }
 
 interface AssignmentCardProps {
@@ -67,6 +68,11 @@ export function AssignmentCard({ assignment, language, onClick }: AssignmentCard
         <span className="px-2.5 py-1 rounded-full text-xs font-semibold" style={{ background: diff.bg, color: diff.text, border: `1px solid ${diff.border}` }}>
           {assignment.difficulty}
         </span>
+        {assignment.grade && (
+          <span className="px-2.5 py-1 rounded-full text-xs font-semibold" style={{ background: 'rgba(139,92,246,0.1)', color: '#8b5cf6', border: '1px solid rgba(139,92,246,0.2)' }}>
+            {assignment.grade}
+          </span>
+        )}
       </div>
 
       {/* Progress + action */}

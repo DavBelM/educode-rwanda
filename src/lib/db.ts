@@ -28,6 +28,7 @@ export interface Assignment {
   assignment_type: 'coding' | 'theoretical';
   difficulty: 'beginner' | 'intermediate' | 'advanced';
   questions: Question[] | null;
+  total_marks: number;
   due_date: string | null;
   is_published: boolean;
   created_at: string;
@@ -41,8 +42,25 @@ export interface Submission {
   text_answers: Array<{ question_id: string; answer: string }> | null;
   tests_passed: number;
   tests_total: number;
+  marks_earned: number | null;
   submitted_at: string;
   profiles?: { full_name: string };
+}
+
+export interface LeaderboardEntry {
+  student_id: string;
+  full_name: string;
+  total_marks_earned: number;
+  total_marks_possible: number;
+  percentage: number;
+  submissions_graded: number;
+  rank: number;
+}
+
+export interface StudentGrade {
+  assignment_id: string;
+  marks_earned: number | null;
+  total_marks: number;
 }
 
 // ─── Classes ──────────────────────────────────────────────────────────────────
@@ -135,6 +153,7 @@ export async function createAssignment(params: {
   descriptionKin: string;
   assignmentType: 'coding' | 'theoretical';
   difficulty: 'beginner' | 'intermediate' | 'advanced';
+  totalMarks: number;
   questions?: Question[];
   dueDate?: string;
 }): Promise<{ data: Assignment | null; error: string | null }> {
@@ -152,6 +171,7 @@ export async function createAssignment(params: {
       description_kin: params.descriptionKin,
       assignment_type: params.assignmentType,
       difficulty: params.difficulty,
+      total_marks: params.totalMarks,
       questions: params.questions ?? null,
       due_date: params.dueDate ?? null,
       is_published: true,
@@ -271,4 +291,231 @@ export async function getAssignmentSubmissionCounts(assignmentIds: string[]): Pr
     counts[row.assignment_id] = (counts[row.assignment_id] ?? 0) + 1;
   }
   return counts;
+}
+
+// ─── Grading ──────────────────────────────────────────────────────────────────
+
+export async function gradeSubmission(submissionId: string, marksEarned: number): Promise<{ error: string | null }> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: 'Not authenticated' };
+
+  const { error } = await supabase
+    .from('student_submissions')
+    .update({ marks_earned: marksEarned, graded_by: user.id, graded_at: new Date().toISOString() })
+    .eq('id', submissionId);
+
+  if (error) return { error: error.message };
+  return { error: null };
+}
+
+// Returns each assignment's grade for the current student
+export async function getStudentGrades(): Promise<StudentGrade[]> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return [];
+
+  const { data } = await supabase
+    .from('student_submissions')
+    .select('assignment_id, marks_earned, assignments(total_marks)')
+    .eq('student_id', user.id);
+
+  return (data ?? []).map((row: { assignment_id: string; marks_earned: number | null; assignments: unknown }) => {
+    const asgn = (Array.isArray(row.assignments) ? row.assignments[0] : row.assignments) as { total_marks: number } | null;
+    return {
+      assignment_id: row.assignment_id,
+      marks_earned: row.marks_earned,
+      total_marks: asgn?.total_marks ?? 10,
+    };
+  });
+}
+
+// ─── Courses ──────────────────────────────────────────────────────────────────
+
+export interface Course {
+  id: string;
+  title: string;
+  title_kin: string | null;
+  description: string | null;
+  description_kin: string | null;
+  difficulty: string;
+  topic: string;
+  estimated_hours: number;
+  is_published: boolean;
+  created_at: string;
+}
+
+export interface CourseModule {
+  id: string;
+  course_id: string;
+  title: string;
+  title_kin: string | null;
+  order_index: number;
+  lessons: CourseLesson[];
+}
+
+export interface CourseLesson {
+  id: string;
+  module_id: string;
+  title: string;
+  title_kin: string | null;
+  content: string | null;
+  content_kin: string | null;
+  lesson_type: 'reading' | 'coding' | 'quiz';
+  exercise_data: {
+    starter_code?: string;
+    instructions?: string;
+    hint?: string;
+    questions?: Array<{ id: string; text: string; options: string[]; correct: number }>;
+  } | null;
+  order_index: number;
+  xp_reward: number;
+}
+
+export async function getCourses(): Promise<Course[]> {
+  const { data } = await supabase.from('courses').select('*').eq('is_published', true).order('created_at');
+  return data ?? [];
+}
+
+export async function getCourseDetail(courseId: string): Promise<{ course: Course | null; modules: CourseModule[] }> {
+  const { data: course } = await supabase.from('courses').select('*').eq('id', courseId).single();
+  const { data: modules } = await supabase.from('course_modules').select('*').eq('course_id', courseId).order('order_index');
+  if (!modules?.length) return { course: course ?? null, modules: [] };
+
+  const { data: lessons } = await supabase
+    .from('course_lessons').select('*')
+    .in('module_id', modules.map(m => m.id))
+    .order('order_index');
+
+  const modulesWithLessons: CourseModule[] = modules.map(m => ({
+    ...m,
+    lessons: (lessons ?? []).filter(l => l.module_id === m.id),
+  }));
+  return { course: course ?? null, modules: modulesWithLessons };
+}
+
+export async function getCompletedLessonIds(courseId: string): Promise<Set<string>> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return new Set();
+  const { data: modules } = await supabase.from('course_modules').select('id').eq('course_id', courseId);
+  if (!modules?.length) return new Set();
+  const { data: lessons } = await supabase.from('course_lessons').select('id').in('module_id', modules.map(m => m.id));
+  if (!lessons?.length) return new Set();
+  const { data } = await supabase
+    .from('student_lesson_progress').select('lesson_id')
+    .eq('student_id', user.id)
+    .in('lesson_id', lessons.map(l => l.id));
+  return new Set((data ?? []).map(r => r.lesson_id));
+}
+
+export async function completeLesson(lessonId: string, score?: number): Promise<{ error: string | null }> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: 'Not authenticated' };
+  const { error } = await supabase.from('student_lesson_progress')
+    .upsert({ student_id: user.id, lesson_id: lessonId, score: score ?? null, completed_at: new Date().toISOString() });
+  if (error) return { error: error.message };
+  return { error: null };
+}
+
+// ─── Streak ───────────────────────────────────────────────────────────────────
+
+export async function recordDailyLogin(): Promise<void> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return;
+  const today = new Date().toISOString().split('T')[0];
+  await supabase.from('daily_logins').upsert({ student_id: user.id, login_date: today });
+}
+
+export async function getStreak(): Promise<number> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return 0;
+  const { data } = await supabase
+    .from('daily_logins').select('login_date')
+    .eq('student_id', user.id)
+    .order('login_date', { ascending: false })
+    .limit(60);
+  if (!data?.length) return 0;
+  const dates = new Set(data.map(r => r.login_date));
+  let streak = 0;
+  const today = new Date();
+  for (let i = 0; i < 60; i++) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    const s = d.toISOString().split('T')[0];
+    if (dates.has(s)) streak++;
+    else break;
+  }
+  return streak;
+}
+
+// ─── Leaderboard ──────────────────────────────────────────────────────────────
+
+export async function getClassLeaderboard(classId: string): Promise<LeaderboardEntry[]> {
+  // Get all students in the class
+  const { data: enrollments } = await supabase
+    .from('class_enrollments')
+    .select('student_id, profiles(full_name)')
+    .eq('class_id', classId);
+
+  if (!enrollments || enrollments.length === 0) return [];
+
+  // Get all graded submissions for assignments in this class
+  const { data: submissions } = await supabase
+    .from('student_submissions')
+    .select('student_id, marks_earned, assignments(total_marks, class_id)')
+    .not('marks_earned', 'is', null)
+    .eq('assignments.class_id', classId);
+
+  // Aggregate marks per student
+  const studentMap: Record<string, { full_name: string; earned: number; possible: number; graded: number }> = {};
+
+  for (const enr of enrollments) {
+    const rawProfile = enr.profiles;
+    const profile = (Array.isArray(rawProfile) ? rawProfile[0] : rawProfile) as { full_name: string } | null;
+    studentMap[enr.student_id] = {
+      full_name: profile?.full_name ?? 'Student',
+      earned: 0,
+      possible: 0,
+      graded: 0,
+    };
+  }
+
+  for (const sub of submissions ?? []) {
+    const rawAsgn = sub.assignments;
+    const asgn = (Array.isArray(rawAsgn) ? rawAsgn[0] : rawAsgn) as { total_marks: number; class_id: string } | null;
+    if (!asgn || asgn.class_id !== classId) continue;
+    if (!studentMap[sub.student_id]) continue;
+    studentMap[sub.student_id].earned += sub.marks_earned ?? 0;
+    studentMap[sub.student_id].possible += asgn.total_marks;
+    studentMap[sub.student_id].graded += 1;
+  }
+
+  // Build entries and rank — primary: total marks earned, tiebreak: percentage
+  const entries = Object.entries(studentMap).map(([student_id, s]) => ({
+    student_id,
+    full_name: s.full_name,
+    total_marks_earned: s.earned,
+    total_marks_possible: s.possible,
+    percentage: s.possible > 0 ? Math.round((s.earned / s.possible) * 100) : 0,
+    submissions_graded: s.graded,
+    rank: 0,
+  }));
+
+  entries.sort((a, b) => {
+    if (b.total_marks_earned !== a.total_marks_earned) return b.total_marks_earned - a.total_marks_earned;
+    return b.percentage - a.percentage;
+  });
+
+  // Assign ranks (same marks + same % = same rank)
+  let currentRank = 1;
+  for (let i = 0; i < entries.length; i++) {
+    if (i > 0 &&
+      entries[i].total_marks_earned === entries[i - 1].total_marks_earned &&
+      entries[i].percentage === entries[i - 1].percentage) {
+      entries[i].rank = entries[i - 1].rank;
+    } else {
+      entries[i].rank = currentRank;
+    }
+    currentRank++;
+  }
+
+  return entries;
 }
