@@ -62,11 +62,11 @@ export function Header({ language, onLanguageToggle, subtitle, hideAssignmentInf
       {!hideAssignmentInfo && (
         <div className="hidden md:flex items-center gap-4">
           <div className="flex flex-col items-end">
-            <span className="text-sm font-medium text-[#1e293b]" style={{ fontFamily: 'Inter, sans-serif' }}>
+            <span className="text-sm font-medium" style={{ fontFamily: 'Inter, sans-serif', color: '#f1f5f9' }}>
               {isKinyarwanda ? 'Umushinga: Kubara Igiciro Cyose' : 'Assignment: Calculate Total Price'}
             </span>
             <div className="flex items-center gap-2 mt-1">
-              <div className="px-2 py-0.5 rounded text-xs font-medium bg-[#10b981] text-white">
+              <div className="px-2 py-0.5 rounded text-xs font-medium" style={{ background: 'rgba(0,212,170,0.15)', color: '#00d4aa', border: '1px solid rgba(0,212,170,0.25)' }}>
                 3/5 {isKinyarwanda ? 'Ibizamini byatsinze' : 'Tests Passed'}
               </div>
             </div>
