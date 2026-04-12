@@ -236,6 +236,18 @@ export async function getStudentSubmissions(assignmentId: string): Promise<{ sub
   return { submitted: !!data, data: data ?? null };
 }
 
+export async function getSubmittedAssignmentIds(): Promise<Set<string>> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return new Set();
+
+  const { data } = await supabase
+    .from('student_submissions')
+    .select('assignment_id')
+    .eq('student_id', user.id);
+
+  return new Set((data ?? []).map((r: { assignment_id: string }) => r.assignment_id));
+}
+
 export async function getAssignmentSubmissions(assignmentId: string): Promise<{ data: Submission[]; error: string | null }> {
   const { data, error } = await supabase
     .from('student_submissions')
@@ -245,4 +257,18 @@ export async function getAssignmentSubmissions(assignmentId: string): Promise<{ 
 
   if (error) return { data: [], error: error.message };
   return { data: data ?? [], error: null };
+}
+
+export async function getAssignmentSubmissionCounts(assignmentIds: string[]): Promise<Record<string, number>> {
+  if (assignmentIds.length === 0) return {};
+  const { data } = await supabase
+    .from('student_submissions')
+    .select('assignment_id')
+    .in('assignment_id', assignmentIds);
+
+  const counts: Record<string, number> = {};
+  for (const row of data ?? []) {
+    counts[row.assignment_id] = (counts[row.assignment_id] ?? 0) + 1;
+  }
+  return counts;
 }

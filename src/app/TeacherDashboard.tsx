@@ -3,7 +3,8 @@ import { Users, FileText, Plus, Copy, Check, X, ChevronDown, BookOpen, Code2, Lo
 import { Header } from './components/Header';
 import {
   createClass, getTeacherClasses, getClassAssignments, createAssignment, getClassStudentCount,
-  type Class, type Assignment, type Question
+  getAssignmentSubmissions, getAssignmentSubmissionCounts,
+  type Class, type Assignment, type Question, type Submission
 } from '../lib/db';
 
 // ─── Create Class Modal ────────────────────────────────────────────────────────
@@ -446,14 +447,141 @@ function ClassCard({ cls, language }: { cls: Class & { studentCount?: number; as
 
 // ─── Assignment Row ────────────────────────────────────────────────────────────
 
-function AssignmentRow({ assignment, language }: { assignment: Assignment; language: 'EN' | 'KIN' }) {
+// ─── Submissions Panel ─────────────────────────────────────────────────────────
+
+function SubmissionsPanel({ assignment, language, onClose }: {
+  assignment: Assignment;
+  language: 'EN' | 'KIN';
+  onClose: () => void;
+}) {
+  const isKin = language === 'KIN';
+  const [submissions, setSubmissions] = useState<Submission[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [expanded, setExpanded] = useState<string | null>(null);
+
+  useEffect(() => {
+    getAssignmentSubmissions(assignment.id).then(({ data }) => {
+      setSubmissions(data);
+      setLoading(false);
+    });
+  }, [assignment.id]);
+
+  const title = isKin ? (assignment.title_kin || assignment.title) : assignment.title;
+  const questions = assignment.questions ?? [];
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }}>
+      <div className="w-full max-w-2xl rounded-2xl" style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.08)', maxHeight: '85vh', display: 'flex', flexDirection: 'column' }}>
+        {/* Header */}
+        <div className="flex items-center justify-between p-5" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+          <div>
+            <h2 className="text-base font-bold" style={{ color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}>{title}</h2>
+            <p className="text-xs mt-0.5" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
+              {submissions.length} {isKin ? 'byatanzwe' : 'submission(s)'}
+            </p>
+          </div>
+          <button onClick={onClose} style={{ color: '#475569' }} onMouseEnter={e => (e.currentTarget.style.color = '#94a3b8')} onMouseLeave={e => (e.currentTarget.style.color = '#475569')}>
+            <X size={20} />
+          </button>
+        </div>
+
+        {/* Body */}
+        <div className="overflow-y-auto p-5 space-y-3">
+          {loading ? (
+            <div className="flex items-center justify-center py-10">
+              <Loader size={20} className="animate-spin" style={{ color: '#00d4aa' }} />
+            </div>
+          ) : submissions.length === 0 ? (
+            <div className="py-10 text-center">
+              <p className="text-sm" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
+                {isKin ? 'Nta nyandiko zatanzwe' : 'No submissions yet'}
+              </p>
+            </div>
+          ) : submissions.map(sub => {
+            const studentName = (sub.profiles as { full_name: string } | undefined)?.full_name ?? 'Student';
+            const initials = studentName.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2);
+            const isOpen = expanded === sub.id;
+
+            return (
+              <div key={sub.id} className="rounded-xl overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.06)' }}>
+                {/* Student row */}
+                <button
+                  onClick={() => setExpanded(isOpen ? null : sub.id)}
+                  className="w-full flex items-center justify-between p-4 text-left transition-all"
+                  style={{ background: isOpen ? 'rgba(0,212,170,0.05)' : 'transparent' }}
+                  onMouseEnter={e => { if (!isOpen) (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.02)'; }}
+                  onMouseLeave={e => { if (!isOpen) (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; }}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0" style={{ background: 'rgba(0,212,170,0.12)', color: '#00d4aa', border: '1px solid rgba(0,212,170,0.2)' }}>
+                      {initials}
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold" style={{ color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}>{studentName}</p>
+                      <p className="text-xs" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
+                        {new Date(sub.submitted_at).toLocaleString()}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="px-2 py-0.5 rounded-full text-xs font-semibold" style={{ background: 'rgba(0,212,170,0.1)', color: '#00d4aa', border: '1px solid rgba(0,212,170,0.2)' }}>
+                      ✓ {isKin ? 'Byatanzwe' : 'Submitted'}
+                    </span>
+                    <ChevronDown size={14} style={{ color: '#475569', transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+                  </div>
+                </button>
+
+                {/* Answers */}
+                {isOpen && assignment.assignment_type === 'theoretical' && sub.text_answers && (
+                  <div className="px-4 pb-4 space-y-3" style={{ borderTop: '1px solid rgba(255,255,255,0.04)' }}>
+                    {questions.map((q, i) => {
+                      const answer = (sub.text_answers ?? []).find(a => a.question_id === q.id)?.answer ?? '';
+                      const qText = isKin ? (q.text_kin || q.text) : q.text;
+                      return (
+                        <div key={q.id} className="pt-3">
+                          <p className="text-xs font-semibold mb-1" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
+                            {isKin ? `Ikibazo ${i + 1}` : `Q${i + 1}`}: {qText}
+                          </p>
+                          <p className="text-sm leading-relaxed px-3 py-2.5 rounded-lg" style={{ color: '#94a3b8', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.04)', fontFamily: 'Inter, sans-serif' }}>
+                            {answer || <span style={{ color: '#334155' }}>{isKin ? '(Nta gisubizo)' : '(No answer)'}</span>}
+                          </p>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Assignment Row ────────────────────────────────────────────────────────────
+
+function AssignmentRow({ assignment, submissionCount, language, onClick }: {
+  assignment: Assignment;
+  submissionCount: number;
+  language: 'EN' | 'KIN';
+  onClick: () => void;
+}) {
   const isKin = language === 'KIN';
   const diffColors: Record<string, string> = { beginner: '#00d4aa', intermediate: '#f59e0b', advanced: '#8b5cf6' };
-  const typeColor = assignment.assignment_type === 'theoretical' ? { bg: 'rgba(139,92,246,0.1)', text: '#a78bfa', border: 'rgba(139,92,246,0.2)' } : { bg: 'rgba(0,212,170,0.1)', text: '#00d4aa', border: 'rgba(0,212,170,0.2)' };
+  const typeColor = assignment.assignment_type === 'theoretical'
+    ? { bg: 'rgba(139,92,246,0.1)', text: '#a78bfa', border: 'rgba(139,92,246,0.2)' }
+    : { bg: 'rgba(0,212,170,0.1)', text: '#00d4aa', border: 'rgba(0,212,170,0.2)' };
   const title = isKin ? (assignment.title_kin || assignment.title) : assignment.title;
 
   return (
-    <div className="flex items-center justify-between py-3 px-4 rounded-xl transition-all" style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+    <button
+      onClick={onClick}
+      className="w-full flex items-center justify-between py-3 px-4 rounded-xl transition-all text-left"
+      style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}
+      onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.03)')}
+      onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+    >
       <div className="flex items-center gap-3">
         <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: typeColor.bg, border: `1px solid ${typeColor.border}` }}>
           {assignment.assignment_type === 'theoretical' ? <BookOpen size={14} style={{ color: typeColor.text }} /> : <Code2 size={14} style={{ color: typeColor.text }} />}
@@ -468,6 +596,9 @@ function AssignmentRow({ assignment, language }: { assignment: Assignment; langu
         </div>
       </div>
       <div className="flex items-center gap-2">
+        <span className="px-2 py-0.5 rounded-full text-xs font-semibold" style={{ background: 'rgba(0,212,170,0.08)', color: '#00d4aa', border: '1px solid rgba(0,212,170,0.15)', fontFamily: 'Inter, sans-serif' }}>
+          {submissionCount} {isKin ? 'byatanzwe' : submissionCount === 1 ? 'submission' : 'submissions'}
+        </span>
         <span className="px-2 py-0.5 rounded-full text-xs font-semibold" style={{ background: typeColor.bg, color: typeColor.text, border: `1px solid ${typeColor.border}` }}>
           {assignment.assignment_type === 'theoretical' ? (isKin ? 'Inyandiko' : 'Theory') : 'Code'}
         </span>
@@ -475,7 +606,7 @@ function AssignmentRow({ assignment, language }: { assignment: Assignment; langu
           {assignment.difficulty}
         </span>
       </div>
-    </div>
+    </button>
   );
 }
 
@@ -487,10 +618,12 @@ export default function TeacherDashboard() {
 
   const [classes, setClasses] = useState<Array<Class & { studentCount?: number; assignmentCount?: number }>>([]);
   const [assignments, setAssignments] = useState<Assignment[]>([]);
+  const [submissionCounts, setSubmissionCounts] = useState<Record<string, number>>({});
   const [loadingData, setLoadingData] = useState(true);
   const [showCreateClass, setShowCreateClass] = useState(false);
   const [showCreateAssignment, setShowCreateAssignment] = useState(false);
   const [selectedClassId, setSelectedClassId] = useState<string | null>(null);
+  const [viewingAssignment, setViewingAssignment] = useState<Assignment | null>(null);
 
   const loadData = async () => {
     setLoadingData(true);
@@ -512,6 +645,8 @@ export default function TeacherDashboard() {
       setSelectedClassId(targetId);
       const { data: aData } = await getClassAssignments(targetId);
       setAssignments(aData);
+      const counts = await getAssignmentSubmissionCounts(aData.map(a => a.id));
+      setSubmissionCounts(counts);
     }
 
     setLoadingData(false);
@@ -521,7 +656,11 @@ export default function TeacherDashboard() {
 
   useEffect(() => {
     if (!selectedClassId) return;
-    getClassAssignments(selectedClassId).then(({ data }) => setAssignments(data));
+    getClassAssignments(selectedClassId).then(async ({ data }) => {
+      setAssignments(data);
+      const counts = await getAssignmentSubmissionCounts(data.map(a => a.id));
+      setSubmissionCounts(counts);
+    });
   }, [selectedClassId]);
 
   const totalStudents = classes.reduce((sum, c) => sum + (c.studentCount ?? 0), 0);
@@ -641,7 +780,15 @@ export default function TeacherDashboard() {
                     </div>
                   ) : (
                     <div className="space-y-1">
-                      {assignments.map(a => <AssignmentRow key={a.id} assignment={a} language={language} />)}
+                      {assignments.map(a => (
+                        <AssignmentRow
+                          key={a.id}
+                          assignment={a}
+                          submissionCount={submissionCounts[a.id] ?? 0}
+                          language={language}
+                          onClick={() => setViewingAssignment(a)}
+                        />
+                      ))}
                     </div>
                   )}
                 </div>
@@ -672,6 +819,14 @@ export default function TeacherDashboard() {
             setShowCreateAssignment(false);
             loadData();
           }}
+        />
+      )}
+
+      {viewingAssignment && (
+        <SubmissionsPanel
+          assignment={viewingAssignment}
+          language={language}
+          onClose={() => setViewingAssignment(null)}
         />
       )}
     </div>
