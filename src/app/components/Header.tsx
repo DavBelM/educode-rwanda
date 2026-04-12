@@ -80,15 +80,15 @@ export function Header({ language, onLanguageToggle, subtitle, hideAssignmentInf
         {showWorkspaceActions && (
           <>
             <button
-              className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-lg border-2 border-gray-300 text-gray-700 hover:bg-gray-50 transition-all"
-              style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600 }}
+              className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-lg transition-all"
+              style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600, color: '#94a3b8', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.04)' }}
             >
               <Save size={16} />
               <span className="hidden lg:inline">{isKinyarwanda ? 'Bika' : 'Save'}</span>
             </button>
             <button
-              className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-lg border-2 border-[#10b981] text-[#10b981] hover:bg-[#f0fdf4] transition-all"
-              style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600 }}
+              className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-lg transition-all"
+              style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600, color: '#00d4aa', border: '1px solid rgba(0,212,170,0.3)', background: 'rgba(0,212,170,0.08)' }}
             >
               <Send size={16} />
               <span className="hidden lg:inline">{isKinyarwanda ? 'Ohereza' : 'Submit'}</span>
