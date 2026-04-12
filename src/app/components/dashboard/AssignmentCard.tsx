@@ -82,7 +82,9 @@ export function AssignmentCard({ assignment, language, onClick }: AssignmentCard
             ))}
           </div>
           <span className="text-xs" style={{ fontFamily: 'Inter, sans-serif', color: '#475569' }}>
-            {assignment.testsCompleted}/{assignment.testsTotal} {isKinyarwanda ? 'byatsinze' : 'passed'}
+            {assignment.status === 'completed'
+              ? (isKinyarwanda ? 'Byatanzwe' : 'Submitted')
+              : `${assignment.testsCompleted}/${assignment.testsTotal} ${isKinyarwanda ? 'byatsinze' : 'passed'}`}
           </span>
         </div>
 
