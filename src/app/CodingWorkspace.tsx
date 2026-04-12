@@ -86,14 +86,17 @@ console.log("Total Price: " + totalPrice + " RWF");
       {/* Desktop Layout */}
       <div className="hidden lg:flex flex-1 overflow-hidden">
         {/* Left: Code Editor (60%) */}
-        <div className="w-[60%] relative">
-          <CodeEditor
-            code={code}
-            onChange={setCode}
-            language={language}
-            errorLine={errorLine}
-          />
-          <div className="absolute bottom-6 left-6">
+        <div className="w-[60%] flex flex-col">
+          <div className="flex-1 overflow-hidden">
+            <CodeEditor
+              code={code}
+              onChange={setCode}
+              language={language}
+              errorLine={errorLine}
+            />
+          </div>
+          {/* Run bar — always visible below the editor */}
+          <div className="shrink-0 px-4 py-3 bg-[#181825] border-t border-gray-700 flex items-center gap-3">
             <RunCodeButton onClick={runCode} isRunning={isRunning} language={language} />
           </div>
         </div>
