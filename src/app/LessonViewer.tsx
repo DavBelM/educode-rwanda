@@ -2,6 +2,9 @@ import { useState, useCallback } from 'react';
 import { ArrowLeft, Play, CheckCircle, Loader, Zap, BookOpen, Code2, HelpCircle } from 'lucide-react';
 import { completeLesson, type CourseLesson } from '../lib/db';
 import { executeCode } from '../lib/code-executor';
+import CodeMirror from '@uiw/react-codemirror';
+import { javascript } from '@codemirror/lang-javascript';
+import { vscodeDark } from '@uiw/codemirror-theme-vscode';
 
 interface Props {
   lesson: CourseLesson;
@@ -139,14 +142,13 @@ function CodingLesson({ lesson, language, onComplete, completing }: {
             {isKin ? 'Kora' : 'Run'}
           </button>
         </div>
-        <textarea
+        <CodeMirror
           value={code}
-          onChange={e => setCode(e.target.value)}
-          spellCheck={false}
-          className="w-full resize-none focus:outline-none p-4 text-sm"
-          style={{ background: '#0d0f14', color: '#e2e8f0', fontFamily: 'monospace', lineHeight: '1.6',
-            minHeight: '180px' }}
-          rows={Math.max(10, code.split('\n').length + 2)}
+          onChange={setCode}
+          theme={vscodeDark}
+          extensions={[javascript(), ]}
+          basicSetup={{ lineNumbers: true, highlightActiveLine: true, foldGutter: false }}
+          style={{ fontSize: '13px' }}
         />
       </div>
 

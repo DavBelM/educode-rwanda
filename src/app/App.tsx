@@ -74,6 +74,7 @@ export default function App() {
       const nextLesson = openLesson.allLessons[currentIdx + 1] ?? null;
       return (
         <LessonViewer
+          key={openLesson.lesson.id}
           lesson={openLesson.lesson}
           courseTitle={openLesson.courseTitle}
           language={language}
