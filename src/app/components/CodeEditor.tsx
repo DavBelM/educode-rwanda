@@ -1,4 +1,8 @@
-import React from 'react';
+import CodeMirror from '@uiw/react-codemirror';
+import { javascript } from '@codemirror/lang-javascript';
+import { vscodeDark } from '@uiw/codemirror-theme-vscode';
+import { EditorView, Decoration, ViewPlugin, ViewUpdate } from '@codemirror/view';
+import { RangeSetBuilder } from '@codemirror/state';
 
 interface CodeEditorProps {
   code: string;
@@ -7,25 +11,63 @@ interface CodeEditorProps {
   errorLine?: number;
 }
 
+// Plugin that highlights a specific line in red
+function errorLinePlugin(line: number) {
+  return ViewPlugin.fromClass(
+    class {
+      decorations;
+      constructor(view: EditorView) {
+        this.decorations = this.build(view, line);
+      }
+      update(update: ViewUpdate) {
+        if (update.docChanged || update.viewportChanged) {
+          this.decorations = this.build(update.view, line);
+        }
+      }
+      build(view: EditorView, targetLine: number) {
+        const builder = new RangeSetBuilder<Decoration>();
+        for (const { from, to } of view.visibleRanges) {
+          let pos = from;
+          while (pos <= to) {
+            const lineObj = view.state.doc.lineAt(pos);
+            if (lineObj.number === targetLine) {
+              builder.add(
+                lineObj.from,
+                lineObj.from,
+                Decoration.line({ attributes: { style: 'background: rgba(239,68,68,0.12); border-left: 3px solid #ef4444;' } })
+              );
+            }
+            pos = lineObj.to + 1;
+          }
+        }
+        return builder.finish();
+      }
+    },
+    { decorations: (v) => v.decorations }
+  );
+}
+
 export function CodeEditor({ code, onChange, language, errorLine }: CodeEditorProps) {
   const isKinyarwanda = language === 'KIN';
-  const lines = code.split('\n');
+
+  const extensions = [
+    javascript(),
+    EditorView.lineWrapping,
+    ...(errorLine ? [errorLinePlugin(errorLine)] : []),
+  ];
 
   return (
     <div className="h-full flex flex-col bg-[#1e1e2e]">
-      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700">
+      {/* Toolbar */}
+      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700 shrink-0">
         <div className="flex items-center gap-3">
           <span className="text-sm font-medium text-gray-300" style={{ fontFamily: 'Inter, sans-serif' }}>
             {isKinyarwanda ? 'Wandika kode yawe' : 'Code Editor'}
           </span>
-          <span className="text-xs text-gray-500">•</span>
-          <span className="text-xs text-gray-400" style={{ fontFamily: 'Inter, sans-serif' }}>
-            {isKinyarwanda ? 'Imyitozo: Gukoresha ibihwanye' : 'Variables Practice'}
-          </span>
           <div className="flex gap-2 ml-2">
-            <div className="w-3 h-3 rounded-full bg-red-500"></div>
-            <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-            <div className="w-3 h-3 rounded-full bg-green-500"></div>
+            <div className="w-3 h-3 rounded-full bg-red-500" />
+            <div className="w-3 h-3 rounded-full bg-yellow-500" />
+            <div className="w-3 h-3 rounded-full bg-green-500" />
           </div>
         </div>
         <span className="text-xs text-gray-400 px-2 py-1 bg-gray-800 rounded" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
@@ -33,66 +75,24 @@ export function CodeEditor({ code, onChange, language, errorLine }: CodeEditorPr
         </span>
       </div>
 
-      <div className="flex-1 relative overflow-hidden">
-        {/* Line numbers with grid lines and error highlighting */}
-        <div className="absolute left-0 top-0 bottom-0 w-12 bg-[#181825] flex flex-col items-center py-4 border-r border-gray-700 z-10">
-          {Array.from({ length: 20 }, (_, i) => (
-            <div
-              key={i}
-              className="text-xs leading-6 relative w-full text-center"
-              style={{
-                fontFamily: 'JetBrains Mono, monospace',
-                color: errorLine === i + 1 ? '#ef4444' : 'rgba(148, 163, 184, 0.4)',
-                fontWeight: errorLine === i + 1 ? 600 : 400,
-                backgroundColor: errorLine === i + 1 ? 'rgba(239, 68, 68, 0.1)' : 'transparent'
-              }}
-            >
-              {i + 1}
-              {/* Grid line every 5 lines */}
-              {(i + 1) % 5 === 0 && (
-                <div className="absolute right-0 top-1/2 w-screen h-px bg-gray-700 opacity-20"></div>
-              )}
-            </div>
-          ))}
-        </div>
-
-        {/* Code content with error highlighting */}
-        <div className="absolute inset-0 pl-12">
-          <div className="relative h-full">
-            <textarea
-              value={code}
-              onChange={(e) => onChange(e.target.value)}
-              className="w-full h-full bg-transparent text-gray-100 pl-4 pr-4 py-4 resize-none focus:outline-none relative z-20"
-              style={{
-                fontFamily: 'JetBrains Mono, monospace',
-                fontSize: '14px',
-                lineHeight: '24px'
-              }}
-              placeholder={isKinyarwanda ? '// Andika kode yawe hano...' : '// Write your code here...'}
-              spellCheck={false}
-            />
-            {/* Error underline overlay */}
-            {errorLine && (
-              <div
-                className="absolute left-0 right-0 pointer-events-none z-10"
-                style={{
-                  top: `${(errorLine - 1) * 24 + 16}px`,
-                  height: '24px',
-                  backgroundColor: 'rgba(239, 68, 68, 0.08)'
-                }}
-              >
-                <div
-                  className="absolute bottom-0 left-0 right-0"
-                  style={{
-                    height: '2px',
-                    backgroundImage: 'repeating-linear-gradient(90deg, #ef4444 0px, #ef4444 4px, transparent 4px, transparent 8px)',
-                    backgroundSize: '8px 2px'
-                  }}
-                />
-              </div>
-            )}
-          </div>
-        </div>
+      {/* Editor */}
+      <div className="flex-1 overflow-auto">
+        <CodeMirror
+          value={code}
+          onChange={onChange}
+          theme={vscodeDark}
+          extensions={extensions}
+          height="100%"
+          style={{ height: '100%', fontSize: '14px' }}
+          basicSetup={{
+            lineNumbers: true,
+            highlightActiveLine: true,
+            highlightActiveLineGutter: true,
+            foldGutter: false,
+            dropCursor: false,
+            allowMultipleSelections: false,
+          }}
+        />
       </div>
     </div>
   );
