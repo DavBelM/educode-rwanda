@@ -1,9 +1,10 @@
 import { useState, useCallback } from 'react';
-import { ArrowLeft, Play, CheckCircle, Loader, Zap, BookOpen, Code2, HelpCircle } from 'lucide-react';
+import { ArrowLeft, Play, CheckCircle, Loader, Zap, BookOpen, Code2, HelpCircle, Monitor } from 'lucide-react';
 import { completeLesson, type CourseLesson } from '../lib/db';
 import { executeCode } from '../lib/code-executor';
 import CodeMirror from '@uiw/react-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
+import { html } from '@codemirror/lang-html';
 import { vscodeDark } from '@uiw/codemirror-theme-vscode';
 
 interface Props {
@@ -87,21 +88,30 @@ function CodingLesson({ lesson, language, onComplete, completing }: {
   lesson: CourseLesson; language: 'EN' | 'KIN'; onComplete: () => void; completing: boolean;
 }) {
   const isKin = language === 'KIN';
+  // Exercises with empty starter_code are HTML/DOM exercises — use HTML editor + preview
+  const isHtmlExercise = !lesson.exercise_data?.starter_code;
   const [code, setCode] = useState(lesson.exercise_data?.starter_code ?? '');
+  const [htmlCode, setHtmlCode] = useState('');
   const [output, setOutput] = useState('');
+  const [previewSrc, setPreviewSrc] = useState('');
   const [running, setRunning] = useState(false);
   const [hasRun, setHasRun] = useState(false);
   const [showHint, setShowHint] = useState(false);
 
   const run = useCallback(async () => {
-    setRunning(true);
-    const result = await executeCode(code);
-    let out = result.output;
-    if (result.error) out = (out ? out + '\n' : '') + `❌ ${result.error}`;
-    setOutput(out || '(no output)');
-    setHasRun(true);
-    setRunning(false);
-  }, [code]);
+    if (isHtmlExercise) {
+      setPreviewSrc(htmlCode);
+      setHasRun(true);
+    } else {
+      setRunning(true);
+      const result = await executeCode(code);
+      let out = result.output;
+      if (result.error) out = (out ? out + '\n' : '') + `❌ ${result.error}`;
+      setOutput(out || '(no output)');
+      setHasRun(true);
+      setRunning(false);
+    }
+  }, [code, htmlCode, isHtmlExercise]);
 
   const hasError = output.includes('❌');
 
@@ -109,7 +119,7 @@ function CodingLesson({ lesson, language, onComplete, completing }: {
     <div className="space-y-4">
       {/* Instructions */}
       <div className="rounded-xl p-4" style={{ background: 'rgba(0,212,170,0.05)', border: '1px solid rgba(0,212,170,0.15)' }}>
-        <p className="text-sm" style={{ color: '#cbd5e1', fontFamily: 'Inter, sans-serif' }}>
+        <p className="text-sm whitespace-pre-line" style={{ color: '#cbd5e1', fontFamily: 'Inter, sans-serif' }}>
           {lesson.exercise_data?.instructions}
         </p>
         {lesson.exercise_data?.hint && (
@@ -126,44 +136,96 @@ function CodingLesson({ lesson, language, onComplete, completing }: {
         )}
       </div>
 
-      {/* Editor */}
-      <div className="rounded-xl overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.08)' }}>
-        <div className="px-4 py-2 flex items-center justify-between"
-          style={{ background: '#1a1e2a', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-          <span className="text-xs font-semibold" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
-            JavaScript
-          </span>
-          <button onClick={run} disabled={running}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all disabled:opacity-50"
-            style={{ background: '#00d4aa', color: '#0d0f14' }}
-            onMouseEnter={e => { if (!running) (e.currentTarget as HTMLButtonElement).style.background = '#00bfa0'; }}
-            onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = '#00d4aa'; }}>
-            {running ? <Loader size={12} className="animate-spin" /> : <Play size={12} />}
-            {isKin ? 'Kora' : 'Run'}
-          </button>
-        </div>
-        <CodeMirror
-          value={code}
-          onChange={setCode}
-          theme={vscodeDark}
-          extensions={[javascript(), ]}
-          basicSetup={{ lineNumbers: true, highlightActiveLine: true, foldGutter: false }}
-          style={{ fontSize: '13px' }}
-        />
-      </div>
+      {isHtmlExercise ? (
+        <>
+          {/* HTML Editor */}
+          <div className="rounded-xl overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.08)' }}>
+            <div className="px-4 py-2 flex items-center justify-between"
+              style={{ background: '#1a1e2a', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+              <span className="text-xs font-semibold" style={{ color: '#f97316', fontFamily: 'monospace' }}>
+                index.html
+              </span>
+              <button onClick={run}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
+                style={{ background: '#00d4aa', color: '#0d0f14' }}
+                onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = '#00bfa0'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = '#00d4aa'; }}>
+                <Monitor size={12} />
+                {isKin ? 'Reba' : 'Preview'}
+              </button>
+            </div>
+            <CodeMirror
+              value={htmlCode}
+              onChange={setHtmlCode}
+              theme={vscodeDark}
+              extensions={[html()]}
+              basicSetup={{ lineNumbers: true, highlightActiveLine: true, foldGutter: false }}
+              style={{ fontSize: '13px' }}
+              placeholder="<!-- Write your full HTML page here -->"
+            />
+          </div>
 
-      {/* Output */}
-      {output && (
-        <div className="rounded-xl p-4" style={{ background: '#0d0f14', border: '1px solid rgba(255,255,255,0.06)' }}>
-          <p className="text-xs font-semibold mb-2" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>Output</p>
-          <pre className="text-sm whitespace-pre-wrap"
-            style={{ color: hasError ? '#f87171' : '#00d4aa', fontFamily: 'monospace' }}>
-            {output}
-          </pre>
-        </div>
+          {/* Iframe Preview */}
+          {previewSrc && (
+            <div className="rounded-xl overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.08)' }}>
+              <div className="px-4 py-2"
+                style={{ background: '#1a1e2a', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                <span className="text-xs font-semibold" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
+                  Preview
+                </span>
+              </div>
+              <iframe
+                srcDoc={previewSrc}
+                title="preview"
+                className="w-full"
+                style={{ height: '320px', border: 'none', background: '#fff' }}
+                sandbox="allow-scripts"
+              />
+            </div>
+          )}
+        </>
+      ) : (
+        <>
+          {/* JS Editor */}
+          <div className="rounded-xl overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.08)' }}>
+            <div className="px-4 py-2 flex items-center justify-between"
+              style={{ background: '#1a1e2a', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+              <span className="text-xs font-semibold" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
+                JavaScript
+              </span>
+              <button onClick={run} disabled={running}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all disabled:opacity-50"
+                style={{ background: '#00d4aa', color: '#0d0f14' }}
+                onMouseEnter={e => { if (!running) (e.currentTarget as HTMLButtonElement).style.background = '#00bfa0'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = '#00d4aa'; }}>
+                {running ? <Loader size={12} className="animate-spin" /> : <Play size={12} />}
+                {isKin ? 'Kora' : 'Run'}
+              </button>
+            </div>
+            <CodeMirror
+              value={code}
+              onChange={setCode}
+              theme={vscodeDark}
+              extensions={[javascript()]}
+              basicSetup={{ lineNumbers: true, highlightActiveLine: true, foldGutter: false }}
+              style={{ fontSize: '13px' }}
+            />
+          </div>
+
+          {/* Console Output */}
+          {output && (
+            <div className="rounded-xl p-4" style={{ background: '#0d0f14', border: '1px solid rgba(255,255,255,0.06)' }}>
+              <p className="text-xs font-semibold mb-2" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>Output</p>
+              <pre className="text-sm whitespace-pre-wrap"
+                style={{ color: hasError ? '#f87171' : '#00d4aa', fontFamily: 'monospace' }}>
+                {output}
+              </pre>
+            </div>
+          )}
+        </>
       )}
 
-      {hasRun && !hasError && (
+      {hasRun && (isHtmlExercise || !hasError) && (
         <button onClick={onComplete} disabled={completing}
           className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm transition-all disabled:opacity-50"
           style={{ background: '#00d4aa', color: '#0d0f14', fontFamily: 'Inter, sans-serif' }}

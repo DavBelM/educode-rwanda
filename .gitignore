@@ -1,6 +1,7 @@
 node_modules/
 dist/
 .env
+seed.sql
 .env.local
 .env.*.local
 
@@ -8,5 +9,7 @@ dist/
 PART_1_PROJECT_OVERVIEW.md
 PART_2_AI_ML_STRATEGY.md
 PART_3_DEVELOPMENT_ROADMAP.md
+TeM_SWDJF301_JavaScript Fundamentals.pdf
+TeM_SWDWD301_Website Development.pdf
 default_shadcn_theme.css
 src/imports/
