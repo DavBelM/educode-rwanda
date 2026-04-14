@@ -13,7 +13,7 @@ import AboutPage from './AboutPage';
 import ContactPage from './ContactPage';
 import PrivacyPolicyPage from './PrivacyPolicyPage';
 import { useAuth } from '../lib/auth';
-import type { Assignment, CourseLesson } from '../lib/db';
+import { getResumeLesson, type Assignment, type CourseLesson } from '../lib/db';
 
 type PublicView = 'landing' | 'login' | 'signup' | 'school-signup' | 'about' | 'contact' | 'privacy';
 type StudentView = 'dashboard' | 'workspace' | 'theoretical' | 'courses' | 'lesson';
@@ -93,6 +93,15 @@ export default function App() {
         onStartCoding={() => setStudentView('workspace')}
         onOpenAssignment={(a) => { setOpenAssignment(a); setStudentView('theoretical'); }}
         onOpenCourses={() => setStudentView('courses')}
+        onContinueLearning={async () => {
+          const resume = await getResumeLesson();
+          if (resume) {
+            setOpenLesson(resume);
+            setStudentView('lesson');
+          } else {
+            setStudentView('courses');
+          }
+        }}
       />
     );
   }

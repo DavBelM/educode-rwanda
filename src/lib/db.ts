@@ -406,6 +406,25 @@ export async function getCompletedLessonIds(courseId: string): Promise<Set<strin
   return new Set((data ?? []).map(r => r.lesson_id));
 }
 
+export async function getResumeLesson(): Promise<{
+  lesson: CourseLesson;
+  courseTitle: string;
+  allLessons: CourseLesson[];
+} | null> {
+  const courses = await getCourses();
+  for (const course of courses) {
+    const { modules } = await getCourseDetail(course.id);
+    const allLessons = modules.flatMap(m => m.lessons);
+    if (allLessons.length === 0) continue;
+    const completedIds = await getCompletedLessonIds(course.id);
+    const nextLesson = allLessons.find(l => !completedIds.has(l.id));
+    if (nextLesson) {
+      return { lesson: nextLesson, courseTitle: course.title, allLessons };
+    }
+  }
+  return null;
+}
+
 export async function completeLesson(lessonId: string, score?: number): Promise<{ error: string | null }> {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { error: 'Not authenticated' };

@@ -8,9 +8,10 @@ interface ProgressOverviewProps {
   streak: number;
   xpPoints: number;
   level: string;
+  onContinueLearning?: () => void;
 }
 
-export function ProgressOverview({ language, progress, assignmentsCompleted, assignmentsTotal, streak, xpPoints, level }: ProgressOverviewProps) {
+export function ProgressOverview({ language, progress, assignmentsCompleted, assignmentsTotal, streak, xpPoints, level, onContinueLearning }: ProgressOverviewProps) {
   const isKinyarwanda = language === 'KIN';
   const circumference = 2 * Math.PI * 70;
 
@@ -91,6 +92,7 @@ export function ProgressOverview({ language, progress, assignmentsCompleted, ass
         }}
         onMouseEnter={e => (e.currentTarget.style.background = 'rgba(0,212,170,0.2)')}
         onMouseLeave={e => (e.currentTarget.style.background = 'rgba(0,212,170,0.12)')}
+        onClick={onContinueLearning}
       >
         {isKinyarwanda ? 'Komeza Kwiga' : 'Continue Learning'}
       </button>
