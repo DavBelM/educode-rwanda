@@ -425,6 +425,89 @@ export async function getResumeLesson(): Promise<{
   return null;
 }
 
+// ─── Announcements ────────────────────────────────────────────────────────────
+
+export interface Announcement {
+  id: string;
+  class_id: string;
+  teacher_id: string;
+  title: string;
+  body: string;
+  pinned: boolean;
+  created_at: string;
+  classes?: { name: string };
+}
+
+export async function createAnnouncement(params: {
+  classId: string;
+  title: string;
+  body: string;
+  pinned?: boolean;
+}): Promise<{ data: Announcement | null; error: string | null }> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { data: null, error: 'Not authenticated' };
+
+  const { data, error } = await supabase
+    .from('announcements')
+    .insert({
+      class_id: params.classId,
+      teacher_id: user.id,
+      title: params.title,
+      body: params.body,
+      pinned: params.pinned ?? false,
+    })
+    .select()
+    .single();
+
+  if (error) return { data: null, error: error.message };
+  return { data, error: null };
+}
+
+export async function getClassAnnouncements(classId: string): Promise<{ data: Announcement[]; error: string | null }> {
+  const { data, error } = await supabase
+    .from('announcements')
+    .select('*')
+    .eq('class_id', classId)
+    .order('pinned', { ascending: false })
+    .order('created_at', { ascending: false });
+
+  if (error) return { data: [], error: error.message };
+  return { data: data ?? [], error: null };
+}
+
+export async function getStudentAnnouncements(): Promise<{ data: Announcement[]; error: string | null }> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { data: [], error: 'Not authenticated' };
+
+  const { data: enrollments } = await supabase
+    .from('class_enrollments')
+    .select('class_id')
+    .eq('student_id', user.id);
+
+  if (!enrollments || enrollments.length === 0) return { data: [], error: null };
+
+  const classIds = enrollments.map((e: { class_id: string }) => e.class_id);
+
+  const { data, error } = await supabase
+    .from('announcements')
+    .select('*, classes(name)')
+    .in('class_id', classIds)
+    .order('pinned', { ascending: false })
+    .order('created_at', { ascending: false })
+    .limit(20);
+
+  if (error) return { data: [], error: error.message };
+  return { data: data ?? [], error: null };
+}
+
+export async function deleteAnnouncement(id: string): Promise<{ error: string | null }> {
+  const { error } = await supabase.from('announcements').delete().eq('id', id);
+  if (error) return { error: error.message };
+  return { error: null };
+}
+
+// ─── Lessons ──────────────────────────────────────────────────────────────────
+
 export async function completeLesson(lessonId: string, score?: number): Promise<{ error: string | null }> {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { error: 'Not authenticated' };

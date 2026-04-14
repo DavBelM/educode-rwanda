@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Users, FileText, Plus, Copy, Check, X, ChevronDown, BookOpen, Code2, Loader, Trophy, Medal } from 'lucide-react';
+import { Users, FileText, Plus, Copy, Check, X, ChevronDown, BookOpen, Code2, Loader, Trophy, Medal, Megaphone, Pin, Trash2 } from 'lucide-react';
 import { Header } from './components/Header';
 import {
   createClass, getTeacherClasses, getClassAssignments, createAssignment, getClassStudentCount,
   getAssignmentSubmissions, getAssignmentSubmissionCounts, gradeSubmission, getClassLeaderboard,
-  type Class, type Assignment, type Question, type Submission, type LeaderboardEntry
+  createAnnouncement, getClassAnnouncements, deleteAnnouncement,
+  type Class, type Assignment, type Question, type Submission, type LeaderboardEntry, type Announcement
 } from '../lib/db';
 
 // ─── Create Class Modal ────────────────────────────────────────────────────────
@@ -414,9 +415,208 @@ function CreateAssignmentModal({ language, classes, onClose, onCreate }: {
   );
 }
 
+// ─── Announcements Modal ──────────────────────────────────────────────────────
+
+function AnnouncementsModal({ cls, language, onClose }: {
+  cls: Class;
+  language: 'EN' | 'KIN';
+  onClose: () => void;
+}) {
+  const isKin = language === 'KIN';
+  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [tab, setTab] = useState<'list' | 'new'>('list');
+  const [title, setTitle] = useState('');
+  const [body, setBody] = useState('');
+  const [pinned, setPinned] = useState(false);
+  const [posting, setPosting] = useState(false);
+  const [postError, setPostError] = useState('');
+  const [deleting, setDeleting] = useState<string | null>(null);
+
+  const load = () => {
+    getClassAnnouncements(cls.id).then(({ data }) => {
+      setAnnouncements(data);
+      setLoading(false);
+    });
+  };
+
+  useEffect(() => { load(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handlePost = async () => {
+    if (!title.trim() || !body.trim()) return;
+    setPosting(true);
+    setPostError('');
+    const { error } = await createAnnouncement({ classId: cls.id, title: title.trim(), body: body.trim(), pinned });
+    if (error) { setPostError(error); setPosting(false); return; }
+    setTitle(''); setBody(''); setPinned(false);
+    setTab('list');
+    setLoading(true);
+    load();
+    setPosting(false);
+  };
+
+  const handleDelete = async (id: string) => {
+    setDeleting(id);
+    await deleteAnnouncement(id);
+    setAnnouncements(prev => prev.filter(a => a.id !== id));
+    setDeleting(null);
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }}>
+      <div className="w-full max-w-lg rounded-2xl flex flex-col" style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.08)', maxHeight: '80vh' }}>
+        {/* Header */}
+        <div className="flex items-center justify-between p-5" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+          <div className="flex items-center gap-2">
+            <Megaphone size={16} style={{ color: '#f59e0b' }} />
+            <div>
+              <h2 className="text-base font-bold" style={{ color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}>
+                {isKin ? 'Inyandiko z\'Umwarimu' : 'Announcements'}
+              </h2>
+              <p className="text-xs" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>{cls.name}</p>
+            </div>
+          </div>
+          <button onClick={onClose} style={{ color: '#475569' }} onMouseEnter={e => (e.currentTarget.style.color = '#94a3b8')} onMouseLeave={e => (e.currentTarget.style.color = '#475569')}>
+            <X size={20} />
+          </button>
+        </div>
+
+        {/* Tabs */}
+        <div className="flex px-5 pt-4 gap-2">
+          {(['list', 'new'] as const).map(t => (
+            <button
+              key={t}
+              onClick={() => setTab(t)}
+              className="px-4 py-1.5 rounded-lg text-xs font-semibold transition-all"
+              style={{
+                background: tab === t ? 'rgba(245,158,11,0.12)' : 'transparent',
+                color: tab === t ? '#f59e0b' : '#475569',
+                border: tab === t ? '1px solid rgba(245,158,11,0.25)' : '1px solid transparent',
+                fontFamily: 'Inter, sans-serif',
+              }}
+            >
+              {t === 'list' ? (isKin ? 'Reba' : 'View All') : (isKin ? 'Shyiraho Rishya' : 'Post New')}
+            </button>
+          ))}
+        </div>
+
+        {/* Body */}
+        <div className="overflow-y-auto p-5 flex-1">
+          {tab === 'list' ? (
+            loading ? (
+              <div className="flex justify-center py-10">
+                <Loader size={18} className="animate-spin" style={{ color: '#f59e0b' }} />
+              </div>
+            ) : announcements.length === 0 ? (
+              <div className="py-10 text-center">
+                <Megaphone size={28} className="mx-auto mb-3" style={{ color: '#334155' }} />
+                <p className="text-sm" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
+                  {isKin ? 'Nta nyandiko zihari' : 'No announcements yet'}
+                </p>
+                <button
+                  onClick={() => setTab('new')}
+                  className="mt-4 px-4 py-2 rounded-xl text-xs font-semibold transition-all"
+                  style={{ background: 'rgba(245,158,11,0.12)', color: '#f59e0b', border: '1px solid rgba(245,158,11,0.25)', fontFamily: 'Inter, sans-serif' }}
+                >
+                  {isKin ? 'Tangaza ubutumwa' : 'Post first announcement'}
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {announcements.map(a => (
+                  <div key={a.id} className="rounded-xl p-4" style={{ background: a.pinned ? 'rgba(245,158,11,0.05)' : '#1a1e2a', border: a.pinned ? '1px solid rgba(245,158,11,0.2)' : '1px solid rgba(255,255,255,0.05)' }}>
+                    <div className="flex items-start justify-between gap-2 mb-1">
+                      <div className="flex items-center gap-1.5 flex-1 min-w-0">
+                        {a.pinned && <Pin size={12} style={{ color: '#f59e0b', flexShrink: 0 }} />}
+                        <p className="text-sm font-semibold truncate" style={{ color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}>{a.title}</p>
+                      </div>
+                      <button
+                        onClick={() => handleDelete(a.id)}
+                        disabled={deleting === a.id}
+                        style={{ color: '#475569', flexShrink: 0 }}
+                        onMouseEnter={e => (e.currentTarget.style.color = '#ef4444')}
+                        onMouseLeave={e => (e.currentTarget.style.color = '#475569')}
+                      >
+                        {deleting === a.id ? <Loader size={13} className="animate-spin" /> : <Trash2 size={13} />}
+                      </button>
+                    </div>
+                    <p className="text-xs leading-relaxed mb-2" style={{ color: '#94a3b8', fontFamily: 'Inter, sans-serif', whiteSpace: 'pre-wrap' }}>{a.body}</p>
+                    <p className="text-xs" style={{ color: '#334155', fontFamily: 'Inter, sans-serif' }}>
+                      {new Date(a.created_at).toLocaleString()}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )
+          ) : (
+            <div className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold mb-1.5" style={{ color: '#94a3b8', fontFamily: 'Inter, sans-serif' }}>
+                  {isKin ? 'Umutwe' : 'Title'}
+                </label>
+                <input
+                  type="text"
+                  value={title}
+                  onChange={e => setTitle(e.target.value)}
+                  placeholder={isKin ? 'Urugero: Isomo rya ejo hazaza rihagaritswe' : 'e.g. Tomorrow\'s class is cancelled'}
+                  className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none"
+                  style={{ background: '#0d0f14', border: '1px solid rgba(255,255,255,0.08)', color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}
+                  onFocus={e => (e.target.style.border = '1px solid rgba(245,158,11,0.4)')}
+                  onBlur={e => (e.target.style.border = '1px solid rgba(255,255,255,0.08)')}
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold mb-1.5" style={{ color: '#94a3b8', fontFamily: 'Inter, sans-serif' }}>
+                  {isKin ? 'Ubutumwa' : 'Message'}
+                </label>
+                <textarea
+                  value={body}
+                  onChange={e => setBody(e.target.value)}
+                  rows={5}
+                  placeholder={isKin ? 'Andika ubutumwa hano...' : 'Write your message here...'}
+                  className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none resize-none"
+                  style={{ background: '#0d0f14', border: '1px solid rgba(255,255,255,0.08)', color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}
+                  onFocus={e => (e.target.style.border = '1px solid rgba(245,158,11,0.4)')}
+                  onBlur={e => (e.target.style.border = '1px solid rgba(255,255,255,0.08)')}
+                />
+              </div>
+              <label className="flex items-center gap-2.5 cursor-pointer select-none">
+                <div
+                  onClick={() => setPinned(p => !p)}
+                  className="w-4 h-4 rounded flex items-center justify-center transition-all"
+                  style={{ background: pinned ? '#f59e0b' : 'transparent', border: pinned ? '1px solid #f59e0b' : '1px solid rgba(255,255,255,0.2)' }}
+                >
+                  {pinned && <Check size={10} style={{ color: '#0d0f14' }} />}
+                </div>
+                <span className="text-xs font-medium" style={{ color: '#94a3b8', fontFamily: 'Inter, sans-serif' }}>
+                  {isKin ? 'Shyira hejuru (pinned)' : 'Pin to top'}
+                </span>
+              </label>
+              {postError && (
+                <p className="text-xs p-3 rounded-xl" style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#f87171', fontFamily: 'Inter, sans-serif' }}>
+                  {postError}
+                </p>
+              )}
+              <button
+                onClick={handlePost}
+                disabled={!title.trim() || !body.trim() || posting}
+                className="w-full py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2 disabled:opacity-50 transition-all"
+                style={{ background: '#f59e0b', color: '#0d0f14', fontFamily: 'Inter, sans-serif' }}
+              >
+                {posting ? <Loader size={16} className="animate-spin" /> : <Megaphone size={15} />}
+                {isKin ? 'Tangaza' : 'Post Announcement'}
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Invite Code Card ──────────────────────────────────────────────────────────
 
-function ClassCard({ cls, language }: { cls: Class & { studentCount?: number; assignmentCount?: number }; language: 'EN' | 'KIN' }) {
+function ClassCard({ cls, language, onAnnouncements }: { cls: Class & { studentCount?: number; assignmentCount?: number }; language: 'EN' | 'KIN'; onAnnouncements: () => void }) {
   const isKin = language === 'KIN';
   const [copied, setCopied] = useState(false);
 
@@ -461,6 +661,17 @@ function ClassCard({ cls, language }: { cls: Class & { studentCount?: number; as
           {copied ? (isKin ? 'Nakopiwemo!' : 'Copied!') : (isKin ? 'Kopi' : 'Copy')}
         </button>
       </div>
+
+      <button
+        onClick={e => { e.stopPropagation(); onAnnouncements(); }}
+        className="mt-3 w-full flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-semibold transition-all"
+        style={{ background: 'rgba(245,158,11,0.08)', color: '#f59e0b', border: '1px solid rgba(245,158,11,0.18)', fontFamily: 'Inter, sans-serif' }}
+        onMouseEnter={e => (e.currentTarget.style.background = 'rgba(245,158,11,0.15)')}
+        onMouseLeave={e => (e.currentTarget.style.background = 'rgba(245,158,11,0.08)')}
+      >
+        <Megaphone size={13} />
+        {isKin ? 'Inyandiko' : 'Announcements'}
+      </button>
     </div>
   );
 }
@@ -737,7 +948,7 @@ function Leaderboard({ classId, language }: { classId: string; language: 'EN' | 
         </p>
       ) : (
         <div className="space-y-2">
-          {entries.map((e, i) => {
+          {entries.map((e) => {
             const initials = e.full_name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
             const isTop = e.rank <= 3;
             return (
@@ -778,6 +989,7 @@ export default function TeacherDashboard() {
   const [showCreateAssignment, setShowCreateAssignment] = useState(false);
   const [selectedClassId, setSelectedClassId] = useState<string | null>(null);
   const [viewingAssignment, setViewingAssignment] = useState<Assignment | null>(null);
+  const [announcementsClass, setAnnouncementsClass] = useState<Class | null>(null);
 
   const loadData = async () => {
     setLoadingData(true);
@@ -893,7 +1105,7 @@ export default function TeacherDashboard() {
                 ) : (
                   classes.map(cls => (
                     <div key={cls.id} onClick={() => setSelectedClassId(cls.id)} className="cursor-pointer" style={{ outline: selectedClassId === cls.id ? '2px solid rgba(0,212,170,0.3)' : 'none', borderRadius: '16px' }}>
-                      <ClassCard cls={cls} language={language} />
+                      <ClassCard cls={cls} language={language} onAnnouncements={() => setAnnouncementsClass(cls)} />
                     </div>
                   ))
                 )}
@@ -997,6 +1209,14 @@ export default function TeacherDashboard() {
           assignment={viewingAssignment}
           language={language}
           onClose={() => setViewingAssignment(null)}
+        />
+      )}
+
+      {announcementsClass && (
+        <AnnouncementsModal
+          cls={announcementsClass}
+          language={language}
+          onClose={() => setAnnouncementsClass(null)}
         />
       )}
     </div>
