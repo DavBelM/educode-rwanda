@@ -102,14 +102,15 @@ export function Header({ language, onLanguageToggle, subtitle, hideAssignmentInf
         {onAnnouncementsClick !== undefined && (
           <button
             onClick={onAnnouncementsClick}
+            title={isKinyarwanda ? 'Inyandiko z\'Umwarimu' : 'Announcements'}
             className="relative w-10 h-10 rounded-full flex items-center justify-center transition-all"
-            style={{ background: announcementCount ? 'rgba(245,158,11,0.12)' : 'rgba(255,255,255,0.04)', border: announcementCount ? '1px solid rgba(245,158,11,0.3)' : '1px solid rgba(255,255,255,0.08)' }}
-            onMouseEnter={e => (e.currentTarget.style.background = announcementCount ? 'rgba(245,158,11,0.2)' : 'rgba(255,255,255,0.08)')}
-            onMouseLeave={e => (e.currentTarget.style.background = announcementCount ? 'rgba(245,158,11,0.12)' : 'rgba(255,255,255,0.04)')}
+            style={{ background: announcementCount ? 'rgba(245,158,11,0.15)' : 'rgba(255,255,255,0.06)', border: announcementCount ? '1px solid rgba(245,158,11,0.4)' : '1px solid rgba(255,255,255,0.12)' }}
+            onMouseEnter={e => (e.currentTarget.style.background = announcementCount ? 'rgba(245,158,11,0.25)' : 'rgba(255,255,255,0.12)')}
+            onMouseLeave={e => (e.currentTarget.style.background = announcementCount ? 'rgba(245,158,11,0.15)' : 'rgba(255,255,255,0.06)')}
           >
-            <Bell size={16} style={{ color: announcementCount ? '#f59e0b' : '#475569' }} />
+            <Bell size={17} style={{ color: announcementCount ? '#f59e0b' : '#94a3b8' }} />
             {!!announcementCount && (
-              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center text-xs font-bold" style={{ background: '#f59e0b', color: '#0d0f14', fontFamily: 'Inter, sans-serif', fontSize: '10px' }}>
+              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center font-bold" style={{ background: '#f59e0b', color: '#0d0f14', fontFamily: 'Inter, sans-serif', fontSize: '10px' }}>
                 {announcementCount > 9 ? '9+' : announcementCount}
               </span>
             )}
