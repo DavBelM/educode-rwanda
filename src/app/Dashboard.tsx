@@ -15,6 +15,7 @@ interface Props {
   onStartCoding?: () => void;
   onOpenAssignment?: (assignment: Assignment) => void;
   onOpenCourses?: () => void;
+  onContinueLearning?: () => void;
 }
 
 // ─── Join Class Modal ──────────────────────────────────────────────────────────
@@ -112,7 +113,7 @@ function JoinClassModal({ language, onClose, onJoined }: {
 
 // ─── Main Dashboard ────────────────────────────────────────────────────────────
 
-export default function Dashboard({ language, onLanguageChange, onStartCoding, onOpenAssignment, onOpenCourses }: Props) {
+export default function Dashboard({ language, onLanguageChange, onStartCoding, onOpenAssignment, onOpenCourses, onContinueLearning }: Props) {
   const { profile } = useAuth();
   const studentName = profile?.full_name ?? 'Student';
   const isKinyarwanda = language === 'KIN';
@@ -257,6 +258,7 @@ export default function Dashboard({ language, onLanguageChange, onStartCoding, o
               streak={streak}
               xpPoints={totalEarned}
               level={getLevel(totalEarned)}
+              onContinueLearning={onContinueLearning}
             />
           </div>
 
