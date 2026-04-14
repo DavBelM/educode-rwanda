@@ -6,8 +6,8 @@ import { AssignmentCard } from './components/dashboard/AssignmentCard';
 import { AIInsights } from './components/dashboard/AIInsights';
 import { AchievementBadges } from './components/dashboard/AchievementBadges';
 import { useAuth } from '../lib/auth';
-import { getStudentAssignments, getStudentClasses, getClassWithInviteCode, joinClass, getSubmittedAssignmentIds, getStudentGrades, recordDailyLogin, getStreak, type Assignment } from '../lib/db';
-import { Users, ArrowRight, Loader, X, BookOpen } from 'lucide-react';
+import { getStudentAssignments, getStudentClasses, getClassWithInviteCode, joinClass, getSubmittedAssignmentIds, getStudentGrades, recordDailyLogin, getStreak, getStudentAnnouncements, type Assignment, type Announcement } from '../lib/db';
+import { Users, ArrowRight, Loader, X, BookOpen, Megaphone, Pin } from 'lucide-react';
 
 interface Props {
   language: 'EN' | 'KIN';
@@ -127,16 +127,19 @@ export default function Dashboard({ language, onLanguageChange, onStartCoding, o
   const [hasClass, setHasClass] = useState<boolean | null>(null);
   const [showJoinModal, setShowJoinModal] = useState(false);
   const [loadingAssignments, setLoadingAssignments] = useState(true);
+  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
 
   const loadAssignments = async () => {
     setLoadingAssignments(true);
-    const [{ data: classes }, { data: asgns }, submitted, grades, currentStreak] = await Promise.all([
+    const [{ data: classes }, { data: asgns }, submitted, grades, currentStreak, { data: ann }] = await Promise.all([
       getStudentClasses(),
       getStudentAssignments(),
       getSubmittedAssignmentIds(),
       getStudentGrades(),
       getStreak(),
+      getStudentAnnouncements(),
     ]);
+    setAnnouncements(ann ?? []);
     setStreak(currentStreak);
     setHasClass(classes.length > 0);
     setAssignments(asgns);
@@ -246,6 +249,40 @@ export default function Dashboard({ language, onLanguageChange, onStartCoding, o
 
       <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
         <HeroBanner language={language} studentName={studentName} />
+
+        {/* Announcements */}
+        {announcements.length > 0 && (
+          <div className="rounded-2xl p-5" style={{ background: '#13161e', border: '1px solid rgba(245,158,11,0.18)' }}>
+            <div className="flex items-center gap-2 mb-4">
+              <Megaphone size={15} style={{ color: '#f59e0b' }} />
+              <h2 className="text-sm font-bold" style={{ color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}>
+                {isKinyarwanda ? 'Inyandiko z\'Umwarimu' : 'Announcements'}
+              </h2>
+            </div>
+            <div className="space-y-3">
+              {announcements.slice(0, 5).map(a => {
+                const className = (a.classes as { name: string } | undefined)?.name;
+                return (
+                  <div key={a.id} className="rounded-xl p-4" style={{ background: a.pinned ? 'rgba(245,158,11,0.06)' : '#1a1e2a', border: a.pinned ? '1px solid rgba(245,158,11,0.2)' : '1px solid rgba(255,255,255,0.05)' }}>
+                    <div className="flex items-center gap-1.5 mb-1">
+                      {a.pinned && <Pin size={11} style={{ color: '#f59e0b' }} />}
+                      <p className="text-sm font-semibold" style={{ color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}>{a.title}</p>
+                      {className && (
+                        <span className="ml-auto text-xs px-2 py-0.5 rounded-full shrink-0" style={{ background: 'rgba(0,212,170,0.08)', color: '#00d4aa', border: '1px solid rgba(0,212,170,0.15)', fontFamily: 'Inter, sans-serif' }}>
+                          {className}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs leading-relaxed mb-1.5" style={{ color: '#94a3b8', fontFamily: 'Inter, sans-serif', whiteSpace: 'pre-wrap' }}>{a.body}</p>
+                    <p className="text-xs" style={{ color: '#334155', fontFamily: 'Inter, sans-serif' }}>
+                      {new Date(a.created_at).toLocaleString()}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Progress */}

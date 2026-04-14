@@ -13,3 +13,8 @@ TeM_SWDJF301_JavaScript Fundamentals.pdf
 TeM_SWDWD301_Website Development.pdf
 default_shadcn_theme.css
 src/imports/
+
+# ML — large dataset files stay local
+ml/data/fixjs/
+ml/data/processed/
+ml/data/kinyarwanda/
