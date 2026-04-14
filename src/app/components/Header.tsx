@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Save, Send, LogOut, User } from 'lucide-react';
+import { Save, Send, LogOut, User, Bell } from 'lucide-react';
 import { useAuth } from '../../lib/auth';
 
 interface HeaderProps {
@@ -9,9 +9,11 @@ interface HeaderProps {
   hideAssignmentInfo?: boolean;
   showWorkspaceActions?: boolean;
   onBack?: () => void;
+  announcementCount?: number;
+  onAnnouncementsClick?: () => void;
 }
 
-export function Header({ language, onLanguageToggle, subtitle, hideAssignmentInfo = false, showWorkspaceActions = false, onBack }: HeaderProps) {
+export function Header({ language, onLanguageToggle, subtitle, hideAssignmentInfo = false, showWorkspaceActions = false, onBack, announcementCount, onAnnouncementsClick }: HeaderProps) {
   const isKinyarwanda = language === 'KIN';
   const defaultSubtitle = subtitle || (isKinyarwanda ? 'Ikibanza cyo gutoza kode' : 'Student Coding Workspace');
   const { profile, signOut } = useAuth();
@@ -94,6 +96,24 @@ export function Header({ language, onLanguageToggle, subtitle, hideAssignmentInf
               <span className="hidden lg:inline">{isKinyarwanda ? 'Ohereza' : 'Submit'}</span>
             </button>
           </>
+        )}
+
+        {/* Announcements Bell */}
+        {onAnnouncementsClick !== undefined && (
+          <button
+            onClick={onAnnouncementsClick}
+            className="relative w-10 h-10 rounded-full flex items-center justify-center transition-all"
+            style={{ background: announcementCount ? 'rgba(245,158,11,0.12)' : 'rgba(255,255,255,0.04)', border: announcementCount ? '1px solid rgba(245,158,11,0.3)' : '1px solid rgba(255,255,255,0.08)' }}
+            onMouseEnter={e => (e.currentTarget.style.background = announcementCount ? 'rgba(245,158,11,0.2)' : 'rgba(255,255,255,0.08)')}
+            onMouseLeave={e => (e.currentTarget.style.background = announcementCount ? 'rgba(245,158,11,0.12)' : 'rgba(255,255,255,0.04)')}
+          >
+            <Bell size={16} style={{ color: announcementCount ? '#f59e0b' : '#475569' }} />
+            {!!announcementCount && (
+              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center text-xs font-bold" style={{ background: '#f59e0b', color: '#0d0f14', fontFamily: 'Inter, sans-serif', fontSize: '10px' }}>
+                {announcementCount > 9 ? '9+' : announcementCount}
+              </span>
+            )}
+          </button>
         )}
 
         {/* Language Toggle Pill */}
