@@ -690,6 +690,7 @@ function SubmissionsPanel({ assignment, language, onClose }: {
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState<string | null>(null);
   const [markInputs, setMarkInputs] = useState<Record<string, string>>({});
+  const [feedbackInputs, setFeedbackInputs] = useState<Record<string, string>>({});
   const [grading, setGrading] = useState<Record<string, boolean>>({});
   const [gradeError, setGradeError] = useState<Record<string, string>>({});
 
@@ -698,12 +699,15 @@ function SubmissionsPanel({ assignment, language, onClose }: {
       setSubmissions(data);
       // Pre-fill mark inputs from already-graded submissions
       const prefilled: Record<string, string> = {};
+      const preFeedback: Record<string, string> = {};
       for (const s of data) {
         if (s.marks_earned !== null && s.marks_earned !== undefined) {
           prefilled[s.id] = String(s.marks_earned);
         }
+        if (s.teacher_feedback) preFeedback[s.id] = s.teacher_feedback;
       }
       setMarkInputs(prefilled);
+      setFeedbackInputs(preFeedback);
       setLoading(false);
     });
   }, [assignment.id]);
@@ -720,11 +724,12 @@ function SubmissionsPanel({ assignment, language, onClose }: {
     }
     setGrading(prev => ({ ...prev, [subId]: true }));
     setGradeError(prev => ({ ...prev, [subId]: '' }));
-    const { error } = await gradeSubmission(subId, val);
+    const fb = feedbackInputs[subId]?.trim() || undefined;
+    const { error } = await gradeSubmission(subId, val, fb);
     if (error) {
       setGradeError(prev => ({ ...prev, [subId]: error }));
     } else {
-      setSubmissions(prev => prev.map(s => s.id === subId ? { ...s, marks_earned: val } : s));
+      setSubmissions(prev => prev.map(s => s.id === subId ? { ...s, marks_earned: val, teacher_feedback: fb ?? null } : s));
     }
     setGrading(prev => ({ ...prev, [subId]: false }));
   };
@@ -817,39 +822,51 @@ function SubmissionsPanel({ assignment, language, onClose }: {
                     })}
 
                     {/* Grading row */}
-                    <div className="pt-3 flex items-center gap-3" style={{ borderTop: '1px solid rgba(255,255,255,0.04)' }}>
-                      <label className="text-xs font-semibold shrink-0" style={{ color: '#94a3b8', fontFamily: 'Inter, sans-serif' }}>
-                        {isKin ? `Amanota (/${totalMarks})` : `Grade (/${totalMarks})`}
-                      </label>
-                      <input
-                        type="number"
-                        min={0}
-                        max={totalMarks}
-                        value={markInputs[sub.id] ?? ''}
-                        onChange={e => setMarkInputs(prev => ({ ...prev, [sub.id]: e.target.value }))}
-                        placeholder={`0 – ${totalMarks}`}
-                        className="w-24 px-3 py-1.5 rounded-lg text-sm text-center focus:outline-none"
-                        style={{ background: '#0d0f14', border: gradeError[sub.id] ? '1px solid rgba(239,68,68,0.5)' : '1px solid rgba(255,255,255,0.08)', color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}
+                    <div className="pt-3 space-y-2.5" style={{ borderTop: '1px solid rgba(255,255,255,0.04)' }}>
+                      <div className="flex items-center gap-3">
+                        <label className="text-xs font-semibold shrink-0" style={{ color: '#94a3b8', fontFamily: 'Inter, sans-serif' }}>
+                          {isKin ? `Amanota (/${totalMarks})` : `Grade (/${totalMarks})`}
+                        </label>
+                        <input
+                          type="number"
+                          min={0}
+                          max={totalMarks}
+                          value={markInputs[sub.id] ?? ''}
+                          onChange={e => setMarkInputs(prev => ({ ...prev, [sub.id]: e.target.value }))}
+                          placeholder={`0 – ${totalMarks}`}
+                          className="w-24 px-3 py-1.5 rounded-lg text-sm text-center focus:outline-none"
+                          style={{ background: '#0d0f14', border: gradeError[sub.id] ? '1px solid rgba(239,68,68,0.5)' : '1px solid rgba(255,255,255,0.08)', color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}
+                          onFocus={e => (e.target.style.border = '1px solid rgba(0,212,170,0.4)')}
+                          onBlur={e => (e.target.style.border = gradeError[sub.id] ? '1px solid rgba(239,68,68,0.5)' : '1px solid rgba(255,255,255,0.08)')}
+                        />
+                        <button
+                          onClick={() => handleGrade(sub.id)}
+                          disabled={grading[sub.id] || !markInputs[sub.id]}
+                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all disabled:opacity-40"
+                          style={{ background: '#00d4aa', color: '#0d0f14', fontFamily: 'Inter, sans-serif' }}
+                        >
+                          {grading[sub.id] ? <Loader size={12} className="animate-spin" /> : <Check size={12} />}
+                          {isKin ? 'Saba' : 'Save'}
+                        </button>
+                        {gradeError[sub.id] && (
+                          <span className="text-xs" style={{ color: '#f87171', fontFamily: 'Inter, sans-serif' }}>{gradeError[sub.id]}</span>
+                        )}
+                        {sub.marks_earned !== null && sub.marks_earned !== undefined && !gradeError[sub.id] && (
+                          <span className="text-xs" style={{ color: '#00d4aa', fontFamily: 'Inter, sans-serif' }}>
+                            ✓ {sub.marks_earned}/{totalMarks} {isKin ? 'byabitswe' : 'saved'}
+                          </span>
+                        )}
+                      </div>
+                      <textarea
+                        rows={2}
+                        value={feedbackInputs[sub.id] ?? ''}
+                        onChange={e => setFeedbackInputs(prev => ({ ...prev, [sub.id]: e.target.value }))}
+                        placeholder={isKin ? 'Andika igitekerezo (bihitamo)...' : 'Write feedback for the student (optional)...'}
+                        className="w-full px-3 py-2 rounded-lg text-xs leading-relaxed resize-none focus:outline-none"
+                        style={{ background: '#0d0f14', border: '1px solid rgba(255,255,255,0.08)', color: '#94a3b8', fontFamily: 'Inter, sans-serif' }}
                         onFocus={e => (e.target.style.border = '1px solid rgba(0,212,170,0.4)')}
-                        onBlur={e => (e.target.style.border = gradeError[sub.id] ? '1px solid rgba(239,68,68,0.5)' : '1px solid rgba(255,255,255,0.08)')}
+                        onBlur={e => (e.target.style.border = '1px solid rgba(255,255,255,0.08)')}
                       />
-                      <button
-                        onClick={() => handleGrade(sub.id)}
-                        disabled={grading[sub.id] || !markInputs[sub.id]}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all disabled:opacity-40"
-                        style={{ background: '#00d4aa', color: '#0d0f14', fontFamily: 'Inter, sans-serif' }}
-                      >
-                        {grading[sub.id] ? <Loader size={12} className="animate-spin" /> : <Check size={12} />}
-                        {isKin ? 'Saba' : 'Save'}
-                      </button>
-                      {gradeError[sub.id] && (
-                        <span className="text-xs" style={{ color: '#f87171', fontFamily: 'Inter, sans-serif' }}>{gradeError[sub.id]}</span>
-                      )}
-                      {sub.marks_earned !== null && sub.marks_earned !== undefined && !gradeError[sub.id] && (
-                        <span className="text-xs" style={{ color: '#00d4aa', fontFamily: 'Inter, sans-serif' }}>
-                          ✓ {sub.marks_earned}/{totalMarks} {isKin ? 'byabitswe' : 'saved'}
-                        </span>
-                      )}
                     </div>
                   </div>
                 )}

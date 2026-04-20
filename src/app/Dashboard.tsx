@@ -12,7 +12,7 @@ import { Users, ArrowRight, Loader, X, BookOpen, Megaphone, Pin } from 'lucide-r
 interface Props {
   language: 'EN' | 'KIN';
   onLanguageChange: (lang: 'EN' | 'KIN') => void;
-  onStartCoding?: () => void;
+  onStartCoding?: (assignment?: Assignment) => void;
   onOpenAssignment?: (assignment: Assignment) => void;
   onOpenCourses?: () => void;
   onContinueLearning?: () => void;
@@ -121,6 +121,7 @@ export default function Dashboard({ language, onLanguageChange, onStartCoding, o
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [submittedIds, setSubmittedIds] = useState<Set<string>>(new Set());
   const [gradeMap, setGradeMap] = useState<Record<string, string>>({});
+  const [feedbackMap, setFeedbackMap] = useState<Record<string, string>>({});
   const [totalEarned, setTotalEarned] = useState(0);
   const [totalPossible, setTotalPossible] = useState(0);
   const [streak, setStreak] = useState(0);
@@ -153,10 +154,13 @@ export default function Dashboard({ language, onLanguageChange, onStartCoding, o
 
     // Build grade badge map: assignmentId -> "15/20"
     const map: Record<string, string> = {};
+    const fbMap: Record<string, string> = {};
     for (const g of graded) {
       map[g.assignment_id] = `${g.marks_earned}/${g.total_marks}`;
+      if (g.teacher_feedback) fbMap[g.assignment_id] = g.teacher_feedback;
     }
     setGradeMap(map);
+    setFeedbackMap(fbMap);
 
     setLoadingAssignments(false);
   };
@@ -203,6 +207,7 @@ export default function Dashboard({ language, onLanguageChange, onStartCoding, o
       testsTotal: a.assignment_type === 'theoretical' ? (a.questions?.length ?? 1) : 5,
       status: isSubmitted ? 'completed' as const : 'not-started' as const,
       grade: gradeMap[a.id],
+      feedback: feedbackMap[a.id],
     };
   };
 
@@ -210,7 +215,7 @@ export default function Dashboard({ language, onLanguageChange, onStartCoding, o
     if (assignment.assignment_type === 'theoretical') {
       onOpenAssignment?.(assignment);
     } else {
-      onStartCoding?.();
+      onStartCoding?.(assignment);
     }
   };
 
@@ -225,11 +230,67 @@ export default function Dashboard({ language, onLanguageChange, onStartCoding, o
 
   const progressPct = totalPossible > 0 ? Math.round((totalEarned / totalPossible) * 100) : 0;
 
-  const insights = [
-    { text: isKinyarwanda ? 'Wiga cyane loops - uzazikenera mu mashusho' : "Practice more with loops - you'll need them in projects", isPositive: false },
-    { text: isKinyarwanda ? 'Suzuma syntax ya functions' : 'Review function syntax', isPositive: false },
-    { text: isKinyarwanda ? 'Urakora neza kuri variables! ✅' : 'Great progress on variables! ✅', isPositive: true },
-  ];
+  const insights = (() => {
+    const result: Array<{ text: string; isPositive: boolean }> = [];
+    const total = assignments.length;
+    const submitted = submittedIds.size;
+    const pending = total - submitted;
+    const now = new Date();
+    const overdueCount = assignments.filter(a =>
+      !submittedIds.has(a.id) && a.due_date && new Date(a.due_date) < now
+    ).length;
+
+    if (total === 0) {
+      result.push({ isPositive: false, text: isKinyarwanda
+        ? 'Nta mishinga urafite. Injira mu ishuri kugirango utangire.'
+        : 'No assignments yet. Join a class to get started.' });
+      return result;
+    }
+
+    if (submitted === 0) {
+      result.push({ isPositive: false, text: isKinyarwanda
+        ? `Ufite imishinga ${total} itaratanzwe. Tangira ugatange umwe!`
+        : `You have ${total} assignment${total > 1 ? 's' : ''} to complete. Submit one to get started!` });
+    } else if (submitted === total) {
+      result.push({ isPositive: true, text: isKinyarwanda
+        ? `Watanze imishinga yose ${total}! Biragaragara ko ukomeza! 🎉`
+        : `You've submitted all ${total} assignments! Keep it up! 🎉` });
+    } else {
+      result.push({ isPositive: true, text: isKinyarwanda
+        ? `Watanze ${submitted} mu ${total} mishinga. Ufite ${pending} isigaye.`
+        : `Submitted ${submitted} of ${total} assignments — ${pending} still pending.` });
+    }
+
+    if (overdueCount > 0) {
+      result.push({ isPositive: false, text: isKinyarwanda
+        ? `Ufite ${overdueCount} ${overdueCount > 1 ? 'mishinga' : 'umushinga'} yarangirije itariki. Bishoboka biragiranwa!`
+        : `${overdueCount} assignment${overdueCount > 1 ? 's are' : ' is'} overdue — submit if you still can!` });
+    }
+
+    if (totalPossible > 0) {
+      if (progressPct >= 80) {
+        result.push({ isPositive: true, text: isKinyarwanda
+          ? `Amanota meza cyane — ugera kuri ${progressPct}% by'amanota yose! 🌟`
+          : `Excellent scores — you're averaging ${progressPct}% overall! 🌟` });
+      } else if (progressPct >= 50) {
+        result.push({ isPositive: false, text: isKinyarwanda
+          ? `Ugeraho ${progressPct}% ku bisubizo byawe. Kongera gusuzuma ibyo usomye.`
+          : `Scoring ${progressPct}% on graded work. Review feedback to improve.` });
+      } else {
+        result.push({ isPositive: false, text: isKinyarwanda
+          ? `Amanota ya ${progressPct}% arakeneye iterambere. Soma ibihano by'umwarimu.`
+          : `${progressPct}% score needs improvement — read your teacher's feedback.` });
+      }
+    }
+
+    if (streak >= 3) {
+      result.push({ isPositive: true, text: isKinyarwanda
+        ? `Iminsi ${streak} yo kwiga ukurikirana! Komeza! 🔥`
+        : `${streak}-day learning streak! Keep the momentum going! 🔥` });
+    }
+
+    return result.slice(0, 3);
+  })();
 
   // Real badges derived from actual activity
   const badges = [
