@@ -382,6 +382,56 @@ export async function getStudentGrades(): Promise<StudentGrade[]> {
   });
 }
 
+export interface StudentResult {
+  assignment_id: string;
+  title: string;
+  title_kin: string | null;
+  assignment_type: 'coding' | 'theoretical';
+  difficulty: string;
+  total_marks: number;
+  submitted: boolean;
+  submitted_at: string | null;
+  marks_earned: number | null;
+  teacher_feedback: string | null;
+}
+
+export async function getStudentResults(): Promise<StudentResult[]> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return [];
+
+  const [{ data: assignments }, { data: submissions }] = await Promise.all([
+    supabase
+      .from('assignments')
+      .select('id, title, title_kin, assignment_type, difficulty, total_marks, class_id')
+      .order('created_at', { ascending: false }),
+    supabase
+      .from('student_submissions')
+      .select('assignment_id, marks_earned, teacher_feedback, submitted_at')
+      .eq('student_id', user.id),
+  ]);
+
+  const subMap = new Map<string, { marks_earned: number | null; teacher_feedback: string | null; submitted_at: string }>();
+  for (const s of submissions ?? []) {
+    subMap.set(s.assignment_id, { marks_earned: s.marks_earned, teacher_feedback: s.teacher_feedback, submitted_at: s.submitted_at });
+  }
+
+  return (assignments ?? []).map((a: Assignment) => {
+    const sub = subMap.get(a.id) ?? null;
+    return {
+      assignment_id: a.id,
+      title: a.title,
+      title_kin: a.title_kin,
+      assignment_type: a.assignment_type,
+      difficulty: a.difficulty,
+      total_marks: a.total_marks,
+      submitted: !!sub,
+      submitted_at: sub?.submitted_at ?? null,
+      marks_earned: sub?.marks_earned ?? null,
+      teacher_feedback: sub?.teacher_feedback ?? null,
+    };
+  });
+}
+
 // ─── Courses ──────────────────────────────────────────────────────────────────
 
 export interface Course {

@@ -15,6 +15,7 @@ interface Props {
   onStartCoding?: (assignment?: Assignment) => void;
   onOpenAssignment?: (assignment: Assignment) => void;
   onOpenCourses?: () => void;
+  onOpenResults?: () => void;
   onContinueLearning?: () => void;
 }
 
@@ -113,7 +114,7 @@ function JoinClassModal({ language, onClose, onJoined }: {
 
 // ─── Main Dashboard ────────────────────────────────────────────────────────────
 
-export default function Dashboard({ language, onLanguageChange, onStartCoding, onOpenAssignment, onOpenCourses, onContinueLearning }: Props) {
+export default function Dashboard({ language, onLanguageChange, onStartCoding, onOpenAssignment, onOpenCourses, onOpenResults, onContinueLearning }: Props) {
   const { profile } = useAuth();
   const studentName = profile?.full_name ?? 'Student';
   const isKinyarwanda = language === 'KIN';
@@ -387,6 +388,16 @@ export default function Dashboard({ language, onLanguageChange, onStartCoding, o
                   {isKinyarwanda ? 'Ibisabwa' : 'Active Assignments'}
                 </h2>
                 <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => onOpenResults?.()}
+                    className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg transition-all"
+                    style={{ color: '#f59e0b', background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.2)' }}
+                    onMouseEnter={e => (e.currentTarget.style.background = 'rgba(245,158,11,0.15)')}
+                    onMouseLeave={e => (e.currentTarget.style.background = 'rgba(245,158,11,0.08)')}
+                  >
+                    <ArrowRight size={12} />
+                    {isKinyarwanda ? 'Amanota Yanjye' : 'My Results'}
+                  </button>
                   <button
                     onClick={() => onOpenCourses?.()}
                     className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg transition-all"
