@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Dashboard from './Dashboard';
 import TeacherDashboard from './TeacherDashboard';
 import CodingWorkspace from './CodingWorkspace';
@@ -15,6 +15,7 @@ import PrivacyPolicyPage from './PrivacyPolicyPage';
 import ForgotPasswordPage from './ForgotPasswordPage';
 import ResetPasswordPage from './ResetPasswordPage';
 import MyResultsPage from './MyResultsPage';
+import OnboardingModal from './OnboardingModal';
 import { useAuth } from '../lib/auth';
 import { getResumeLesson, type Assignment, type CourseLesson } from '../lib/db';
 
@@ -24,11 +25,26 @@ type StudentView = 'dashboard' | 'workspace' | 'theoretical' | 'courses' | 'less
 export default function App() {
   const { user, profile, loading, isRecoveryMode } = useAuth();
   const [view, setView] = useState<PublicView>('landing');
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const [studentView, setStudentView] = useState<StudentView>('dashboard');
   const [language, setLanguage] = useState<'EN' | 'KIN'>('EN');
   const [openAssignment, setOpenAssignment] = useState<Assignment | null>(null);
   const [openCodingAssignment, setOpenCodingAssignment] = useState<Assignment | null>(null);
   const [openLesson, setOpenLesson] = useState<{ lesson: CourseLesson; courseTitle: string; allLessons: CourseLesson[] } | null>(null);
+
+  useEffect(() => {
+    if (user && profile) {
+      const key = `educode_onboarded_${user.id}`;
+      if (!localStorage.getItem(key)) {
+        setShowOnboarding(true);
+      }
+    }
+  }, [user, profile]);
+
+  const handleOnboardingDone = () => {
+    if (user) localStorage.setItem(`educode_onboarded_${user.id}`, '1');
+    setShowOnboarding(false);
+  };
 
   if (loading) {
     return (
@@ -45,8 +61,17 @@ export default function App() {
   }
 
   // Authenticated users
-  if (user) {
-    if (profile?.user_type === 'teacher') return <TeacherDashboard />;
+  if (user && profile) {
+    const onboardingModal = showOnboarding ? (
+      <OnboardingModal
+        userType={profile.user_type as 'student' | 'teacher' | 'self_learner'}
+        userName={profile.full_name ?? user.email ?? 'User'}
+        language={language}
+        onDone={handleOnboardingDone}
+      />
+    ) : null;
+
+    if (profile?.user_type === 'teacher') return <>{<TeacherDashboard />}{onboardingModal}</>;
 
     if (studentView === 'workspace') return (
       <CodingWorkspace
@@ -106,23 +131,26 @@ export default function App() {
     }
 
     return (
-      <Dashboard
-        language={language}
-        onLanguageChange={setLanguage}
-        onStartCoding={(a) => { setOpenCodingAssignment(a ?? null); setStudentView('workspace'); }}
-        onOpenAssignment={(a) => { setOpenAssignment(a); setStudentView('theoretical'); }}
-        onOpenCourses={() => setStudentView('courses')}
-        onOpenResults={() => setStudentView('results')}
-        onContinueLearning={async () => {
-          const resume = await getResumeLesson();
-          if (resume) {
-            setOpenLesson(resume);
-            setStudentView('lesson');
-          } else {
-            setStudentView('courses');
-          }
-        }}
-      />
+      <>
+        <Dashboard
+          language={language}
+          onLanguageChange={setLanguage}
+          onStartCoding={(a) => { setOpenCodingAssignment(a ?? null); setStudentView('workspace'); }}
+          onOpenAssignment={(a) => { setOpenAssignment(a); setStudentView('theoretical'); }}
+          onOpenCourses={() => setStudentView('courses')}
+          onOpenResults={() => setStudentView('results')}
+          onContinueLearning={async () => {
+            const resume = await getResumeLesson();
+            if (resume) {
+              setOpenLesson(resume);
+              setStudentView('lesson');
+            } else {
+              setStudentView('courses');
+            }
+          }}
+        />
+        {onboardingModal}
+      </>
     );
   }
 

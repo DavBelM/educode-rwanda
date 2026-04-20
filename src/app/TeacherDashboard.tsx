@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Users, FileText, Plus, Copy, Check, X, ChevronDown, BookOpen, Code2, Loader, Trophy, Medal, Megaphone, Pin, Trash2, BarChart2, AlertCircle, TrendingUp } from 'lucide-react';
+import { Users, FileText, Plus, Copy, Check, X, ChevronDown, BookOpen, Code2, Loader, Trophy, Medal, Megaphone, Pin, Trash2, BarChart2, AlertCircle, TrendingUp, Download } from 'lucide-react';
 import { Header } from './components/Header';
 import {
   createClass, getTeacherClasses, getClassAssignments, createAssignment, getClassStudentCount,
   getAssignmentSubmissions, getAssignmentSubmissionCounts, gradeSubmission, getClassLeaderboard,
-  getClassAnalytics,
+  getClassAnalytics, getClassGradesExport,
   createAnnouncement, getClassAnnouncements, deleteAnnouncement,
   type Class, type Assignment, type Question, type Submission, type LeaderboardEntry, type Announcement, type ClassAnalytics
 } from '../lib/db';
@@ -665,10 +665,37 @@ function ClassAnalyticsModal({ cls, language, onClose }: { cls: Class & { studen
   const [analytics, setAnalytics] = useState<ClassAnalytics | null>(null);
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState<string | null>(null);
+  const [downloading, setDownloading] = useState(false);
 
   useEffect(() => {
     getClassAnalytics(cls.id).then(data => { setAnalytics(data); setLoading(false); });
   }, [cls.id]);
+
+  const handleExportCSV = async () => {
+    setDownloading(true);
+    const rows = await getClassGradesExport(cls.id);
+    const header = ['Student Name', 'Assignment', 'Type', 'Marks Earned', 'Total Marks', 'Score %', 'Submitted', 'Submitted At', 'Teacher Feedback'];
+    const csvRows = rows.map(r => [
+      `"${r.student_name}"`,
+      `"${r.assignment_title}"`,
+      r.assignment_type,
+      r.marks_earned ?? '',
+      r.total_marks,
+      r.score_pct !== null ? `${r.score_pct}%` : '',
+      r.submitted ? 'Yes' : 'No',
+      r.submitted_at ? new Date(r.submitted_at).toLocaleDateString() : '',
+      `"${(r.teacher_feedback ?? '').replace(/"/g, '""')}"`,
+    ]);
+    const csv = [header.join(','), ...csvRows.map(r => r.join(','))].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${cls.name.replace(/\s+/g, '_')}_grades.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    setDownloading(false);
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }}>
@@ -682,11 +709,23 @@ function ClassAnalyticsModal({ cls, language, onClose }: { cls: Class & { studen
               {isKin ? 'Ibisobanuro by\'ishuri' : 'Class analytics'}
             </p>
           </div>
-          <button onClick={onClose} style={{ color: '#475569' }}
-            onMouseEnter={e => (e.currentTarget.style.color = '#94a3b8')}
-            onMouseLeave={e => (e.currentTarget.style.color = '#475569')}>
-            <X size={20} />
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleExportCSV}
+              disabled={downloading || loading}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
+              style={{ background: 'rgba(0,212,170,0.1)', color: '#00d4aa', border: '1px solid rgba(0,212,170,0.2)', opacity: (downloading || loading) ? 0.5 : 1 }}
+              onMouseEnter={e => { if (!downloading && !loading) (e.currentTarget as HTMLButtonElement).style.background = 'rgba(0,212,170,0.18)'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(0,212,170,0.1)'; }}>
+              {downloading ? <Loader size={12} className="animate-spin" /> : <Download size={12} />}
+              {isKin ? 'Pakurura CSV' : 'Export CSV'}
+            </button>
+            <button onClick={onClose} style={{ color: '#475569' }}
+              onMouseEnter={e => (e.currentTarget.style.color = '#94a3b8')}
+              onMouseLeave={e => (e.currentTarget.style.color = '#475569')}>
+              <X size={20} />
+            </button>
+          </div>
         </div>
 
         <div className="overflow-y-auto p-5 space-y-4">
