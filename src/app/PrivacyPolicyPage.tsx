@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Download, ChevronRight, Shield, Lock, Eye, Database, Users, Cookie, FileText, Mail } from 'lucide-react';
 
 export default function PrivacyPolicyPage() {
@@ -109,10 +109,10 @@ export default function PrivacyPolicyPage() {
                 : 'All your data is encrypted (AES-256)'}
             </li>
             <li>
-              <strong>{isKinyarwanda ? 'Seriveri zo mu Rwanda' : 'Rwanda-based servers'}:</strong>{' '}
+              <strong>{isKinyarwanda ? 'Seriveri zifite icyemezo' : 'SOC2-certified infrastructure'}:</strong>{' '}
               {isKinyarwanda
-                ? 'Amakuru yawe ari mu Rwanda, si mu mahanga'
-                : 'Your data stays in Rwanda, not abroad'}
+                ? 'Dukoresha Supabase ifite icyemezo cya SOC2 Type 2 cy\'umutekano'
+                : 'We use Supabase infrastructure with SOC2 Type 2 security certification'}
             </li>
             <li>
               <strong>{isKinyarwanda ? 'Backup zihoraho' : 'Regular backups'}:</strong>{' '}

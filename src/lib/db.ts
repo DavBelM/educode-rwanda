@@ -415,7 +415,7 @@ export async function getStudentResults(): Promise<StudentResult[]> {
     subMap.set(s.assignment_id, { marks_earned: s.marks_earned, teacher_feedback: s.teacher_feedback, submitted_at: s.submitted_at });
   }
 
-  return (assignments ?? []).map((a: Assignment) => {
+  return (assignments ?? []).map((a: Pick<Assignment, 'id' | 'title' | 'title_kin' | 'assignment_type' | 'difficulty' | 'total_marks' | 'class_id'>) => {
     const sub = subMap.get(a.id) ?? null;
     return {
       assignment_id: a.id,
@@ -727,6 +727,52 @@ export async function getClassLeaderboard(classId: string): Promise<LeaderboardE
 }
 
 // ─── Class Analytics ──────────────────────────────────────────────────────────
+
+export interface ClassGradeRow {
+  student_name: string;
+  assignment_title: string;
+  assignment_type: string;
+  marks_earned: number | null;
+  total_marks: number;
+  score_pct: number | null;
+  submitted: boolean;
+  submitted_at: string | null;
+  teacher_feedback: string | null;
+}
+
+export async function getClassGradesExport(classId: string): Promise<ClassGradeRow[]> {
+  const [{ data: enrollments }, { data: assignments }] = await Promise.all([
+    supabase.from('class_enrollments').select('student_id, profiles(full_name)').eq('class_id', classId),
+    supabase.from('assignments').select('id, title, assignment_type, total_marks').eq('class_id', classId).order('created_at', { ascending: true }),
+  ]);
+
+  const assignmentIds = (assignments ?? []).map((a: { id: string }) => a.id);
+  const { data: submissions } = assignmentIds.length > 0
+    ? await supabase.from('student_submissions').select('student_id, assignment_id, marks_earned, submitted_at, teacher_feedback').in('assignment_id', assignmentIds)
+    : { data: [] };
+
+  const rows: ClassGradeRow[] = [];
+  for (const e of enrollments ?? []) {
+    const p = (Array.isArray(e.profiles) ? e.profiles[0] : e.profiles) as { full_name: string } | null;
+    const studentName = p?.full_name ?? 'Unknown';
+    for (const a of assignments ?? []) {
+      const sub = (submissions ?? []).find((s: { student_id: string; assignment_id: string }) => s.student_id === e.student_id && s.assignment_id === a.id);
+      const marksEarned = sub?.marks_earned ?? null;
+      rows.push({
+        student_name: studentName,
+        assignment_title: a.title,
+        assignment_type: a.assignment_type,
+        marks_earned: marksEarned,
+        total_marks: a.total_marks,
+        score_pct: marksEarned !== null ? Math.round((marksEarned / a.total_marks) * 100) : null,
+        submitted: !!sub,
+        submitted_at: sub?.submitted_at ?? null,
+        teacher_feedback: sub?.teacher_feedback ?? null,
+      });
+    }
+  }
+  return rows.sort((a, b) => a.student_name.localeCompare(b.student_name) || a.assignment_title.localeCompare(b.assignment_title));
+}
 
 export interface AssignmentAnalytics {
   id: string;
