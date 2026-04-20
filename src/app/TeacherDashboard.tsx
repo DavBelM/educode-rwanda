@@ -119,6 +119,8 @@ function CreateAssignmentModal({ language, classes, onClose, onCreate }: {
   const [difficulty, setDifficulty] = useState<'beginner' | 'intermediate' | 'advanced'>('beginner');
   const [totalMarks, setTotalMarks] = useState(10);
   const [dueDate, setDueDate] = useState('');
+  const [examMode, setExamMode] = useState(false);
+  const [durationMinutes, setDurationMinutes] = useState(30);
   const [questions, setQuestions] = useState<Question[]>([{ id: '1', text: '', text_kin: '' }]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -149,6 +151,8 @@ function CreateAssignmentModal({ language, classes, onClose, onCreate }: {
       totalMarks,
       questions: assignmentType === 'theoretical' ? questions.filter(q => q.text.trim()) : undefined,
       dueDate: dueDate || undefined,
+      examMode,
+      durationMinutes: examMode ? durationMinutes : undefined,
     });
     if (error) { setError(error); setLoading(false); return; }
     onCreate();
@@ -339,6 +343,43 @@ function CreateAssignmentModal({ language, classes, onClose, onCreate }: {
                     onBlur={e => (e.target.style.border = '1px solid rgba(255,255,255,0.08)')}
                   />
                 </div>
+              </div>
+
+              {/* Exam Mode */}
+              <div className="rounded-xl p-4" style={{ background: examMode ? 'rgba(239,68,68,0.05)' : 'rgba(255,255,255,0.02)', border: examMode ? '1px solid rgba(239,68,68,0.2)' : '1px solid rgba(255,255,255,0.06)' }}>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-semibold" style={{ color: examMode ? '#f87171' : '#94a3b8', fontFamily: 'Inter, sans-serif' }}>
+                      {isKin ? '🔒 Imikino yo Gusuzuma' : '🔒 Exam Mode'}
+                    </p>
+                    <p className="text-xs mt-0.5" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
+                      {isKin ? 'Gufunga screen yuzuye, gukurikirana guhindura tab, no gusubiza igihe cyangiye' : 'Fullscreen lock, tab-switch tracking, auto-submit on timeout'}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setExamMode(p => !p)}
+                    className="relative w-11 h-6 rounded-full transition-all shrink-0"
+                    style={{ background: examMode ? '#ef4444' : 'rgba(255,255,255,0.1)' }}
+                  >
+                    <span className="absolute top-0.5 w-5 h-5 rounded-full bg-white transition-all" style={{ left: examMode ? '22px' : '2px' }} />
+                  </button>
+                </div>
+                {examMode && (
+                  <div className="mt-3 flex items-center gap-3">
+                    <label className="text-xs font-semibold shrink-0" style={{ color: '#f87171', fontFamily: 'Inter, sans-serif' }}>
+                      {isKin ? 'Igihe (Iminota)' : 'Duration (minutes)'}
+                    </label>
+                    <input
+                      type="number"
+                      min={5}
+                      max={240}
+                      value={durationMinutes}
+                      onChange={e => setDurationMinutes(Math.max(5, Math.min(240, Number(e.target.value))))}
+                      className="w-24 px-3 py-1.5 rounded-lg text-sm text-center focus:outline-none"
+                      style={{ background: '#0d0f14', border: '1px solid rgba(239,68,68,0.3)', color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}
+                    />
+                  </div>
+                )}
               </div>
 
               {/* Questions (theoretical only) */}
@@ -798,6 +839,11 @@ function SubmissionsPanel({ assignment, language, onClose }: {
                         ✓ {isKin ? 'Byatanzwe' : 'Submitted'}
                       </span>
                     )}
+                    {((sub.tab_switches ?? 0) + (sub.paste_count ?? 0) + (sub.fullscreen_exits ?? 0)) > 0 && (
+                      <span className="px-2 py-0.5 rounded-full text-xs font-semibold" style={{ background: 'rgba(239,68,68,0.1)', color: '#f87171', border: '1px solid rgba(239,68,68,0.2)' }}>
+                        ⚠️ {(sub.tab_switches ?? 0) + (sub.paste_count ?? 0) + (sub.fullscreen_exits ?? 0)}
+                      </span>
+                    )}
                     <ChevronDown size={14} style={{ color: '#475569', transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
                   </div>
                 </button>
@@ -820,6 +866,32 @@ function SubmissionsPanel({ assignment, language, onClose }: {
                         </div>
                       );
                     })}
+
+                    {/* Violation summary */}
+                    {((sub.tab_switches ?? 0) + (sub.paste_count ?? 0) + (sub.fullscreen_exits ?? 0)) > 0 && (
+                      <div className="pt-3 rounded-xl px-3 py-2.5" style={{ background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.15)' }}>
+                        <p className="text-xs font-semibold mb-1.5" style={{ color: '#f87171', fontFamily: 'Inter, sans-serif' }}>
+                          ⚠️ {isKin ? 'Ibimenyetso byo Gukopya' : 'Integrity Flags'}
+                        </p>
+                        <div className="flex gap-4">
+                          {(sub.tab_switches ?? 0) > 0 && (
+                            <span className="text-xs" style={{ color: '#94a3b8', fontFamily: 'Inter, sans-serif' }}>
+                              🔀 {isKin ? `Guhindura tab: ${sub.tab_switches}` : `Tab switches: ${sub.tab_switches}`}
+                            </span>
+                          )}
+                          {(sub.paste_count ?? 0) > 0 && (
+                            <span className="text-xs" style={{ color: '#94a3b8', fontFamily: 'Inter, sans-serif' }}>
+                              📋 {isKin ? `Gukopya: ${sub.paste_count}` : `Pastes: ${sub.paste_count}`}
+                            </span>
+                          )}
+                          {(sub.fullscreen_exits ?? 0) > 0 && (
+                            <span className="text-xs" style={{ color: '#94a3b8', fontFamily: 'Inter, sans-serif' }}>
+                              ↙️ {isKin ? `Gusohoka ku screen: ${sub.fullscreen_exits}` : `Fullscreen exits: ${sub.fullscreen_exits}`}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    )}
 
                     {/* Grading row */}
                     <div className="pt-3 space-y-2.5" style={{ borderTop: '1px solid rgba(255,255,255,0.04)' }}>
