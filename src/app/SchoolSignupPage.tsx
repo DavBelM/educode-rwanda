@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
-import { School, Users, Target, CheckCircle2, ArrowRight, Mail, Phone, MapPin, ChevronDown, ChevronRight } from 'lucide-react';
+import { useState } from 'react';
+import { School, Users, Target, CheckCircle2, ArrowRight, Mail, Phone, ChevronDown, ChevronRight, Lock, Eye, EyeOff } from 'lucide-react';
+import { supabase } from '../lib/supabase';
+import { createSchool, linkProfileToSchool } from '../lib/db';
 
 export default function SchoolSignupPage() {
   const [language, setLanguage] = useState<'EN' | 'KIN'>('EN');
@@ -12,10 +14,14 @@ export default function SchoolSignupPage() {
     position: '',
     email: '',
     phone: '',
+    password: '',
     challenges: ''
   });
+  const [showPassword, setShowPassword] = useState(false);
   const [expandedFAQ, setExpandedFAQ] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
 
   const isKinyarwanda = language === 'KIN';
 
@@ -52,10 +58,31 @@ export default function SchoolSignupPage() {
     }
   ];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: { preventDefault(): void }) => {
     e.preventDefault();
-    setLoading(true);
-    setTimeout(() => setLoading(false), 1500);
+    setLoading(true); setError('');
+
+    // 1. Create school record
+    const { data: school, error: schoolErr } = await createSchool({
+      name: formData.schoolName,
+      location: formData.location,
+      contactEmail: formData.email,
+    });
+    if (schoolErr || !school) { setError(schoolErr ?? 'Failed to create school'); setLoading(false); return; }
+
+    // 2. Sign up the admin user
+    const { data: authData, error: authErr } = await supabase.auth.signUp({
+      email: formData.email,
+      password: formData.password,
+      options: { data: { full_name: formData.fullName, user_type: 'school_admin', preferred_language: 'en' } },
+    });
+    if (authErr || !authData.user) { setError(authErr?.message ?? 'Signup failed'); setLoading(false); return; }
+
+    // 3. Link admin profile to school
+    await linkProfileToSchool(authData.user.id, school.id);
+
+    setLoading(false);
+    setSuccess(true);
   };
 
   return (
@@ -142,6 +169,28 @@ export default function SchoolSignupPage() {
       <div className="py-16">
         <div className="max-w-2xl mx-auto px-4">
           <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-8 md:p-12">
+            {success ? (
+              <div className="text-center py-8">
+                <div className="text-6xl mb-4">🎉</div>
+                <h2 className="text-2xl font-bold text-[#1e293b] mb-3">
+                  {isKinyarwanda ? 'Konto yawe yashyizweho!' : 'Account created!'}
+                </h2>
+                <p className="text-gray-600 mb-2">
+                  {isKinyarwanda
+                    ? 'Injira ukoresheje email na ijambo banga wahinze.'
+                    : 'Log in with the email and password you just set.'}
+                </p>
+                <p className="text-sm text-gray-500 mb-6">
+                  {isKinyarwanda ? 'Uzabona dashboard ya konti y\'ishuri ryawe.' : "You'll see your school admin dashboard after logging in."}
+                </p>
+                <a
+                  href="/"
+                  className="inline-block px-8 py-3 bg-[#10b981] text-white rounded-lg font-bold hover:bg-[#059669] transition-all">
+                  {isKinyarwanda ? 'Injira' : 'Go to Login'}
+                </a>
+              </div>
+            ) : (
+            <>
             <h2 className="text-3xl font-bold text-[#1e293b] mb-2 text-center">
               {isKinyarwanda ? 'Saba Trial yawe y\'Amezi 3 Kubusa' : 'Request Your Free 3-Month Trial'}
             </h2>
@@ -292,6 +341,28 @@ export default function SchoolSignupPage() {
 
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      {isKinyarwanda ? 'Ijambo Banga' : 'Password'} *
+                    </label>
+                    <div className="relative">
+                      <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                      <input
+                        type={showPassword ? 'text' : 'password'}
+                        value={formData.password}
+                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                        placeholder="Min. 8 characters"
+                        minLength={8}
+                        className="w-full pl-12 pr-12 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]"
+                        required
+                      />
+                      <button type="button" onClick={() => setShowPassword(p => !p)}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
                       {isKinyarwanda ? 'Nimero ya Telefoni' : 'Phone Number'} *
                     </label>
                     <div className="relative">
@@ -324,6 +395,10 @@ export default function SchoolSignupPage() {
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]"
                 />
               </div>
+
+              {error && (
+                <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-sm text-red-700">{error}</div>
+              )}
 
               {/* Submit Button */}
               <button
@@ -359,6 +434,8 @@ export default function SchoolSignupPage() {
                 </div>
               </div>
             </form>
+            </>
+            )}
           </div>
 
           {/* What Happens Next */}

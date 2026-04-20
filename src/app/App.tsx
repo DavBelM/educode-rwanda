@@ -16,6 +16,7 @@ import ForgotPasswordPage from './ForgotPasswordPage';
 import ResetPasswordPage from './ResetPasswordPage';
 import MyResultsPage from './MyResultsPage';
 import OnboardingModal from './OnboardingModal';
+import SchoolAdminDashboard from './SchoolAdminDashboard';
 import { useAuth } from '../lib/auth';
 import { getResumeLesson, type Assignment, type CourseLesson } from '../lib/db';
 
@@ -71,6 +72,7 @@ export default function App() {
       />
     ) : null;
 
+    if (profile?.user_type === 'school_admin') return <SchoolAdminDashboard />;
     if (profile?.user_type === 'teacher') return <>{<TeacherDashboard />}{onboardingModal}</>;
 
     if (studentView === 'workspace') return (
