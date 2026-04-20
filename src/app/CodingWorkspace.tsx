@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Header } from './components/Header';
 import { CodeEditor } from './components/CodeEditor';
 import { AIFeedbackPanel } from './components/AIFeedbackPanel';
@@ -8,7 +8,8 @@ import { MobileAssignmentCard } from './components/MobileAssignmentCard';
 import { executeCode } from '../lib/code-executor';
 import { analyzeFeedback, formatFeedbackForUI } from '../lib/feedback-engine';
 import { submitCodingAssignment, type Assignment } from '../lib/db';
-import { Send, CheckCircle, Loader } from 'lucide-react';
+import { useExamMode } from '../hooks/useExamMode';
+import { Send, CheckCircle, Loader, AlertTriangle, Clock } from 'lucide-react';
 
 const DEFAULT_JS = `// Welcome to EduCode Rwanda!
 // Try manipulating the DOM elements in index.html
@@ -49,12 +50,72 @@ export default function CodingWorkspace({ onBack, assignment, language: initialL
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [submitError, setSubmitError] = useState('');
+  const [violationWarning, setViolationWarning] = useState('');
+
+  // Exam mode
+  const examMode = !!(assignment?.exam_mode);
+  const [secondsLeft, setSecondsLeft] = useState(() =>
+    assignment?.duration_minutes ? assignment.duration_minutes * 60 : 0
+  );
+  const autoSubmitRef = useRef(false);
+
+  const { violations, isFullscreen, requestFullscreen, onPaste } = useExamMode({
+    enabled: examMode,
+    onViolation: (type) => {
+      const msg = type === 'tabSwitches'
+        ? (isKin ? '⚠️ Guhindura tab byarabonye!' : '⚠️ Tab switch detected!')
+        : type === 'pasteCount'
+        ? (isKin ? '⚠️ Gukopya code byarabonye!' : '⚠️ Code paste detected!')
+        : (isKin ? '⚠️ Gusohoka ku screen nzima byarabonye!' : '⚠️ Fullscreen exit detected!');
+      setViolationWarning(msg);
+      setTimeout(() => setViolationWarning(''), 3000);
+    },
+  });
+
+  // Request fullscreen when exam mode starts
+  useEffect(() => {
+    if (examMode && !submitted) requestFullscreen();
+  }, [examMode, submitted, requestFullscreen]);
+
+  // Countdown timer
+  useEffect(() => {
+    if (!examMode || submitted || secondsLeft <= 0) return;
+    const interval = setInterval(() => {
+      setSecondsLeft(s => {
+        if (s <= 1) {
+          clearInterval(interval);
+          return 0;
+        }
+        return s - 1;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [examMode, submitted, secondsLeft]);
+
+  // Auto-submit when timer hits 0
+  useEffect(() => {
+    if (examMode && secondsLeft === 0 && !submitted && !autoSubmitRef.current && assignment) {
+      autoSubmitRef.current = true;
+      submitCodingAssignment({
+        assignmentId: assignment.id,
+        codeSubmitted: jsCode,
+        violations: { tabSwitches: violations.current.tabSwitches, pasteCount: violations.current.pasteCount, fullscreenExits: violations.current.fullscreenExits },
+      }).then(() => setSubmitted(true));
+    }
+  }, [secondsLeft, examMode, submitted, assignment, jsCode, violations]);
+
+  const timerColor = secondsLeft > 60 ? '#00d4aa' : secondsLeft > 30 ? '#f59e0b' : '#ef4444';
+  const timerDisplay = `${String(Math.floor(secondsLeft / 60)).padStart(2, '0')}:${String(secondsLeft % 60).padStart(2, '0')}`;
 
   const handleSubmit = async () => {
     if (!assignment) return;
     setSubmitting(true);
     setSubmitError('');
-    const { error } = await submitCodingAssignment({ assignmentId: assignment.id, codeSubmitted: jsCode });
+    const { error } = await submitCodingAssignment({
+      assignmentId: assignment.id,
+      codeSubmitted: jsCode,
+      violations: examMode ? { tabSwitches: violations.current.tabSwitches, pasteCount: violations.current.pasteCount, fullscreenExits: violations.current.fullscreenExits } : undefined,
+    });
     if (error === 'already_submitted') {
       setSubmitted(true);
     } else if (error) {
@@ -117,12 +178,32 @@ export default function CodingWorkspace({ onBack, assignment, language: initialL
     <div className="h-screen flex flex-col bg-[#f8fafc]" style={{ fontFamily: 'Inter, sans-serif' }}>
       <Header language={language} onLanguageToggle={toggleLanguage} onBack={onBack} hideAssignmentInfo />
 
+      {/* Violation warning toast */}
+      {violationWarning && (
+        <div className="shrink-0 px-4 py-2 flex items-center gap-2" style={{ background: 'rgba(239,68,68,0.12)', borderBottom: '1px solid rgba(239,68,68,0.25)' }}>
+          <AlertTriangle size={14} style={{ color: '#f87171' }} />
+          <p className="text-xs font-semibold" style={{ color: '#f87171' }}>{violationWarning}</p>
+        </div>
+      )}
+
+      {/* Exam mode — enter fullscreen nudge */}
+      {examMode && !isFullscreen && !submitted && (
+        <div className="shrink-0 px-4 py-2 flex items-center justify-between" style={{ background: 'rgba(245,158,11,0.08)', borderBottom: '1px solid rgba(245,158,11,0.2)' }}>
+          <p className="text-xs font-semibold" style={{ color: '#f59e0b' }}>
+            {isKin ? '⚠️ Injira mu screen yuzuye kugirango utangire' : '⚠️ Enter fullscreen to continue the exam'}
+          </p>
+          <button onClick={requestFullscreen} className="text-xs font-bold px-3 py-1 rounded-lg" style={{ background: 'rgba(245,158,11,0.15)', color: '#f59e0b', border: '1px solid rgba(245,158,11,0.3)' }}>
+            {isKin ? 'Injira' : 'Go Fullscreen'}
+          </button>
+        </div>
+      )}
+
       {/* Assignment banner */}
       {assignment && (
         <div className="shrink-0 px-6 py-3 flex items-center justify-between" style={{ background: '#13161e', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
           <div className="min-w-0">
             <p className="text-xs font-semibold uppercase mb-0.5" style={{ color: '#475569', letterSpacing: '0.05em' }}>
-              {isKin ? 'Umushinga' : 'Assignment'}
+              {examMode ? (isKin ? '🔒 Ikizamini' : '🔒 Exam') : (isKin ? 'Umushinga' : 'Assignment')}
             </p>
             <p className="text-sm font-bold truncate" style={{ color: '#f1f5f9' }}>
               {isKin && assignment.title_kin ? assignment.title_kin : assignment.title}
@@ -135,6 +216,13 @@ export default function CodingWorkspace({ onBack, assignment, language: initialL
           </div>
 
           <div className="flex items-center gap-3 shrink-0 ml-4">
+            {/* Countdown timer */}
+            {examMode && !submitted && (
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-mono text-sm font-bold" style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid ${timerColor}40`, color: timerColor }}>
+                <Clock size={14} />
+                {timerDisplay}
+              </div>
+            )}
             {submitError && (
               <p className="text-xs" style={{ color: '#f87171' }}>{submitError}</p>
             )}
@@ -163,7 +251,7 @@ export default function CodingWorkspace({ onBack, assignment, language: initialL
       {/* Desktop Layout */}
       <div className="hidden lg:flex flex-1 overflow-hidden">
         {/* Left: Code Editor (60%) */}
-        <div className="w-[60%] flex flex-col">
+        <div className="w-[60%] flex flex-col" onPaste={examMode ? onPaste : undefined}>
           <div className="flex-1 overflow-hidden">
             <CodeEditor
               jsCode={jsCode}
@@ -199,7 +287,7 @@ export default function CodingWorkspace({ onBack, assignment, language: initialL
       <div className="lg:hidden flex-1 overflow-hidden flex flex-col">
         <MobileAssignmentCard language={language} />
 
-        <div className="h-[40%]">
+        <div className="h-[40%]" onPaste={examMode ? onPaste : undefined}>
           <CodeEditor
             jsCode={jsCode}
             htmlCode={htmlCode}

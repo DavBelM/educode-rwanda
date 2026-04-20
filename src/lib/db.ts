@@ -30,6 +30,8 @@ export interface Assignment {
   questions: Question[] | null;
   total_marks: number;
   due_date: string | null;
+  duration_minutes: number | null;
+  exam_mode: boolean;
   is_published: boolean;
   created_at: string;
 }
@@ -44,6 +46,9 @@ export interface Submission {
   tests_total: number;
   marks_earned: number | null;
   teacher_feedback: string | null;
+  tab_switches: number;
+  paste_count: number;
+  fullscreen_exits: number;
   submitted_at: string;
   profiles?: { full_name: string };
 }
@@ -158,6 +163,8 @@ export async function createAssignment(params: {
   totalMarks: number;
   questions?: Question[];
   dueDate?: string;
+  examMode?: boolean;
+  durationMinutes?: number;
 }): Promise<{ data: Assignment | null; error: string | null }> {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { data: null, error: 'Not authenticated' };
@@ -176,6 +183,8 @@ export async function createAssignment(params: {
       total_marks: params.totalMarks,
       questions: params.questions ?? null,
       due_date: params.dueDate ?? null,
+      exam_mode: params.examMode ?? false,
+      duration_minutes: params.durationMinutes ?? null,
       is_published: true,
     })
     .select()
@@ -224,9 +233,16 @@ export async function getStudentAssignments(): Promise<{ data: Assignment[]; err
 
 // ─── Submissions ──────────────────────────────────────────────────────────────
 
+export interface SubmissionViolations {
+  tabSwitches?: number;
+  pasteCount?: number;
+  fullscreenExits?: number;
+}
+
 export async function submitCodingAssignment(params: {
   assignmentId: string;
   codeSubmitted: string;
+  violations?: SubmissionViolations;
 }): Promise<{ error: string | null }> {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { error: 'Not authenticated' };
@@ -238,6 +254,9 @@ export async function submitCodingAssignment(params: {
       assignment_id: params.assignmentId,
       code_submitted: params.codeSubmitted,
       text_answers: null,
+      tab_switches: params.violations?.tabSwitches ?? 0,
+      paste_count: params.violations?.pasteCount ?? 0,
+      fullscreen_exits: params.violations?.fullscreenExits ?? 0,
     });
 
   if (error) {
@@ -250,6 +269,7 @@ export async function submitCodingAssignment(params: {
 export async function submitTheoreticalAssignment(params: {
   assignmentId: string;
   textAnswers: Array<{ question_id: string; answer: string }>;
+  violations?: SubmissionViolations;
 }): Promise<{ error: string | null }> {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { error: 'Not authenticated' };
@@ -259,8 +279,11 @@ export async function submitTheoreticalAssignment(params: {
     .insert({
       student_id: user.id,
       assignment_id: params.assignmentId,
-      code_submitted: '', // not applicable for theoretical
+      code_submitted: '',
       text_answers: params.textAnswers,
+      tab_switches: params.violations?.tabSwitches ?? 0,
+      paste_count: params.violations?.pasteCount ?? 0,
+      fullscreen_exits: params.violations?.fullscreenExits ?? 0,
     });
 
   if (error) return { error: error.message };
