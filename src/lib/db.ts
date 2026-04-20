@@ -725,3 +725,108 @@ export async function getClassLeaderboard(classId: string): Promise<LeaderboardE
 
   return entries;
 }
+
+// ─── Class Analytics ──────────────────────────────────────────────────────────
+
+export interface AssignmentAnalytics {
+  id: string;
+  title: string;
+  title_kin: string | null;
+  assignment_type: 'coding' | 'theoretical';
+  total_marks: number;
+  submitted_count: number;
+  graded_count: number;
+  missing_students: string[];
+  avg_score: number | null;
+  avg_pct: number | null;
+  top_score: number | null;
+  low_score: number | null;
+  dist: { label: string; count: number; color: string }[];
+}
+
+export interface ClassAnalytics {
+  total_students: number;
+  assignments: AssignmentAnalytics[];
+  class_avg_pct: number | null;
+  overall_submission_rate: number | null;
+}
+
+export async function getClassAnalytics(classId: string): Promise<ClassAnalytics> {
+  const [{ data: enrollments }, { data: assignments }, { data: submissions }] = await Promise.all([
+    supabase.from('class_enrollments').select('student_id, profiles(full_name)').eq('class_id', classId),
+    supabase.from('assignments').select('id, title, title_kin, assignment_type, total_marks').eq('class_id', classId).order('created_at', { ascending: false }),
+    supabase.from('student_submissions').select('student_id, assignment_id, marks_earned').in(
+      'assignment_id',
+      ((await supabase.from('assignments').select('id').eq('class_id', classId)).data ?? []).map((a: { id: string }) => a.id)
+    ),
+  ]);
+
+  const studentNames: Record<string, string> = {};
+  for (const e of enrollments ?? []) {
+    const p = (Array.isArray(e.profiles) ? e.profiles[0] : e.profiles) as { full_name: string } | null;
+    studentNames[e.student_id] = p?.full_name ?? 'Student';
+  }
+
+  const totalStudents = Object.keys(studentNames).length;
+
+  const assignmentList = (assignments ?? []) as Assignment[];
+  const subList = submissions ?? [];
+
+  const analyticsRows: AssignmentAnalytics[] = assignmentList.map(a => {
+    const asgSubs = subList.filter(s => s.assignment_id === a.id);
+    const gradedSubs = asgSubs.filter(s => s.marks_earned !== null);
+    const submittedIds = new Set(asgSubs.map(s => s.student_id));
+    const missing = Object.entries(studentNames)
+      .filter(([id]) => !submittedIds.has(id))
+      .map(([, name]) => name)
+      .sort();
+
+    const scores = gradedSubs.map(s => s.marks_earned as number);
+    const avgScore = scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : null;
+    const avgPct = avgScore !== null ? Math.round((avgScore / a.total_marks) * 100) : null;
+
+    // Score distribution buckets
+    const buckets = [0, 0, 0, 0]; // 0-49%, 50-69%, 70-89%, 90-100%
+    for (const s of scores) {
+      const pct = (s / a.total_marks) * 100;
+      if (pct >= 90) buckets[3]++;
+      else if (pct >= 70) buckets[2]++;
+      else if (pct >= 50) buckets[1]++;
+      else buckets[0]++;
+    }
+
+    return {
+      id: a.id,
+      title: a.title,
+      title_kin: a.title_kin,
+      assignment_type: a.assignment_type,
+      total_marks: a.total_marks,
+      submitted_count: asgSubs.length,
+      graded_count: gradedSubs.length,
+      missing_students: missing,
+      avg_score: avgScore !== null ? Math.round(avgScore * 10) / 10 : null,
+      avg_pct: avgPct,
+      top_score: scores.length > 0 ? Math.max(...scores) : null,
+      low_score: scores.length > 0 ? Math.min(...scores) : null,
+      dist: [
+        { label: '0–49%', count: buckets[0], color: '#ef4444' },
+        { label: '50–69%', count: buckets[1], color: '#f59e0b' },
+        { label: '70–89%', count: buckets[2], color: '#00d4aa' },
+        { label: '90–100%', count: buckets[3], color: '#8b5cf6' },
+      ],
+    };
+  });
+
+  const allGraded = analyticsRows.filter(a => a.avg_pct !== null);
+  const classAvgPct = allGraded.length > 0
+    ? Math.round(allGraded.reduce((s, a) => s + (a.avg_pct ?? 0), 0) / allGraded.length)
+    : null;
+
+  const totalPossibleSubs = assignmentList.length * totalStudents;
+  const totalActualSubs = analyticsRows.reduce((s, a) => s + a.submitted_count, 0);
+  const overallSubmissionRate = totalPossibleSubs > 0
+    ? Math.round((totalActualSubs / totalPossibleSubs) * 100)
+    : null;
+
+  return { total_students: totalStudents, assignments: analyticsRows, class_avg_pct: classAvgPct, overall_submission_rate: overallSubmissionRate };
+}
