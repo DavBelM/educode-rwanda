@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Users, FileText, Plus, Copy, Check, X, ChevronDown, BookOpen, Code2, Loader, Trophy, Medal, Megaphone, Pin, Trash2, BarChart2, AlertCircle, TrendingUp, Download } from 'lucide-react';
+import { Users, FileText, Plus, Copy, Check, X, ChevronDown, BookOpen, Code2, Loader, Trophy, Medal, Megaphone, Pin, Trash2, BarChart2, AlertCircle, Download } from 'lucide-react';
 import { Header } from './components/Header';
 import {
   createClass, getTeacherClasses, getClassAssignments, createAssignment, getClassStudentCount,
@@ -674,7 +674,7 @@ function ClassAnalyticsModal({ cls, language, onClose }: { cls: Class & { studen
   const handleExportCSV = async () => {
     setDownloading(true);
     const rows = await getClassGradesExport(cls.id);
-    const header = ['Student Name', 'Assignment', 'Type', 'Marks Earned', 'Total Marks', 'Score %', 'Submitted', 'Submitted At', 'Teacher Feedback'];
+    const header = ['Student Name', 'Assignment', 'Type', 'Marks Earned', 'Total Marks', 'Score %', 'Weight %', 'Weighted Score', 'Submitted', 'Submitted At', 'Teacher Feedback'];
     const csvRows = rows.map(r => [
       `"${r.student_name}"`,
       `"${r.assignment_title}"`,
@@ -682,6 +682,8 @@ function ClassAnalyticsModal({ cls, language, onClose }: { cls: Class & { studen
       r.marks_earned ?? '',
       r.total_marks,
       r.score_pct !== null ? `${r.score_pct}%` : '',
+      `${r.weight_pct}%`,
+      r.weighted_score !== null ? `${r.weighted_score}%` : '',
       r.submitted ? 'Yes' : 'No',
       r.submitted_at ? new Date(r.submitted_at).toLocaleDateString() : '',
       `"${(r.teacher_feedback ?? '').replace(/"/g, '""')}"`,
