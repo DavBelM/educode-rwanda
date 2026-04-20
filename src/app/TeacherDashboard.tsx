@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Users, FileText, Plus, Copy, Check, X, ChevronDown, BookOpen, Code2, Loader, Trophy, Medal, Megaphone, Pin, Trash2 } from 'lucide-react';
+import { Users, FileText, Plus, Copy, Check, X, ChevronDown, BookOpen, Code2, Loader, Trophy, Medal, Megaphone, Pin, Trash2, BarChart2, AlertCircle, TrendingUp } from 'lucide-react';
 import { Header } from './components/Header';
 import {
   createClass, getTeacherClasses, getClassAssignments, createAssignment, getClassStudentCount,
   getAssignmentSubmissions, getAssignmentSubmissionCounts, gradeSubmission, getClassLeaderboard,
+  getClassAnalytics,
   createAnnouncement, getClassAnnouncements, deleteAnnouncement,
-  type Class, type Assignment, type Question, type Submission, type LeaderboardEntry, type Announcement
+  type Class, type Assignment, type Question, type Submission, type LeaderboardEntry, type Announcement, type ClassAnalytics
 } from '../lib/db';
 
 // ─── Create Class Modal ────────────────────────────────────────────────────────
@@ -657,7 +658,190 @@ function AnnouncementsModal({ cls, language, onClose }: {
 
 // ─── Invite Code Card ──────────────────────────────────────────────────────────
 
-function ClassCard({ cls, language, onAnnouncements }: { cls: Class & { studentCount?: number; assignmentCount?: number }; language: 'EN' | 'KIN'; onAnnouncements: () => void }) {
+// ─── Class Analytics Modal ─────────────────────────────────────────────────────
+
+function ClassAnalyticsModal({ cls, language, onClose }: { cls: Class & { studentCount?: number }; language: 'EN' | 'KIN'; onClose: () => void }) {
+  const isKin = language === 'KIN';
+  const [analytics, setAnalytics] = useState<ClassAnalytics | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [expanded, setExpanded] = useState<string | null>(null);
+
+  useEffect(() => {
+    getClassAnalytics(cls.id).then(data => { setAnalytics(data); setLoading(false); });
+  }, [cls.id]);
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }}>
+      <div className="w-full max-w-2xl rounded-2xl flex flex-col" style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.08)', maxHeight: '88vh' }}>
+
+        {/* Header */}
+        <div className="flex items-center justify-between p-5 shrink-0" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+          <div>
+            <h2 className="text-base font-bold" style={{ color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}>{cls.name}</h2>
+            <p className="text-xs mt-0.5" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
+              {isKin ? 'Ibisobanuro by\'ishuri' : 'Class analytics'}
+            </p>
+          </div>
+          <button onClick={onClose} style={{ color: '#475569' }}
+            onMouseEnter={e => (e.currentTarget.style.color = '#94a3b8')}
+            onMouseLeave={e => (e.currentTarget.style.color = '#475569')}>
+            <X size={20} />
+          </button>
+        </div>
+
+        <div className="overflow-y-auto p-5 space-y-4">
+          {loading ? (
+            <div className="flex items-center justify-center py-16">
+              <Loader size={22} className="animate-spin" style={{ color: '#00d4aa' }} />
+            </div>
+          ) : !analytics ? null : (
+            <>
+              {/* ── Summary row ── */}
+              <div className="grid grid-cols-3 gap-3">
+                {[
+                  { label: isKin ? 'Abanyeshuri' : 'Students',        value: analytics.total_students,                          color: '#00d4aa' },
+                  { label: isKin ? 'Amanota y\'ishuri' : 'Class avg',  value: analytics.class_avg_pct !== null ? `${analytics.class_avg_pct}%` : '—', color: analytics.class_avg_pct !== null && analytics.class_avg_pct >= 70 ? '#00d4aa' : analytics.class_avg_pct !== null && analytics.class_avg_pct >= 50 ? '#f59e0b' : '#ef4444' },
+                  { label: isKin ? 'Gutanga ibisubizo' : 'Submit rate', value: analytics.overall_submission_rate !== null ? `${analytics.overall_submission_rate}%` : '—', color: '#8b5cf6' },
+                ].map(s => (
+                  <div key={s.label} className="rounded-xl p-4 text-center" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                    <p className="text-2xl font-bold mb-1" style={{ color: s.color, fontFamily: 'Inter, sans-serif' }}>{s.value}</p>
+                    <p className="text-xs" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>{s.label}</p>
+                  </div>
+                ))}
+              </div>
+
+              {/* ── Per-assignment list ── */}
+              {analytics.assignments.length === 0 ? (
+                <div className="py-10 text-center">
+                  <p className="text-sm" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
+                    {isKin ? 'Nta mishinga ihari' : 'No assignments yet'}
+                  </p>
+                </div>
+              ) : analytics.assignments.map(a => {
+                const isOpen = expanded === a.id;
+                const subRate = analytics.total_students > 0 ? Math.round((a.submitted_count / analytics.total_students) * 100) : 0;
+                const scoreColor = a.avg_pct === null ? '#475569' : a.avg_pct >= 70 ? '#00d4aa' : a.avg_pct >= 50 ? '#f59e0b' : '#ef4444';
+                const totalDist = a.dist.reduce((s, d) => s + d.count, 0);
+
+                return (
+                  <div key={a.id} className="rounded-xl overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.06)' }}>
+                    {/* Row */}
+                    <button
+                      onClick={() => setExpanded(isOpen ? null : a.id)}
+                      className="w-full flex items-center justify-between p-4 text-left transition-all"
+                      style={{ background: isOpen ? 'rgba(255,255,255,0.03)' : 'transparent' }}
+                      onMouseEnter={e => { if (!isOpen) (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.02)'; }}
+                      onMouseLeave={e => { if (!isOpen) (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; }}>
+                      <div className="flex items-center gap-3 min-w-0">
+                        {a.assignment_type === 'coding'
+                          ? <Code2 size={14} style={{ color: '#00d4aa', flexShrink: 0 }} />
+                          : <BookOpen size={14} style={{ color: '#8b5cf6', flexShrink: 0 }} />}
+                        <p className="text-sm font-semibold truncate" style={{ color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}>
+                          {isKin && a.title_kin ? a.title_kin : a.title}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-3 shrink-0 ml-3">
+                        {/* Submission count */}
+                        <span className="text-xs font-semibold" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
+                          {a.submitted_count}/{analytics.total_students}
+                        </span>
+                        {/* Avg score */}
+                        {a.avg_pct !== null && (
+                          <span className="px-2 py-0.5 rounded-full text-xs font-bold" style={{ background: `${scoreColor}18`, color: scoreColor, border: `1px solid ${scoreColor}30` }}>
+                            {a.avg_pct}%
+                          </span>
+                        )}
+                        <ChevronDown size={14} style={{ color: '#475569', transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+                      </div>
+                    </button>
+
+                    {/* Expanded detail */}
+                    {isOpen && (
+                      <div className="px-4 pb-4 space-y-4" style={{ borderTop: '1px solid rgba(255,255,255,0.04)' }}>
+
+                        {/* Stats row */}
+                        <div className="grid grid-cols-3 gap-2 pt-3">
+                          {[
+                            { label: isKin ? 'Umubare w\'amanota' : 'Avg score', value: a.avg_score !== null ? `${a.avg_score}/${a.total_marks}` : '—', color: scoreColor },
+                            { label: isKin ? 'Amanota menshi' : 'Top score',    value: a.top_score !== null ? `${a.top_score}/${a.total_marks}` : '—', color: '#00d4aa' },
+                            { label: isKin ? 'Amanota make' : 'Low score',      value: a.low_score !== null ? `${a.low_score}/${a.total_marks}` : '—', color: '#f87171' },
+                          ].map(s => (
+                            <div key={s.label} className="rounded-lg p-3 text-center" style={{ background: 'rgba(255,255,255,0.03)' }}>
+                              <p className="text-sm font-bold" style={{ color: s.color, fontFamily: 'Inter, sans-serif' }}>{s.value}</p>
+                              <p className="text-xs mt-0.5" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>{s.label}</p>
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* Submission rate bar */}
+                        <div>
+                          <div className="flex justify-between text-xs mb-1.5" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
+                            <span>{isKin ? 'Gutanga ibisubizo' : 'Submission rate'}</span>
+                            <span style={{ color: '#f1f5f9', fontWeight: 600 }}>{a.submitted_count} / {analytics.total_students} ({subRate}%)</span>
+                          </div>
+                          <div className="h-2 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+                            <div className="h-full rounded-full" style={{ width: `${subRate}%`, background: subRate >= 70 ? '#00d4aa' : subRate >= 40 ? '#f59e0b' : '#ef4444', transition: 'width 0.6s ease' }} />
+                          </div>
+                        </div>
+
+                        {/* Score distribution */}
+                        {totalDist > 0 && (
+                          <div>
+                            <p className="text-xs font-semibold mb-2" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
+                              {isKin ? 'Ikigereranyo cy\'amanota' : 'Score distribution'}
+                            </p>
+                            <div className="flex h-6 rounded-lg overflow-hidden gap-px">
+                              {a.dist.filter(d => d.count > 0).map(d => (
+                                <div key={d.label} className="relative group flex-shrink-0"
+                                  style={{ width: `${(d.count / totalDist) * 100}%`, background: d.color, opacity: 0.8 }}
+                                  title={`${d.label}: ${d.count} student${d.count !== 1 ? 's' : ''}`} />
+                              ))}
+                            </div>
+                            <div className="flex flex-wrap gap-3 mt-2">
+                              {a.dist.map(d => (
+                                <div key={d.label} className="flex items-center gap-1">
+                                  <div className="w-2.5 h-2.5 rounded-sm" style={{ background: d.color }} />
+                                  <span className="text-xs" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>{d.label}: {d.count}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Missing students */}
+                        {a.missing_students.length > 0 && (
+                          <div className="rounded-xl p-3" style={{ background: 'rgba(239,68,68,0.05)', border: '1px solid rgba(239,68,68,0.15)' }}>
+                            <div className="flex items-center gap-2 mb-2">
+                              <AlertCircle size={13} style={{ color: '#f87171' }} />
+                              <p className="text-xs font-semibold" style={{ color: '#f87171', fontFamily: 'Inter, sans-serif' }}>
+                                {isKin ? `Ntibatanze (${a.missing_students.length})` : `Not submitted (${a.missing_students.length})`}
+                              </p>
+                            </div>
+                            <div className="flex flex-wrap gap-1.5">
+                              {a.missing_students.map(name => (
+                                <span key={name} className="px-2 py-0.5 rounded-full text-xs" style={{ background: 'rgba(239,68,68,0.1)', color: '#f87171', border: '1px solid rgba(239,68,68,0.2)', fontFamily: 'Inter, sans-serif' }}>
+                                  {name}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Class Card ────────────────────────────────────────────────────────────────
+
+function ClassCard({ cls, language, onAnnouncements, onAnalytics }: { cls: Class & { studentCount?: number; assignmentCount?: number }; language: 'EN' | 'KIN'; onAnnouncements: () => void; onAnalytics: () => void }) {
   const isKin = language === 'KIN';
   const [copied, setCopied] = useState(false);
 
@@ -703,16 +887,28 @@ function ClassCard({ cls, language, onAnnouncements }: { cls: Class & { studentC
         </button>
       </div>
 
-      <button
-        onClick={e => { e.stopPropagation(); onAnnouncements(); }}
-        className="mt-3 w-full flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-semibold transition-all"
-        style={{ background: 'rgba(245,158,11,0.08)', color: '#f59e0b', border: '1px solid rgba(245,158,11,0.18)', fontFamily: 'Inter, sans-serif' }}
-        onMouseEnter={e => (e.currentTarget.style.background = 'rgba(245,158,11,0.15)')}
-        onMouseLeave={e => (e.currentTarget.style.background = 'rgba(245,158,11,0.08)')}
-      >
-        <Megaphone size={13} />
-        {isKin ? 'Inyandiko' : 'Announcements'}
-      </button>
+      <div className="mt-3 grid grid-cols-2 gap-2">
+        <button
+          onClick={e => { e.stopPropagation(); onAnalytics(); }}
+          className="flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-semibold transition-all"
+          style={{ background: 'rgba(0,212,170,0.08)', color: '#00d4aa', border: '1px solid rgba(0,212,170,0.18)', fontFamily: 'Inter, sans-serif' }}
+          onMouseEnter={e => (e.currentTarget.style.background = 'rgba(0,212,170,0.15)')}
+          onMouseLeave={e => (e.currentTarget.style.background = 'rgba(0,212,170,0.08)')}
+        >
+          <BarChart2 size={13} />
+          {isKin ? 'Imibare' : 'Analytics'}
+        </button>
+        <button
+          onClick={e => { e.stopPropagation(); onAnnouncements(); }}
+          className="flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-semibold transition-all"
+          style={{ background: 'rgba(245,158,11,0.08)', color: '#f59e0b', border: '1px solid rgba(245,158,11,0.18)', fontFamily: 'Inter, sans-serif' }}
+          onMouseEnter={e => (e.currentTarget.style.background = 'rgba(245,158,11,0.15)')}
+          onMouseLeave={e => (e.currentTarget.style.background = 'rgba(245,158,11,0.08)')}
+        >
+          <Megaphone size={13} />
+          {isKin ? 'Inyandiko' : 'Announcements'}
+        </button>
+      </div>
     </div>
   );
 }
@@ -1079,6 +1275,7 @@ export default function TeacherDashboard() {
   const [selectedClassId, setSelectedClassId] = useState<string | null>(null);
   const [viewingAssignment, setViewingAssignment] = useState<Assignment | null>(null);
   const [announcementsClass, setAnnouncementsClass] = useState<Class | null>(null);
+  const [analyticsClass, setAnalyticsClass] = useState<Class | null>(null);
 
   const loadData = async () => {
     setLoadingData(true);
@@ -1194,7 +1391,7 @@ export default function TeacherDashboard() {
                 ) : (
                   classes.map(cls => (
                     <div key={cls.id} onClick={() => setSelectedClassId(cls.id)} className="cursor-pointer" style={{ outline: selectedClassId === cls.id ? '2px solid rgba(0,212,170,0.3)' : 'none', borderRadius: '16px' }}>
-                      <ClassCard cls={cls} language={language} onAnnouncements={() => setAnnouncementsClass(cls)} />
+                      <ClassCard cls={cls} language={language} onAnnouncements={() => setAnnouncementsClass(cls)} onAnalytics={() => setAnalyticsClass(cls)} />
                     </div>
                   ))
                 )}
@@ -1306,6 +1503,14 @@ export default function TeacherDashboard() {
           cls={announcementsClass}
           language={language}
           onClose={() => setAnnouncementsClass(null)}
+        />
+      )}
+
+      {analyticsClass && (
+        <ClassAnalyticsModal
+          cls={analyticsClass}
+          language={language}
+          onClose={() => setAnalyticsClass(null)}
         />
       )}
     </div>
