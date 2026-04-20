@@ -14,11 +14,12 @@ import ContactPage from './ContactPage';
 import PrivacyPolicyPage from './PrivacyPolicyPage';
 import ForgotPasswordPage from './ForgotPasswordPage';
 import ResetPasswordPage from './ResetPasswordPage';
+import MyResultsPage from './MyResultsPage';
 import { useAuth } from '../lib/auth';
 import { getResumeLesson, type Assignment, type CourseLesson } from '../lib/db';
 
 type PublicView = 'landing' | 'login' | 'signup' | 'school-signup' | 'about' | 'contact' | 'privacy' | 'forgot-password';
-type StudentView = 'dashboard' | 'workspace' | 'theoretical' | 'courses' | 'lesson';
+type StudentView = 'dashboard' | 'workspace' | 'theoretical' | 'courses' | 'lesson' | 'results';
 
 export default function App() {
   const { user, profile, loading, isRecoveryMode } = useAuth();
@@ -65,6 +66,15 @@ export default function App() {
       );
     }
 
+    if (studentView === 'results') {
+      return (
+        <MyResultsPage
+          language={language}
+          onBack={() => setStudentView('dashboard')}
+        />
+      );
+    }
+
     if (studentView === 'courses') {
       return (
         <CoursesPage
@@ -102,6 +112,7 @@ export default function App() {
         onStartCoding={(a) => { setOpenCodingAssignment(a ?? null); setStudentView('workspace'); }}
         onOpenAssignment={(a) => { setOpenAssignment(a); setStudentView('theoretical'); }}
         onOpenCourses={() => setStudentView('courses')}
+        onOpenResults={() => setStudentView('results')}
         onContinueLearning={async () => {
           const resume = await getResumeLesson();
           if (resume) {
