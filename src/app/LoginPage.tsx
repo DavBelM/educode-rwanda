@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Eye, EyeOff, Lock, Mail, ArrowRight } from 'lucide-react';
 import { useAuth } from '../lib/auth';
 
-export default function LoginPage({ onSuccess, onSignupClick }: { onSuccess?: () => void; onSignupClick?: () => void }) {
+export default function LoginPage({ onSuccess, onSignupClick, onForgotPassword }: { onSuccess?: () => void; onSignupClick?: () => void; onForgotPassword?: () => void }) {
   const { signIn } = useAuth();
   const [language, setLanguage] = useState<'EN' | 'KIN'>('EN');
   const [showPassword, setShowPassword] = useState(false);
@@ -197,7 +197,7 @@ export default function LoginPage({ onSuccess, onSignupClick }: { onSuccess?: ()
 
             {/* Forgot password */}
             <div className="flex justify-end">
-              <button type="button" className="text-xs font-semibold transition-colors" style={{ color: '#475569' }}
+              <button type="button" onClick={onForgotPassword} className="text-xs font-semibold transition-colors" style={{ color: '#475569' }}
                 onMouseEnter={e => (e.currentTarget.style.color = '#00d4aa')}
                 onMouseLeave={e => (e.currentTarget.style.color = '#475569')}
               >

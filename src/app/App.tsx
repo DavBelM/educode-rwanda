@@ -12,14 +12,16 @@ import SchoolSignupPage from './SchoolSignupPage';
 import AboutPage from './AboutPage';
 import ContactPage from './ContactPage';
 import PrivacyPolicyPage from './PrivacyPolicyPage';
+import ForgotPasswordPage from './ForgotPasswordPage';
+import ResetPasswordPage from './ResetPasswordPage';
 import { useAuth } from '../lib/auth';
 import { getResumeLesson, type Assignment, type CourseLesson } from '../lib/db';
 
-type PublicView = 'landing' | 'login' | 'signup' | 'school-signup' | 'about' | 'contact' | 'privacy';
+type PublicView = 'landing' | 'login' | 'signup' | 'school-signup' | 'about' | 'contact' | 'privacy' | 'forgot-password';
 type StudentView = 'dashboard' | 'workspace' | 'theoretical' | 'courses' | 'lesson';
 
 export default function App() {
-  const { user, profile, loading } = useAuth();
+  const { user, profile, loading, isRecoveryMode } = useAuth();
   const [view, setView] = useState<PublicView>('landing');
   const [studentView, setStudentView] = useState<StudentView>('dashboard');
   const [language, setLanguage] = useState<'EN' | 'KIN'>('EN');
@@ -113,8 +115,12 @@ export default function App() {
     );
   }
 
+  // Password recovery — Supabase redirects back with a session in recovery mode
+  if (isRecoveryMode) return <ResetPasswordPage onDone={() => setView('login')} />;
+
   // Public pages
-  if (view === 'login') return <LoginPage onSuccess={() => {}} onSignupClick={() => setView('signup')} />;
+  if (view === 'login') return <LoginPage onSuccess={() => {}} onSignupClick={() => setView('signup')} onForgotPassword={() => setView('forgot-password')} />;
+  if (view === 'forgot-password') return <ForgotPasswordPage onBack={() => setView('login')} />;
   if (view === 'signup') return (
     <SignupPage onSuccess={() => setView('login')} onLoginClick={() => setView('login')} />
   );
