@@ -43,6 +43,7 @@ export interface Submission {
   tests_passed: number;
   tests_total: number;
   marks_earned: number | null;
+  teacher_feedback: string | null;
   submitted_at: string;
   profiles?: { full_name: string };
 }
@@ -61,6 +62,7 @@ export interface StudentGrade {
   assignment_id: string;
   marks_earned: number | null;
   total_marks: number;
+  teacher_feedback: string | null;
 }
 
 // ─── Classes ──────────────────────────────────────────────────────────────────
@@ -222,6 +224,29 @@ export async function getStudentAssignments(): Promise<{ data: Assignment[]; err
 
 // ─── Submissions ──────────────────────────────────────────────────────────────
 
+export async function submitCodingAssignment(params: {
+  assignmentId: string;
+  codeSubmitted: string;
+}): Promise<{ error: string | null }> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: 'Not authenticated' };
+
+  const { error } = await supabase
+    .from('student_submissions')
+    .insert({
+      student_id: user.id,
+      assignment_id: params.assignmentId,
+      code_submitted: params.codeSubmitted,
+      text_answers: null,
+    });
+
+  if (error) {
+    if (error.code === '23505') return { error: 'already_submitted' };
+    return { error: error.message };
+  }
+  return { error: null };
+}
+
 export async function submitTheoreticalAssignment(params: {
   assignmentId: string;
   textAnswers: Array<{ question_id: string; answer: string }>;
@@ -295,13 +320,18 @@ export async function getAssignmentSubmissionCounts(assignmentIds: string[]): Pr
 
 // ─── Grading ──────────────────────────────────────────────────────────────────
 
-export async function gradeSubmission(submissionId: string, marksEarned: number): Promise<{ error: string | null }> {
+export async function gradeSubmission(submissionId: string, marksEarned: number, feedback?: string): Promise<{ error: string | null }> {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { error: 'Not authenticated' };
 
   const { error } = await supabase
     .from('student_submissions')
-    .update({ marks_earned: marksEarned, graded_by: user.id, graded_at: new Date().toISOString() })
+    .update({
+      marks_earned: marksEarned,
+      teacher_feedback: feedback ?? null,
+      graded_by: user.id,
+      graded_at: new Date().toISOString(),
+    })
     .eq('id', submissionId);
 
   if (error) return { error: error.message };
@@ -315,14 +345,15 @@ export async function getStudentGrades(): Promise<StudentGrade[]> {
 
   const { data } = await supabase
     .from('student_submissions')
-    .select('assignment_id, marks_earned, assignments(total_marks)')
+    .select('assignment_id, marks_earned, teacher_feedback, assignments(total_marks)')
     .eq('student_id', user.id);
 
-  return (data ?? []).map((row: { assignment_id: string; marks_earned: number | null; assignments: unknown }) => {
+  return (data ?? []).map((row: { assignment_id: string; marks_earned: number | null; teacher_feedback: string | null; assignments: unknown }) => {
     const asgn = (Array.isArray(row.assignments) ? row.assignments[0] : row.assignments) as { total_marks: number } | null;
     return {
       assignment_id: row.assignment_id,
       marks_earned: row.marks_earned,
+      teacher_feedback: row.teacher_feedback ?? null,
       total_marks: asgn?.total_marks ?? 10,
     };
   });

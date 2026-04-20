@@ -11,6 +11,7 @@ export interface Assignment {
   testsTotal: number;
   status: 'not-started' | 'in-progress' | 'completed';
   grade?: string; // e.g. "15/20"
+  feedback?: string;
 }
 
 interface AssignmentCardProps {
@@ -74,6 +75,13 @@ export function AssignmentCard({ assignment, language, onClick }: AssignmentCard
           </span>
         )}
       </div>
+
+      {assignment.feedback && (
+        <div className="mb-4 px-3 py-2 rounded-lg text-xs leading-relaxed" style={{ background: 'rgba(139,92,246,0.07)', border: '1px solid rgba(139,92,246,0.15)', color: '#a78bfa', fontFamily: 'Inter, sans-serif' }}>
+          <span className="font-semibold" style={{ color: '#8b5cf6' }}>{isKinyarwanda ? 'Igitekerezo cy\'umwarimu: ' : 'Teacher feedback: '}</span>
+          {assignment.feedback}
+        </div>
+      )}
 
       {/* Progress + action */}
       <div className="flex items-center justify-between">

@@ -7,6 +7,8 @@ import { RunCodeButton } from './components/RunCodeButton';
 import { MobileAssignmentCard } from './components/MobileAssignmentCard';
 import { executeCode } from '../lib/code-executor';
 import { analyzeFeedback, formatFeedbackForUI } from '../lib/feedback-engine';
+import { submitCodingAssignment, type Assignment } from '../lib/db';
+import { Send, CheckCircle, Loader } from 'lucide-react';
 
 const DEFAULT_JS = `// Welcome to EduCode Rwanda!
 // Try manipulating the DOM elements in index.html
@@ -30,10 +32,13 @@ const DEFAULT_HTML = `<div style="padding: 20px; font-family: sans-serif;">
 
 interface Props {
   onBack?: () => void;
+  assignment?: Assignment | null;
+  language?: 'EN' | 'KIN';
 }
 
-export default function CodingWorkspace({ onBack }: Props) {
-  const [language, setLanguage] = useState<'EN' | 'KIN'>('EN');
+export default function CodingWorkspace({ onBack, assignment, language: initialLanguage }: Props) {
+  const [language, setLanguage] = useState<'EN' | 'KIN'>( initialLanguage ?? 'EN');
+  const isKin = language === 'KIN';
   const [jsCode, setJsCode] = useState(DEFAULT_JS);
   const [htmlCode, setHtmlCode] = useState(DEFAULT_HTML);
   const [output, setOutput] = useState('');
@@ -41,6 +46,24 @@ export default function CodingWorkspace({ onBack }: Props) {
   const [isRunning, setIsRunning] = useState(false);
   const [feedback, setFeedback] = useState<Array<{ type: 'success' | 'error' | 'info'; message: string }>>([]);
   const [errorLine, setErrorLine] = useState<number | undefined>(undefined);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState('');
+
+  const handleSubmit = async () => {
+    if (!assignment) return;
+    setSubmitting(true);
+    setSubmitError('');
+    const { error } = await submitCodingAssignment({ assignmentId: assignment.id, codeSubmitted: jsCode });
+    if (error === 'already_submitted') {
+      setSubmitted(true);
+    } else if (error) {
+      setSubmitError(error);
+    } else {
+      setSubmitted(true);
+    }
+    setSubmitting(false);
+  };
 
   const toggleLanguage = () => setLanguage(prev => prev === 'EN' ? 'KIN' : 'EN');
 
@@ -92,7 +115,50 @@ export default function CodingWorkspace({ onBack }: Props) {
 
   return (
     <div className="h-screen flex flex-col bg-[#f8fafc]" style={{ fontFamily: 'Inter, sans-serif' }}>
-      <Header language={language} onLanguageToggle={toggleLanguage} showWorkspaceActions onBack={onBack} />
+      <Header language={language} onLanguageToggle={toggleLanguage} onBack={onBack} hideAssignmentInfo />
+
+      {/* Assignment banner */}
+      {assignment && (
+        <div className="shrink-0 px-6 py-3 flex items-center justify-between" style={{ background: '#13161e', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+          <div className="min-w-0">
+            <p className="text-xs font-semibold uppercase mb-0.5" style={{ color: '#475569', letterSpacing: '0.05em' }}>
+              {isKin ? 'Umushinga' : 'Assignment'}
+            </p>
+            <p className="text-sm font-bold truncate" style={{ color: '#f1f5f9' }}>
+              {isKin && assignment.title_kin ? assignment.title_kin : assignment.title}
+            </p>
+            {assignment.description && (
+              <p className="text-xs mt-0.5 truncate" style={{ color: '#475569' }}>
+                {isKin && assignment.description_kin ? assignment.description_kin : assignment.description}
+              </p>
+            )}
+          </div>
+
+          <div className="flex items-center gap-3 shrink-0 ml-4">
+            {submitError && (
+              <p className="text-xs" style={{ color: '#f87171' }}>{submitError}</p>
+            )}
+            {submitted ? (
+              <div className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold" style={{ background: 'rgba(0,212,170,0.12)', color: '#00d4aa', border: '1px solid rgba(0,212,170,0.25)' }}>
+                <CheckCircle size={15} />
+                {isKin ? 'Byatanzwe!' : 'Submitted!'}
+              </div>
+            ) : (
+              <button
+                onClick={handleSubmit}
+                disabled={submitting}
+                className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold transition-all disabled:opacity-50"
+                style={{ background: '#00d4aa', color: '#0d0f14' }}
+                onMouseEnter={e => { if (!submitting) (e.currentTarget as HTMLButtonElement).style.background = '#00bfa0'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = '#00d4aa'; }}
+              >
+                {submitting ? <Loader size={14} className="animate-spin" /> : <Send size={14} />}
+                {isKin ? 'Ohereza' : 'Submit'}
+              </button>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Desktop Layout */}
       <div className="hidden lg:flex flex-1 overflow-hidden">
@@ -157,8 +223,19 @@ export default function CodingWorkspace({ onBack }: Props) {
           <AIFeedbackPanel feedback={feedback} language={language} isLoading={isRunning} />
         </div>
 
-        <div className="sticky bottom-0 p-4 bg-white border-t border-gray-200 shadow-lg">
+        <div className="sticky bottom-0 p-4 bg-white border-t border-gray-200 shadow-lg flex gap-3">
           <RunCodeButton onClick={runCode} isRunning={isRunning} language={language} isMobile />
+          {assignment && !submitted && (
+            <button
+              onClick={handleSubmit}
+              disabled={submitting}
+              className="flex-1 flex items-center justify-center gap-1.5 py-3 rounded-xl text-sm font-bold disabled:opacity-50"
+              style={{ background: '#00d4aa', color: '#0d0f14' }}
+            >
+              {submitting ? <Loader size={14} className="animate-spin" /> : <Send size={14} />}
+              {isKin ? 'Ohereza' : 'Submit'}
+            </button>
+          )}
         </div>
       </div>
     </div>

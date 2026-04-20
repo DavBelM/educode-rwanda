@@ -24,6 +24,7 @@ export default function App() {
   const [studentView, setStudentView] = useState<StudentView>('dashboard');
   const [language, setLanguage] = useState<'EN' | 'KIN'>('EN');
   const [openAssignment, setOpenAssignment] = useState<Assignment | null>(null);
+  const [openCodingAssignment, setOpenCodingAssignment] = useState<Assignment | null>(null);
   const [openLesson, setOpenLesson] = useState<{ lesson: CourseLesson; courseTitle: string; allLessons: CourseLesson[] } | null>(null);
 
   if (loading) {
@@ -44,7 +45,13 @@ export default function App() {
   if (user) {
     if (profile?.user_type === 'teacher') return <TeacherDashboard />;
 
-    if (studentView === 'workspace') return <CodingWorkspace onBack={() => setStudentView('dashboard')} />;
+    if (studentView === 'workspace') return (
+      <CodingWorkspace
+        assignment={openCodingAssignment}
+        language={language}
+        onBack={() => { setStudentView('dashboard'); setOpenCodingAssignment(null); }}
+      />
+    );
 
     if (studentView === 'theoretical' && openAssignment) {
       return (
@@ -90,7 +97,7 @@ export default function App() {
       <Dashboard
         language={language}
         onLanguageChange={setLanguage}
-        onStartCoding={() => setStudentView('workspace')}
+        onStartCoding={(a) => { setOpenCodingAssignment(a ?? null); setStudentView('workspace'); }}
         onOpenAssignment={(a) => { setOpenAssignment(a); setStudentView('theoretical'); }}
         onOpenCourses={() => setStudentView('courses')}
         onContinueLearning={async () => {

@@ -1,7 +1,16 @@
 """
 Preprocess FixJS dataset → JSONL instruction-response pairs for Qwen2.5-7B fine-tuning.
 
+FixJS structure:
+  input/
+    50/          (fixes in files ≤ 50 lines)
+    50-100/      (fixes in files 50-100 lines)
+    100+/        (fixes in files > 100 lines)
+      before/    (buggy JS files, named <hash>_<line>_<n>.js)
+      after/     (fixed JS files, same filenames)
+
 Usage:
+    cd /home/mitali/EduCode
     python ml/notebooks/preprocess_fixjs.py
 
 Output:
@@ -14,7 +23,7 @@ import os
 import random
 from pathlib import Path
 
-FIXJS_DIR = Path("ml/data/fixjs")
+FIXJS_INPUT = Path("ml/data/fixjs/input")
 KINYARWANDA_DIR = Path("ml/data/kinyarwanda")
 OUTPUT_DIR = Path("ml/data/processed")
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -35,46 +44,59 @@ INSTRUCTION_TEMPLATES = [
 RESPONSE_TEMPLATE = "```javascript\n{fixed}\n```"
 
 
-def load_fixjs_pairs(fixjs_dir: Path) -> list[dict]:
-    """Load buggy/fixed pairs from FixJS dataset structure."""
+def load_fixjs_pairs() -> list[dict]:
+    """
+    Load buggy/fixed pairs from FixJS input directory.
+    Matches files in before/ with same-named files in after/.
+    """
     pairs = []
+    size_buckets = ["50", "50-100", "100+"]
 
-    # FixJS stores pairs in subdirectories: each has a buggy.js and fixed.js
-    # Walk the directory and collect matching pairs
-    for root, dirs, files in os.walk(fixjs_dir):
-        root_path = Path(root)
-        buggy_file = root_path / "buggy.js"
-        fixed_file = root_path / "fixed.js"
+    for bucket in size_buckets:
+        before_dir = FIXJS_INPUT / bucket / "before"
+        after_dir = FIXJS_INPUT / bucket / "after"
 
-        if buggy_file.exists() and fixed_file.exists():
+        if not before_dir.exists() or not after_dir.exists():
+            print(f"  Skipping bucket '{bucket}' — before/after dirs not found")
+            continue
+
+        before_files = set(os.listdir(before_dir))
+        after_files = set(os.listdir(after_dir))
+        matched = before_files & after_files  # only files present in both
+
+        print(f"  Bucket '{bucket}': {len(matched):,} matched pairs")
+
+        for filename in matched:
             try:
-                buggy = buggy_file.read_text(encoding="utf-8", errors="ignore").strip()
-                fixed = fixed_file.read_text(encoding="utf-8", errors="ignore").strip()
+                buggy = (before_dir / filename).read_text(encoding="utf-8", errors="ignore").strip()
+                fixed = (after_dir / filename).read_text(encoding="utf-8", errors="ignore").strip()
 
-                # Skip trivial / empty pairs
+                # Skip trivial / identical pairs
                 if len(buggy) < 10 or len(fixed) < 10:
                     continue
-                # Skip very large files (> 4000 chars) — too long for training
-                if len(buggy) > 4000 or len(fixed) > 4000:
+                if buggy == fixed:
+                    continue
+                # Skip very large snippets — too long for a 1024-token context
+                if len(buggy) > 3000 or len(fixed) > 3000:
                     continue
 
                 pairs.append({"buggy": buggy, "fixed": fixed})
             except Exception as e:
-                print(f"  Skipping {root}: {e}")
+                print(f"    Skipping {filename}: {e}")
 
     return pairs
 
 
-def load_kinyarwanda_docs(kin_dir: Path) -> list[dict]:
+def load_kinyarwanda_docs() -> list[dict]:
     """
     Load Kinyarwanda concept Q&A pairs.
-    Expected format: one JSON file per concept with {"question": "...", "answer": "..."} entries.
+    Expected format: JSON files with list of {"question": "...", "answer": "..."} objects.
     """
     pairs = []
-    if not kin_dir.exists():
+    if not KINYARWANDA_DIR.exists():
         return pairs
 
-    for f in kin_dir.glob("*.json"):
+    for f in KINYARWANDA_DIR.glob("*.json"):
         try:
             data = json.loads(f.read_text(encoding="utf-8"))
             if isinstance(data, list):
@@ -82,20 +104,18 @@ def load_kinyarwanda_docs(kin_dir: Path) -> list[dict]:
                     if "question" in item and "answer" in item:
                         pairs.append(item)
         except Exception as e:
-            print(f"  Skipping {f}: {e}")
+            print(f"  Skipping {f.name}: {e}")
 
     return pairs
 
 
 def make_fixjs_sample(pair: dict) -> dict:
     template = random.choice(INSTRUCTION_TEMPLATES)
-    instruction = template.format(buggy=pair["buggy"])
-    response = RESPONSE_TEMPLATE.format(fixed=pair["fixed"])
     return {
         "messages": [
             {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": instruction},
-            {"role": "assistant", "content": response},
+            {"role": "user", "content": template.format(buggy=pair["buggy"])},
+            {"role": "assistant", "content": RESPONSE_TEMPLATE.format(fixed=pair["fixed"])},
         ]
     }
 
@@ -119,17 +139,15 @@ def write_jsonl(samples: list[dict], path: Path):
 
 def main():
     print("Loading FixJS pairs...")
-    fixjs_pairs = load_fixjs_pairs(FIXJS_DIR)
-    print(f"  Found {len(fixjs_pairs):,} FixJS pairs")
+    fixjs_pairs = load_fixjs_pairs()
+    print(f"  Total usable FixJS pairs: {len(fixjs_pairs):,}")
 
-    print("Loading Kinyarwanda docs...")
-    kin_pairs = load_kinyarwanda_docs(KINYARWANDA_DIR)
-    print(f"  Found {len(kin_pairs):,} Kinyarwanda Q&A pairs")
+    print("\nLoading Kinyarwanda docs...")
+    kin_pairs = load_kinyarwanda_docs()
+    print(f"  Total Kinyarwanda Q&A pairs: {len(kin_pairs):,}")
 
     if not fixjs_pairs and not kin_pairs:
-        print("\nNo data found. Make sure you have:")
-        print("  - FixJS cloned at ml/data/fixjs/")
-        print("  - Kinyarwanda docs at ml/data/kinyarwanda/*.json")
+        print("\nNo data found. Check that ml/data/fixjs/ is cloned correctly.")
         return
 
     # Build samples
@@ -145,7 +163,10 @@ def main():
     split = int(len(samples) * 0.9)
     train, val = samples[:split], samples[split:]
 
-    print(f"\nTotal samples: {len(samples):,}  →  train: {len(train):,}  val: {len(val):,}")
+    print(f"\nTotal samples : {len(samples):,}")
+    print(f"Train         : {len(train):,}")
+    print(f"Val           : {len(val):,}")
+    print()
     write_jsonl(train, OUTPUT_DIR / "train.jsonl")
     write_jsonl(val, OUTPUT_DIR / "val.jsonl")
     print("\nDone! Upload ml/data/processed/ to Kaggle as a dataset before running the training notebook.")
