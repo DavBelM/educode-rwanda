@@ -122,6 +122,7 @@ function CreateAssignmentModal({ language, classes, onClose, onCreate }: {
   const [dueDate, setDueDate] = useState('');
   const [examMode, setExamMode] = useState(false);
   const [durationMinutes, setDurationMinutes] = useState(30);
+  const [weightPct, setWeightPct] = useState(100);
   const [questions, setQuestions] = useState<Question[]>([{ id: '1', text: '', text_kin: '' }]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -154,6 +155,7 @@ function CreateAssignmentModal({ language, classes, onClose, onCreate }: {
       dueDate: dueDate || undefined,
       examMode,
       durationMinutes: examMode ? durationMinutes : undefined,
+      weightPct,
     });
     if (error) { setError(error); setLoading(false); return; }
     onCreate();
@@ -343,6 +345,29 @@ function CreateAssignmentModal({ language, classes, onClose, onCreate }: {
                     onFocus={e => (e.target.style.border = '1px solid rgba(0,212,170,0.4)')}
                     onBlur={e => (e.target.style.border = '1px solid rgba(255,255,255,0.08)')}
                   />
+                </div>
+              </div>
+
+              {/* Weight % */}
+              <div>
+                <label className="block text-sm font-semibold mb-2" style={{ color: '#94a3b8', fontFamily: 'Inter, sans-serif' }}>
+                  {isKin ? 'Uburemere bw\'Amanota (%)' : 'Grade Weight (%)'}
+                </label>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="number"
+                    min={1}
+                    max={100}
+                    value={weightPct}
+                    onChange={e => setWeightPct(Math.max(1, Math.min(100, Number(e.target.value))))}
+                    className="w-24 px-3 py-2 rounded-xl text-sm text-center focus:outline-none"
+                    style={{ background: '#0d0f14', border: '1px solid rgba(255,255,255,0.08)', color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}
+                  />
+                  <p className="text-xs" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
+                    {isKin
+                      ? weightPct === 100 ? 'Ibarwa yuzuye mu manota ya term' : `Ibarwa ${weightPct}% mu manota ya term`
+                      : weightPct === 100 ? 'Counts fully toward term grade' : `Counts as ${weightPct}% toward term grade`}
+                  </p>
                 </div>
               </div>
 
