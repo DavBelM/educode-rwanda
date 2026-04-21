@@ -1231,34 +1231,38 @@ function AssignmentRow({ assignment, submissionCount, language, onClick }: {
   return (
     <button
       onClick={onClick}
-      className="w-full flex items-center justify-between py-3 px-4 rounded-xl transition-all text-left"
+      className="w-full flex items-start gap-3 py-3 px-4 rounded-xl transition-all text-left"
       style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}
       onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.03)')}
       onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
     >
-      <div className="flex items-center gap-3">
-        <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0" style={{ background: typeColor.bg, border: `1px solid ${typeColor.border}` }}>
-          {assignment.assignment_type === 'theoretical' ? <BookOpen size={14} style={{ color: typeColor.text }} /> : <Code2 size={14} style={{ color: typeColor.text }} />}
-        </div>
-        <div>
-          <p className="text-sm font-semibold" style={{ color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}>{title}</p>
+      {/* Type icon */}
+      <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5" style={{ background: typeColor.bg, border: `1px solid ${typeColor.border}` }}>
+        {assignment.assignment_type === 'theoretical' ? <BookOpen size={14} style={{ color: typeColor.text }} /> : <Code2 size={14} style={{ color: typeColor.text }} />}
+      </div>
+
+      {/* Content */}
+      <div className="flex-1 min-w-0">
+        {/* Title */}
+        <p className="text-sm font-semibold leading-snug" style={{ color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}>{title}</p>
+
+        {/* Badges row */}
+        <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
+          <span className="px-2 py-0.5 rounded-full text-xs font-semibold" style={{ background: 'rgba(0,212,170,0.08)', color: '#00d4aa', border: '1px solid rgba(0,212,170,0.15)', fontFamily: 'Inter, sans-serif' }}>
+            {submissionCount} {isKin ? 'byatanzwe' : submissionCount === 1 ? 'submission' : 'submissions'}
+          </span>
+          <span className="px-2 py-0.5 rounded-full text-xs font-semibold" style={{ background: typeColor.bg, color: typeColor.text, border: `1px solid ${typeColor.border}`, fontFamily: 'Inter, sans-serif' }}>
+            {assignment.assignment_type === 'theoretical' ? (isKin ? 'Inyandiko' : 'Theory') : 'Code'}
+          </span>
+          <span className="px-2 py-0.5 rounded-full text-xs font-semibold" style={{ color: diffColors[assignment.difficulty], background: `${diffColors[assignment.difficulty]}18`, border: `1px solid ${diffColors[assignment.difficulty]}30`, fontFamily: 'Inter, sans-serif' }}>
+            {assignment.difficulty}
+          </span>
           {assignment.due_date && (
-            <p className="text-xs" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
-              {isKin ? 'Kurangira' : 'Due'}: {new Date(assignment.due_date).toLocaleDateString()}
-            </p>
+            <span className="text-xs" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
+              · {isKin ? 'Kurangira' : 'Due'}: {new Date(assignment.due_date).toLocaleDateString()}
+            </span>
           )}
         </div>
-      </div>
-      <div className="flex items-center gap-2">
-        <span className="px-2 py-0.5 rounded-full text-xs font-semibold" style={{ background: 'rgba(0,212,170,0.08)', color: '#00d4aa', border: '1px solid rgba(0,212,170,0.15)', fontFamily: 'Inter, sans-serif' }}>
-          {submissionCount} {isKin ? 'byatanzwe' : submissionCount === 1 ? 'submission' : 'submissions'}
-        </span>
-        <span className="px-2 py-0.5 rounded-full text-xs font-semibold" style={{ background: typeColor.bg, color: typeColor.text, border: `1px solid ${typeColor.border}` }}>
-          {assignment.assignment_type === 'theoretical' ? (isKin ? 'Inyandiko' : 'Theory') : 'Code'}
-        </span>
-        <span className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{ color: diffColors[assignment.difficulty], background: `${diffColors[assignment.difficulty]}18`, border: `1px solid ${diffColors[assignment.difficulty]}30` }}>
-          {assignment.difficulty}
-        </span>
       </div>
     </button>
   );
