@@ -435,6 +435,65 @@ export async function getStudentResults(): Promise<StudentResult[]> {
   });
 }
 
+// ─── Self-Learner ─────────────────────────────────────────────────────────────
+
+export interface CourseProgress {
+  course_id: string;
+  title: string;
+  title_kin: string | null;
+  difficulty: string;
+  total_lessons: number;
+  completed_lessons: number;
+  pct: number;
+}
+
+export async function getSelfLearnerStats(): Promise<{
+  streak: number;
+  courseProgress: CourseProgress[];
+  totalCompleted: number;
+  totalLessons: number;
+}> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { streak: 0, courseProgress: [], totalCompleted: 0, totalLessons: 0 };
+
+  const courses = await getCourses();
+  if (!courses.length) return { streak: await getStreak(), courseProgress: [], totalCompleted: 0, totalLessons: 0 };
+
+  // Fetch all modules + lessons in parallel
+  const courseDetails = await Promise.all(courses.map(c => getCourseDetail(c.id)));
+
+  // All lesson ids across all courses
+  const allLessonIds = courseDetails.flatMap(({ modules }) => modules.flatMap(m => m.lessons.map(l => l.id)));
+
+  const [{ data: progressRows }, streak] = await Promise.all([
+    allLessonIds.length > 0
+      ? supabase.from('student_lesson_progress').select('lesson_id').eq('student_id', user.id).in('lesson_id', allLessonIds)
+      : { data: [] },
+    getStreak(),
+  ]);
+
+  const completedSet = new Set((progressRows ?? []).map((r: { lesson_id: string }) => r.lesson_id));
+
+  const courseProgress: CourseProgress[] = courses.map((c, i) => {
+    const lessons = courseDetails[i].modules.flatMap(m => m.lessons);
+    const completed = lessons.filter(l => completedSet.has(l.id)).length;
+    return {
+      course_id: c.id,
+      title: c.title,
+      title_kin: c.title_kin,
+      difficulty: c.difficulty,
+      total_lessons: lessons.length,
+      completed_lessons: completed,
+      pct: lessons.length > 0 ? Math.round((completed / lessons.length) * 100) : 0,
+    };
+  });
+
+  const totalCompleted = courseProgress.reduce((s, c) => s + c.completed_lessons, 0);
+  const totalLessons   = courseProgress.reduce((s, c) => s + c.total_lessons, 0);
+
+  return { streak, courseProgress, totalCompleted, totalLessons };
+}
+
 // ─── Courses ──────────────────────────────────────────────────────────────────
 
 export interface Course {

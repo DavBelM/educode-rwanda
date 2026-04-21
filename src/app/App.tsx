@@ -17,6 +17,7 @@ import ResetPasswordPage from './ResetPasswordPage';
 import MyResultsPage from './MyResultsPage';
 import OnboardingModal from './OnboardingModal';
 import SchoolAdminDashboard from './SchoolAdminDashboard';
+import SelfLearnerDashboard from './SelfLearnerDashboard';
 import { useAuth } from '../lib/auth';
 import { getResumeLesson, type Assignment, type CourseLesson } from '../lib/db';
 
@@ -129,6 +130,33 @@ export default function App() {
           onCompleted={() => setStudentView('courses')}
           onNextLesson={(next) => setOpenLesson({ ...openLesson, lesson: next })}
         />
+      );
+    }
+
+    const sharedProps = {
+      language,
+      onLanguageChange: setLanguage,
+      onStartCoding: () => { setOpenCodingAssignment(null); setStudentView('workspace'); },
+      onOpenCourses: () => setStudentView('courses'),
+      onOpenLesson: (lesson: CourseLesson, courseTitle: string, allLessons: CourseLesson[]) => {
+        setOpenLesson({ lesson, courseTitle, allLessons });
+        setStudentView('lesson');
+      },
+    };
+
+    if (profile.user_type === 'self_learner') {
+      return (
+        <>
+          <SelfLearnerDashboard
+            {...sharedProps}
+            onContinueLearning={async () => {
+              const resume = await getResumeLesson();
+              if (resume) { setOpenLesson(resume); setStudentView('lesson'); }
+              else setStudentView('courses');
+            }}
+          />
+          {onboardingModal}
+        </>
       );
     }
 
