@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router';
 import Dashboard from './Dashboard';
 import TeacherDashboard from './TeacherDashboard';
 import CodingWorkspace from './CodingWorkspace';
@@ -21,31 +22,79 @@ import SelfLearnerDashboard from './SelfLearnerDashboard';
 import { useAuth } from '../lib/auth';
 import { getResumeLesson, type Assignment, type CourseLesson } from '../lib/db';
 
-type PublicView = 'landing' | 'login' | 'signup' | 'school-signup' | 'about' | 'contact' | 'privacy' | 'forgot-password';
-type StudentView = 'dashboard' | 'workspace' | 'theoretical' | 'courses' | 'lesson' | 'results';
+// ── Route wrappers that read complex objects from location.state ──────────────
+
+function WorkspaceRoute({ language }: { language: 'EN' | 'KIN' }) {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const assignment: Assignment | null = location.state?.assignment ?? null;
+  return (
+    <CodingWorkspace
+      assignment={assignment}
+      language={language}
+      onBack={() => navigate(-1)}
+    />
+  );
+}
+
+function TheoreticalRoute({ language }: { language: 'EN' | 'KIN' }) {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const assignment: Assignment | null = location.state?.assignment ?? null;
+  if (!assignment) return <Navigate to="/dashboard" replace />;
+  return (
+    <TheoreticalAssignment
+      assignment={assignment}
+      language={language}
+      onBack={() => navigate(-1)}
+    />
+  );
+}
+
+function LessonRoute({ language }: { language: 'EN' | 'KIN' }) {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const state = location.state as { lesson: CourseLesson; courseTitle: string; allLessons: CourseLesson[] } | null;
+  if (!state?.lesson) return <Navigate to="/courses" replace />;
+  const { lesson, courseTitle, allLessons } = state;
+  const currentIdx = allLessons.findIndex(l => l.id === lesson.id);
+  const nextLesson = allLessons[currentIdx + 1] ?? null;
+  return (
+    <LessonViewer
+      key={lesson.id}
+      lesson={lesson}
+      courseTitle={courseTitle}
+      language={language}
+      nextLesson={nextLesson}
+      onBack={() => navigate('/courses')}
+      onCompleted={() => navigate('/courses')}
+      onNextLesson={(next) => navigate('/lesson', { state: { lesson: next, courseTitle, allLessons }, replace: true })}
+    />
+  );
+}
+
+// ── Main App ──────────────────────────────────────────────────────────────────
 
 export default function App() {
   const { user, profile, loading, isRecoveryMode } = useAuth();
-  const [view, setView] = useState<PublicView>('landing');
+  const navigate = useNavigate();
   const [showOnboarding, setShowOnboarding] = useState(false);
-  const [studentView, setStudentView] = useState<StudentView>('dashboard');
   const [language, setLanguage] = useState<'EN' | 'KIN'>('EN');
-  const [openAssignment, setOpenAssignment] = useState<Assignment | null>(null);
-  const [openCodingAssignment, setOpenCodingAssignment] = useState<Assignment | null>(null);
-  const [openLesson, setOpenLesson] = useState<{ lesson: CourseLesson; courseTitle: string; allLessons: CourseLesson[] } | null>(null);
 
   useEffect(() => {
     if (user && profile) {
       const key = `educode_onboarded_${user.id}`;
-      if (!localStorage.getItem(key)) {
-        setShowOnboarding(true);
-      }
+      if (!localStorage.getItem(key)) setShowOnboarding(true);
     }
   }, [user, profile]);
 
   const handleOnboardingDone = () => {
     if (user) localStorage.setItem(`educode_onboarded_${user.id}`, '1');
     setShowOnboarding(false);
+  };
+
+  const openLesson = (lesson: CourseLesson, courseTitle: string, allLessons: CourseLesson[]) => {
+    navigate('/lesson', { state: { lesson, courseTitle, allLessons } });
   };
 
   if (loading) {
@@ -62,7 +111,9 @@ export default function App() {
     );
   }
 
-  // Authenticated users
+  if (isRecoveryMode) return <ResetPasswordPage onDone={() => navigate('/login')} />;
+
+  // ── Authenticated ──────────────────────────────────────────────────────────
   if (user && profile) {
     const onboardingModal = showOnboarding ? (
       <OnboardingModal
@@ -73,136 +124,96 @@ export default function App() {
       />
     ) : null;
 
-    if (profile?.user_type === 'school_admin') return <SchoolAdminDashboard />;
-    if (profile?.user_type === 'teacher') return <>{<TeacherDashboard />}{onboardingModal}</>;
+    if (profile.user_type === 'school_admin') return <SchoolAdminDashboard />;
+    if (profile.user_type === 'teacher') return <>{<TeacherDashboard />}{onboardingModal}</>;
 
-    if (studentView === 'workspace') return (
-      <CodingWorkspace
-        assignment={openCodingAssignment}
-        language={language}
-        onBack={() => { setStudentView('dashboard'); setOpenCodingAssignment(null); }}
-      />
-    );
-
-    if (studentView === 'theoretical' && openAssignment) {
-      return (
-        <TheoreticalAssignment
-          assignment={openAssignment}
-          language={language}
-          onBack={() => { setStudentView('dashboard'); setOpenAssignment(null); }}
-        />
-      );
-    }
-
-    if (studentView === 'results') {
-      return (
-        <MyResultsPage
-          language={language}
-          onBack={() => setStudentView('dashboard')}
-        />
-      );
-    }
-
-    if (studentView === 'courses') {
-      return (
-        <CoursesPage
-          language={language}
-          onBack={() => setStudentView('dashboard')}
-          onOpenLesson={(lesson, courseTitle, allLessons) => {
-            setOpenLesson({ lesson, courseTitle, allLessons });
-            setStudentView('lesson');
-          }}
-        />
-      );
-    }
-
-    if (studentView === 'lesson' && openLesson) {
-      const currentIdx = openLesson.allLessons.findIndex(l => l.id === openLesson.lesson.id);
-      const nextLesson = openLesson.allLessons[currentIdx + 1] ?? null;
-      return (
-        <LessonViewer
-          key={openLesson.lesson.id}
-          lesson={openLesson.lesson}
-          courseTitle={openLesson.courseTitle}
-          language={language}
-          nextLesson={nextLesson}
-          onBack={() => setStudentView('courses')}
-          onCompleted={() => setStudentView('courses')}
-          onNextLesson={(next) => setOpenLesson({ ...openLesson, lesson: next })}
-        />
-      );
-    }
-
-    const sharedProps = {
+    const sharedCourseProps = {
       language,
       onLanguageChange: setLanguage,
-      onStartCoding: () => { setOpenCodingAssignment(null); setStudentView('workspace'); },
-      onOpenCourses: () => setStudentView('courses'),
-      onOpenLesson: (lesson: CourseLesson, courseTitle: string, allLessons: CourseLesson[]) => {
-        setOpenLesson({ lesson, courseTitle, allLessons });
-        setStudentView('lesson');
-      },
+      onOpenLesson: openLesson,
     };
 
     if (profile.user_type === 'self_learner') {
       return (
         <>
-          <SelfLearnerDashboard
-            {...sharedProps}
-            onContinueLearning={async () => {
-              const resume = await getResumeLesson();
-              if (resume) { setOpenLesson(resume); setStudentView('lesson'); }
-              else setStudentView('courses');
-            }}
-          />
           {onboardingModal}
+          <Routes>
+            <Route path="/workspace" element={<WorkspaceRoute language={language} />} />
+            <Route path="/courses" element={
+              <CoursesPage
+                {...sharedCourseProps}
+                onBack={() => navigate('/learn')}
+              />
+            } />
+            <Route path="/lesson" element={<LessonRoute language={language} />} />
+            <Route path="*" element={
+              <SelfLearnerDashboard
+                {...sharedCourseProps}
+                onStartCoding={() => navigate('/workspace')}
+                onOpenCourses={() => navigate('/courses')}
+                onContinueLearning={async () => {
+                  const resume = await getResumeLesson();
+                  if (resume) navigate('/lesson', { state: resume });
+                  else navigate('/courses');
+                }}
+              />
+            } />
+          </Routes>
         </>
       );
     }
 
+    // Student
     return (
       <>
-        <Dashboard
-          language={language}
-          onLanguageChange={setLanguage}
-          onStartCoding={(a) => { setOpenCodingAssignment(a ?? null); setStudentView('workspace'); }}
-          onOpenAssignment={(a) => { setOpenAssignment(a); setStudentView('theoretical'); }}
-          onOpenCourses={() => setStudentView('courses')}
-          onOpenResults={() => setStudentView('results')}
-          onContinueLearning={async () => {
-            const resume = await getResumeLesson();
-            if (resume) {
-              setOpenLesson(resume);
-              setStudentView('lesson');
-            } else {
-              setStudentView('courses');
-            }
-          }}
-        />
         {onboardingModal}
+        <Routes>
+          <Route path="/workspace" element={<WorkspaceRoute language={language} onLanguageChange={setLanguage} />} />
+          <Route path="/assignment" element={<TheoreticalRoute language={language} />} />
+          <Route path="/courses" element={
+            <CoursesPage
+              {...sharedCourseProps}
+              onBack={() => navigate('/dashboard')}
+            />
+          } />
+          <Route path="/lesson" element={<LessonRoute language={language} />} />
+          <Route path="/results" element={
+            <MyResultsPage
+              language={language}
+              onBack={() => navigate('/dashboard')}
+            />
+          } />
+          <Route path="*" element={
+            <Dashboard
+              language={language}
+              onLanguageChange={setLanguage}
+              onStartCoding={(a) => navigate('/workspace', { state: { assignment: a ?? null } })}
+              onOpenAssignment={(a) => navigate('/assignment', { state: { assignment: a } })}
+              onOpenCourses={() => navigate('/courses')}
+              onOpenResults={() => navigate('/results')}
+              onContinueLearning={async () => {
+                const resume = await getResumeLesson();
+                if (resume) navigate('/lesson', { state: resume });
+                else navigate('/courses');
+              }}
+            />
+          } />
+        </Routes>
       </>
     );
   }
 
-  // Password recovery — Supabase redirects back with a session in recovery mode
-  if (isRecoveryMode) return <ResetPasswordPage onDone={() => setView('login')} />;
-
-  // Public pages
-  if (view === 'login') return <LoginPage onSuccess={() => {}} onSignupClick={() => setView('signup')} onForgotPassword={() => setView('forgot-password')} />;
-  if (view === 'forgot-password') return <ForgotPasswordPage onBack={() => setView('login')} />;
-  if (view === 'signup') return (
-    <SignupPage onSuccess={() => setView('login')} onLoginClick={() => setView('login')} />
-  );
-  if (view === 'school-signup') return <SchoolSignupPage />;
-  if (view === 'about') return <AboutPage />;
-  if (view === 'contact') return <ContactPage />;
-  if (view === 'privacy') return <PrivacyPolicyPage />;
-
+  // ── Public ─────────────────────────────────────────────────────────────────
   return (
-    <LandingPage
-      onLogin={() => setView('login')}
-      onSignup={() => setView('signup')}
-      onSchoolSignup={() => setView('school-signup')}
-    />
+    <Routes>
+      <Route path="/login" element={<LoginPage onSuccess={() => {}} onSignupClick={() => navigate('/signup')} onForgotPassword={() => navigate('/forgot-password')} />} />
+      <Route path="/forgot-password" element={<ForgotPasswordPage onBack={() => navigate('/login')} />} />
+      <Route path="/signup" element={<SignupPage onSuccess={() => navigate('/login')} onLoginClick={() => navigate('/login')} />} />
+      <Route path="/school-signup" element={<SchoolSignupPage />} />
+      <Route path="/about" element={<AboutPage />} />
+      <Route path="/contact" element={<ContactPage />} />
+      <Route path="/privacy" element={<PrivacyPolicyPage />} />
+      <Route path="*" element={<LandingPage onLogin={() => navigate('/login')} onSignup={() => navigate('/signup')} onSchoolSignup={() => navigate('/school-signup')} />} />
+    </Routes>
   );
 }
