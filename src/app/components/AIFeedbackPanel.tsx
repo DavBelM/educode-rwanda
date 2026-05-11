@@ -12,8 +12,8 @@ export function AIFeedbackPanel({ feedback, language, isLoading = false, aiRespo
   const isKinyarwanda = language === 'KIN';
 
   return (
-    <div className="h-full flex flex-col" style={{ background: '#13161e', borderLeft: '1px solid rgba(255,255,255,0.06)' }}>
-      <div className="flex items-center gap-2 px-4 py-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+    <div className="h-full flex flex-col" style={{ background: 'var(--ec-surface)', borderLeft: '1px solid var(--ec-b1)' }}>
+      <div className="flex items-center gap-2 px-4 py-3" style={{ borderBottom: '1px solid var(--ec-b1)' }}>
         <div className="w-8 h-8 rounded-lg bg-[#8b5cf6] flex items-center justify-center">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="white" strokeWidth="2" strokeLinejoin="round"/>
@@ -21,7 +21,7 @@ export function AIFeedbackPanel({ feedback, language, isLoading = false, aiRespo
             <path d="M2 12L12 17L22 12" stroke="white" strokeWidth="2" strokeLinejoin="round"/>
           </svg>
         </div>
-        <span className="font-semibold" style={{ fontFamily: 'Inter, sans-serif', fontSize: '17px', color: '#f1f5f9' }}>
+        <span className="font-semibold" style={{ fontFamily: 'Inter, sans-serif', fontSize: '17px', color: 'var(--ec-text-1)' }}>
           {isKinyarwanda ? 'Ibisobanuro bya AI' : 'AI Feedback'}
         </span>
       </div>
@@ -42,11 +42,11 @@ export function AIFeedbackPanel({ feedback, language, isLoading = false, aiRespo
             {/* Loading Text */}
             <div className="space-y-4 mb-6 w-full max-w-xs">
               <div className="space-y-1">
-                <p className="font-medium flex items-center justify-center gap-2" style={{ fontFamily: 'Inter, sans-serif', fontSize: '17px', color: '#94a3b8' }}>
+                <p className="font-medium flex items-center justify-center gap-2" style={{ fontFamily: 'Inter, sans-serif', fontSize: '17px', color: 'var(--ec-text-4)' }}>
                   <span className="animate-spin">⏳</span>
                   Turareba code yawe...
                 </p>
-                <p className="text-sm text-center" style={{ fontFamily: 'Inter, sans-serif', color: '#475569' }}>
+                <p className="text-sm text-center" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--ec-text-6)' }}>
                   Analyzing your code...
                 </p>
               </div>
@@ -57,10 +57,10 @@ export function AIFeedbackPanel({ feedback, language, isLoading = false, aiRespo
               </div>
 
               <div className="space-y-1">
-                <p className="font-medium text-center" style={{ fontFamily: 'Inter, sans-serif', fontSize: '15px', color: '#94a3b8' }}>
+                <p className="font-medium text-center" style={{ fontFamily: 'Inter, sans-serif', fontSize: '15px', color: 'var(--ec-text-4)' }}>
                   Tugira ibisobanuro by'AI...
                 </p>
-                <p className="text-sm text-center" style={{ fontFamily: 'Inter, sans-serif', color: '#475569' }}>
+                <p className="text-sm text-center" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--ec-text-6)' }}>
                   Generating AI feedback...
                 </p>
               </div>
@@ -86,10 +86,10 @@ export function AIFeedbackPanel({ feedback, language, isLoading = false, aiRespo
 
             {/* Bilingual Text */}
             <div className="space-y-2 mb-6">
-              <p className="font-medium" style={{ fontFamily: 'Inter, sans-serif', fontSize: '17px', color: '#94a3b8' }}>
+              <p className="font-medium" style={{ fontFamily: 'Inter, sans-serif', fontSize: '17px', color: 'var(--ec-text-4)' }}>
                 Click "Run Code" to get AI-powered feedback
               </p>
-              <p className="text-sm" style={{ fontFamily: 'Inter, sans-serif', color: '#475569' }}>
+              <p className="text-sm" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--ec-text-6)' }}>
                 Kanda "Kora Code" kugirango ubone ibisobanuro by'AI
               </p>
             </div>
@@ -154,7 +154,7 @@ export function AIFeedbackPanel({ feedback, language, isLoading = false, aiRespo
                   backgroundColor: item.type === 'success' ? 'rgba(16,185,129,0.08)' : item.type === 'error' ? 'rgba(239,68,68,0.08)' : 'rgba(139,92,246,0.08)'
                 }}
               >
-                <p className="text-sm whitespace-pre-line" style={{ fontFamily: 'Inter, sans-serif', fontSize: '15px', lineHeight: '1.6', color: '#cbd5e1' }}>
+                <p className="text-sm whitespace-pre-line" style={{ fontFamily: 'Inter, sans-serif', fontSize: '15px', lineHeight: '1.6', color: 'var(--ec-text-3)' }}>
                   {item.message}
                 </p>
               </div>
@@ -178,7 +178,7 @@ export function AIFeedbackPanel({ feedback, language, isLoading = false, aiRespo
                 <div className="h-3 rounded-full animate-pulse" style={{ background: 'rgba(139,92,246,0.15)', width: '75%', animationDelay: '300ms' }} />
               </div>
             ) : (
-              <p className="text-sm leading-relaxed whitespace-pre-line" style={{ color: '#e2e8f0' }}>
+              <p className="text-sm leading-relaxed whitespace-pre-line" style={{ color: 'var(--ec-text-2)' }}>
                 {aiResponse}
               </p>
             )}
@@ -193,7 +193,7 @@ export function AIFeedbackPanel({ feedback, language, isLoading = false, aiRespo
               <div className="grid grid-cols-2 gap-2">
                 <button
                   className="px-4 py-2 rounded-lg text-sm font-medium transition-all"
-                  style={{ fontFamily: 'Inter, sans-serif', border: '1px solid rgba(255,255,255,0.1)', color: '#94a3b8', background: 'rgba(255,255,255,0.04)' }}
+                  style={{ fontFamily: 'Inter, sans-serif', border: '1px solid var(--ec-b4)', color: 'var(--ec-text-4)', background: 'var(--ec-b3)' }}
                 >
                   {isKinyarwanda ? 'Kwikosora' : 'Fix Myself'}
                 </button>

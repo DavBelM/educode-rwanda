@@ -29,7 +29,7 @@ function RenderContent({ text }: { text: string }) {
         if (codeMatch) {
           return (
             <pre key={i} className="rounded-xl p-4 my-3 overflow-x-auto text-sm"
-              style={{ background: '#0d0f14', border: '1px solid rgba(255,255,255,0.08)',
+              style={{ background: 'var(--ec-bg)', border: '1px solid var(--ec-b2)',
                 color: '#00d4aa', fontFamily: 'monospace', lineHeight: '1.6' }}>
               {codeMatch[1].trim()}
             </pre>
@@ -42,10 +42,10 @@ function RenderContent({ text }: { text: string }) {
               const parts = line.split(/\*\*(.+?)\*\*/g);
               return (
                 <p key={li} className="text-sm leading-relaxed mb-1"
-                  style={{ color: '#94a3b8', fontFamily: 'Inter, sans-serif' }}>
+                  style={{ color: 'var(--ec-text-4)', fontFamily: 'Inter, sans-serif' }}>
                   {parts.map((p, pi) =>
                     pi % 2 === 1
-                      ? <strong key={pi} style={{ color: '#f1f5f9' }}>{p}</strong>
+                      ? <strong key={pi} style={{ color: 'var(--ec-text-1)' }}>{p}</strong>
                       : p
                   )}
                 </p>
@@ -67,12 +67,12 @@ function ReadingLesson({ lesson, language, onComplete, completing }: {
   const content = isKin && lesson.content_kin ? lesson.content_kin : lesson.content;
   return (
     <div>
-      <div className="rounded-2xl p-6 mb-6" style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.06)' }}>
+      <div className="rounded-2xl p-6 mb-6" style={{ background: 'var(--ec-surface)', border: '1px solid var(--ec-b1)' }}>
         <RenderContent text={content ?? ''} />
       </div>
       <button onClick={onComplete} disabled={completing}
         className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm transition-all disabled:opacity-50"
-        style={{ background: '#00d4aa', color: '#0d0f14', fontFamily: 'Inter, sans-serif' }}
+        style={{ background: '#00d4aa', color: 'var(--ec-bg)', fontFamily: 'Inter, sans-serif' }}
         onMouseEnter={e => { if (!completing) (e.currentTarget as HTMLButtonElement).style.background = '#00bfa0'; }}
         onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = '#00d4aa'; }}>
         {completing ? <Loader size={16} className="animate-spin" /> : <CheckCircle size={16} />}
@@ -119,7 +119,7 @@ function CodingLesson({ lesson, language, onComplete, completing }: {
     <div className="space-y-4">
       {/* Instructions */}
       <div className="rounded-xl p-4" style={{ background: 'rgba(0,212,170,0.05)', border: '1px solid rgba(0,212,170,0.15)' }}>
-        <p className="text-sm whitespace-pre-line" style={{ color: '#cbd5e1', fontFamily: 'Inter, sans-serif' }}>
+        <p className="text-sm whitespace-pre-line" style={{ color: 'var(--ec-text-3)', fontFamily: 'Inter, sans-serif' }}>
           {lesson.exercise_data?.instructions}
         </p>
         {lesson.exercise_data?.hint && (
@@ -128,7 +128,7 @@ function CodingLesson({ lesson, language, onComplete, completing }: {
               {showHint ? '▲ Hide hint' : '▼ Show hint'}
             </button>
             {showHint && (
-              <p className="text-xs mt-2" style={{ color: '#94a3b8', fontFamily: 'Inter, sans-serif' }}>
+              <p className="text-xs mt-2" style={{ color: 'var(--ec-text-4)', fontFamily: 'Inter, sans-serif' }}>
                 {lesson.exercise_data.hint}
               </p>
             )}
@@ -139,15 +139,15 @@ function CodingLesson({ lesson, language, onComplete, completing }: {
       {isHtmlExercise ? (
         <>
           {/* HTML Editor */}
-          <div className="rounded-xl overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.08)' }}>
+          <div className="rounded-xl overflow-hidden" style={{ border: '1px solid var(--ec-b2)' }}>
             <div className="px-4 py-2 flex items-center justify-between"
-              style={{ background: '#1a1e2a', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+              style={{ background: 'var(--ec-surface-2)', borderBottom: '1px solid var(--ec-b1)' }}>
               <span className="text-xs font-semibold" style={{ color: '#f97316', fontFamily: 'monospace' }}>
                 index.html
               </span>
               <button onClick={run}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
-                style={{ background: '#00d4aa', color: '#0d0f14' }}
+                style={{ background: '#00d4aa', color: 'var(--ec-bg)' }}
                 onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = '#00bfa0'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = '#00d4aa'; }}>
                 <Monitor size={12} />
@@ -167,10 +167,10 @@ function CodingLesson({ lesson, language, onComplete, completing }: {
 
           {/* Iframe Preview */}
           {previewSrc && (
-            <div className="rounded-xl overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.08)' }}>
+            <div className="rounded-xl overflow-hidden" style={{ border: '1px solid var(--ec-b2)' }}>
               <div className="px-4 py-2"
-                style={{ background: '#1a1e2a', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                <span className="text-xs font-semibold" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
+                style={{ background: 'var(--ec-surface-2)', borderBottom: '1px solid var(--ec-b1)' }}>
+                <span className="text-xs font-semibold" style={{ color: 'var(--ec-text-6)', fontFamily: 'Inter, sans-serif' }}>
                   Preview
                 </span>
               </div>
@@ -187,15 +187,15 @@ function CodingLesson({ lesson, language, onComplete, completing }: {
       ) : (
         <>
           {/* JS Editor */}
-          <div className="rounded-xl overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.08)' }}>
+          <div className="rounded-xl overflow-hidden" style={{ border: '1px solid var(--ec-b2)' }}>
             <div className="px-4 py-2 flex items-center justify-between"
-              style={{ background: '#1a1e2a', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-              <span className="text-xs font-semibold" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
+              style={{ background: 'var(--ec-surface-2)', borderBottom: '1px solid var(--ec-b1)' }}>
+              <span className="text-xs font-semibold" style={{ color: 'var(--ec-text-6)', fontFamily: 'Inter, sans-serif' }}>
                 JavaScript
               </span>
               <button onClick={run} disabled={running}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all disabled:opacity-50"
-                style={{ background: '#00d4aa', color: '#0d0f14' }}
+                style={{ background: '#00d4aa', color: 'var(--ec-bg)' }}
                 onMouseEnter={e => { if (!running) (e.currentTarget as HTMLButtonElement).style.background = '#00bfa0'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = '#00d4aa'; }}>
                 {running ? <Loader size={12} className="animate-spin" /> : <Play size={12} />}
@@ -214,8 +214,8 @@ function CodingLesson({ lesson, language, onComplete, completing }: {
 
           {/* Console Output */}
           {output && (
-            <div className="rounded-xl p-4" style={{ background: '#0d0f14', border: '1px solid rgba(255,255,255,0.06)' }}>
-              <p className="text-xs font-semibold mb-2" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>Output</p>
+            <div className="rounded-xl p-4" style={{ background: 'var(--ec-bg)', border: '1px solid var(--ec-b1)' }}>
+              <p className="text-xs font-semibold mb-2" style={{ color: 'var(--ec-text-6)', fontFamily: 'Inter, sans-serif' }}>Output</p>
               <pre className="text-sm whitespace-pre-wrap"
                 style={{ color: hasError ? '#f87171' : '#00d4aa', fontFamily: 'monospace' }}>
                 {output}
@@ -228,7 +228,7 @@ function CodingLesson({ lesson, language, onComplete, completing }: {
       {hasRun && (isHtmlExercise || !hasError) && (
         <button onClick={onComplete} disabled={completing}
           className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm transition-all disabled:opacity-50"
-          style={{ background: '#00d4aa', color: '#0d0f14', fontFamily: 'Inter, sans-serif' }}
+          style={{ background: '#00d4aa', color: 'var(--ec-bg)', fontFamily: 'Inter, sans-serif' }}
           onMouseEnter={e => { if (!completing) (e.currentTarget as HTMLButtonElement).style.background = '#00bfa0'; }}
           onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = '#00d4aa'; }}>
           {completing ? <Loader size={16} className="animate-spin" /> : <CheckCircle size={16} />}
@@ -263,8 +263,8 @@ function QuizLesson({ lesson, language, onComplete, completing }: {
   return (
     <div className="space-y-5">
       {questions.map((q, qi) => (
-        <div key={q.id} className="rounded-xl p-5" style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.06)' }}>
-          <p className="text-sm font-semibold mb-4" style={{ color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}>
+        <div key={q.id} className="rounded-xl p-5" style={{ background: 'var(--ec-surface)', border: '1px solid var(--ec-b1)' }}>
+          <p className="text-sm font-semibold mb-4" style={{ color: 'var(--ec-text-1)', fontFamily: 'Inter, sans-serif' }}>
             {qi + 1}. {q.text}
           </p>
           <div className="space-y-2">
@@ -278,9 +278,9 @@ function QuizLesson({ lesson, language, onComplete, completing }: {
                   className="w-full text-left px-4 py-3 rounded-xl text-sm transition-all"
                   style={{
                     fontFamily: 'Inter, sans-serif',
-                    background: correct ? 'rgba(0,212,170,0.12)' : wrong ? 'rgba(239,68,68,0.1)' : selected ? 'rgba(139,92,246,0.12)' : 'rgba(255,255,255,0.03)',
-                    border: correct ? '1px solid rgba(0,212,170,0.3)' : wrong ? '1px solid rgba(239,68,68,0.25)' : selected ? '1px solid rgba(139,92,246,0.3)' : '1px solid rgba(255,255,255,0.06)',
-                    color: correct ? '#00d4aa' : wrong ? '#f87171' : selected ? '#a78bfa' : '#94a3b8',
+                    background: correct ? 'rgba(0,212,170,0.12)' : wrong ? 'rgba(239,68,68,0.1)' : selected ? 'rgba(139,92,246,0.12)' : 'var(--ec-b6)',
+                    border: correct ? '1px solid rgba(0,212,170,0.3)' : wrong ? '1px solid rgba(239,68,68,0.25)' : selected ? '1px solid rgba(139,92,246,0.3)' : '1px solid var(--ec-b1)',
+                    color: correct ? '#00d4aa' : wrong ? '#f87171' : selected ? '#a78bfa' : 'var(--ec-text-4)',
                     cursor: submitted ? 'default' : 'pointer',
                   }}>
                   {String.fromCharCode(65 + oi)}. {opt}
@@ -305,7 +305,7 @@ function QuizLesson({ lesson, language, onComplete, completing }: {
             <div className="text-3xl font-bold" style={{ color: perfect ? '#00d4aa' : '#f59e0b', fontFamily: 'Inter, sans-serif' }}>
               {score}/{questions.length}
             </div>
-            <p className="text-sm" style={{ color: '#94a3b8', fontFamily: 'Inter, sans-serif' }}>
+            <p className="text-sm" style={{ color: 'var(--ec-text-4)', fontFamily: 'Inter, sans-serif' }}>
               {perfect
                 ? (isKin ? 'Ni byiza cyane! Wasubije neza byose.' : 'Perfect! You got everything right.')
                 : (isKin ? 'Wagerageje! Ongera usuzume ibyo utatsinze.' : 'Good effort! Review the ones you missed.')}
@@ -313,7 +313,7 @@ function QuizLesson({ lesson, language, onComplete, completing }: {
           </div>
           <button onClick={() => onComplete(score)} disabled={completing}
             className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm transition-all disabled:opacity-50"
-            style={{ background: '#00d4aa', color: '#0d0f14', fontFamily: 'Inter, sans-serif' }}
+            style={{ background: '#00d4aa', color: 'var(--ec-bg)', fontFamily: 'Inter, sans-serif' }}
             onMouseEnter={e => { if (!completing) (e.currentTarget as HTMLButtonElement).style.background = '#00bfa0'; }}
             onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = '#00d4aa'; }}>
             {completing ? <Loader size={16} className="animate-spin" /> : <CheckCircle size={16} />}
@@ -350,16 +350,16 @@ export default function LessonViewer({ lesson, courseTitle, language, nextLesson
   // Completion screen
   if (done) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: '#0d0f14' }}>
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--ec-bg)' }}>
         <div className="text-center max-w-sm px-6">
           <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6"
             style={{ background: 'rgba(0,212,170,0.1)', border: '2px solid rgba(0,212,170,0.3)' }}>
             <CheckCircle size={36} style={{ color: '#00d4aa' }} />
           </div>
-          <h2 className="text-xl font-bold mb-2" style={{ color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}>
+          <h2 className="text-xl font-bold mb-2" style={{ color: 'var(--ec-text-1)', fontFamily: 'Inter, sans-serif' }}>
             {isKin ? 'Warangije Isomo!' : 'Lesson Complete!'}
           </h2>
-          <p className="text-sm mb-4" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
+          <p className="text-sm mb-4" style={{ color: 'var(--ec-text-6)', fontFamily: 'Inter, sans-serif' }}>
             {lessonTitle}
           </p>
           <div className="flex items-center justify-center gap-2 mb-8" style={{ color: '#f59e0b' }}>
@@ -371,7 +371,7 @@ export default function LessonViewer({ lesson, courseTitle, language, nextLesson
               <button
                 onClick={() => onNextLesson(nextLesson)}
                 className="w-full px-6 py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2"
-                style={{ background: '#00d4aa', color: '#0d0f14', fontFamily: 'Inter, sans-serif' }}
+                style={{ background: '#00d4aa', color: 'var(--ec-bg)', fontFamily: 'Inter, sans-serif' }}
                 onMouseEnter={e => (e.currentTarget.style.background = '#00bfa0')}
                 onMouseLeave={e => (e.currentTarget.style.background = '#00d4aa')}
               >
@@ -381,9 +381,9 @@ export default function LessonViewer({ lesson, courseTitle, language, nextLesson
             <button
               onClick={() => onCompleted(lesson.xp_reward)}
               className="w-full px-6 py-3 rounded-xl font-semibold text-sm"
-              style={{ background: nextLesson ? 'rgba(255,255,255,0.05)' : '#00d4aa',
-                color: nextLesson ? '#64748b' : '#0d0f14', fontFamily: 'Inter, sans-serif',
-                border: nextLesson ? '1px solid rgba(255,255,255,0.08)' : 'none' }}
+              style={{ background: nextLesson ? 'var(--ec-b5)' : '#00d4aa',
+                color: nextLesson ? 'var(--ec-text-5)' : 'var(--ec-bg)', fontFamily: 'Inter, sans-serif',
+                border: nextLesson ? '1px solid var(--ec-b2)' : 'none' }}
             >
               {isKin ? 'Garuka ku Isomo' : 'Back to Course'}
             </button>
@@ -394,17 +394,17 @@ export default function LessonViewer({ lesson, courseTitle, language, nextLesson
   }
 
   return (
-    <div className="min-h-screen" style={{ background: '#0d0f14', fontFamily: 'Inter, sans-serif' }}>
+    <div className="min-h-screen" style={{ background: 'var(--ec-bg)', fontFamily: 'Inter, sans-serif' }}>
       {/* Top bar */}
       <div className="border-b px-6 py-4 flex items-center gap-3"
-        style={{ background: '#13161e', borderColor: 'rgba(255,255,255,0.06)' }}>
+        style={{ background: 'var(--ec-surface)', borderColor: 'var(--ec-b1)' }}>
         <button onClick={onBack} className="flex items-center gap-2 text-sm transition-all"
-          style={{ color: '#475569' }}
-          onMouseEnter={e => (e.currentTarget.style.color = '#94a3b8')}
-          onMouseLeave={e => (e.currentTarget.style.color = '#475569')}>
+          style={{ color: 'var(--ec-text-6)' }}
+          onMouseEnter={e => (e.currentTarget.style.color = 'var(--ec-text-4)')}
+          onMouseLeave={e => (e.currentTarget.style.color = 'var(--ec-text-6)')}>
           <ArrowLeft size={16} /> {courseTitle}
         </button>
-        <span style={{ color: 'rgba(255,255,255,0.08)' }}>|</span>
+        <span style={{ color: 'var(--ec-b2)' }}>|</span>
         <span className="flex items-center gap-1 px-2 py-1 rounded-full text-xs"
           style={{ background: typeInfo.bg, color: typeInfo.color, border: `1px solid ${typeInfo.border}` }}>
           {typeInfo.icon} {typeInfo.label}
@@ -414,7 +414,7 @@ export default function LessonViewer({ lesson, courseTitle, language, nextLesson
       <div className="max-w-3xl mx-auto px-4 py-8">
         {/* Title + XP */}
         <div className="flex items-start justify-between mb-6">
-          <h1 className="text-xl font-bold leading-snug" style={{ color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}>
+          <h1 className="text-xl font-bold leading-snug" style={{ color: 'var(--ec-text-1)', fontFamily: 'Inter, sans-serif' }}>
             {lessonTitle}
           </h1>
           <div className="flex items-center gap-1 ml-4 flex-shrink-0" style={{ color: '#f59e0b' }}>

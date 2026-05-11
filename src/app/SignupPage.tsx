@@ -62,20 +62,20 @@ export default function SignupPage({ onSuccess, onLoginClick }: { onSuccess?: ()
 
   const inputStyle = (hasError = false) => ({
     height: '48px',
-    background: '#13161e',
-    border: hasError ? '1px solid rgba(239,68,68,0.5)' : '1px solid rgba(255,255,255,0.08)',
-    color: '#f1f5f9',
+    background: 'var(--ec-surface)',
+    border: hasError ? '1px solid rgba(239,68,68,0.5)' : '1px solid var(--ec-b2)',
+    color: 'var(--ec-text-1)',
   });
 
   const strengthColors = ['#ef4444', '#f59e0b', '#22c55e'];
 
   return (
-    <div className="min-h-screen flex" style={{ fontFamily: 'Inter, sans-serif', background: '#0d0f14' }}>
+    <div className="min-h-screen flex" style={{ fontFamily: 'Inter, sans-serif', background: 'var(--ec-bg)' }}>
 
       {/* Left Side - Brand panel */}
       <div
         className="hidden lg:flex lg:w-2/5 flex-col justify-between p-12 relative overflow-hidden"
-        style={{ background: '#13161e', borderRight: '1px solid rgba(255,255,255,0.06)' }}
+        style={{ background: 'var(--ec-surface)', borderRight: '1px solid var(--ec-b1)' }}
       >
         {/* Ambient glows */}
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-80 h-80 rounded-full pointer-events-none" style={{ background: 'radial-gradient(ellipse, rgba(0,212,170,0.08) 0%, transparent 70%)', filter: 'blur(40px)' }} />
@@ -88,7 +88,7 @@ export default function SignupPage({ onSuccess, onLoginClick }: { onSuccess?: ()
               <path d="M8 6H16M8 12H16M8 18H13" stroke="white" strokeWidth="2" strokeLinecap="round"/>
             </svg>
           </div>
-          <span className="text-xl font-bold" style={{ color: '#f1f5f9' }}>EduCode Rwanda</span>
+          <span className="text-xl font-bold" style={{ color: 'var(--ec-text-1)' }}>EduCode Rwanda</span>
         </div>
 
         {/* Center visual */}
@@ -112,14 +112,14 @@ export default function SignupPage({ onSuccess, onLoginClick }: { onSuccess?: ()
           ].map((benefit, i) => (
             <div key={i} className="flex items-center gap-2">
               <CheckCircle2 size={14} style={{ color: '#00d4aa' }} />
-              <span className="text-sm" style={{ color: '#94a3b8' }}>{benefit}</span>
+              <span className="text-sm" style={{ color: 'var(--ec-text-4)' }}>{benefit}</span>
             </div>
           ))}
         </div>
       </div>
 
       {/* Right Side - Form */}
-      <div className="flex-1 flex items-center justify-center p-8 overflow-y-auto" style={{ background: '#0d0f14' }}>
+      <div className="flex-1 flex items-center justify-center p-8 overflow-y-auto" style={{ background: 'var(--ec-bg)' }}>
         <div className="w-full max-w-md py-8">
 
           {/* Mobile Logo */}
@@ -129,19 +129,19 @@ export default function SignupPage({ onSuccess, onLoginClick }: { onSuccess?: ()
                 <path d="M8 6H16M8 12H16M8 18H13" stroke="white" strokeWidth="2" strokeLinecap="round"/>
               </svg>
             </div>
-            <span className="text-xl font-bold" style={{ color: '#f1f5f9' }}>EduCode Rwanda</span>
+            <span className="text-xl font-bold" style={{ color: 'var(--ec-text-1)' }}>EduCode Rwanda</span>
           </div>
 
           {/* Language Toggle */}
           <div className="flex justify-end mb-8">
-            <div className="flex items-center rounded-lg overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.08)' }}>
+            <div className="flex items-center rounded-lg overflow-hidden" style={{ border: '1px solid var(--ec-b2)' }}>
               <button
                 onClick={() => setLanguage('EN')}
                 className="px-3 py-1.5 text-xs font-bold transition-all"
                 style={{
                   background: language === 'EN' ? 'rgba(0,212,170,0.15)' : 'transparent',
-                  color: language === 'EN' ? '#00d4aa' : '#475569',
-                  borderRight: '1px solid rgba(255,255,255,0.08)',
+                  color: language === 'EN' ? '#00d4aa' : 'var(--ec-text-6)',
+                  borderRight: '1px solid var(--ec-b2)',
                 }}
               >EN</button>
               <button
@@ -149,17 +149,17 @@ export default function SignupPage({ onSuccess, onLoginClick }: { onSuccess?: ()
                 className="px-3 py-1.5 text-xs font-bold transition-all"
                 style={{
                   background: language === 'KIN' ? 'rgba(0,212,170,0.15)' : 'transparent',
-                  color: language === 'KIN' ? '#00d4aa' : '#475569',
+                  color: language === 'KIN' ? '#00d4aa' : 'var(--ec-text-6)',
                 }}
               >KIN</button>
             </div>
           </div>
 
           {/* Heading */}
-          <h1 className="text-3xl font-bold mb-2" style={{ color: '#f1f5f9', letterSpacing: '-0.01em' }}>
+          <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--ec-text-1)', letterSpacing: '-0.01em' }}>
             {isKinyarwanda ? 'Tangira Kwiga None' : 'Start Learning Today'}
           </h1>
-          <p className="mb-8 text-sm" style={{ color: '#64748b' }}>
+          <p className="mb-8 text-sm" style={{ color: 'var(--ec-text-5)' }}>
             {isKinyarwanda
               ? 'Fungura konti yawe ku buntu mu masegonda 30'
               : 'Create your free account in 30 seconds'}
@@ -169,11 +169,11 @@ export default function SignupPage({ onSuccess, onLoginClick }: { onSuccess?: ()
 
             {/* Full Name */}
             <div>
-              <label className="block text-sm font-semibold mb-2" style={{ color: '#94a3b8' }}>
+              <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--ec-text-4)' }}>
                 {isKinyarwanda ? 'Amazina Yose' : 'Full Name'}
               </label>
               <div className="relative">
-                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: '#475569' }} />
+                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--ec-text-6)' }} />
                 <input
                   type="text"
                   value={formData.fullName}
@@ -182,18 +182,18 @@ export default function SignupPage({ onSuccess, onLoginClick }: { onSuccess?: ()
                   className="w-full pl-11 pr-4 py-3 rounded-xl text-sm transition-all focus:outline-none"
                   style={inputStyle()}
                   onFocus={e => (e.target.style.border = '1px solid rgba(0,212,170,0.4)')}
-                  onBlur={e => (e.target.style.border = '1px solid rgba(255,255,255,0.08)')}
+                  onBlur={e => (e.target.style.border = '1px solid var(--ec-b2)')}
                 />
               </div>
             </div>
 
             {/* Email */}
             <div>
-              <label className="block text-sm font-semibold mb-2" style={{ color: '#94a3b8' }}>
+              <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--ec-text-4)' }}>
                 {isKinyarwanda ? 'Email' : 'Email'}
               </label>
               <div className="relative">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: '#475569' }} />
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--ec-text-6)' }} />
                 <input
                   type="text"
                   value={formData.email}
@@ -202,7 +202,7 @@ export default function SignupPage({ onSuccess, onLoginClick }: { onSuccess?: ()
                   className="w-full pl-11 pr-10 py-3 rounded-xl text-sm transition-all focus:outline-none"
                   style={inputStyle()}
                   onFocus={e => (e.target.style.border = '1px solid rgba(0,212,170,0.4)')}
-                  onBlur={e => (e.target.style.border = '1px solid rgba(255,255,255,0.08)')}
+                  onBlur={e => (e.target.style.border = '1px solid var(--ec-b2)')}
                 />
                 {formData.email && (
                   <div className="absolute right-4 top-1/2 -translate-y-1/2">
@@ -218,11 +218,11 @@ export default function SignupPage({ onSuccess, onLoginClick }: { onSuccess?: ()
 
             {/* Password */}
             <div>
-              <label className="block text-sm font-semibold mb-2" style={{ color: '#94a3b8' }}>
+              <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--ec-text-4)' }}>
                 {isKinyarwanda ? 'Ijambo ryibanga' : 'Password'}
               </label>
               <div className="relative">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: '#475569' }} />
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--ec-text-6)' }} />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={formData.password}
@@ -231,15 +231,15 @@ export default function SignupPage({ onSuccess, onLoginClick }: { onSuccess?: ()
                   className="w-full pl-11 pr-12 py-3 rounded-xl text-sm transition-all focus:outline-none"
                   style={inputStyle()}
                   onFocus={e => (e.target.style.border = '1px solid rgba(0,212,170,0.4)')}
-                  onBlur={e => (e.target.style.border = '1px solid rgba(255,255,255,0.08)')}
+                  onBlur={e => (e.target.style.border = '1px solid var(--ec-b2)')}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-4 top-1/2 -translate-y-1/2 transition-colors"
-                  style={{ color: '#475569' }}
-                  onMouseEnter={e => (e.currentTarget.style.color = '#94a3b8')}
-                  onMouseLeave={e => (e.currentTarget.style.color = '#475569')}
+                  style={{ color: 'var(--ec-text-6)' }}
+                  onMouseEnter={e => (e.currentTarget.style.color = 'var(--ec-text-4)')}
+                  onMouseLeave={e => (e.currentTarget.style.color = 'var(--ec-text-6)')}
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -254,12 +254,12 @@ export default function SignupPage({ onSuccess, onLoginClick }: { onSuccess?: ()
                         style={{
                           background: level <= passwordStrength.strength
                             ? strengthColors[passwordStrength.strength - 1]
-                            : 'rgba(255,255,255,0.06)'
+                            : 'var(--ec-b1)'
                         }}
                       />
                     ))}
                   </div>
-                  <p className="text-xs" style={{ color: '#475569' }}>
+                  <p className="text-xs" style={{ color: 'var(--ec-text-6)' }}>
                     {passwordStrength.label} {isKinyarwanda ? 'gukomera' : 'strength'}
                   </p>
                 </div>
@@ -268,7 +268,7 @@ export default function SignupPage({ onSuccess, onLoginClick }: { onSuccess?: ()
 
             {/* User Type */}
             <div>
-              <label className="block text-sm font-semibold mb-3" style={{ color: '#94a3b8' }}>
+              <label className="block text-sm font-semibold mb-3" style={{ color: 'var(--ec-text-4)' }}>
                 {isKinyarwanda ? 'Ndi:' : 'I am a:'}
               </label>
               <div className="flex gap-2">
@@ -281,9 +281,9 @@ export default function SignupPage({ onSuccess, onLoginClick }: { onSuccess?: ()
                     key={type.value}
                     className="flex-1 px-3 py-2.5 rounded-xl cursor-pointer transition-all text-center"
                     style={{
-                      background: formData.userType === type.value ? 'rgba(0,212,170,0.12)' : 'rgba(255,255,255,0.03)',
-                      border: formData.userType === type.value ? '1px solid rgba(0,212,170,0.35)' : '1px solid rgba(255,255,255,0.06)',
-                      color: formData.userType === type.value ? '#00d4aa' : '#64748b',
+                      background: formData.userType === type.value ? 'rgba(0,212,170,0.12)' : 'var(--ec-b6)',
+                      border: formData.userType === type.value ? '1px solid rgba(0,212,170,0.35)' : '1px solid var(--ec-b1)',
+                      color: formData.userType === type.value ? '#00d4aa' : 'var(--ec-text-5)',
                     }}
                   >
                     <input
@@ -302,7 +302,7 @@ export default function SignupPage({ onSuccess, onLoginClick }: { onSuccess?: ()
 
             {/* Preferred Language */}
             <div>
-              <label className="block text-sm font-semibold mb-3" style={{ color: '#94a3b8' }}>
+              <label className="block text-sm font-semibold mb-3" style={{ color: 'var(--ec-text-4)' }}>
                 {isKinyarwanda ? 'Ururimi ukunda:' : 'Preferred language:'}
               </label>
               <div className="flex gap-2">
@@ -315,9 +315,9 @@ export default function SignupPage({ onSuccess, onLoginClick }: { onSuccess?: ()
                     key={lang.value}
                     className="flex-1 px-3 py-2.5 rounded-xl cursor-pointer transition-all text-center"
                     style={{
-                      background: formData.preferredLanguage === lang.value ? 'rgba(139,92,246,0.12)' : 'rgba(255,255,255,0.03)',
-                      border: formData.preferredLanguage === lang.value ? '1px solid rgba(139,92,246,0.35)' : '1px solid rgba(255,255,255,0.06)',
-                      color: formData.preferredLanguage === lang.value ? '#a78bfa' : '#64748b',
+                      background: formData.preferredLanguage === lang.value ? 'rgba(139,92,246,0.12)' : 'var(--ec-b6)',
+                      border: formData.preferredLanguage === lang.value ? '1px solid rgba(139,92,246,0.35)' : '1px solid var(--ec-b1)',
+                      color: formData.preferredLanguage === lang.value ? '#a78bfa' : 'var(--ec-text-5)',
                     }}
                   >
                     <input
@@ -341,14 +341,14 @@ export default function SignupPage({ onSuccess, onLoginClick }: { onSuccess?: ()
                   className="w-4 h-4 mt-0.5 rounded flex items-center justify-center shrink-0 transition-all"
                   style={{
                     background: agreedToTerms ? '#00d4aa' : 'transparent',
-                    border: agreedToTerms ? '1px solid #00d4aa' : '1px solid rgba(255,255,255,0.15)',
+                    border: agreedToTerms ? '1px solid #00d4aa' : '1px solid var(--ec-b8)',
                   }}
                   onClick={() => setAgreedToTerms(!agreedToTerms)}
                 >
-                  {agreedToTerms && <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="#0d0f14" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                  {agreedToTerms && <svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="var(--ec-bg)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
                 </div>
                 <input type="checkbox" checked={agreedToTerms} onChange={(e) => setAgreedToTerms(e.target.checked)} className="sr-only" />
-                <span className="text-xs" style={{ color: '#64748b' }}>
+                <span className="text-xs" style={{ color: 'var(--ec-text-5)' }}>
                   {isKinyarwanda ? 'Nemeye' : 'I agree to the'}{' '}
                   <span className="font-semibold" style={{ color: '#00d4aa' }}>
                     {isKinyarwanda ? 'Amabwiriza n’Amategeko y’Ikoreshwa' : 'Terms of Service'}
@@ -382,12 +382,12 @@ export default function SignupPage({ onSuccess, onLoginClick }: { onSuccess?: ()
               type="submit"
               disabled={loading || !agreedToTerms}
               className="w-full rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-              style={{ height: '48px', background: '#00d4aa', color: '#0d0f14', boxShadow: '0 0 20px rgba(0,212,170,0.25)' }}
+              style={{ height: '48px', background: '#00d4aa', color: 'var(--ec-bg)', boxShadow: '0 0 20px rgba(0,212,170,0.25)' }}
               onMouseEnter={e => { if (!loading && agreedToTerms) (e.currentTarget as HTMLButtonElement).style.background = '#00bfa0'; }}
               onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = '#00d4aa'; }}
             >
               {loading ? (
-                <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" style={{ borderColor: '#0d0f14', borderTopColor: 'transparent' }} />
+                <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" style={{ borderColor: 'var(--ec-bg)', borderTopColor: 'transparent' }} />
               ) : (
                 <>
                   {isKinyarwanda ? "Iyandikishe — Ni ubuntu!" : "Sign Up — It's Free!"}
@@ -398,16 +398,16 @@ export default function SignupPage({ onSuccess, onLoginClick }: { onSuccess?: ()
 
             {/* Divider */}
             <div className="relative flex items-center">
-              <div className="flex-1" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }} />
-              <span className="px-3 text-xs" style={{ color: '#334155' }}>
+              <div className="flex-1" style={{ borderTop: '1px solid var(--ec-b1)' }} />
+              <span className="px-3 text-xs" style={{ color: 'var(--ec-text-7)' }}>
                 {isKinyarwanda ? 'CYANGWA' : 'OR'}
               </span>
-              <div className="flex-1" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }} />
+              <div className="flex-1" style={{ borderTop: '1px solid var(--ec-b1)' }} />
             </div>
 
             {/* Login Link */}
             <div className="text-center text-sm">
-              <span style={{ color: '#475569' }}>
+              <span style={{ color: 'var(--ec-text-6)' }}>
                 {isKinyarwanda ? 'Usanzwe ufite konti?' : 'Already have an account?'}{' '}
               </span>
               <button

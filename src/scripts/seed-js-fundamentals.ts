@@ -1744,7 +1744,7 @@ el.textContent = "Plain text only";           // no HTML parsing
 \`\`\`javascript
 let box = document.getElementById("box");
 box.style.color = "#00d4aa";
-box.style.backgroundColor = "#1a1e2a";
+box.style.backgroundColor = "var(--ec-surface-2)";
 box.style.fontSize = "20px";
 \`\`\`
 

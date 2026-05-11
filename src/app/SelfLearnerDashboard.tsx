@@ -80,14 +80,14 @@ export default function SelfLearnerDashboard({ language, onLanguageChange, onSta
   const completed   = courseProgress.filter(c => c.pct === 100 && c.total_lessons > 0);
 
   return (
-    <div className="min-h-screen" style={{ background: '#0d0f14', fontFamily: 'Inter, sans-serif' }}>
+    <div className="min-h-screen" style={{ background: 'var(--ec-bg)', fontFamily: 'Inter, sans-serif' }}>
 
       {/* Header */}
-      <header style={{ background: '#13161e', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+      <header style={{ background: 'var(--ec-surface)', borderBottom: '1px solid var(--ec-b1)' }}>
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-xl">🇷🇼</span>
-            <span className="text-base font-bold" style={{ color: '#f1f5f9' }}>EduCode Rwanda</span>
+            <span className="text-base font-bold" style={{ color: 'var(--ec-text-1)' }}>EduCode Rwanda</span>
           </div>
           <div className="flex items-center gap-3">
             {/* XP + Level */}
@@ -107,11 +107,11 @@ export default function SelfLearnerDashboard({ language, onLanguageChange, onSta
               </div>
             )}
             {/* Language toggle */}
-            <div className="flex items-center gap-1 rounded-lg p-1" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
+            <div className="flex items-center gap-1 rounded-lg p-1" style={{ background: 'var(--ec-b3)', border: '1px solid var(--ec-b1)' }}>
               {(['EN', 'KIN'] as const).map(l => (
                 <button key={l} onClick={() => onLanguageChange(l)}
                   className="px-2.5 py-1 rounded-md text-xs font-semibold transition-all"
-                  style={{ background: language === l ? 'rgba(0,212,170,0.15)' : 'transparent', color: language === l ? '#00d4aa' : '#475569' }}>
+                  style={{ background: language === l ? 'rgba(0,212,170,0.15)' : 'transparent', color: language === l ? '#00d4aa' : 'var(--ec-text-6)' }}>
                   {l}
                 </button>
               ))}
@@ -123,26 +123,26 @@ export default function SelfLearnerDashboard({ language, onLanguageChange, onSta
       <main className="max-w-4xl mx-auto px-4 py-8 space-y-6">
 
         {/* Welcome + Level bar */}
-        <div className="rounded-2xl p-6" style={{ background: 'linear-gradient(135deg, rgba(0,212,170,0.08), rgba(139,92,246,0.08))', border: '1px solid rgba(255,255,255,0.06)' }}>
+        <div className="rounded-2xl p-6" style={{ background: 'linear-gradient(135deg, rgba(0,212,170,0.08), rgba(139,92,246,0.08))', border: '1px solid var(--ec-b1)' }}>
           <div className="flex items-start justify-between gap-4 flex-wrap">
             <div>
-              <h1 className="text-2xl font-bold mb-1" style={{ color: '#f1f5f9' }}>
+              <h1 className="text-2xl font-bold mb-1" style={{ color: 'var(--ec-text-1)' }}>
                 {isKin ? `Ikaze nanone, ${firstName}! 👋` : `Welcome back, ${firstName}! 👋`}
               </h1>
-              <p className="text-sm" style={{ color: '#64748b' }}>
+              <p className="text-sm" style={{ color: 'var(--ec-text-5)' }}>
                 {isKin ? 'Komeza wigire. Buri somo rishya ryongera ubumenyi bwawe.' : 'Keep learning. Every lesson adds to your skills.'}
               </p>
             </div>
             <div className="text-right shrink-0">
-              <p className="text-xs font-semibold mb-1" style={{ color: '#475569' }}>
+              <p className="text-xs font-semibold mb-1" style={{ color: 'var(--ec-text-6)' }}>
                 {isKin ? `Urwego ${lvl.level} — ${lvl.name}` : `Level ${lvl.level} — ${lvl.name}`}
               </p>
-              <p className="text-xs" style={{ color: '#334155' }}>
+              <p className="text-xs" style={{ color: 'var(--ec-text-7)' }}>
                 {lvl.xpToNext > 0
                   ? (isKin ? `Hasigaye ${lvl.xpToNext} XP ngo ugere ku rwego rukurikira` : `${lvl.xpToNext} XP to next level`)
                   : (isKin ? 'Wageze ku rwego rwa nyuma!' : 'Max level!')}
               </p>
-              <div className="w-40 h-1.5 rounded-full mt-2" style={{ background: 'rgba(255,255,255,0.06)' }}>
+              <div className="w-40 h-1.5 rounded-full mt-2" style={{ background: 'var(--ec-b1)' }}>
                 <div className="h-full rounded-full transition-all" style={{ width: `${lvl.pct}%`, background: 'linear-gradient(90deg,#00d4aa,#8b5cf6)' }} />
               </div>
             </div>
@@ -150,12 +150,12 @@ export default function SelfLearnerDashboard({ language, onLanguageChange, onSta
 
           {/* Overall progress */}
           {!loading && totalLessons > 0 && (
-            <div className="mt-5 pt-4" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-              <div className="flex justify-between text-xs mb-2" style={{ color: '#475569' }}>
+            <div className="mt-5 pt-4" style={{ borderTop: '1px solid var(--ec-b5)' }}>
+              <div className="flex justify-between text-xs mb-2" style={{ color: 'var(--ec-text-6)' }}>
                 <span>{isKin ? 'Iterambere ryawe muri rusange' : 'Overall progress'}</span>
-                <span style={{ color: '#f1f5f9', fontWeight: 600 }}>{totalCompleted} / {totalLessons} {isKin ? 'amasomo' : 'lessons'} ({overallPct}%)</span>
+                <span style={{ color: 'var(--ec-text-1)', fontWeight: 600 }}>{totalCompleted} / {totalLessons} {isKin ? 'amasomo' : 'lessons'} ({overallPct}%)</span>
               </div>
-              <div className="h-2 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+              <div className="h-2 rounded-full overflow-hidden" style={{ background: 'var(--ec-b1)' }}>
                 <div className="h-full rounded-full transition-all duration-700" style={{ width: `${overallPct}%`, background: 'linear-gradient(90deg,#00d4aa,#8b5cf6)' }} />
               </div>
             </div>
@@ -209,8 +209,8 @@ export default function SelfLearnerDashboard({ language, onLanguageChange, onSta
                 {a.primary && <ArrowRight size={14} style={{ color: '#00d4aa' }} />}
               </div>
               <div>
-                <p className="text-sm font-bold" style={{ color: '#f1f5f9' }}>{a.title}</p>
-                <p className="text-xs mt-0.5" style={{ color: '#475569' }}>{a.sub}</p>
+                <p className="text-sm font-bold" style={{ color: 'var(--ec-text-1)' }}>{a.title}</p>
+                <p className="text-xs mt-0.5" style={{ color: 'var(--ec-text-6)' }}>{a.sub}</p>
               </div>
             </button>
           ))}
@@ -225,10 +225,10 @@ export default function SelfLearnerDashboard({ language, onLanguageChange, onSta
               <Bot size={20} style={{ color: '#8b5cf6' }} />
             </div>
             <div>
-              <p className="text-sm font-bold" style={{ color: '#f1f5f9' }}>
+              <p className="text-sm font-bold" style={{ color: 'var(--ec-text-1)' }}>
                 {isKin ? 'Mwarimu wawe wa AI' : 'Your AI Tutor'}
               </p>
-              <p className="text-xs mt-0.5" style={{ color: '#64748b' }}>
+              <p className="text-xs mt-0.5" style={{ color: 'var(--ec-text-5)' }}>
                 {isKin
                   ? 'Iyo wanditse code, AI isobanura amakosa yawe ikakuyobora. Fungura workspace uyigerageze.'
                   : 'When you write code, the AI explains your errors and guides you. Open the workspace to try it.'}
@@ -251,9 +251,9 @@ export default function SelfLearnerDashboard({ language, onLanguageChange, onSta
             <Loader size={22} className="animate-spin" style={{ color: '#00d4aa' }} />
           </div>
         ) : courseProgress.length === 0 ? (
-          <div className="text-center py-12 rounded-2xl" style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.06)' }}>
+          <div className="text-center py-12 rounded-2xl" style={{ background: 'var(--ec-surface)', border: '1px solid var(--ec-b1)' }}>
             <BookOpen size={32} style={{ color: '#1e293b', margin: '0 auto 12px' }} />
-            <p className="text-sm" style={{ color: '#475569' }}>
+            <p className="text-sm" style={{ color: 'var(--ec-text-6)' }}>
               {isKin ? 'Nta masomo arahari ubu.' : 'No courses available yet.'}
             </p>
           </div>
@@ -262,7 +262,7 @@ export default function SelfLearnerDashboard({ language, onLanguageChange, onSta
             {/* In progress */}
             {inProgress.length > 0 && (
               <section>
-                <h2 className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: '#475569' }}>
+                <h2 className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: 'var(--ec-text-6)' }}>
                   {isKin ? 'Biracyakorwa' : 'In Progress'}
                 </h2>
                 <div className="space-y-2">
@@ -274,7 +274,7 @@ export default function SelfLearnerDashboard({ language, onLanguageChange, onSta
             {/* Not started */}
             {notStarted.length > 0 && (
               <section>
-                <h2 className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: '#475569' }}>
+                <h2 className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: 'var(--ec-text-6)' }}>
                   {isKin ? 'Ntibiratangira' : 'Not Started'}
                 </h2>
                 <div className="space-y-2">
@@ -286,7 +286,7 @@ export default function SelfLearnerDashboard({ language, onLanguageChange, onSta
             {/* Completed */}
             {completed.length > 0 && (
               <section>
-                <h2 className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: '#475569' }}>
+                <h2 className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: 'var(--ec-text-6)' }}>
                   {isKin ? 'Byarangiye' : 'Completed'}
                 </h2>
                 <div className="space-y-2">
@@ -302,18 +302,18 @@ export default function SelfLearnerDashboard({ language, onLanguageChange, onSta
 }
 
 function CourseCard({ course, isKin, onOpen }: { course: CourseProgress; isKin: boolean; onOpen: () => void }) {
-  const barColor = course.pct === 100 ? '#00d4aa' : course.pct > 0 ? '#8b5cf6' : 'rgba(255,255,255,0.1)';
+  const barColor = course.pct === 100 ? '#00d4aa' : course.pct > 0 ? '#8b5cf6' : 'var(--ec-b4)';
   return (
     <button
       onClick={onOpen}
       className="w-full rounded-2xl p-4 text-left transition-all flex items-center gap-4"
-      style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.06)' }}
-      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.12)'; }}
-      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.06)'; }}>
+      style={{ background: 'var(--ec-surface)', border: '1px solid var(--ec-b1)' }}
+      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--ec-b7)'; }}
+      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--ec-b1)'; }}>
       {/* Completion ring */}
       <div className="relative w-11 h-11 shrink-0">
         <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
-          <circle cx="18" cy="18" r="15" fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth="3" />
+          <circle cx="18" cy="18" r="15" fill="none" stroke="var(--ec-b1)" strokeWidth="3" />
           <circle cx="18" cy="18" r="15" fill="none" stroke={course.pct === 100 ? '#00d4aa' : '#8b5cf6'}
             strokeWidth="3" strokeDasharray={`${(course.pct / 100) * 94.2} 94.2`} strokeLinecap="round" />
         </svg>
@@ -324,20 +324,20 @@ function CourseCard({ course, isKin, onOpen }: { course: CourseProgress; isKin: 
 
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1">
-          <p className="text-sm font-semibold truncate" style={{ color: '#f1f5f9' }}>
+          <p className="text-sm font-semibold truncate" style={{ color: 'var(--ec-text-1)' }}>
             {isKin && course.title_kin ? course.title_kin : course.title}
           </p>
           <DifficultyBadge difficulty={course.difficulty} isKin={isKin} />
         </div>
-        <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.05)' }}>
+        <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--ec-b5)' }}>
           <div className="h-full rounded-full transition-all duration-500" style={{ width: `${course.pct}%`, background: barColor }} />
         </div>
-        <p className="text-xs mt-1" style={{ color: '#475569' }}>
+        <p className="text-xs mt-1" style={{ color: 'var(--ec-text-6)' }}>
           {course.completed_lessons} / {course.total_lessons} {isKin ? 'amasomo' : 'lessons'}
         </p>
       </div>
 
-      <ChevronRight size={16} style={{ color: '#334155', flexShrink: 0 }} />
+      <ChevronRight size={16} style={{ color: 'var(--ec-text-7)', flexShrink: 0 }} />
     </button>
   );
 }

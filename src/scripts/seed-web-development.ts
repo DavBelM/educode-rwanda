@@ -831,7 +831,7 @@ Note: The video and audio won't play (no real files), but the elements should ap
       starter_code: '',
       hint: `For the SVG banner, use this inline code:
 <svg width="600" height="120" xmlns="http://www.w3.org/2000/svg">
-  <rect width="600" height="120" fill="#13161e"/>
+  <rect width="600" height="120" fill="var(--ec-surface)"/>
   <text x="300" y="70" text-anchor="middle" fill="#00d4aa" font-size="32" font-family="Arial">Rwanda Tech News</text>
 </svg>
 

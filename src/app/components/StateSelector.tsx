@@ -7,7 +7,7 @@ interface StateSelectorProps {
 
 export function StateSelector({ currentState, onStateChange }: StateSelectorProps) {
   const states = [
-    { id: 'empty' as const, label: 'Empty', color: '#94a3b8' },
+    { id: 'empty' as const, label: 'Empty', color: 'var(--ec-text-4)' },
     { id: 'success' as const, label: 'Success', color: '#10b981' },
     { id: 'error' as const, label: 'Error', color: '#ef4444' },
     { id: 'loading' as const, label: 'Loading', color: '#8b5cf6' }

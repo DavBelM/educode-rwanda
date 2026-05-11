@@ -115,22 +115,22 @@ export default function OnboardingModal({ userType, userName, language, onDone }
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
       style={{ background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(6px)', fontFamily: 'Inter, sans-serif' }}>
       <div className="w-full max-w-lg rounded-3xl overflow-hidden"
-        style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 40px 80px rgba(0,0,0,0.5)' }}>
+        style={{ background: 'var(--ec-surface)', border: '1px solid var(--ec-b2)', boxShadow: '0 40px 80px rgba(0,0,0,0.5)' }}>
 
         {/* Progress bar */}
-        <div className="h-1" style={{ background: 'rgba(255,255,255,0.06)' }}>
+        <div className="h-1" style={{ background: 'var(--ec-b1)' }}>
           <div className="h-full transition-all duration-500"
             style={{ width: `${progress}%`, background: 'linear-gradient(90deg, #00d4aa, #8b5cf6)' }} />
         </div>
 
         {/* Header */}
         <div className="flex items-center justify-between px-6 pt-5 pb-0">
-          <span className="text-xs font-semibold" style={{ color: '#334155' }}>
+          <span className="text-xs font-semibold" style={{ color: 'var(--ec-text-7)' }}>
             {step + 1} / {steps.length}
           </span>
-          <button onClick={onDone} style={{ color: '#334155' }}
-            onMouseEnter={e => (e.currentTarget.style.color = '#94a3b8')}
-            onMouseLeave={e => (e.currentTarget.style.color = '#334155')}>
+          <button onClick={onDone} style={{ color: 'var(--ec-text-7)' }}
+            onMouseEnter={e => (e.currentTarget.style.color = 'var(--ec-text-4)')}
+            onMouseLeave={e => (e.currentTarget.style.color = 'var(--ec-text-7)')}>
             <X size={18} />
           </button>
         </div>
@@ -139,10 +139,10 @@ export default function OnboardingModal({ userType, userName, language, onDone }
         <div className="px-8 py-8 text-center">
           <div className="flex justify-center mb-6">{current.icon}</div>
 
-          <h2 className="text-2xl font-bold mb-3" style={{ color: '#f1f5f9', letterSpacing: '-0.01em' }}>
+          <h2 className="text-2xl font-bold mb-3" style={{ color: 'var(--ec-text-1)', letterSpacing: '-0.01em' }}>
             {current.title}
           </h2>
-          <p className="text-sm leading-relaxed mb-4" style={{ color: '#64748b', maxWidth: '360px', margin: '0 auto 16px' }}>
+          <p className="text-sm leading-relaxed mb-4" style={{ color: 'var(--ec-text-5)', maxWidth: '360px', margin: '0 auto 16px' }}>
             {current.description}
           </p>
 
@@ -163,7 +163,7 @@ export default function OnboardingModal({ userType, userName, language, onDone }
                 width: i === step ? '20px' : '8px',
                 height: '8px',
                 borderRadius: '4px',
-                background: i === step ? '#00d4aa' : i < step ? 'rgba(0,212,170,0.3)' : 'rgba(255,255,255,0.1)',
+                background: i === step ? '#00d4aa' : i < step ? 'rgba(0,212,170,0.3)' : 'var(--ec-b4)',
               }} />
           ))}
         </div>
@@ -173,16 +173,16 @@ export default function OnboardingModal({ userType, userName, language, onDone }
           {step > 0 && (
             <button onClick={() => setStep(s => s - 1)}
               className="flex-1 py-3 rounded-xl text-sm font-semibold transition-all"
-              style={{ background: 'rgba(255,255,255,0.04)', color: '#94a3b8', border: '1px solid rgba(255,255,255,0.08)' }}
-              onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.08)')}
-              onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.04)')}>
+              style={{ background: 'var(--ec-b3)', color: 'var(--ec-text-4)', border: '1px solid var(--ec-b2)' }}
+              onMouseEnter={e => (e.currentTarget.style.background = 'var(--ec-b2)')}
+              onMouseLeave={e => (e.currentTarget.style.background = 'var(--ec-b3)')}>
               {isKin ? 'Subira inyuma' : 'Back'}
             </button>
           )}
           <button
             onClick={() => isLast ? onDone() : setStep(s => s + 1)}
             className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold transition-all"
-            style={{ background: isLast ? '#00d4aa' : 'rgba(0,212,170,0.12)', color: isLast ? '#0d0f14' : '#00d4aa', border: isLast ? 'none' : '1px solid rgba(0,212,170,0.25)', boxShadow: isLast ? '0 0 24px rgba(0,212,170,0.25)' : 'none' }}
+            style={{ background: isLast ? '#00d4aa' : 'rgba(0,212,170,0.12)', color: isLast ? 'var(--ec-bg)' : '#00d4aa', border: isLast ? 'none' : '1px solid rgba(0,212,170,0.25)', boxShadow: isLast ? '0 0 24px rgba(0,212,170,0.25)' : 'none' }}
             onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = isLast ? '#00bfa0' : 'rgba(0,212,170,0.2)'; }}
             onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = isLast ? '#00d4aa' : 'rgba(0,212,170,0.12)'; }}>
             {isLast

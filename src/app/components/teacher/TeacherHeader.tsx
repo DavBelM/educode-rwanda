@@ -67,8 +67,8 @@ export function TeacherHeader({ language, onLanguageToggle, notificationCount = 
             className="flex-1 h-full px-3 transition-all border-2"
             style={{
               backgroundColor: language === 'EN' ? '#0ea5e9' : 'transparent',
-              color: language === 'EN' ? 'white' : '#64748b',
-              borderColor: language === 'EN' ? '#0ea5e9' : '#e2e8f0',
+              color: language === 'EN' ? 'white' : 'var(--ec-text-5)',
+              borderColor: language === 'EN' ? '#0ea5e9' : 'var(--ec-text-2)',
               fontFamily: 'Inter, sans-serif',
               fontWeight: 700,
               fontSize: '14px',
@@ -82,8 +82,8 @@ export function TeacherHeader({ language, onLanguageToggle, notificationCount = 
             className="flex-1 h-full px-3 transition-all border-2 border-l-0"
             style={{
               backgroundColor: language === 'KIN' ? '#0ea5e9' : 'transparent',
-              color: language === 'KIN' ? 'white' : '#64748b',
-              borderColor: language === 'KIN' ? '#0ea5e9' : '#e2e8f0',
+              color: language === 'KIN' ? 'white' : 'var(--ec-text-5)',
+              borderColor: language === 'KIN' ? '#0ea5e9' : 'var(--ec-text-2)',
               fontFamily: 'Inter, sans-serif',
               fontWeight: 700,
               fontSize: '14px',

@@ -30,10 +30,10 @@ export function HeroBanner({ language, studentName }: HeroBannerProps) {
             <span className="w-1.5 h-1.5 rounded-full bg-[#00d4aa]" />
             {isKinyarwanda ? 'Ikaze nanone' : 'Welcome back'}
           </div>
-          <h1 className="text-3xl md:text-4xl font-bold mb-2" style={{ fontFamily: 'Inter, sans-serif', color: '#f1f5f9' }}>
+          <h1 className="text-3xl md:text-4xl font-bold mb-2" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--ec-text-1)' }}>
             {isKinyarwanda ? `Muraho, ${studentName}!` : `Hello, ${studentName}!`}
           </h1>
-          <p className="text-base" style={{ fontFamily: 'Inter, sans-serif', color: '#94a3b8' }}>
+          <p className="text-base" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--ec-text-4)' }}>
             {isKinyarwanda ? 'Komeza kwiga — urakora neza' : 'Keep learning — you\'re doing great'}
           </p>
         </div>
@@ -46,7 +46,7 @@ export function HeroBanner({ language, studentName }: HeroBannerProps) {
           <svg width="52" height="52" viewBox="0 0 24 24" fill="none">
             <path d="M8 6L2 12L8 18" stroke="#00d4aa" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             <path d="M16 6L22 12L16 18" stroke="#8b5cf6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M14 4L10 20" stroke="#475569" strokeWidth="2" strokeLinecap="round"/>
+            <path d="M14 4L10 20" stroke="var(--ec-text-6)" strokeWidth="2" strokeLinecap="round"/>
           </svg>
         </div>
       </div>

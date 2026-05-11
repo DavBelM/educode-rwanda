@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
-import { Save, Send, LogOut, User, Bell } from 'lucide-react';
+import { Save, Send, LogOut, User, Bell, Sun, Moon } from 'lucide-react';
 import { useAuth } from '../../lib/auth';
+import { useTheme } from '../../lib/theme';
 
 interface HeaderProps {
   language: 'EN' | 'KIN';
@@ -17,6 +18,7 @@ export function Header({ language, onLanguageToggle, subtitle, hideAssignmentInf
   const isKinyarwanda = language === 'KIN';
   const defaultSubtitle = subtitle || (isKinyarwanda ? 'Workspace yo kwandikiramo code' : 'Student Coding Workspace');
   const { profile, signOut } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -36,7 +38,7 @@ export function Header({ language, onLanguageToggle, subtitle, hideAssignmentInf
   }, []);
 
   return (
-    <header className="flex items-center justify-between px-6 py-4" style={{ background: '#13161e', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+    <header className="flex items-center justify-between px-6 py-4" style={{ background: 'var(--ec-surface)', borderBottom: '1px solid var(--ec-b1)' }}>
       {/* Logo / Back */}
       <div className="flex items-center gap-3">
         {onBack ? (
@@ -51,10 +53,10 @@ export function Header({ language, onLanguageToggle, subtitle, hideAssignmentInf
           </div>
         )}
         <div>
-          <h1 className="text-xl font-semibold" style={{ fontFamily: 'Inter, sans-serif', color: '#f1f5f9' }}>
+          <h1 className="text-xl font-semibold" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--ec-text-1)' }}>
             EduCode Rwanda
           </h1>
-          <p className="text-sm" style={{ fontFamily: 'Inter, sans-serif', color: '#475569' }}>
+          <p className="text-sm" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--ec-text-6)' }}>
             {defaultSubtitle}
           </p>
         </div>
@@ -64,7 +66,7 @@ export function Header({ language, onLanguageToggle, subtitle, hideAssignmentInf
       {!hideAssignmentInfo && (
         <div className="hidden md:flex items-center gap-4">
           <div className="flex flex-col items-end">
-            <span className="text-sm font-medium" style={{ fontFamily: 'Inter, sans-serif', color: '#f1f5f9' }}>
+            <span className="text-sm font-medium" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--ec-text-1)' }}>
               {isKinyarwanda ? 'Umukoro: Kubara igiciro cyose hamwe' : 'Assignment: Calculate Total Price'}
             </span>
             <div className="flex items-center gap-2 mt-1">
@@ -83,7 +85,7 @@ export function Header({ language, onLanguageToggle, subtitle, hideAssignmentInf
           <>
             <button
               className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-lg transition-all"
-              style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600, color: '#94a3b8', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(255,255,255,0.04)' }}
+              style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600, color: 'var(--ec-text-4)', border: '1px solid var(--ec-b4)', background: 'var(--ec-b3)' }}
             >
               <Save size={16} />
               <span className="hidden lg:inline">{isKinyarwanda ? 'Bika' : 'Save'}</span>
@@ -104,18 +106,32 @@ export function Header({ language, onLanguageToggle, subtitle, hideAssignmentInf
             onClick={onAnnouncementsClick}
             title={isKinyarwanda ? 'Inyandiko z\'Umwarimu' : 'Announcements'}
             className="relative w-10 h-10 rounded-full flex items-center justify-center transition-all"
-            style={{ background: announcementCount ? 'rgba(245,158,11,0.15)' : 'rgba(255,255,255,0.06)', border: announcementCount ? '1px solid rgba(245,158,11,0.4)' : '1px solid rgba(255,255,255,0.12)' }}
-            onMouseEnter={e => (e.currentTarget.style.background = announcementCount ? 'rgba(245,158,11,0.25)' : 'rgba(255,255,255,0.12)')}
-            onMouseLeave={e => (e.currentTarget.style.background = announcementCount ? 'rgba(245,158,11,0.15)' : 'rgba(255,255,255,0.06)')}
+            style={{ background: announcementCount ? 'rgba(245,158,11,0.15)' : 'var(--ec-b1)', border: announcementCount ? '1px solid rgba(245,158,11,0.4)' : '1px solid var(--ec-b7)' }}
+            onMouseEnter={e => (e.currentTarget.style.background = announcementCount ? 'rgba(245,158,11,0.25)' : 'var(--ec-b7)')}
+            onMouseLeave={e => (e.currentTarget.style.background = announcementCount ? 'rgba(245,158,11,0.15)' : 'var(--ec-b1)')}
           >
-            <Bell size={17} style={{ color: announcementCount ? '#f59e0b' : '#94a3b8' }} />
+            <Bell size={17} style={{ color: announcementCount ? '#f59e0b' : 'var(--ec-text-4)' }} />
             {!!announcementCount && (
-              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center font-bold" style={{ background: '#f59e0b', color: '#0d0f14', fontFamily: 'Inter, sans-serif', fontSize: '10px' }}>
+              <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center font-bold" style={{ background: '#f59e0b', color: 'var(--ec-bg)', fontFamily: 'Inter, sans-serif', fontSize: '10px' }}>
                 {announcementCount > 9 ? '9+' : announcementCount}
               </span>
             )}
           </button>
         )}
+
+        {/* Theme toggle */}
+        <button
+          onClick={toggleTheme}
+          title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+          className="w-10 h-10 rounded-full flex items-center justify-center transition-all"
+          style={{ background: 'var(--ec-b1)', border: '1px solid var(--ec-b2)' }}
+          onMouseEnter={e => (e.currentTarget.style.background = 'var(--ec-b2)')}
+          onMouseLeave={e => (e.currentTarget.style.background = 'var(--ec-b1)')}
+        >
+          {theme === 'dark'
+            ? <Sun size={16} style={{ color: 'var(--ec-text-4)' }} />
+            : <Moon size={16} style={{ color: 'var(--ec-text-4)' }} />}
+        </button>
 
         {/* Language Toggle Pill */}
         <div
@@ -130,8 +146,8 @@ export function Header({ language, onLanguageToggle, subtitle, hideAssignmentInf
             className="flex-1 h-full px-3 transition-all"
             style={{
               backgroundColor: language === 'EN' ? 'rgba(0,212,170,0.15)' : 'transparent',
-              color: language === 'EN' ? '#00d4aa' : '#475569',
-              border: language === 'EN' ? '1px solid rgba(0,212,170,0.3)' : '1px solid rgba(255,255,255,0.06)',
+              color: language === 'EN' ? '#00d4aa' : 'var(--ec-text-6)',
+              border: language === 'EN' ? '1px solid rgba(0,212,170,0.3)' : '1px solid var(--ec-b1)',
               fontFamily: 'Inter, sans-serif',
               fontWeight: 700,
               fontSize: '13px',
@@ -145,8 +161,8 @@ export function Header({ language, onLanguageToggle, subtitle, hideAssignmentInf
             className="flex-1 h-full px-3 transition-all"
             style={{
               backgroundColor: language === 'KIN' ? 'rgba(0,212,170,0.15)' : 'transparent',
-              color: language === 'KIN' ? '#00d4aa' : '#475569',
-              border: language === 'KIN' ? '1px solid rgba(0,212,170,0.3)' : '1px solid rgba(255,255,255,0.06)',
+              color: language === 'KIN' ? '#00d4aa' : 'var(--ec-text-6)',
+              border: language === 'KIN' ? '1px solid rgba(0,212,170,0.3)' : '1px solid var(--ec-b1)',
               borderLeft: 'none',
               fontFamily: 'Inter, sans-serif',
               fontWeight: 700,
@@ -169,26 +185,26 @@ export function Header({ language, onLanguageToggle, subtitle, hideAssignmentInf
           </button>
 
           {menuOpen && (
-            <div className="absolute right-0 top-12 w-56 rounded-xl z-50 overflow-hidden" style={{ background: '#1a1e2a', border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 8px 32px rgba(0,0,0,0.4)' }}>
+            <div className="absolute right-0 top-12 w-56 rounded-xl z-50 overflow-hidden" style={{ background: 'var(--ec-surface-2)', border: '1px solid var(--ec-b2)', boxShadow: '0 8px 32px rgba(0,0,0,0.4)' }}>
               {/* User info */}
-              <div className="px-4 py-3" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+              <div className="px-4 py-3" style={{ borderBottom: '1px solid var(--ec-b1)' }}>
                 <div className="flex items-center gap-3">
                   <div className="w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm" style={{ background: 'rgba(0,212,170,0.15)', color: '#00d4aa', border: '1px solid rgba(0,212,170,0.25)' }}>
                     {initials}
                   </div>
                   <div>
-                    <p className="text-sm font-semibold" style={{ color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}>{profile?.full_name ?? 'Student'}</p>
-                    <p className="text-xs capitalize" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>{profile?.user_type?.replace('_', ' ') ?? ''}</p>
+                    <p className="text-sm font-semibold" style={{ color: 'var(--ec-text-1)', fontFamily: 'Inter, sans-serif' }}>{profile?.full_name ?? 'Student'}</p>
+                    <p className="text-xs capitalize" style={{ color: 'var(--ec-text-6)', fontFamily: 'Inter, sans-serif' }}>{profile?.user_type?.replace('_', ' ') ?? ''}</p>
                   </div>
                 </div>
               </div>
 
               <div className="py-1">
-                <button className="w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors" style={{ color: '#94a3b8', fontFamily: 'Inter, sans-serif' }}
-                  onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.04)')}
+                <button className="w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors" style={{ color: 'var(--ec-text-4)', fontFamily: 'Inter, sans-serif' }}
+                  onMouseEnter={e => (e.currentTarget.style.background = 'var(--ec-b3)')}
                   onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
                 >
-                  <User size={15} style={{ color: '#475569' }} />
+                  <User size={15} style={{ color: 'var(--ec-text-6)' }} />
                   {isKinyarwanda ? 'Umwirondoro' : 'Profile'}
                 </button>
                 <button onClick={() => signOut()} className="w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors" style={{ color: '#ef4444', fontFamily: 'Inter, sans-serif' }}

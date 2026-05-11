@@ -44,7 +44,7 @@ export function RunCodeButton({ onClick, isRunning, language, isMobile = false }
 
       {/* Keyboard shortcut hint */}
       {!isRunning && (
-        <div className="flex items-center gap-1 px-2 text-xs" style={{ fontFamily: 'Inter, sans-serif', color: '#94a3b8' }}>
+        <div className="flex items-center gap-1 px-2 text-xs" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--ec-text-4)' }}>
           <kbd className="px-2 py-0.5 bg-gray-700 text-gray-300 rounded text-xs" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
             Ctrl
           </kbd>

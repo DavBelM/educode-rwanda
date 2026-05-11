@@ -72,20 +72,20 @@ export default function MyResultsPage({ language, onBack }: Props) {
   ];
 
   return (
-    <div className="min-h-screen" style={{ fontFamily: 'Inter, sans-serif', background: '#0d0f14' }}>
+    <div className="min-h-screen" style={{ fontFamily: 'Inter, sans-serif', background: 'var(--ec-bg)' }}>
 
       {/* Top bar */}
       <div className="sticky top-0 z-10 px-6 py-5 flex items-center justify-between"
-        style={{ background: 'rgba(13,15,20,0.95)', backdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+        style={{ background: 'var(--ec-bg-a95)', backdropFilter: 'blur(12px)', borderBottom: '1px solid var(--ec-b1)' }}>
         <button onClick={onBack}
           className="flex items-center gap-2 font-medium transition-colors"
-          style={{ color: '#94a3b8', fontSize: '15px' }}
-          onMouseEnter={e => (e.currentTarget.style.color = '#f1f5f9')}
-          onMouseLeave={e => (e.currentTarget.style.color = '#94a3b8')}>
+          style={{ color: 'var(--ec-text-4)', fontSize: '15px' }}
+          onMouseEnter={e => (e.currentTarget.style.color = 'var(--ec-text-1)')}
+          onMouseLeave={e => (e.currentTarget.style.color = 'var(--ec-text-4)')}>
           <ArrowLeft size={18} />
           {isKin ? 'Subira inyuma' : 'Back'}
         </button>
-        <h1 className="font-bold" style={{ color: '#f1f5f9', fontSize: '18px' }}>
+        <h1 className="font-bold" style={{ color: 'var(--ec-text-1)', fontSize: '18px' }}>
           {isKin ? 'Amanota Yanjye' : 'My Results'}
         </h1>
         <div className="w-16" />
@@ -94,21 +94,21 @@ export default function MyResultsPage({ language, onBack }: Props) {
       <div className="max-w-3xl mx-auto px-4 py-8 space-y-6">
 
         {/* Summary card */}
-        <div className="rounded-2xl p-8" style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.06)' }}>
+        <div className="rounded-2xl p-8" style={{ background: 'var(--ec-surface)', border: '1px solid var(--ec-b1)' }}>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
             <div className="text-center">
-              <p className="text-4xl font-bold mb-1" style={{ color: '#f1f5f9' }}>{results.length}</p>
-              <p className="text-sm" style={{ color: '#475569' }}>{isKin ? 'Imikoro yose hamwe' : 'Total assignments'}</p>
+              <p className="text-4xl font-bold mb-1" style={{ color: 'var(--ec-text-1)' }}>{results.length}</p>
+              <p className="text-sm" style={{ color: 'var(--ec-text-6)' }}>{isKin ? 'Imikoro yose hamwe' : 'Total assignments'}</p>
             </div>
             <div className="text-center">
               <p className="text-4xl font-bold mb-1" style={{ color: '#00d4aa' }}>{submitted.length}</p>
-              <p className="text-sm" style={{ color: '#475569' }}>{isKin ? 'Byatanzwe' : 'Submitted'}</p>
+              <p className="text-sm" style={{ color: 'var(--ec-text-6)' }}>{isKin ? 'Byatanzwe' : 'Submitted'}</p>
             </div>
             <div className="text-center">
               <p className="text-4xl font-bold mb-1" style={{ color: '#f59e0b' }}>
                 {pct !== null ? `${pct}%` : '—'}
               </p>
-              <p className="text-sm" style={{ color: '#475569' }}>{isKin ? 'Ikigereranyo cy\'amanota' : 'Average score'}</p>
+              <p className="text-sm" style={{ color: 'var(--ec-text-6)' }}>{isKin ? 'Ikigereranyo cy\'amanota' : 'Average score'}</p>
             </div>
             <div className="text-center">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full font-bold mb-1"
@@ -116,17 +116,17 @@ export default function MyResultsPage({ language, onBack }: Props) {
                 <TrendingUp size={14} />
                 {level}
               </div>
-              <p className="text-sm" style={{ color: '#475569' }}>{isKin ? 'Urwego' : 'Level'}</p>
+              <p className="text-sm" style={{ color: 'var(--ec-text-6)' }}>{isKin ? 'Urwego' : 'Level'}</p>
             </div>
           </div>
 
           {totalPossible > 0 && (
             <div className="mt-6">
-              <div className="flex justify-between text-sm mb-2" style={{ color: '#475569' }}>
+              <div className="flex justify-between text-sm mb-2" style={{ color: 'var(--ec-text-6)' }}>
                 <span>{isKin ? 'Amanota yose hamwe' : 'Overall score'}</span>
-                <span style={{ color: '#f1f5f9', fontWeight: 600 }}>{totalEarned} / {totalPossible}</span>
+                <span style={{ color: 'var(--ec-text-1)', fontWeight: 600 }}>{totalEarned} / {totalPossible}</span>
               </div>
-              <div className="h-3 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+              <div className="h-3 rounded-full overflow-hidden" style={{ background: 'var(--ec-b1)' }}>
                 <div className="h-full rounded-full transition-all duration-700"
                   style={{ width: `${pct}%`, background: pct! >= 70 ? '#00d4aa' : pct! >= 50 ? '#f59e0b' : '#ef4444' }} />
               </div>
@@ -141,13 +141,13 @@ export default function MyResultsPage({ language, onBack }: Props) {
               className="flex items-center gap-2 px-4 py-2 rounded-xl font-semibold whitespace-nowrap transition-all shrink-0"
               style={{
                 fontSize: '14px',
-                background: filter === f.key ? 'rgba(0,212,170,0.12)' : 'rgba(255,255,255,0.04)',
-                color: filter === f.key ? '#00d4aa' : '#475569',
-                border: filter === f.key ? '1px solid rgba(0,212,170,0.25)' : '1px solid rgba(255,255,255,0.06)',
+                background: filter === f.key ? 'rgba(0,212,170,0.12)' : 'var(--ec-b3)',
+                color: filter === f.key ? '#00d4aa' : 'var(--ec-text-6)',
+                border: filter === f.key ? '1px solid rgba(0,212,170,0.25)' : '1px solid var(--ec-b1)',
               }}>
               {f.label}
               <span className="px-2 py-0.5 rounded-full text-xs"
-                style={{ background: 'rgba(255,255,255,0.08)', color: '#94a3b8' }}>
+                style={{ background: 'var(--ec-b2)', color: 'var(--ec-text-4)' }}>
                 {f.count}
               </span>
             </button>
@@ -161,8 +161,8 @@ export default function MyResultsPage({ language, onBack }: Props) {
               style={{ borderColor: '#00d4aa', borderTopColor: 'transparent' }} />
           </div>
         ) : filtered.length === 0 ? (
-          <div className="rounded-2xl py-16 text-center" style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.06)' }}>
-            <p style={{ color: '#475569', fontSize: '15px' }}>
+          <div className="rounded-2xl py-16 text-center" style={{ background: 'var(--ec-surface)', border: '1px solid var(--ec-b1)' }}>
+            <p style={{ color: 'var(--ec-text-6)', fontSize: '15px' }}>
               {isKin ? 'Nta bisubizo birahagaragara.' : 'Nothing here yet.'}
             </p>
           </div>
@@ -170,7 +170,7 @@ export default function MyResultsPage({ language, onBack }: Props) {
           <div className="space-y-4">
             {filtered.map(r => {
               const diff = difficultyStyle[r.difficulty] ?? difficultyStyle.beginner;
-              const scoreColor = r.marks_earned === null ? '#475569'
+              const scoreColor = r.marks_earned === null ? 'var(--ec-text-6)'
                 : (r.marks_earned / r.total_marks) >= 0.7 ? '#00d4aa'
                 : (r.marks_earned / r.total_marks) >= 0.5 ? '#f59e0b'
                 : '#ef4444';
@@ -179,8 +179,8 @@ export default function MyResultsPage({ language, onBack }: Props) {
               return (
                 <div key={r.assignment_id} className="rounded-2xl p-6"
                   style={{
-                    background: '#13161e',
-                    border: isNew ? '1px solid rgba(0,212,170,0.3)' : '1px solid rgba(255,255,255,0.06)',
+                    background: 'var(--ec-surface)',
+                    border: isNew ? '1px solid rgba(0,212,170,0.3)' : '1px solid var(--ec-b1)',
                   }}>
 
                   {/* New grade banner */}
@@ -201,7 +201,7 @@ export default function MyResultsPage({ language, onBack }: Props) {
                         {r.assignment_type === 'coding'
                           ? <Code2 size={16} style={{ color: '#00d4aa', flexShrink: 0 }} />
                           : <BookOpen size={16} style={{ color: '#8b5cf6', flexShrink: 0 }} />}
-                        <p className="font-semibold truncate" style={{ color: '#f1f5f9', fontSize: '16px' }}>
+                        <p className="font-semibold truncate" style={{ color: 'var(--ec-text-1)', fontSize: '16px' }}>
                           {isKin && r.title_kin ? r.title_kin : r.title}
                         </p>
                       </div>
@@ -211,7 +211,7 @@ export default function MyResultsPage({ language, onBack }: Props) {
                           {r.difficulty.charAt(0).toUpperCase() + r.difficulty.slice(1)}
                         </span>
                         {r.submitted_at && (
-                          <span className="flex items-center gap-1" style={{ color: '#334155', fontSize: '13px' }}>
+                          <span className="flex items-center gap-1" style={{ color: 'var(--ec-text-7)', fontSize: '13px' }}>
                             <Clock size={12} />
                             {new Date(r.submitted_at).toLocaleDateString()}
                           </span>
@@ -223,7 +223,7 @@ export default function MyResultsPage({ language, onBack }: Props) {
                     <div className="shrink-0 text-right">
                       {!r.submitted ? (
                         <span className="px-3 py-1.5 rounded-full font-semibold"
-                          style={{ background: 'rgba(255,255,255,0.04)', color: '#334155', border: '1px solid rgba(255,255,255,0.06)', fontSize: '13px' }}>
+                          style={{ background: 'var(--ec-b3)', color: 'var(--ec-text-7)', border: '1px solid var(--ec-b1)', fontSize: '13px' }}>
                           {isKin ? 'Bitaratanzwe' : 'Not submitted'}
                         </span>
                       ) : r.marks_earned === null ? (
@@ -234,7 +234,7 @@ export default function MyResultsPage({ language, onBack }: Props) {
                       ) : (
                         <div>
                           <p className="text-3xl font-bold" style={{ color: scoreColor }}>
-                            {r.marks_earned}<span className="text-base font-medium" style={{ color: '#475569' }}>/{r.total_marks}</span>
+                            {r.marks_earned}<span className="text-base font-medium" style={{ color: 'var(--ec-text-6)' }}>/{r.total_marks}</span>
                           </p>
                           <p className="font-semibold" style={{ color: scoreColor, fontSize: '15px' }}>
                             {Math.round((r.marks_earned / r.total_marks) * 100)}%
@@ -247,7 +247,7 @@ export default function MyResultsPage({ language, onBack }: Props) {
                   {/* Score bar for graded */}
                   {r.marks_earned !== null && (
                     <div className="mb-4">
-                      <div className="h-2 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+                      <div className="h-2 rounded-full overflow-hidden" style={{ background: 'var(--ec-b1)' }}>
                         <div className="h-full rounded-full transition-all duration-700"
                           style={{ width: `${Math.round((r.marks_earned / r.total_marks) * 100)}%`, background: scoreColor }} />
                       </div>
@@ -263,7 +263,7 @@ export default function MyResultsPage({ language, onBack }: Props) {
                         <p className="font-semibold mb-1" style={{ color: '#8b5cf6', fontSize: '13px' }}>
                           {isKin ? 'Ibitekerezo by\'umwarimu' : 'Teacher feedback'}
                         </p>
-                        <p className="leading-relaxed" style={{ color: '#94a3b8', fontSize: '14px' }}>{r.teacher_feedback}</p>
+                        <p className="leading-relaxed" style={{ color: 'var(--ec-text-4)', fontSize: '14px' }}>{r.teacher_feedback}</p>
                       </div>
                     </div>
                   )}
@@ -271,7 +271,7 @@ export default function MyResultsPage({ language, onBack }: Props) {
                   {r.submitted && r.marks_earned !== null && (
                     <div className="flex items-center gap-2 mt-3">
                       <CheckCircle size={14} style={{ color: '#00d4aa' }} />
-                      <span style={{ color: '#334155', fontSize: '13px' }}>
+                      <span style={{ color: 'var(--ec-text-7)', fontSize: '13px' }}>
                         {isKin ? 'Byahawe amanota' : 'Graded'}
                       </span>
                     </div>
