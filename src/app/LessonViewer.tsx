@@ -541,7 +541,7 @@ function CodingLesson({ lesson, language, onComplete, completing }: {
           return null;
         }
         return (
-          <button onClick={onComplete} disabled={completing}
+          <button onClick={() => onComplete(solutionRevealed)} disabled={completing}
             className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm transition-all disabled:opacity-50"
             style={{ background: '#00d4aa', color: 'var(--ec-bg)', fontFamily: 'Inter, sans-serif' }}
             onMouseEnter={e => { if (!completing) (e.currentTarget as HTMLButtonElement).style.background = '#00bfa0'; }}
@@ -649,6 +649,7 @@ export default function LessonViewer({ lesson, courseTitle, language, nextLesson
   const isKin = language === 'KIN';
   const [completing, setCompleting] = useState(false);
   const [done, setDone] = useState(false);
+  const [xpAwarded, setXpAwarded] = useState(0);
 
   const lessonTitle = isKin && lesson.title_kin ? lesson.title_kin : lesson.title;
 
@@ -660,7 +661,8 @@ export default function LessonViewer({ lesson, courseTitle, language, nextLesson
 
   const handleComplete = async (score?: number, usedSolution?: boolean) => {
     setCompleting(true);
-    await completeLesson(lesson.id, score, usedSolution ? 0 : undefined);
+    const { xpAwarded: earned } = await completeLesson(lesson.id, score, usedSolution ? 0 : undefined);
+    setXpAwarded(earned);
     setDone(true);
     setCompleting(false);
   };
@@ -680,9 +682,11 @@ export default function LessonViewer({ lesson, courseTitle, language, nextLesson
           <p className="text-sm mb-4" style={{ color: 'var(--ec-text-6)', fontFamily: 'Inter, sans-serif' }}>
             {lessonTitle}
           </p>
-          <div className="flex items-center justify-center gap-2 mb-8" style={{ color: '#f59e0b' }}>
-            <Zap size={20} fill="#f59e0b" />
-            <span className="text-xl font-bold" style={{ fontFamily: 'Inter, sans-serif' }}>+{lesson.xp_reward} XP</span>
+          <div className="flex items-center justify-center gap-2 mb-8" style={{ color: xpAwarded > 0 ? '#f59e0b' : 'var(--ec-text-6)' }}>
+            <Zap size={20} fill={xpAwarded > 0 ? '#f59e0b' : 'none'} style={{ color: xpAwarded > 0 ? '#f59e0b' : 'var(--ec-text-6)' }} />
+            <span className="text-xl font-bold" style={{ fontFamily: 'Inter, sans-serif' }}>
+              {xpAwarded > 0 ? `+${xpAwarded} XP` : isKin ? 'Nta XP (wakoresheje igisubizo)' : 'No XP (solution used)'}
+            </span>
           </div>
           <div className="flex flex-col gap-3 w-full">
             {nextLesson && (

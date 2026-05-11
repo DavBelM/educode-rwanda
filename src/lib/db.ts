@@ -703,19 +703,72 @@ export async function deleteAnnouncement(id: string): Promise<{ error: string | 
 
 // ─── Lessons ──────────────────────────────────────────────────────────────────
 
-export async function completeLesson(lessonId: string, score?: number, xpOverride?: number): Promise<{ error: string | null }> {
+export async function completeLesson(
+  lessonId: string,
+  score?: number,
+  xpOverride?: number
+): Promise<{ error: string | null; xpAwarded: number }> {
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { error: 'Not authenticated' };
+  if (!user) return { error: 'Not authenticated', xpAwarded: 0 };
+
+  // Check if already completed so we don't double-award XP
+  const { data: existing } = await supabase
+    .from('student_lesson_progress')
+    .select('id')
+    .eq('student_id', user.id)
+    .eq('lesson_id', lessonId)
+    .maybeSingle();
+
+  const alreadyCompleted = !!existing;
+
   const { error } = await supabase.from('student_lesson_progress')
     .upsert({
       student_id: user.id,
       lesson_id: lessonId,
       score: score ?? null,
-      xp_earned: xpOverride ?? null,
-      completed_at: new Date().toISOString()
+      completed_at: new Date().toISOString(),
     });
-  if (error) return { error: error.message };
-  return { error: null };
+
+  if (error) return { error: error.message, xpAwarded: 0 };
+
+  // Award XP only on first completion; xpOverride=0 means solution was used
+  if (!alreadyCompleted && xpOverride !== 0) {
+    const { data: lessonRow } = await supabase
+      .from('course_lessons')
+      .select('xp_reward')
+      .eq('id', lessonId)
+      .single();
+
+    const xpToAward = xpOverride ?? lessonRow?.xp_reward ?? 0;
+
+    if (xpToAward > 0) {
+      const { data: prof } = await supabase
+        .from('profiles')
+        .select('xp_points')
+        .eq('id', user.id)
+        .single();
+
+      await supabase
+        .from('profiles')
+        .update({ xp_points: (prof?.xp_points ?? 0) + xpToAward })
+        .eq('id', user.id);
+    }
+
+    return { error: null, xpAwarded: xpToAward };
+  }
+
+  return { error: null, xpAwarded: 0 };
+}
+
+export async function getProfileXP(): Promise<number> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return 0;
+  const { data } = await supabase
+    .from('profiles')
+    .select('xp_points')
+    .eq('id', user.id)
+    .single();
+  return data?.xp_points ?? 0;
 }
 
 // ─── Streak ───────────────────────────────────────────────────────────────────
