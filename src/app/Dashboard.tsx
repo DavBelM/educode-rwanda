@@ -6,7 +6,7 @@ import { AssignmentCard } from './components/dashboard/AssignmentCard';
 import { AIInsights } from './components/dashboard/AIInsights';
 import { AchievementBadges } from './components/dashboard/AchievementBadges';
 import { useAuth } from '../lib/auth';
-import { getStudentAssignments, getStudentClasses, getClassWithInviteCode, joinClass, getSubmittedAssignmentIds, getStudentGrades, recordDailyLogin, getStreak, getStudentAnnouncements, getNewGradeCount, type Assignment, type Announcement } from '../lib/db';
+import { getStudentAssignments, getStudentClasses, getClassWithInviteCode, joinClass, getSubmittedAssignmentIds, getStudentGrades, recordDailyLogin, getStreak, getStudentAnnouncements, getNewGradeCount, getLessonProgress, type Assignment, type Announcement } from '../lib/db';
 import { Users, ArrowRight, Loader, X, BookOpen, Megaphone, Pin, Code2 } from 'lucide-react';
 
 interface Props {
@@ -132,10 +132,11 @@ export default function Dashboard({ language, onLanguageChange, onStartCoding, o
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [newGradeCount, setNewGradeCount] = useState(0);
   const [showAnnouncements, setShowAnnouncements] = useState(false);
+  const [lessonProgress, setLessonProgress] = useState({ completed: 0, total: 0, pct: 0 });
 
   const loadAssignments = async () => {
     setLoadingAssignments(true);
-    const [{ data: classes }, { data: asgns }, submitted, grades, currentStreak, { data: ann }, newGrades] = await Promise.all([
+    const [{ data: classes }, { data: asgns }, submitted, grades, currentStreak, { data: ann }, newGrades, lessonProg] = await Promise.all([
       getStudentClasses(),
       getStudentAssignments(),
       getSubmittedAssignmentIds(),
@@ -143,8 +144,10 @@ export default function Dashboard({ language, onLanguageChange, onStartCoding, o
       getStreak(),
       getStudentAnnouncements(),
       getNewGradeCount(),
+      getLessonProgress(),
     ]);
     setNewGradeCount(newGrades);
+    setLessonProgress(lessonProg);
     setAnnouncements(ann ?? []);
     setStreak(currentStreak);
     setHasClass(classes.length > 0);
@@ -241,10 +244,8 @@ export default function Dashboard({ language, onLanguageChange, onStartCoding, o
     return isKinyarwanda ? 'Intangiriro I' : 'Beginner I';
   };
 
-  // Progress = % of assignments submitted (something the student controls)
-  const progressPct = assignments.length > 0
-    ? Math.round((submittedIds.size / assignments.length) * 100)
-    : 0;
+  // Progress = % of course lessons completed
+  const progressPct = lessonProgress.pct;
 
   const insights = (() => {
     const result: Array<{ text: string; isPositive: boolean }> = [];
@@ -409,8 +410,8 @@ export default function Dashboard({ language, onLanguageChange, onStartCoding, o
             <ProgressOverview
               language={language}
               progress={progressPct}
-              assignmentsCompleted={submittedIds.size}
-              assignmentsTotal={assignments.length}
+              assignmentsCompleted={lessonProgress.completed}
+              assignmentsTotal={lessonProgress.total}
               streak={streak}
               xpPoints={profileXp}
               level={getLevel(profileXp)}
