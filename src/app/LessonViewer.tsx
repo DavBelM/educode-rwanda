@@ -99,6 +99,10 @@ function CodingLesson({ lesson, language, onComplete, completing }: {
   const [hasRun, setHasRun] = useState(false);
   const [hintsRevealed, setHintsRevealed] = useState(0);
 
+  // Test cases
+  const tests = lesson.exercise_data?.tests ?? [];
+  const [testResults, setTestResults] = useState<Array<{ passed: boolean; actual: string }>>([]);
+
   // AI Tutor state
   const [aiOpen, setAiOpen] = useState(false);
   const [aiQuestion, setAiQuestion] = useState('');
@@ -134,9 +138,29 @@ function CodingLesson({ lesson, language, onComplete, completing }: {
       if (result.error) out = (out ? out + '\n' : '') + `❌ ${result.error}`;
       setOutput(out || '(no output)');
       setHasRun(true);
+
+      // Evaluate test cases against actual output
+      if (tests.length > 0) {
+        const actualLines = (result.output ?? '').split('\n').map(l => l.trim());
+        const results = tests.map((t, i) => {
+          const expected = t.expectedOutput.trim();
+          // Match against the i-th output line, or full output for single-test cases
+          const actual = tests.length === 1
+            ? (result.output ?? '').trim()
+            : (actualLines[i] ?? '');
+          const passed = !result.error && (
+            actual === expected ||
+            actual.toLowerCase() === expected.toLowerCase() ||
+            actual.includes(expected)
+          );
+          return { passed, actual };
+        });
+        setTestResults(results);
+      }
+
       setRunning(false);
     }
-  }, [code, htmlCode, isHtmlExercise]);
+  }, [code, htmlCode, isHtmlExercise, tests]);
 
   const hasError = output.includes('❌');
 
@@ -275,6 +299,53 @@ function CodingLesson({ lesson, language, onComplete, completing }: {
               </pre>
             </div>
           )}
+
+          {/* Test results */}
+          {testResults.length > 0 && (
+            <div className="rounded-xl overflow-hidden" style={{ border: '1px solid var(--ec-b2)' }}>
+              <div className="px-4 py-2.5 flex items-center justify-between"
+                style={{ background: 'var(--ec-surface-2)', borderBottom: '1px solid var(--ec-b1)' }}>
+                <p className="text-sm font-semibold" style={{ color: 'var(--ec-text-1)' }}>
+                  {isKin ? 'Ibigerageza' : 'Test Cases'}
+                </p>
+                <span className="text-sm font-bold px-2 py-0.5 rounded-full"
+                  style={{
+                    background: testResults.every(r => r.passed) ? 'rgba(0,212,170,0.12)' : 'rgba(239,68,68,0.1)',
+                    color: testResults.every(r => r.passed) ? '#00d4aa' : '#f87171',
+                  }}>
+                  {testResults.filter(r => r.passed).length}/{testResults.length} {isKin ? 'byatsinzwe' : 'passed'}
+                </span>
+              </div>
+              <div className="divide-y" style={{ borderColor: 'var(--ec-b1)' }}>
+                {tests.map((t, i) => {
+                  const res = testResults[i];
+                  const passed = res?.passed ?? false;
+                  return (
+                    <div key={i} className="px-4 py-3 flex items-start gap-3">
+                      <span className="mt-0.5 shrink-0 text-base">{passed ? '✅' : '❌'}</span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium" style={{ color: 'var(--ec-text-1)' }}>
+                          {t.description}
+                        </p>
+                        {!passed && res && (
+                          <div className="mt-1 space-y-0.5">
+                            <p className="text-xs" style={{ color: 'var(--ec-text-6)' }}>
+                              {isKin ? 'Byategerezwaga' : 'Expected'}:{' '}
+                              <span style={{ color: '#00d4aa', fontFamily: 'monospace' }}>{t.expectedOutput}</span>
+                            </p>
+                            <p className="text-xs" style={{ color: 'var(--ec-text-6)' }}>
+                              {isKin ? 'Byaboneka' : 'Got'}:{' '}
+                              <span style={{ color: '#f87171', fontFamily: 'monospace' }}>{res.actual || '(no output)'}</span>
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </>
       )}
 
@@ -371,16 +442,32 @@ function CodingLesson({ lesson, language, onComplete, completing }: {
         )}
       </div>
 
-      {hasRun && (isHtmlExercise || !hasError) && (
-        <button onClick={onComplete} disabled={completing}
-          className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm transition-all disabled:opacity-50"
-          style={{ background: '#00d4aa', color: 'var(--ec-bg)', fontFamily: 'Inter, sans-serif' }}
-          onMouseEnter={e => { if (!completing) (e.currentTarget as HTMLButtonElement).style.background = '#00bfa0'; }}
-          onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = '#00d4aa'; }}>
-          {completing ? <Loader size={16} className="animate-spin" /> : <CheckCircle size={16} />}
-          {isKin ? 'Rangiza Isomo' : 'Complete Lesson'}
-        </button>
-      )}
+      {(() => {
+        const allTestsPassed = tests.length === 0 || testResults.every(r => r.passed);
+        const canComplete = hasRun && (isHtmlExercise || !hasError) && allTestsPassed;
+        if (!canComplete) {
+          if (hasRun && tests.length > 0 && !allTestsPassed) {
+            return (
+              <p className="text-sm text-center py-2" style={{ color: 'var(--ec-text-6)' }}>
+                {isKin
+                  ? '⚠️ Rangiza ibigerageza byose mbere yo gusoza isomo'
+                  : '⚠️ Pass all test cases to complete the lesson'}
+              </p>
+            );
+          }
+          return null;
+        }
+        return (
+          <button onClick={onComplete} disabled={completing}
+            className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm transition-all disabled:opacity-50"
+            style={{ background: '#00d4aa', color: 'var(--ec-bg)', fontFamily: 'Inter, sans-serif' }}
+            onMouseEnter={e => { if (!completing) (e.currentTarget as HTMLButtonElement).style.background = '#00bfa0'; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = '#00d4aa'; }}>
+            {completing ? <Loader size={16} className="animate-spin" /> : <CheckCircle size={16} />}
+            {isKin ? 'Rangiza Isomo' : 'Complete Lesson'}
+          </button>
+        );
+      })()}
     </div>
   );
 }

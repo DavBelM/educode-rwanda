@@ -557,6 +557,7 @@ export interface CourseLesson {
     instructions?: string;
     hint?: string;
     hints?: string[];
+    tests?: Array<{ description: string; expectedOutput: string }>;
     questions?: Array<{ id: string; text: string; options: string[]; correct: number }>;
   } | null;
   order_index: number;
