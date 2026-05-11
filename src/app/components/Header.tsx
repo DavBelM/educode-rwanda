@@ -124,13 +124,13 @@ export function Header({ language, onLanguageToggle, subtitle, hideAssignmentInf
           onClick={toggleTheme}
           title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
           className="w-10 h-10 rounded-full flex items-center justify-center transition-all"
-          style={{ background: 'var(--ec-b1)', border: '1px solid var(--ec-b2)' }}
-          onMouseEnter={e => (e.currentTarget.style.background = 'var(--ec-b2)')}
-          onMouseLeave={e => (e.currentTarget.style.background = 'var(--ec-b1)')}
+          style={{ background: 'rgba(139,92,246,0.12)', border: '1px solid rgba(139,92,246,0.3)' }}
+          onMouseEnter={e => (e.currentTarget.style.background = 'rgba(139,92,246,0.22)')}
+          onMouseLeave={e => (e.currentTarget.style.background = 'rgba(139,92,246,0.12)')}
         >
           {theme === 'dark'
-            ? <Sun size={16} style={{ color: 'var(--ec-text-4)' }} />
-            : <Moon size={16} style={{ color: 'var(--ec-text-4)' }} />}
+            ? <Sun size={16} style={{ color: '#a78bfa' }} />
+            : <Moon size={16} style={{ color: '#a78bfa' }} />}
         </button>
 
         {/* Language Toggle Pill */}
