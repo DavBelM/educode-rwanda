@@ -41,8 +41,14 @@ interface Props {
 export default function CodingWorkspace({ onBack, assignment, language: initialLanguage }: Props) {
   const [language, setLanguage] = useState<'EN' | 'KIN'>( initialLanguage ?? 'EN');
   const isKin = language === 'KIN';
-  const [jsCode, setJsCode] = useState(DEFAULT_JS);
-  const [htmlCode, setHtmlCode] = useState(DEFAULT_HTML);
+
+  // Auto-save key — per assignment or free practice
+  const saveKey = assignment ? `educode_code_${assignment.id}` : 'educode_code_free';
+  const savedJs = localStorage.getItem(saveKey + '_js');
+  const savedHtml = localStorage.getItem(saveKey + '_html');
+
+  const [jsCode, setJsCode] = useState(savedJs ?? DEFAULT_JS);
+  const [htmlCode, setHtmlCode] = useState(savedHtml ?? DEFAULT_HTML);
   const [output, setOutput] = useState('');
   const [previewSrc, setPreviewSrc] = useState('');
   const [isRunning, setIsRunning] = useState(false);
@@ -54,6 +60,26 @@ export default function CodingWorkspace({ onBack, assignment, language: initialL
   const [submitted, setSubmitted] = useState(false);
   const [submitError, setSubmitError] = useState('');
   const [violationWarning, setViolationWarning] = useState('');
+
+  // Auto-save code as student types
+  useEffect(() => {
+    localStorage.setItem(saveKey + '_js', jsCode);
+  }, [jsCode, saveKey]);
+
+  useEffect(() => {
+    localStorage.setItem(saveKey + '_html', htmlCode);
+  }, [htmlCode, saveKey]);
+
+  // Warn before refresh/close during active assignment
+  useEffect(() => {
+    if (!assignment || submitted) return;
+    const handler = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = '';
+    };
+    window.addEventListener('beforeunload', handler);
+    return () => window.removeEventListener('beforeunload', handler);
+  }, [assignment, submitted]);
 
   // Exam mode
   const examMode = !!(assignment?.exam_mode);
@@ -125,6 +151,8 @@ export default function CodingWorkspace({ onBack, assignment, language: initialL
       setSubmitError(error);
     } else {
       setSubmitted(true);
+      localStorage.removeItem(saveKey + '_js');
+      localStorage.removeItem(saveKey + '_html');
     }
     setSubmitting(false);
   };
@@ -166,7 +194,12 @@ export default function CodingWorkspace({ onBack, assignment, language: initialL
 
     setIsRunning(false);
 
-    // AI feedback (runs in parallel, updates when ready)
+    // AI feedback disabled during exam mode
+    if (examMode) {
+      setAiLoading(false);
+      return;
+    }
+
     getAIFeedback(jsCode, result.error, language)
       .then(response => setAiResponse(response))
       .catch(() => setAiResponse(null))
