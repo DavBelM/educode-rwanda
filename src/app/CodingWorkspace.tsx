@@ -7,6 +7,7 @@ import { RunCodeButton } from './components/RunCodeButton';
 import { MobileAssignmentCard } from './components/MobileAssignmentCard';
 import { executeCode } from '../lib/code-executor';
 import { analyzeFeedback, formatFeedbackForUI } from '../lib/feedback-engine';
+import { getAIFeedback } from '../lib/ai';
 import { submitCodingAssignment, type Assignment } from '../lib/db';
 import { useExamMode } from '../hooks/useExamMode';
 import { Send, CheckCircle, Loader, AlertTriangle, Clock } from 'lucide-react';
@@ -47,6 +48,8 @@ export default function CodingWorkspace({ onBack, assignment, language: initialL
   const [isRunning, setIsRunning] = useState(false);
   const [feedback, setFeedback] = useState<Array<{ type: 'success' | 'error' | 'info'; message: string }>>([]);
   const [errorLine, setErrorLine] = useState<number | undefined>(undefined);
+  const [aiResponse, setAiResponse] = useState<string | null>(null);
+  const [aiLoading, setAiLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [submitError, setSubmitError] = useState('');
@@ -134,6 +137,8 @@ export default function CodingWorkspace({ onBack, assignment, language: initialL
     setFeedback([]);
     setErrorLine(undefined);
     setPreviewSrc('');
+    setAiResponse(null);
+    setAiLoading(true);
 
     const result = await executeCode(jsCode, htmlCode);
 
@@ -155,11 +160,17 @@ export default function CodingWorkspace({ onBack, assignment, language: initialL
     const lineMatch = result.error?.match(/line (\d+)/i);
     if (lineMatch) setErrorLine(parseInt(lineMatch[1], 10));
 
-    // Bilingual feedback
+    // Bilingual rule-based feedback
     const feedbacks = analyzeFeedback(result.error, jsCode, result.output, language);
     setFeedback(formatFeedbackForUI(feedbacks, language));
 
     setIsRunning(false);
+
+    // AI feedback (runs in parallel, updates when ready)
+    getAIFeedback(jsCode, result.error, language)
+      .then(response => setAiResponse(response))
+      .catch(() => setAiResponse(null))
+      .finally(() => setAiLoading(false));
   }, [jsCode, htmlCode, language]);
 
   // Ctrl+Enter shortcut
@@ -270,7 +281,7 @@ export default function CodingWorkspace({ onBack, assignment, language: initialL
         {/* Right: AI Feedback + Output (40%) */}
         <div className="w-[40%] flex flex-col">
           <div className="h-1/2">
-            <AIFeedbackPanel feedback={feedback} language={language} isLoading={isRunning} />
+            <AIFeedbackPanel feedback={feedback} language={language} isLoading={isRunning} aiResponse={aiResponse} aiLoading={aiLoading} />
           </div>
           <div className="h-1/2">
             <OutputConsole

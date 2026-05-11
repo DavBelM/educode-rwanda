@@ -1,13 +1,14 @@
-import React from 'react';
-import { Bot } from 'lucide-react';
+import { Bot, Sparkles } from 'lucide-react';
 
 interface AIFeedbackPanelProps {
   feedback: Array<{ type: 'success' | 'error' | 'info'; message: string }>;
   language: 'EN' | 'KIN';
   isLoading?: boolean;
+  aiResponse?: string | null;
+  aiLoading?: boolean;
 }
 
-export function AIFeedbackPanel({ feedback, language, isLoading = false }: AIFeedbackPanelProps) {
+export function AIFeedbackPanel({ feedback, language, isLoading = false, aiResponse = null, aiLoading = false }: AIFeedbackPanelProps) {
   const isKinyarwanda = language === 'KIN';
 
   return (
@@ -159,6 +160,29 @@ export function AIFeedbackPanel({ feedback, language, isLoading = false }: AIFee
               </div>
             ))}
           </>
+        )}
+
+        {/* AI Model Response */}
+        {(aiLoading || aiResponse) && (
+          <div className="mt-2 p-4 rounded-xl" style={{ background: 'linear-gradient(135deg, #1e1b4b, #2e1065)', border: '1px solid rgba(139,92,246,0.3)' }}>
+            <div className="flex items-center gap-2 mb-2">
+              <Sparkles size={14} style={{ color: '#a78bfa' }} />
+              <span className="text-xs font-bold uppercase tracking-wide" style={{ color: '#a78bfa' }}>
+                {isKinyarwanda ? 'EduCode AI' : 'EduCode AI'}
+              </span>
+            </div>
+            {aiLoading ? (
+              <div className="space-y-2">
+                <div className="h-3 rounded-full animate-pulse" style={{ background: 'rgba(139,92,246,0.3)', width: '85%' }} />
+                <div className="h-3 rounded-full animate-pulse" style={{ background: 'rgba(139,92,246,0.2)', width: '65%', animationDelay: '150ms' }} />
+                <div className="h-3 rounded-full animate-pulse" style={{ background: 'rgba(139,92,246,0.15)', width: '75%', animationDelay: '300ms' }} />
+              </div>
+            ) : (
+              <p className="text-sm leading-relaxed whitespace-pre-line" style={{ color: '#e2e8f0' }}>
+                {aiResponse}
+              </p>
+            )}
+          </div>
         )}
 
         {/* Action Buttons */}
