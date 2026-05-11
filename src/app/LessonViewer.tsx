@@ -97,7 +97,7 @@ function CodingLesson({ lesson, language, onComplete, completing }: {
   const [previewSrc, setPreviewSrc] = useState('');
   const [running, setRunning] = useState(false);
   const [hasRun, setHasRun] = useState(false);
-  const [showHint, setShowHint] = useState(false);
+  const [hintsRevealed, setHintsRevealed] = useState(0);
 
   // AI Tutor state
   const [aiOpen, setAiOpen] = useState(false);
@@ -147,18 +147,46 @@ function CodingLesson({ lesson, language, onComplete, completing }: {
         <p className="text-sm whitespace-pre-line" style={{ color: 'var(--ec-text-3)', fontFamily: 'Inter, sans-serif' }}>
           {lesson.exercise_data?.instructions}
         </p>
-        {lesson.exercise_data?.hint && (
-          <div className="mt-3">
-            <button onClick={() => setShowHint(h => !h)} className="text-xs font-semibold" style={{ color: '#f59e0b' }}>
-              {showHint ? '▲ Hide hint' : '▼ Show hint'}
-            </button>
-            {showHint && (
-              <p className="text-xs mt-2" style={{ color: 'var(--ec-text-4)', fontFamily: 'Inter, sans-serif' }}>
-                {lesson.exercise_data.hint}
-              </p>
-            )}
-          </div>
-        )}
+        {(() => {
+          const ed = lesson.exercise_data;
+          if (!ed) return null;
+          // Support both hints[] array and legacy single hint string
+          const hints: string[] = ed.hints?.length
+            ? ed.hints
+            : ed.hint ? [ed.hint] : [];
+          if (hints.length === 0) return null;
+          return (
+            <div className="mt-3 space-y-2">
+              {hints.slice(0, hintsRevealed).map((h, i) => (
+                <div key={i} className="flex items-start gap-2 rounded-lg px-3 py-2"
+                  style={{ background: 'rgba(245,158,11,0.07)', border: '1px solid rgba(245,158,11,0.2)' }}>
+                  <span className="text-xs font-bold mt-0.5 shrink-0" style={{ color: '#f59e0b' }}>
+                    {isKin ? `Icyifuzo ${i + 1}` : `Hint ${i + 1}`}
+                  </span>
+                  <p className="text-xs leading-relaxed" style={{ color: 'var(--ec-text-4)' }}>{h}</p>
+                </div>
+              ))}
+              {hintsRevealed < hints.length && (
+                <button
+                  onClick={() => setHintsRevealed(n => n + 1)}
+                  className="flex items-center gap-1.5 text-xs font-semibold transition-all"
+                  style={{ color: '#f59e0b' }}
+                  onMouseEnter={e => (e.currentTarget.style.opacity = '0.75')}
+                  onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
+                >
+                  💡 {isKin
+                    ? `Bona icyifuzo ${hintsRevealed + 1} (${hints.length - hintsRevealed} bisigaye)`
+                    : `Show hint ${hintsRevealed + 1} of ${hints.length}`}
+                </button>
+              )}
+              {hintsRevealed === hints.length && hintsRevealed > 0 && (
+                <p className="text-xs" style={{ color: 'var(--ec-text-7)' }}>
+                  {isKin ? '✓ Ibyifuzo byose biragaragara' : '✓ All hints revealed'}
+                </p>
+              )}
+            </div>
+          );
+        })()}
       </div>
 
       {isHtmlExercise ? (
