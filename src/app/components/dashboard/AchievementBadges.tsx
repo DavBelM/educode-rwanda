@@ -25,19 +25,19 @@ export function AchievementBadges({ language, badges }: AchievementBadgesProps) 
       border: '1px solid rgba(255,255,255,0.06)',
     }}>
       <div className="flex items-center justify-between mb-5">
-        <p className="text-sm font-semibold" style={{ fontFamily: 'Inter, sans-serif', color: '#94a3b8', letterSpacing: '0.05em', textTransform: 'uppercase', fontSize: '11px' }}>
+        <p className="font-semibold" style={{ fontFamily: 'Inter, sans-serif', color: '#94a3b8', letterSpacing: '0.05em', textTransform: 'uppercase', fontSize: '13px' }}>
           {isKinyarwanda ? 'Ibihembo' : 'Achievements'}
         </p>
-        <button className="text-xs font-semibold" style={{ color: '#00d4aa', fontFamily: 'Inter, sans-serif' }}>
+        <button className="text-sm font-semibold" style={{ color: '#00d4aa', fontFamily: 'Inter, sans-serif' }}>
           {isKinyarwanda ? 'Reba Byose' : 'View all'} →
         </button>
       </div>
 
-      <div className="flex gap-3 overflow-x-auto pb-1">
+      <div className="flex gap-4 overflow-x-auto pb-1">
         {badges.map((badge) => (
-          <div key={badge.id} className="flex flex-col items-center gap-2 min-w-[64px]">
+          <div key={badge.id} className="flex flex-col items-center gap-2 min-w-[72px]">
             <div
-              className="w-14 h-14 rounded-2xl flex items-center justify-center transition-all"
+              className="w-16 h-16 rounded-2xl flex items-center justify-center transition-all"
               style={badge.earned
                 ? {
                     background: 'linear-gradient(135deg, rgba(245,158,11,0.2), rgba(251,191,36,0.1))',
@@ -54,10 +54,10 @@ export function AchievementBadges({ language, badges }: AchievementBadgesProps) 
             >
               {iconMap[badge.icon] ?? <Award size={22} />}
             </div>
-            <p className="text-xs text-center leading-tight" style={{
+            <p className="text-sm text-center leading-tight" style={{
               fontFamily: 'Inter, sans-serif',
               color: badge.earned ? '#94a3b8' : '#334155',
-              maxWidth: '60px'
+              maxWidth: '72px'
             }}>
               {badge.name}
             </p>

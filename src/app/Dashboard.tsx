@@ -315,7 +315,7 @@ export default function Dashboard({ language, onLanguageChange, onStartCoding, o
         onAnnouncementsClick={() => setShowAnnouncements(true)}
       />
 
-      <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
+      <div className="max-w-7xl mx-auto px-6 py-8 space-y-8">
         <HeroBanner language={language} studentName={studentName} />
 
         {/* Announcements modal */}
@@ -409,13 +409,13 @@ export default function Dashboard({ language, onLanguageChange, onStartCoding, o
           <div className="lg:col-span-6">
             <div className="rounded-2xl p-6" style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.06)' }}>
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-base font-bold" style={{ color: '#f1f5f9' }}>
+                <h2 className="text-lg font-bold" style={{ color: '#f1f5f9' }}>
                   {isKinyarwanda ? 'Ibisabwa' : 'Active Assignments'}
                 </h2>
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => onOpenResults?.()}
-                    className="relative flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg transition-all"
+                    className="relative flex items-center gap-1.5 text-sm font-semibold px-3 py-1.5 rounded-lg transition-all"
                     style={{ color: '#f59e0b', background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.2)' }}
                     onMouseEnter={e => (e.currentTarget.style.background = 'rgba(245,158,11,0.15)')}
                     onMouseLeave={e => (e.currentTarget.style.background = 'rgba(245,158,11,0.08)')}
@@ -431,22 +431,22 @@ export default function Dashboard({ language, onLanguageChange, onStartCoding, o
                   </button>
                   <button
                     onClick={() => onOpenCourses?.()}
-                    className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg transition-all"
+                    className="flex items-center gap-1.5 text-sm font-semibold px-3 py-1.5 rounded-lg transition-all"
                     style={{ color: '#8b5cf6', background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.2)' }}
                     onMouseEnter={e => (e.currentTarget.style.background = 'rgba(139,92,246,0.15)')}
                     onMouseLeave={e => (e.currentTarget.style.background = 'rgba(139,92,246,0.08)')}
                   >
-                    <BookOpen size={12} />
+                    <BookOpen size={13} />
                     {isKinyarwanda ? 'Amasomo' : 'Courses'}
                   </button>
                   <button
                     onClick={() => setShowJoinModal(true)}
-                    className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg transition-all"
+                    className="flex items-center gap-1.5 text-sm font-semibold px-3 py-1.5 rounded-lg transition-all"
                     style={{ color: '#00d4aa', background: 'rgba(0,212,170,0.08)', border: '1px solid rgba(0,212,170,0.2)' }}
                     onMouseEnter={e => (e.currentTarget.style.background = 'rgba(0,212,170,0.15)')}
                     onMouseLeave={e => (e.currentTarget.style.background = 'rgba(0,212,170,0.08)')}
                   >
-                    <Users size={12} />
+                    <Users size={13} />
                     {isKinyarwanda ? 'Injira mu Somo' : 'Join Class'}
                   </button>
                 </div>

@@ -54,30 +54,30 @@ export function AssignmentCard({ assignment, language, onClick }: AssignmentCard
         (e.currentTarget as HTMLDivElement).style.boxShadow = 'none';
       }}
     >
-      <h3 className="text-base font-semibold mb-1" style={{ fontFamily: 'Inter, sans-serif', color: '#f1f5f9' }}>
+      <h3 className="text-lg font-bold mb-1.5" style={{ fontFamily: 'Inter, sans-serif', color: '#f1f5f9' }}>
         {assignment.title}
       </h3>
-      <p className="text-sm mb-4" style={{ fontFamily: 'Inter, sans-serif', color: '#475569' }}>
+      <p className="text-base mb-4" style={{ fontFamily: 'Inter, sans-serif', color: '#475569' }}>
         {assignment.description}
       </p>
 
       {/* Badges */}
       <div className="flex items-center gap-2 mb-4 flex-wrap">
-        <span className="px-2.5 py-1 rounded-full text-xs font-semibold" style={{ background: due.bg, color: due.text, border: `1px solid ${due.border}` }}>
+        <span className="px-3 py-1.5 rounded-full text-sm font-semibold" style={{ background: due.bg, color: due.text, border: `1px solid ${due.border}` }}>
           {assignment.dueText}
         </span>
-        <span className="px-2.5 py-1 rounded-full text-xs font-semibold" style={{ background: diff.bg, color: diff.text, border: `1px solid ${diff.border}` }}>
+        <span className="px-3 py-1.5 rounded-full text-sm font-semibold" style={{ background: diff.bg, color: diff.text, border: `1px solid ${diff.border}` }}>
           {assignment.difficulty}
         </span>
         {assignment.grade && (
-          <span className="px-2.5 py-1 rounded-full text-xs font-semibold" style={{ background: 'rgba(139,92,246,0.1)', color: '#8b5cf6', border: '1px solid rgba(139,92,246,0.2)' }}>
+          <span className="px-3 py-1.5 rounded-full text-sm font-semibold" style={{ background: 'rgba(139,92,246,0.1)', color: '#8b5cf6', border: '1px solid rgba(139,92,246,0.2)' }}>
             {assignment.grade}
           </span>
         )}
       </div>
 
       {assignment.feedback && (
-        <div className="mb-4 px-3 py-2 rounded-lg text-xs leading-relaxed" style={{ background: 'rgba(139,92,246,0.07)', border: '1px solid rgba(139,92,246,0.15)', color: '#a78bfa', fontFamily: 'Inter, sans-serif' }}>
+        <div className="mb-4 px-4 py-3 rounded-lg text-sm leading-relaxed" style={{ background: 'rgba(139,92,246,0.07)', border: '1px solid rgba(139,92,246,0.15)', color: '#a78bfa', fontFamily: 'Inter, sans-serif' }}>
           <span className="font-semibold" style={{ color: '#8b5cf6' }}>{isKinyarwanda ? 'Igitekerezo cy\'umwarimu: ' : 'Teacher feedback: '}</span>
           {assignment.feedback}
         </div>
@@ -86,23 +86,23 @@ export function AssignmentCard({ assignment, language, onClick }: AssignmentCard
       {/* Progress + action */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="flex gap-1">
+          <div className="flex gap-1.5">
             {Array.from({ length: assignment.testsTotal }, (_, i) => (
               <div
                 key={i}
-                className="w-2 h-2 rounded-full transition-all"
+                className="w-2.5 h-2.5 rounded-full transition-all"
                 style={{ background: i < assignment.testsCompleted ? '#00d4aa' : 'rgba(255,255,255,0.1)' }}
               />
             ))}
           </div>
-          <span className="text-xs" style={{ fontFamily: 'Inter, sans-serif', color: '#475569' }}>
+          <span className="text-sm" style={{ fontFamily: 'Inter, sans-serif', color: '#475569' }}>
             {assignment.status === 'completed'
               ? (isKinyarwanda ? 'Byatanzwe' : 'Submitted')
               : `${assignment.testsCompleted}/${assignment.testsTotal} ${isKinyarwanda ? 'byatsinze' : 'passed'}`}
           </span>
         </div>
 
-        <button className="flex items-center gap-1 text-sm font-semibold transition-all" style={{ color: '#00d4aa', fontFamily: 'Inter, sans-serif' }}>
+        <button className="flex items-center gap-1.5 text-base font-semibold transition-all" style={{ color: '#00d4aa', fontFamily: 'Inter, sans-serif' }}>
           {assignment.status === 'not-started'
             ? (isKinyarwanda ? 'Tangira' : 'Start')
             : assignment.status === 'completed'
