@@ -64,7 +64,7 @@ export function ProgressOverview({ language, progress, assignmentsCompleted, ass
       {/* Stats Grid */}
       <div className="grid grid-cols-2 gap-3 mb-6">
         {[
-          { label: isKinyarwanda ? 'Imikoro' : 'Assignments', value: `${assignmentsCompleted}/${assignmentsTotal}` },
+          { label: isKinyarwanda ? 'Amasomo' : 'Lessons', value: `${assignmentsCompleted}/${assignmentsTotal}` },
           { label: isKinyarwanda ? 'Iminsi ukurikirana' : 'Streak', value: streak, icon: <Zap size={16} className="text-[#f59e0b]" fill="#f59e0b" /> },
           { label: isKinyarwanda ? 'Amanota (XP)' : 'XP Points', value: xpPoints.toLocaleString() },
           { label: isKinyarwanda ? 'Urwego' : 'Level', value: level, small: true },

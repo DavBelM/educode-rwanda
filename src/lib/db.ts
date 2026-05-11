@@ -473,6 +473,28 @@ export interface CourseProgress {
   pct: number;
 }
 
+export async function getLessonProgress(): Promise<{ completed: number; total: number; pct: number }> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { completed: 0, total: 0, pct: 0 };
+
+  const courses = await getCourses();
+  if (!courses.length) return { completed: 0, total: 0, pct: 0 };
+
+  const courseDetails = await Promise.all(courses.map(c => getCourseDetail(c.id)));
+  const allLessonIds = courseDetails.flatMap(({ modules }) => modules.flatMap(m => m.lessons.map(l => l.id)));
+  if (!allLessonIds.length) return { completed: 0, total: 0, pct: 0 };
+
+  const { data: progressRows } = await supabase
+    .from('student_lesson_progress')
+    .select('lesson_id')
+    .eq('student_id', user.id)
+    .in('lesson_id', allLessonIds);
+
+  const completed = new Set((progressRows ?? []).map((r: { lesson_id: string }) => r.lesson_id)).size;
+  const total = allLessonIds.length;
+  return { completed, total, pct: Math.round((completed / total) * 100) };
+}
+
 export async function getSelfLearnerStats(): Promise<{
   streak: number;
   courseProgress: CourseProgress[];
