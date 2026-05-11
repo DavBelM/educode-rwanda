@@ -3,7 +3,7 @@ import { Users, FileText, Plus, Copy, Check, X, ChevronDown, BookOpen, Code2, Lo
 import { Header } from './components/Header';
 import {
   createClass, getTeacherClasses, getClassAssignments, createAssignment, getClassStudentCount,
-  getAssignmentSubmissions, getAssignmentSubmissionCounts, gradeSubmission, getClassLeaderboard,
+  getAssignmentSubmissions, getAssignmentSubmissionCounts, gradeSubmission, releaseGrades, getClassLeaderboard,
   getClassAnalytics, getClassGradesExport,
   createAnnouncement, getClassAnnouncements, deleteAnnouncement,
   type Class, type Assignment, type Question, type Submission, type LeaderboardEntry, type Announcement, type ClassAnalytics
@@ -996,6 +996,8 @@ function SubmissionsPanel({ assignment, language, onClose }: {
   const [feedbackInputs, setFeedbackInputs] = useState<Record<string, string>>({});
   const [grading, setGrading] = useState<Record<string, boolean>>({});
   const [gradeError, setGradeError] = useState<Record<string, string>>({});
+  const [releasing, setReleasing] = useState(false);
+  const [released, setReleased] = useState(!!assignment.grades_released);
 
   useEffect(() => {
     getAssignmentSubmissions(assignment.id).then(({ data }) => {
@@ -1048,9 +1050,34 @@ function SubmissionsPanel({ assignment, language, onClose }: {
               {submissions.length} {isKin ? 'byatanzwe' : 'submission(s)'}
             </p>
           </div>
-          <button onClick={onClose} style={{ color: '#475569' }} onMouseEnter={e => (e.currentTarget.style.color = '#94a3b8')} onMouseLeave={e => (e.currentTarget.style.color = '#475569')}>
-            <X size={20} />
-          </button>
+          <div className="flex items-center gap-2">
+            {released ? (
+              <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold"
+                style={{ background: 'rgba(0,212,170,0.1)', color: '#00d4aa', border: '1px solid rgba(0,212,170,0.2)' }}>
+                ✓ {isKin ? 'Amanota Yatangiwe' : 'Grades Released'}
+              </span>
+            ) : (
+              <button
+                onClick={async () => {
+                  setReleasing(true);
+                  const { error } = await releaseGrades(assignment.id);
+                  if (!error) setReleased(true);
+                  setReleasing(false);
+                }}
+                disabled={releasing || submissions.filter(s => s.marks_earned !== null).length === 0}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all disabled:opacity-40"
+                style={{ background: 'rgba(0,212,170,0.1)', color: '#00d4aa', border: '1px solid rgba(0,212,170,0.2)' }}
+                onMouseEnter={e => { if (!releasing) (e.currentTarget as HTMLButtonElement).style.background = 'rgba(0,212,170,0.2)'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(0,212,170,0.1)'; }}
+              >
+                {releasing ? <Loader size={12} className="animate-spin" /> : null}
+                {isKin ? 'Tanga Amanota' : 'Release Grades'}
+              </button>
+            )}
+            <button onClick={onClose} style={{ color: '#475569' }} onMouseEnter={e => (e.currentTarget.style.color = '#94a3b8')} onMouseLeave={e => (e.currentTarget.style.color = '#475569')}>
+              <X size={20} />
+            </button>
+          </div>
         </div>
 
         {/* Body */}
