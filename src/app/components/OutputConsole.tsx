@@ -15,38 +15,38 @@ export function OutputConsole({ output, previewSrc, isRunning, language }: Outpu
   const [tab, setTab] = useState<Tab>('console');
 
   return (
-    <div className="h-full flex flex-col bg-[#f1f5f9] border-l border-t border-[#e2e8f0]">
+    <div className="h-full flex flex-col" style={{ background: '#0d0f14', borderLeft: '1px solid rgba(255,255,255,0.06)', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
       {/* Tab bar */}
-      <div className="flex items-center border-b border-[#e2e8f0] bg-white shrink-0">
+      <div className="flex items-center shrink-0" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)', background: '#13161e' }}>
         <button
           onClick={() => setTab('console')}
-          className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
-            tab === 'console'
-              ? 'border-[#0ea5e9] text-[#0ea5e9]'
-              : 'border-transparent text-gray-500 hover:text-gray-700'
-          }`}
-          style={{ fontFamily: 'Inter, sans-serif' }}
+          className="flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors"
+          style={{
+            fontFamily: 'Inter, sans-serif',
+            borderBottomColor: tab === 'console' ? '#0ea5e9' : 'transparent',
+            color: tab === 'console' ? '#0ea5e9' : '#475569',
+          }}
         >
           <Terminal size={14} />
           {isKinyarwanda ? 'Ibyavuye' : 'Console'}
         </button>
         <button
           onClick={() => setTab('preview')}
-          className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
-            tab === 'preview'
-              ? 'border-[#f97316] text-[#f97316]'
-              : 'border-transparent text-gray-500 hover:text-gray-700'
-          }`}
-          style={{ fontFamily: 'Inter, sans-serif' }}
+          className="flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors"
+          style={{
+            fontFamily: 'Inter, sans-serif',
+            borderBottomColor: tab === 'preview' ? '#f97316' : 'transparent',
+            color: tab === 'preview' ? '#f97316' : '#475569',
+          }}
         >
           <Monitor size={14} />
           {isKinyarwanda ? 'Reba' : 'Preview'}
         </button>
 
         <div className="ml-auto flex items-center gap-2 pr-3">
-          <div className="w-2 h-2 rounded-full" style={{ backgroundColor: isRunning ? '#10b981' : '#94a3b8' }} />
+          <div className="w-2 h-2 rounded-full" style={{ backgroundColor: isRunning ? '#10b981' : '#334155' }} />
           {isRunning && (
-            <span className="text-xs text-gray-500" style={{ fontFamily: 'Inter, sans-serif' }}>
+            <span className="text-xs" style={{ fontFamily: 'Inter, sans-serif', color: '#475569' }}>
               {isKinyarwanda ? 'Irakora...' : 'Running...'}
             </span>
           )}
@@ -58,9 +58,9 @@ export function OutputConsole({ output, previewSrc, isRunning, language }: Outpu
         <div className="flex-1 overflow-y-auto p-4">
           {isRunning && !output ? (
             <div className="flex flex-col items-center justify-center h-full gap-4">
-              <div className="flex items-center gap-2 text-gray-600">
+              <div className="flex items-center gap-2">
                 <span className="animate-spin text-2xl">⏳</span>
-                <p className="font-medium" style={{ fontFamily: 'Inter, sans-serif' }}>
+                <p className="font-medium" style={{ fontFamily: 'Inter, sans-serif', color: '#94a3b8' }}>
                   {isKinyarwanda ? 'Kode yawe irakora...' : 'Running your code...'}
                 </p>
               </div>
@@ -72,14 +72,14 @@ export function OutputConsole({ output, previewSrc, isRunning, language }: Outpu
             </div>
           ) : output ? (
             <pre
-              className="text-sm text-[#1e293b] whitespace-pre-wrap"
-              style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '14px', lineHeight: '1.6' }}
+              className="text-sm whitespace-pre-wrap"
+              style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '14px', lineHeight: '1.6', color: '#e2e8f0' }}
             >
               {output}
             </pre>
           ) : (
             <div className="flex items-center justify-center h-full">
-              <p className="text-gray-400 text-center" style={{ fontFamily: 'Inter, sans-serif' }}>
+              <p className="text-center text-sm" style={{ fontFamily: 'Inter, sans-serif', color: '#334155' }}>
                 {isKinyarwanda
                   ? 'Nta byavuye. Kurura kode yawe hanyuma urebe ibyavuye hano.'
                   : 'No output yet. Run your code to see results here.'}
@@ -89,9 +89,9 @@ export function OutputConsole({ output, previewSrc, isRunning, language }: Outpu
         </div>
       )}
 
-      {/* Preview tab */}
+      {/* Preview tab — keep white background intentionally since it renders HTML */}
       {tab === 'preview' && (
-        <div className="flex-1 bg-white overflow-hidden">
+        <div className="flex-1 overflow-hidden" style={{ background: '#1a1e2a' }}>
           {previewSrc ? (
             <iframe
               srcDoc={previewSrc}
@@ -101,7 +101,7 @@ export function OutputConsole({ output, previewSrc, isRunning, language }: Outpu
             />
           ) : (
             <div className="flex items-center justify-center h-full">
-              <p className="text-gray-400 text-center" style={{ fontFamily: 'Inter, sans-serif' }}>
+              <p className="text-center text-sm" style={{ fontFamily: 'Inter, sans-serif', color: '#334155' }}>
                 {isKinyarwanda
                   ? 'Kurura kode yawe kugirango urebe preview.'
                   : 'Run your code to see the preview here.'}
