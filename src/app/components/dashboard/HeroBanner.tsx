@@ -8,7 +8,7 @@ export function HeroBanner({ language, studentName }: HeroBannerProps) {
 
   return (
     <div className="relative rounded-2xl overflow-hidden" style={{
-      background: 'linear-gradient(135deg, #13161e 0%, #1a1e2a 50%, #13161e 100%)',
+      background: 'var(--ec-gradient-hero)',
       border: '1px solid rgba(0, 212, 170, 0.2)',
       boxShadow: '0 0 40px rgba(0, 212, 170, 0.06)'
     }}>

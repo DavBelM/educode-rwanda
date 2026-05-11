@@ -1,3 +1,4 @@
+import { ThemeToggle } from './components/ThemeToggle';
 import { useState, useEffect } from 'react';
 import { ArrowLeft, BookOpen, Code2, HelpCircle, CheckCircle, Clock, ChevronRight, Zap } from 'lucide-react';
 import {
@@ -244,6 +245,7 @@ export default function CoursesPage({ language, onBack, onOpenLesson }: Props) {
           <ArrowLeft size={18} /> {isKin ? 'Dashboard' : 'Dashboard'}
         </button>
         <span style={{ color: 'var(--ec-b2)' }}>|</span>
+        <ThemeToggle />
         <span className="flex items-center gap-2 text-base font-semibold" style={{ color: 'var(--ec-text-1)' }}>
           <BookOpen size={16} style={{ color: '#00d4aa' }} />
           {isKin ? 'Amasomo' : 'Courses'}

@@ -1,3 +1,4 @@
+import { ThemeToggle } from './components/ThemeToggle';
 import { useState, useEffect, useRef } from 'react';
 import { ArrowLeft, Send, CheckCircle, Clock, BookOpen, AlertTriangle } from 'lucide-react';
 import type { Assignment } from '../lib/db';
@@ -143,6 +144,7 @@ export default function TheoreticalAssignment({ assignment, language, onBack }: 
         </button>
 
         <div className="flex items-center gap-3">
+          <ThemeToggle />
           {examMode && !submitted && (
             <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-mono text-sm font-bold" style={{ background: 'var(--ec-b5)', border: `1px solid ${timerColor}40`, color: timerColor }}>
               <Clock size={14} />

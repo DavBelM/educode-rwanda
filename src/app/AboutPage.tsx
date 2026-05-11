@@ -277,7 +277,7 @@ export default function AboutPage() {
       </div>
 
       {/* Footer */}
-      <footer className="bg-[#0f172a] text-white py-8">
+      <footer className="text-white" style={{ background: 'var(--ec-footer-bg)' py-8">
         <div className="max-w-7xl mx-auto px-4 text-center text-sm text-gray-400">
           <p>© 2026 EduCode Rwanda. All rights reserved.</p>
           <p className="mt-2">
