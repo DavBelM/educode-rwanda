@@ -1,8 +1,9 @@
 import { ThemeToggle } from './components/ThemeToggle';
-import { useState, useCallback } from 'react';
-import { ArrowLeft, Play, CheckCircle, Loader, Zap, BookOpen, Code2, HelpCircle, Monitor } from 'lucide-react';
+import { useState, useCallback, useRef } from 'react';
+import { ArrowLeft, Play, CheckCircle, Loader, Zap, BookOpen, Code2, HelpCircle, Monitor, Bot, Send } from 'lucide-react';
 import { completeLesson, type CourseLesson } from '../lib/db';
 import { executeCode } from '../lib/code-executor';
+import { getLessonAIHelp } from '../lib/ai';
 import CodeMirror from '@uiw/react-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { html } from '@codemirror/lang-html';
@@ -89,7 +90,6 @@ function CodingLesson({ lesson, language, onComplete, completing }: {
   lesson: CourseLesson; language: 'EN' | 'KIN'; onComplete: () => void; completing: boolean;
 }) {
   const isKin = language === 'KIN';
-  // Exercises with empty starter_code are HTML/DOM exercises — use HTML editor + preview
   const isHtmlExercise = !lesson.exercise_data?.starter_code;
   const [code, setCode] = useState(lesson.exercise_data?.starter_code ?? '');
   const [htmlCode, setHtmlCode] = useState('');
@@ -98,6 +98,30 @@ function CodingLesson({ lesson, language, onComplete, completing }: {
   const [running, setRunning] = useState(false);
   const [hasRun, setHasRun] = useState(false);
   const [showHint, setShowHint] = useState(false);
+
+  // AI Tutor state
+  const [aiOpen, setAiOpen] = useState(false);
+  const [aiQuestion, setAiQuestion] = useState('');
+  const [aiMessages, setAiMessages] = useState<Array<{ role: 'user' | 'ai'; text: string }>>([]);
+  const [aiLoading, setAiLoading] = useState(false);
+  const chatEndRef = useRef<HTMLDivElement>(null);
+
+  const askAI = async () => {
+    const q = aiQuestion.trim();
+    if (!q || aiLoading) return;
+    setAiQuestion('');
+    setAiMessages(prev => [...prev, { role: 'user', text: q }]);
+    setAiLoading(true);
+    const answer = await getLessonAIHelp(
+      q,
+      isHtmlExercise ? htmlCode : code,
+      lesson.exercise_data?.instructions ?? '',
+      language
+    );
+    setAiMessages(prev => [...prev, { role: 'ai', text: answer }]);
+    setAiLoading(false);
+    setTimeout(() => chatEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 50);
+  };
 
   const run = useCallback(async () => {
     if (isHtmlExercise) {
@@ -225,6 +249,99 @@ function CodingLesson({ lesson, language, onComplete, completing }: {
           )}
         </>
       )}
+
+      {/* AI Tutor */}
+      <div className="rounded-xl overflow-hidden" style={{ border: '1px solid rgba(139,92,246,0.25)' }}>
+        <button
+          onClick={() => setAiOpen(o => !o)}
+          className="w-full flex items-center gap-3 px-4 py-3 transition-all"
+          style={{ background: 'rgba(139,92,246,0.08)' }}
+          onMouseEnter={e => (e.currentTarget.style.background = 'rgba(139,92,246,0.14)')}
+          onMouseLeave={e => (e.currentTarget.style.background = 'rgba(139,92,246,0.08)')}
+        >
+          <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: 'rgba(139,92,246,0.2)' }}>
+            <Bot size={15} style={{ color: '#a78bfa' }} />
+          </div>
+          <div className="flex-1 text-left">
+            <p className="text-sm font-semibold" style={{ color: '#a78bfa' }}>
+              {isKin ? 'Baza EduCode AI' : 'Ask EduCode AI'}
+            </p>
+            <p className="text-xs" style={{ color: 'var(--ec-text-6)' }}>
+              {isKin ? 'AI igufasha ariko ntiguha igisubizo cyose' : 'AI guides you without giving away the answer'}
+            </p>
+          </div>
+          <span style={{ color: 'var(--ec-text-6)', fontSize: '12px' }}>{aiOpen ? '▲' : '▼'}</span>
+        </button>
+
+        {aiOpen && (
+          <div style={{ background: 'var(--ec-surface)', borderTop: '1px solid rgba(139,92,246,0.15)' }}>
+            {/* Chat history */}
+            <div className="p-4 space-y-3 max-h-64 overflow-y-auto">
+              {aiMessages.length === 0 && (
+                <p className="text-xs text-center py-4" style={{ color: 'var(--ec-text-6)' }}>
+                  {isKin
+                    ? 'Baza ikibazo kijyanye na code yawe cyangwa amabwiriza y\'isomo...'
+                    : 'Ask anything about your code or the lesson instructions...'}
+                </p>
+              )}
+              {aiMessages.map((m, i) => (
+                <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                  <div
+                    className="max-w-[85%] px-3 py-2 rounded-xl text-sm leading-relaxed"
+                    style={{
+                      background: m.role === 'user' ? 'rgba(139,92,246,0.15)' : 'var(--ec-surface-2)',
+                      color: m.role === 'user' ? '#a78bfa' : 'var(--ec-text-3)',
+                      border: m.role === 'user' ? '1px solid rgba(139,92,246,0.25)' : '1px solid var(--ec-b1)',
+                    }}
+                  >
+                    {m.text}
+                  </div>
+                </div>
+              ))}
+              {aiLoading && (
+                <div className="flex justify-start">
+                  <div className="px-4 py-2 rounded-xl flex items-center gap-2"
+                    style={{ background: 'var(--ec-surface-2)', border: '1px solid var(--ec-b1)' }}>
+                    <div className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-bounce" style={{ animationDelay: '0ms' }} />
+                    <div className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-bounce" style={{ animationDelay: '150ms' }} />
+                    <div className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-bounce" style={{ animationDelay: '300ms' }} />
+                  </div>
+                </div>
+              )}
+              <div ref={chatEndRef} />
+            </div>
+
+            {/* Input */}
+            <div className="flex gap-2 px-4 pb-4">
+              <input
+                value={aiQuestion}
+                onChange={e => setAiQuestion(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && askAI()}
+                placeholder={isKin ? 'Andika ikibazo cyawe...' : 'Type your question...'}
+                className="flex-1 px-3 py-2 rounded-xl text-sm focus:outline-none"
+                style={{
+                  background: 'var(--ec-surface-2)',
+                  border: '1px solid var(--ec-b2)',
+                  color: 'var(--ec-text-1)',
+                  fontFamily: 'Inter, sans-serif',
+                }}
+                onFocus={e => (e.target.style.border = '1px solid rgba(139,92,246,0.4)')}
+                onBlur={e => (e.target.style.border = '1px solid var(--ec-b2)')}
+              />
+              <button
+                onClick={askAI}
+                disabled={!aiQuestion.trim() || aiLoading}
+                className="w-9 h-9 rounded-xl flex items-center justify-center transition-all disabled:opacity-40"
+                style={{ background: 'rgba(139,92,246,0.15)', border: '1px solid rgba(139,92,246,0.3)' }}
+                onMouseEnter={e => { if (!aiLoading) (e.currentTarget as HTMLButtonElement).style.background = 'rgba(139,92,246,0.25)'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(139,92,246,0.15)'; }}
+              >
+                <Send size={14} style={{ color: '#a78bfa' }} />
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
 
       {hasRun && (isHtmlExercise || !hasError) && (
         <button onClick={onComplete} disabled={completing}
