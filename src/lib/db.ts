@@ -558,6 +558,7 @@ export interface CourseLesson {
     hint?: string;
     hints?: string[];
     tests?: Array<{ description: string; expectedOutput: string }>;
+    solution?: string;
     questions?: Array<{ id: string; text: string; options: string[]; correct: number }>;
   } | null;
   order_index: number;
@@ -702,11 +703,17 @@ export async function deleteAnnouncement(id: string): Promise<{ error: string | 
 
 // ─── Lessons ──────────────────────────────────────────────────────────────────
 
-export async function completeLesson(lessonId: string, score?: number): Promise<{ error: string | null }> {
+export async function completeLesson(lessonId: string, score?: number, xpOverride?: number): Promise<{ error: string | null }> {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { error: 'Not authenticated' };
   const { error } = await supabase.from('student_lesson_progress')
-    .upsert({ student_id: user.id, lesson_id: lessonId, score: score ?? null, completed_at: new Date().toISOString() });
+    .upsert({
+      student_id: user.id,
+      lesson_id: lessonId,
+      score: score ?? null,
+      xp_earned: xpOverride ?? null,
+      completed_at: new Date().toISOString()
+    });
   if (error) return { error: error.message };
   return { error: null };
 }

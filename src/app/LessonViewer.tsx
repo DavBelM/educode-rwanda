@@ -87,7 +87,7 @@ function ReadingLesson({ lesson, language, onComplete, completing }: {
 // ─── Coding Lesson ────────────────────────────────────────────────────────────
 
 function CodingLesson({ lesson, language, onComplete, completing }: {
-  lesson: CourseLesson; language: 'EN' | 'KIN'; onComplete: () => void; completing: boolean;
+  lesson: CourseLesson; language: 'EN' | 'KIN'; onComplete: (usedSolution?: boolean) => void; completing: boolean;
 }) {
   const isKin = language === 'KIN';
   const isHtmlExercise = !lesson.exercise_data?.starter_code;
@@ -102,6 +102,13 @@ function CodingLesson({ lesson, language, onComplete, completing }: {
   // Test cases
   const tests = lesson.exercise_data?.tests ?? [];
   const [testResults, setTestResults] = useState<Array<{ passed: boolean; actual: string }>>([]);
+
+  // Solution
+  const solution = lesson.exercise_data?.solution ?? null;
+  const [failedAttempts, setFailedAttempts] = useState(0);
+  const [showSolutionWarning, setShowSolutionWarning] = useState(false);
+  const [solutionRevealed, setSolutionRevealed] = useState(false);
+  const UNLOCK_AFTER = 3;
 
   // AI Tutor state
   const [aiOpen, setAiOpen] = useState(false);
@@ -156,6 +163,10 @@ function CodingLesson({ lesson, language, onComplete, completing }: {
           return { passed, actual };
         });
         setTestResults(results);
+        const allPassed = results.every(r => r.passed);
+        if (!allPassed || result.error) setFailedAttempts(n => n + 1);
+      } else if (result.error) {
+        setFailedAttempts(n => n + 1);
       }
 
       setRunning(false);
@@ -349,6 +360,78 @@ function CodingLesson({ lesson, language, onComplete, completing }: {
         </>
       )}
 
+      {/* See Solution */}
+      {solution && failedAttempts >= UNLOCK_AFTER && (
+        <div>
+          {!solutionRevealed ? (
+            <button
+              onClick={() => setShowSolutionWarning(true)}
+              className="flex items-center gap-2 text-sm font-semibold transition-all"
+              style={{ color: 'var(--ec-text-6)' }}
+              onMouseEnter={e => (e.currentTarget.style.color = '#f87171')}
+              onMouseLeave={e => (e.currentTarget.style.color = 'var(--ec-text-6)')}
+            >
+              🔓 {isKin ? `Reba igisubizo (nyuma y'igerageza ${UNLOCK_AFTER})` : `See solution (after ${UNLOCK_AFTER} attempts)`}
+            </button>
+          ) : (
+            <div className="rounded-xl overflow-hidden" style={{ border: '1px solid rgba(239,68,68,0.25)' }}>
+              <div className="px-4 py-2.5 flex items-center gap-2"
+                style={{ background: 'rgba(239,68,68,0.06)', borderBottom: '1px solid rgba(239,68,68,0.15)' }}>
+                <span className="text-sm font-semibold" style={{ color: '#f87171' }}>
+                  {isKin ? '💡 Igisubizo — XP ntizahabwa' : '💡 Solution — no XP awarded'}
+                </span>
+              </div>
+              <CodeMirror
+                value={solution}
+                theme={vscodeDark}
+                extensions={[javascript()]}
+                editable={false}
+                basicSetup={{ lineNumbers: true, highlightActiveLine: false, foldGutter: false }}
+                style={{ fontSize: '13px' }}
+              />
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Solution warning modal */}
+      {showSolutionWarning && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }}>
+          <div className="w-full max-w-sm rounded-2xl p-6"
+            style={{ background: 'var(--ec-surface)', border: '1px solid var(--ec-b2)' }}>
+            <h3 className="text-base font-bold mb-2" style={{ color: 'var(--ec-text-1)' }}>
+              {isKin ? 'Urashaka kureba igisubizo?' : 'View the solution?'}
+            </h3>
+            <p className="text-sm mb-5" style={{ color: 'var(--ec-text-6)' }}>
+              {isKin
+                ? 'Niba ureba igisubizo, ntuzahabwa XP kuri iri somo. Biragushishikariza kwiga ariko ntibigusiba iterambere ryawe.'
+                : 'Viewing the solution means no XP for this lesson. It\'s still encouraged to learn from it — your progress is not lost.'}
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowSolutionWarning(false)}
+                className="flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all"
+                style={{ background: 'var(--ec-b3)', color: 'var(--ec-text-4)', border: '1px solid var(--ec-b2)' }}
+                onMouseEnter={e => (e.currentTarget.style.background = 'var(--ec-b2)')}
+                onMouseLeave={e => (e.currentTarget.style.background = 'var(--ec-b3)')}
+              >
+                {isKin ? 'Subira inyuma' : 'Go back'}
+              </button>
+              <button
+                onClick={() => { setSolutionRevealed(true); setShowSolutionWarning(false); }}
+                className="flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all"
+                style={{ background: 'rgba(239,68,68,0.1)', color: '#f87171', border: '1px solid rgba(239,68,68,0.25)' }}
+                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(239,68,68,0.2)')}
+                onMouseLeave={e => (e.currentTarget.style.background = 'rgba(239,68,68,0.1)')}
+              >
+                {isKin ? 'Yego, reba igisubizo' : 'Yes, show solution'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* AI Tutor */}
       <div className="rounded-xl overflow-hidden" style={{ border: '1px solid rgba(139,92,246,0.25)' }}>
         <button
@@ -464,7 +547,9 @@ function CodingLesson({ lesson, language, onComplete, completing }: {
             onMouseEnter={e => { if (!completing) (e.currentTarget as HTMLButtonElement).style.background = '#00bfa0'; }}
             onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = '#00d4aa'; }}>
             {completing ? <Loader size={16} className="animate-spin" /> : <CheckCircle size={16} />}
-            {isKin ? 'Rangiza Isomo' : 'Complete Lesson'}
+            {solutionRevealed
+              ? (isKin ? 'Rangiza Isomo (nta XP)' : 'Complete Lesson (no XP)')
+              : (isKin ? 'Rangiza Isomo' : 'Complete Lesson')}
           </button>
         );
       })()}
@@ -573,9 +658,9 @@ export default function LessonViewer({ lesson, courseTitle, language, nextLesson
     quiz:    { icon: <HelpCircle size={13} />,label: isKin ? 'Ibibazo (Quiz)' : 'Quiz', color: '#8b5cf6', bg: 'rgba(139,92,246,0.1)',  border: 'rgba(139,92,246,0.2)' },
   }[lesson.lesson_type];
 
-  const handleComplete = async (score?: number) => {
+  const handleComplete = async (score?: number, usedSolution?: boolean) => {
     setCompleting(true);
-    await completeLesson(lesson.id, score);
+    await completeLesson(lesson.id, score, usedSolution ? 0 : undefined);
     setDone(true);
     setCompleting(false);
   };
@@ -661,7 +746,7 @@ export default function LessonViewer({ lesson, courseTitle, language, nextLesson
           <ReadingLesson lesson={lesson} language={language} onComplete={() => handleComplete()} completing={completing} />
         )}
         {lesson.lesson_type === 'coding' && (
-          <CodingLesson lesson={lesson} language={language} onComplete={() => handleComplete()} completing={completing} />
+          <CodingLesson lesson={lesson} language={language} onComplete={(usedSolution) => handleComplete(undefined, usedSolution)} completing={completing} />
         )}
         {lesson.lesson_type === 'quiz' && (
           <QuizLesson lesson={lesson} language={language} onComplete={(s) => handleComplete(s)} completing={completing} />
