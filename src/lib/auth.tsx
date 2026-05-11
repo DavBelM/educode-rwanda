@@ -60,13 +60,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Safety timeout — never hang forever if Supabase is unreachable
     const timeout = setTimeout(() => setLoading(false), 5000);
 
+    async function loadProfile(user: import('@supabase/supabase-js').User) {
+      const base = buildProfileFromUser(user);
+      const { data } = await supabase
+        .from('profiles')
+        .select('xp_points, streak_days')
+        .eq('id', user.id)
+        .maybeSingle();
+      setProfile({
+        ...base,
+        xp_points: data?.xp_points ?? 0,
+        streak_days: data?.streak_days ?? 0,
+      });
+    }
+
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       clearTimeout(timeout);
       setSession(session);
       setUser(session?.user ?? null);
-      if (session?.user) setProfile(buildProfileFromUser(session.user));
-      setLoading(false);
+      if (session?.user) loadProfile(session.user).finally(() => setLoading(false));
+      else setLoading(false);
     });
 
     // Listen for auth changes (login, logout, token refresh, password recovery)
@@ -75,7 +89,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setSession(session);
         setUser(session?.user ?? null);
         if (session?.user) {
-          setProfile(buildProfileFromUser(session.user));
+          loadProfile(session.user);
         } else {
           setProfile(null);
         }
