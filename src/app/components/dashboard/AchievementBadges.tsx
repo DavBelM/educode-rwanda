@@ -26,10 +26,10 @@ export function AchievementBadges({ language, badges }: AchievementBadgesProps) 
     }}>
       <div className="flex items-center justify-between mb-5">
         <p className="font-semibold" style={{ fontFamily: 'Inter, sans-serif', color: '#94a3b8', letterSpacing: '0.05em', textTransform: 'uppercase', fontSize: '13px' }}>
-          {isKinyarwanda ? 'Ibihembo' : 'Achievements'}
+          {isKinyarwanda ? 'Ibihembo (Achievements)' : 'Achievements'}
         </p>
         <button className="text-sm font-semibold" style={{ color: '#00d4aa', fontFamily: 'Inter, sans-serif' }}>
-          {isKinyarwanda ? 'Reba Byose' : 'View all'} →
+          {isKinyarwanda ? 'Reba byose' : 'View all'} →
         </button>
       </div>
 

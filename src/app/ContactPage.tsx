@@ -26,30 +26,30 @@ export default function ContactPage() {
 
   const faqs = [
     {
-      question: isKinyarwanda ? 'Ese nshobora guhindura ijambo ryibanga?' : 'How do I reset my password?',
+      question: isKinyarwanda ? 'Ni gute nahindura ijambo ryanjye ry\'ibanga?' : 'How do I reset my password?',
       answer: isKinyarwanda
         ? 'Kanda "Wibagiwe ijambo ryibanga?" ku rupapuro rwo kwinjira, hanyuma ukurikire amabwiriza.'
         : 'Click "Forgot Password?" on the login page and follow the instructions.',
       link: '#'
     },
     {
-      question: isKinyarwanda ? 'Bigutwara amafaranga angahe?' : 'How much does it cost?',
+      question: isKinyarwanda ? 'Bigura amafaranga angahe?' : 'How much does it cost?',
       answer: isKinyarwanda
-        ? 'Kubusa kugirango utangire hamwe n\'imishinga 5. Premium ni RWF 2,000/ukwezi.'
+        ? 'Ni ubuntu ku mikoro 5 ya mbere. Premium ni 2,000 RWF ku kwezi.'
         : 'Free to start with 5 assignments. Premium is RWF 2,000/month.',
       link: '#pricing'
     },
     {
-      question: isKinyarwanda ? 'Mutanga amashuri ibiciro bidasanzwe?' : 'Do you offer school discounts?',
+      question: isKinyarwanda ? 'Hari igabanyirizwa muha amashuri?' : 'Do you offer school discounts?',
       answer: isKinyarwanda
-        ? 'Yego! Amashuri abona trial y\'amezi 3 kubusa. Saba demo.'
+        ? 'Yego! Amashuri ahabwa amezi 3 y\'igerageza ku buntu. Saba demo.'
         : 'Yes! Schools get a 3-month free trial. Request a demo.',
       link: '#schools'
     },
     {
-      question: isKinyarwanda ? 'Nshobora kubikoresha offline?' : 'Can I use it offline?',
+      question: isKinyarwanda ? 'Nshobora kuyikoresha nta interineti ihari?' : 'Can I use it offline?',
       answer: isKinyarwanda
-        ? 'Yego! Kora code offline, sync iyo uhuye na interineti.'
+        ? 'Yego! Andika code nawe udafite interineti, amakuru azajyaho neza nuyihuza na interineti.'
         : 'Yes! Code offline and sync when you connect.',
       link: '#features'
     }
@@ -99,7 +99,7 @@ export default function ContactPage() {
             {/* Left Side - Contact Info */}
             <div className="lg:col-span-2 bg-gradient-to-br from-[#0ea5e9] to-[#8b5cf6] rounded-2xl p-8 text-white">
               <h1 className="text-3xl font-bold mb-2">
-                {isKinyarwanda ? 'Duhamagare' : 'Get in Touch'}
+                {isKinyarwanda ? 'Twandikire' : 'Get in Touch'}
               </h1>
               <p className="text-blue-100 mb-8">
                 {isKinyarwanda
@@ -276,7 +276,7 @@ export default function ContactPage() {
                       <option value="">{isKinyarwanda ? 'Hitamo' : 'Select'}</option>
                       <option value="student">{isKinyarwanda ? 'Umunyeshuri' : 'Student'}</option>
                       <option value="teacher">{isKinyarwanda ? 'Umwarimu' : 'Teacher'}</option>
-                      <option value="school">{isKinyarwanda ? 'Ishuri' : 'School Admin'}</option>
+                      <option value="school">{isKinyarwanda ? 'Umuyobozi w\'ishuri' : 'School Admin'}</option>
                       <option value="other">{isKinyarwanda ? 'Ikindi' : 'Other'}</option>
                     </select>
                   </div>
@@ -284,13 +284,13 @@ export default function ContactPage() {
                   {/* Subject */}
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      {isKinyarwanda ? 'Ikibazo' : 'Subject'} *
+                      {isKinyarwanda ? 'Icyo wandikira' : 'Subject'} *
                     </label>
                     <input
                       type="text"
                       value={formData.subject}
                       onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                      placeholder={isKinyarwanda ? 'Ikibazo cy\'ubutumwa bwawe' : 'Subject of your message'}
+                      placeholder={isKinyarwanda ? 'Umutwe w\'ubutumwa bwawe' : 'Subject of your message'}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]"
                       required
                     />
@@ -304,7 +304,7 @@ export default function ContactPage() {
                     <textarea
                       value={formData.message}
                       onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                      placeholder={isKinyarwanda ? 'Tubare uburyo dushobora gufasha...' : 'Tell us how we can help...'}
+                      placeholder={isKinyarwanda ? 'Tubwire uburyo twagufashamo...' : 'Tell us how we can help...'}
                       rows={6}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0ea5e9] resize-none"
                       required
@@ -330,7 +330,7 @@ export default function ContactPage() {
                   {/* Response Time */}
                   <p className="text-sm text-gray-500 text-center">
                     {isKinyarwanda
-                      ? 'Mubisanzwe tusubiza mu gihe cy\'amasaha 24'
+                      ? 'Mubisanzwe dusubiza mu masaha 24'
                       : 'We typically respond within 24 hours'}
                   </p>
                 </form>

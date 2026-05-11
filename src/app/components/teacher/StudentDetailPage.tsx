@@ -23,7 +23,7 @@ export function StudentDetailPage({ language, onBack }: StudentDetailPageProps) 
   const studentData = {
     name: 'Jean Mugisha',
     email: 'jean.mugisha@student.rw',
-    joinDate: isKinyarwanda ? 'Mutarama 15, 2026' : 'January 15, 2026',
+    joinDate: isKinyarwanda ? '15 Mutarama 2026' : 'January 15, 2026',
     lastActive: isKinyarwanda ? 'Ejo' : 'Yesterday',
     level: 'Beginner II',
     xpPoints: 1240,
@@ -39,7 +39,7 @@ export function StudentDetailPage({ language, onBack }: StudentDetailPageProps) 
     {
       id: '1',
       title: isKinyarwanda ? 'Conditional Statements' : 'Conditional Statements',
-      submittedDate: isKinyarwanda ? 'Ukwakira 3, 2026' : 'April 3, 2026',
+      submittedDate: isKinyarwanda ? '3 Mata 2026' : 'April 3, 2026',
       grade: 100,
       testsPassedCount: 5,
       testsTotalCount: 5,
@@ -48,7 +48,7 @@ export function StudentDetailPage({ language, onBack }: StudentDetailPageProps) 
     },
     {
       id: '2',
-      title: isKinyarwanda ? 'Functions & Returns' : 'Functions & Returns',
+      title: isKinyarwanda ? 'Functions na Returns' : 'Functions & Returns',
       submittedDate: isKinyarwanda ? 'Werurwe 28, 2026' : 'March 28, 2026',
       grade: 80,
       testsPassedCount: 4,
@@ -68,8 +68,8 @@ export function StudentDetailPage({ language, onBack }: StudentDetailPageProps) 
     },
     {
       id: '4',
-      title: isKinyarwanda ? 'Variables Practice' : 'Variables Practice',
-      submittedDate: isKinyarwanda ? 'Werurwe 20, 2026' : 'March 20, 2026',
+      title: isKinyarwanda ? 'Kwitoza Variables' : 'Variables Practice',
+      submittedDate: isKinyarwanda ? '20 Werurwe 2026' : 'March 20, 2026',
       grade: 85,
       testsPassedCount: 5,
       testsTotalCount: 5,
@@ -104,19 +104,19 @@ export function StudentDetailPage({ language, onBack }: StudentDetailPageProps) 
     {
       type: 'alert',
       title: isKinyarwanda ? 'Akenera ubufasha kuri Loops' : 'Needs help with Loops',
-      description: isKinyarwanda ? 'Yakoze ibigeragezo 3 ariko akanangwa ku bizamini bimwe na bimwe' : 'Has attempted 3 times but struggles with same tests',
+      description: isKinyarwanda ? 'Yagerageje inshuro 3 ariko akomeza kunanirwa amagerageza amwe' : 'Has attempted 3 times but struggles with same tests',
       priority: 'high'
     },
     {
       type: 'success',
-      title: isKinyarwanda ? 'Ateye imbere kuri Conditionals' : 'Excelling at Conditionals',
-      description: isKinyarwanda ? 'Yarangije byose neza ku mushinga wa nyuma' : 'Perfect score on last assignment',
+      title: isKinyarwanda ? 'Akora neza cyane kuri Conditionals' : 'Excelling at Conditionals',
+      description: isKinyarwanda ? 'Yabonye amanota yose ku mukoro uheruka' : 'Perfect score on last assignment',
       priority: 'low'
     },
     {
       type: 'info',
-      title: isKinyarwanda ? 'Umwanya w\'igihe uri neza' : 'Good time management',
-      description: isKinyarwanda ? 'Ikigereranyo cy\'igihe cyo kurangiza ni munsi y\'ikigereranyo cy\'ishuri' : 'Average completion time below class average',
+      title: isKinyarwanda ? 'Akoresha neza igihe cye' : 'Good time management',
+      description: isKinyarwanda ? 'Ikigereranyo cy\'igihe akoresha ni gito ugereranyije n\'ishuri ryose' : 'Average completion time below class average',
       priority: 'medium'
     }
   ];
@@ -152,7 +152,7 @@ export function StudentDetailPage({ language, onBack }: StudentDetailPageProps) 
           className="flex items-center gap-2 text-[#10b981] font-semibold mb-6 hover:underline"
         >
           <ArrowLeft className="w-5 h-5" />
-          {isKinyarwanda ? 'Subira ku banyeshuri bose' : 'Back to All Students'}
+          {isKinyarwanda ? 'Garuka ku rutonde rw\'abanyeshuri bose' : 'Back to All Students'}
         </button>
 
         {/* Header Section */}
@@ -173,11 +173,11 @@ export function StudentDetailPage({ language, onBack }: StudentDetailPageProps) 
                 </div>
                 <div className="flex items-center gap-2">
                   <Calendar className="w-4 h-4" />
-                  {isKinyarwanda ? 'Yinjiye:' : 'Joined:'} {studentData.joinDate}
+                  {isKinyarwanda ? 'Yinjiye ku itariki ya:' : 'Joined:'} {studentData.joinDate}
                 </div>
                 <div className="flex items-center gap-2">
                   <Clock className="w-4 h-4" />
-                  {isKinyarwanda ? 'Igikorwa cya nyuma:' : 'Last active:'} {studentData.lastActive}
+                  {isKinyarwanda ? 'Yaherukaga gukoresha platform:' : 'Last active:'} {studentData.lastActive}
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -198,7 +198,7 @@ export function StudentDetailPage({ language, onBack }: StudentDetailPageProps) 
               </button>
               <button className="px-4 py-2 bg-white text-[#10b981] border-2 border-[#10b981] rounded-lg font-semibold hover:bg-green-50 transition-all flex items-center justify-center gap-2">
                 <Video className="w-4 h-4" />
-                {isKinyarwanda ? 'Shiraho Inama' : 'Schedule Meeting'}
+                {isKinyarwanda ? 'Shiraho igihe cy\'inama' : 'Schedule Meeting'}
               </button>
             </div>
           </div>
@@ -237,7 +237,7 @@ export function StudentDetailPage({ language, onBack }: StudentDetailPageProps) 
               <BookOpen className="w-6 h-6 text-[#8b5cf6]" />
             </div>
             <div className="text-3xl font-bold text-[#1e293b] mb-1">#{studentData.classRank}</div>
-            <div className="text-sm text-gray-600">{isKinyarwanda ? 'Ku ishuri' : 'Class Rank'}</div>
+            <div className="text-sm text-gray-600">{isKinyarwanda ? 'Umwanya mu ishuri' : 'Class Rank'}</div>
             <div className="text-xs text-gray-500 mt-2">
               {isKinyarwanda ? 'kuri' : 'of'} {studentData.totalStudents} {isKinyarwanda ? 'abanyeshuri' : 'students'}
             </div>
@@ -248,9 +248,9 @@ export function StudentDetailPage({ language, onBack }: StudentDetailPageProps) 
               <Clock className="w-4 h-4 text-[#f59e0b]" />
             </div>
             <div className="text-3xl font-bold text-[#1e293b] mb-1">{studentData.currentStreak}</div>
-            <div className="text-sm text-gray-600">{isKinyarwanda ? 'Iminsi ikurikirana' : 'Day Streak'}</div>
+            <div className="text-sm text-gray-600">{isKinyarwanda ? 'Iminsi ukurikirana' : 'Day Streak'}</div>
             <div className="text-xs text-gray-500 mt-2">
-              {isKinyarwanda ? 'Arakora buri munsi' : 'Coding daily'}
+              {isKinyarwanda ? 'Akora code buri munsi' : 'Coding daily'}
             </div>
           </div>
         </div>
@@ -263,7 +263,7 @@ export function StudentDetailPage({ language, onBack }: StudentDetailPageProps) 
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
               <h2 className="text-xl font-bold text-[#1e293b] mb-6 flex items-center gap-2">
                 <TrendingUp className="w-5 h-5 text-[#10b981]" />
-                {isKinyarwanda ? 'Iterambere ry\'ibyumweru' : 'Weekly Progress'}
+                {isKinyarwanda ? 'Iterambere ry\'icyumweru' : 'Weekly Progress'}
               </h2>
 
               <div className="h-64 flex items-end justify-between gap-6">
@@ -288,7 +288,7 @@ export function StudentDetailPage({ language, onBack }: StudentDetailPageProps) 
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
               <h2 className="text-xl font-bold text-[#1e293b] mb-6 flex items-center gap-2">
                 <Target className="w-5 h-5 text-[#10b981]" />
-                {isKinyarwanda ? 'Ubumenyi' : 'Skills Breakdown'}
+                {isKinyarwanda ? 'Inshamake y\'ubumenyi' : 'Skills Breakdown'}
               </h2>
 
               <div className="space-y-4">
@@ -323,7 +323,7 @@ export function StudentDetailPage({ language, onBack }: StudentDetailPageProps) 
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
               <h2 className="text-xl font-bold text-[#1e293b] mb-6 flex items-center gap-2">
                 <FileText className="w-5 h-5 text-[#10b981]" />
-                {isKinyarwanda ? 'Amateka y\'imishinga' : 'Assignment History'}
+                {isKinyarwanda ? 'Amateka y\'imikoro yose' : 'Assignment History'}
               </h2>
 
               <div className="overflow-x-auto">
@@ -340,7 +340,7 @@ export function StudentDetailPage({ language, onBack }: StudentDetailPageProps) 
                         {isKinyarwanda ? 'Amanota' : 'Grade'}
                       </th>
                       <th className="text-left py-3 px-2 text-sm font-semibold text-gray-700">
-                        {isKinyarwanda ? 'Ibizamini' : 'Tests'}
+                        {isKinyarwanda ? 'Amagerageza' : 'Tests'}
                       </th>
                       <th className="text-left py-3 px-2 text-sm font-semibold text-gray-700">
                         {isKinyarwanda ? 'Igihe' : 'Time'}
@@ -383,7 +383,7 @@ export function StudentDetailPage({ language, onBack }: StudentDetailPageProps) 
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
               <h2 className="text-xl font-bold text-[#1e293b] mb-6 flex items-center gap-2">
                 <AlertCircle className="w-5 h-5 text-[#8b5cf6]" />
-                {isKinyarwanda ? 'Inama z\'AI' : 'AI Insights'}
+                {isKinyarwanda ? 'Inama za AI' : 'AI Insights'}
               </h2>
 
               <div className="space-y-4">

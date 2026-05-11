@@ -43,7 +43,7 @@ export function AssignmentManagementPage({ language }: AssignmentManagementPageP
       id: '2',
       title: isKinyarwanda ? 'Imyitozo ya Loops' : 'Loops Practice',
       difficulty: 'Intermediate',
-      dueDate: isKinyarwanda ? 'Ukwakira 10, 2026' : 'April 10, 2026',
+      dueDate: isKinyarwanda ? '10 Mata 2026' : 'April 10, 2026',
       status: 'active',
       studentsCompleted: 25,
       studentsTotal: 52,
@@ -53,7 +53,7 @@ export function AssignmentManagementPage({ language }: AssignmentManagementPageP
     },
     {
       id: '3',
-      title: isKinyarwanda ? 'Functions n\'Arrays' : 'Functions & Arrays',
+      title: isKinyarwanda ? 'Functions na Arrays' : 'Functions & Arrays',
       difficulty: 'Intermediate',
       dueDate: isKinyarwanda ? 'Ukwakira 15, 2026' : 'April 15, 2026',
       status: 'upcoming',
@@ -153,10 +153,10 @@ export function AssignmentManagementPage({ language }: AssignmentManagementPageP
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
           <div>
             <h1 className="text-3xl font-bold text-[#1e293b] mb-2">
-              {isKinyarwanda ? 'Gucunga Imishinga' : 'Assignment Management'}
+              {isKinyarwanda ? 'Gucunga imikoro' : 'Assignment Management'}
             </h1>
             <p className="text-gray-600">
-              {isKinyarwanda ? 'Kora, guhindura, no gucunga imishinga yose' : 'Create, edit, and manage all assignments'}
+              {isKinyarwanda ? 'Kora, hindura, kandi ugenzure imikoro yose' : 'Create, edit, and manage all assignments'}
             </p>
           </div>
           <button
@@ -164,7 +164,7 @@ export function AssignmentManagementPage({ language }: AssignmentManagementPageP
             className="px-6 py-3 bg-[#10b981] text-white rounded-lg font-semibold hover:bg-[#059669] transition-all flex items-center justify-center gap-2 shadow-md"
           >
             <Plus className="w-5 h-5" />
-            {isKinyarwanda ? 'Umushinga Mushya' : 'New Assignment'}
+            {isKinyarwanda ? 'Umukoro mushya' : 'New Assignment'}
           </button>
         </div>
 
@@ -172,10 +172,10 @@ export function AssignmentManagementPage({ language }: AssignmentManagementPageP
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
           {[
             { label: isKinyarwanda ? 'Byose' : 'All', count: statusCounts.all, color: 'gray' },
-            { label: isKinyarwanda ? 'Kirakora' : 'Active', count: statusCounts.active, color: 'blue' },
-            { label: isKinyarwanda ? 'Bizaza' : 'Upcoming', count: statusCounts.upcoming, color: 'purple' },
+            { label: isKinyarwanda ? 'Irimo gukora' : 'Active', count: statusCounts.active, color: 'blue' },
+            { label: isKinyarwanda ? 'Izaza' : 'Upcoming', count: statusCounts.upcoming, color: 'purple' },
             { label: isKinyarwanda ? 'Byarangiye' : 'Completed', count: statusCounts.completed, color: 'green' },
-            { label: isKinyarwanda ? 'Igishushanyo' : 'Draft', count: statusCounts.draft, color: 'gray' }
+            { label: isKinyarwanda ? 'Umushinga w\'agateganyo (Draft)' : 'Draft', count: statusCounts.draft, color: 'gray' }
           ].map((stat, index) => (
             <div key={index} className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
               <div className="text-2xl font-bold text-[#1e293b] mb-1">{stat.count}</div>
@@ -203,10 +203,10 @@ export function AssignmentManagementPage({ language }: AssignmentManagementPageP
             <div className="flex gap-2 flex-wrap">
               {[
                 { id: 'all', label: isKinyarwanda ? 'Byose' : 'All' },
-                { id: 'active', label: isKinyarwanda ? 'Kirakora' : 'Active' },
-                { id: 'upcoming', label: isKinyarwanda ? 'Bizaza' : 'Upcoming' },
+                { id: 'active', label: isKinyarwanda ? 'Irimo gukora' : 'Active' },
+                { id: 'upcoming', label: isKinyarwanda ? 'Izaza' : 'Upcoming' },
                 { id: 'completed', label: isKinyarwanda ? 'Byarangiye' : 'Completed' },
-                { id: 'draft', label: isKinyarwanda ? 'Igishushanyo' : 'Draft' }
+                { id: 'draft', label: isKinyarwanda ? 'Umushinga w\'agateganyo (Draft)' : 'Draft' }
               ].map((filter) => (
                 <button
                   key={filter.id}
@@ -228,16 +228,16 @@ export function AssignmentManagementPage({ language }: AssignmentManagementPageP
         {selectedAssignments.length > 0 && (
           <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6 flex items-center justify-between">
             <span className="text-sm font-semibold text-[#0ea5e9]">
-              {selectedAssignments.length} {isKinyarwanda ? 'imishinga yatoranyijwe' : 'assignments selected'}
+              {selectedAssignments.length} {isKinyarwanda ? 'imikoro yatoranyijwe' : 'assignments selected'}
             </span>
             <div className="flex gap-2">
               <button className="px-4 py-2 bg-white text-[#0ea5e9] border border-blue-300 rounded-lg font-semibold hover:bg-blue-50 transition-all flex items-center gap-2">
                 <Copy className="w-4 h-4" />
-                {isKinyarwanda ? 'Guhuza' : 'Duplicate'}
+                {isKinyarwanda ? 'Gukora kopi (Duplicate)' : 'Duplicate'}
               </button>
               <button className="px-4 py-2 bg-white text-gray-700 border border-gray-300 rounded-lg font-semibold hover:bg-gray-50 transition-all flex items-center gap-2">
                 <Archive className="w-4 h-4" />
-                {isKinyarwanda ? 'Kubika' : 'Archive'}
+                {isKinyarwanda ? 'Kubika (Archive)' : 'Archive'}
               </button>
               <button className="px-4 py-2 bg-white text-[#ef4444] border border-red-300 rounded-lg font-semibold hover:bg-red-50 transition-all flex items-center gap-2">
                 <Trash2 className="w-4 h-4" />
@@ -265,10 +265,10 @@ export function AssignmentManagementPage({ language }: AssignmentManagementPageP
                     {isKinyarwanda ? 'Umushinga' : 'Assignment'}
                   </th>
                   <th className="text-left py-4 px-4 text-sm font-semibold text-gray-700">
-                    {isKinyarwanda ? 'Uko bigoye' : 'Difficulty'}
+                    {isKinyarwanda ? 'Urwego rw’ingorabahizi' : 'Difficulty'}
                   </th>
                   <th className="text-left py-4 px-4 text-sm font-semibold text-gray-700">
-                    {isKinyarwanda ? 'Itariki' : 'Due Date'}
+                    {isKinyarwanda ? 'Itariki ntarengwa' : 'Due Date'}
                   </th>
                   <th className="text-left py-4 px-4 text-sm font-semibold text-gray-700">
                     {isKinyarwanda ? 'Uko bimeze' : 'Status'}
@@ -277,7 +277,7 @@ export function AssignmentManagementPage({ language }: AssignmentManagementPageP
                     {isKinyarwanda ? 'Iterambere' : 'Progress'}
                   </th>
                   <th className="text-left py-4 px-4 text-sm font-semibold text-gray-700">
-                    {isKinyarwanda ? 'Amanota' : 'Avg Grade'}
+                    {isKinyarwanda ? 'Amanota y\'ikigereranyo' : 'Avg Grade'}
                   </th>
                   <th className="text-left py-4 px-4 text-sm font-semibold text-gray-700">
                     {isKinyarwanda ? 'Ibikorwa' : 'Actions'}
@@ -362,10 +362,10 @@ export function AssignmentManagementPage({ language }: AssignmentManagementPageP
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
             <FileText className="w-16 h-16 text-gray-300 mx-auto mb-4" />
             <h3 className="text-xl font-bold text-gray-700 mb-2">
-              {isKinyarwanda ? 'Nta mushinga uboneka' : 'No assignments found'}
+              {isKinyarwanda ? 'Nta mikoro yabonetse' : 'No assignments found'}
             </h3>
             <p className="text-gray-500 mb-6">
-              {isKinyarwanda ? 'Gerageza guhindura amakosa yawe' : 'Try adjusting your filters or search query'}
+              {isKinyarwanda ? 'Gerageza guhindura uko wayunguruye cyangwa ibyo washakishije' : 'Try adjusting your filters or search query'}
             </p>
             <button
               onClick={() => {
@@ -374,7 +374,7 @@ export function AssignmentManagementPage({ language }: AssignmentManagementPageP
               }}
               className="px-6 py-2 bg-[#10b981] text-white rounded-lg font-semibold hover:bg-[#059669] transition-all"
             >
-              {isKinyarwanda ? 'Gusubira' : 'Reset Filters'}
+              {isKinyarwanda ? 'Gusubiza uko byari bimeze' : 'Reset Filters'}
             </button>
           </div>
         )}

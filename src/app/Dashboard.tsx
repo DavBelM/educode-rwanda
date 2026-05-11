@@ -38,14 +38,14 @@ function JoinClassModal({ language, onClose, onJoined }: {
 
     const { data: cls, error: lookupError } = await getClassWithInviteCode(code.trim());
     if (lookupError || !cls) {
-      setError(isKin ? 'Kode ntabwo ibonetse. Reba neza.' : 'Code not found. Check with your teacher.');
+      setError(isKin ? 'Kode ntabwo ibonetse. Baza umwarimu wawe.' : 'Code not found. Check with your teacher.');
       setLoading(false);
       return;
     }
 
     const { error: joinError } = await joinClass(cls.id);
     if (joinError === 'already_enrolled') {
-      setError(isKin ? 'Usanzwe uri muri iryo somo.' : 'You are already in this class.');
+      setError(isKin ? 'Usanzwe uri muri iri somo.' : 'You are already in this class.');
       setLoading(false);
       return;
     }
@@ -63,7 +63,7 @@ function JoinClassModal({ language, onClose, onJoined }: {
       <div className="w-full max-w-sm rounded-2xl p-6" style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.08)', fontFamily: 'Inter, sans-serif' }}>
         <div className="flex items-center justify-between mb-5">
           <h2 className="text-base font-bold" style={{ color: '#f1f5f9' }}>
-            {isKin ? 'Injira mu Isomo' : 'Join a Class'}
+            {isKin ? 'Injira mu Ishuri' : 'Join a Class'}
           </h2>
           <button onClick={onClose} style={{ color: '#475569' }} onMouseEnter={e => (e.currentTarget.style.color = '#94a3b8')} onMouseLeave={e => (e.currentTarget.style.color = '#475569')}>
             <X size={18} />
@@ -104,7 +104,7 @@ function JoinClassModal({ language, onClose, onJoined }: {
           onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = '#00d4aa'; }}
         >
           {loading ? <Loader size={16} className="animate-spin" /> : (
-            <>{isKin ? 'Injira' : 'Join Class'} <ArrowRight size={14} /></>
+            <>{isKin ? 'Injira mu Ishuri' : 'Join Class'} <ArrowRight size={14} /></>
           )}
         </button>
       </div>
@@ -181,12 +181,12 @@ export default function Dashboard({ language, onLanguageChange, onStartCoding, o
     const daysLeft = diffMs !== null ? Math.ceil(diffMs / 86400000) : null;
 
     let dueStatus: 'submitted' | 'due-soon' | 'overdue' = 'due-soon';
-    let dueText = isKinyarwanda ? 'Nta itariki' : 'No due date';
+    let dueText = isKinyarwanda ? 'Nta tariki ntarengwa' : 'No due date';
 
     if (due) {
       if (daysLeft !== null && daysLeft < 0) {
         dueStatus = 'overdue';
-        dueText = isKinyarwanda ? 'Yarangirije' : 'Overdue';
+        dueText = isKinyarwanda ? 'Igihe cyarenze' : 'Overdue';
       } else if (daysLeft !== null && daysLeft <= 3) {
         dueStatus = 'due-soon';
         dueText = isKinyarwanda ? `Iminsi ${daysLeft} isigaye` : `Due in ${daysLeft} day${daysLeft !== 1 ? 's' : ''}`;
@@ -246,7 +246,7 @@ export default function Dashboard({ language, onLanguageChange, onStartCoding, o
 
     if (total === 0) {
       result.push({ isPositive: false, text: isKinyarwanda
-        ? 'Nta mishinga urafite. Injira mu ishuri kugirango utangire.'
+        ? 'Nta mikoro ufite ubu. Injira mu ishuri kugirango utangire.'
         : 'No assignments yet. Join a class to get started.' });
       return result;
     }
@@ -261,7 +261,7 @@ export default function Dashboard({ language, onLanguageChange, onStartCoding, o
         : `You've submitted all ${total} assignments! Keep it up! 🎉` });
     } else {
       result.push({ isPositive: true, text: isKinyarwanda
-        ? `Watanze ${submitted} mu ${total} mishinga. Ufite ${pending} isigaye.`
+        ? `Watanze imikoro ${submitted} kuri ${total}. Ufite ${pending} isigaye.`
         : `Submitted ${submitted} of ${total} assignments — ${pending} still pending.` });
     }
 
@@ -278,7 +278,7 @@ export default function Dashboard({ language, onLanguageChange, onStartCoding, o
           : `Excellent scores — you're averaging ${progressPct}% overall! 🌟` });
       } else if (progressPct >= 50) {
         result.push({ isPositive: false, text: isKinyarwanda
-          ? `Ugeraho ${progressPct}% ku bisubizo byawe. Kongera gusuzuma ibyo usomye.`
+          ? `Ufite amanota ${progressPct}% ku mikoro yahawe amanota. Reba ibitekerezo by'umwarimu ngo ubashe kwikosora.`
           : `Scoring ${progressPct}% on graded work. Review feedback to improve.` });
       } else {
         result.push({ isPositive: false, text: isKinyarwanda
@@ -289,7 +289,7 @@ export default function Dashboard({ language, onLanguageChange, onStartCoding, o
 
     if (streak >= 3) {
       result.push({ isPositive: true, text: isKinyarwanda
-        ? `Iminsi ${streak} yo kwiga ukurikirana! Komeza! 🔥`
+        ? `Iminsi ${streak} ukurikirana wiga! Komeza utyo! 🔥`
         : `${streak}-day learning streak! Keep the momentum going! 🔥` });
     }
 
@@ -298,10 +298,10 @@ export default function Dashboard({ language, onLanguageChange, onStartCoding, o
 
   // Real badges derived from actual activity
   const badges = [
-    { id: '1', name: isKinyarwanda ? 'Umushinga wa mbere' : 'First Submit',  icon: 'award',  earned: submittedIds.size >= 1 },
+    { id: '1', name: isKinyarwanda ? 'Umukoro wa mbere' : 'First Submit',  icon: 'award',  earned: submittedIds.size >= 1 },
     { id: '2', name: isKinyarwanda ? `Iminsi ${streak}` : `${streak}d Streak`, icon: 'flame', earned: streak >= 1 },
     { id: '3', name: isKinyarwanda ? 'Amanota 10+' : '10+ XP',              icon: 'star',   earned: totalEarned >= 10 },
-    { id: '4', name: isKinyarwanda ? 'Igihembo cy\'Iterambere' : 'High Score', icon: 'trophy', earned: progressPct >= 80 },
+    { id: '4', name: isKinyarwanda ? 'Amanota yo hejuru' : 'High Score', icon: 'trophy', earned: progressPct >= 80 },
   ];
 
   return (
@@ -309,7 +309,7 @@ export default function Dashboard({ language, onLanguageChange, onStartCoding, o
       <Header
         language={language}
         onLanguageToggle={toggleLanguage}
-        subtitle={isKinyarwanda ? 'Ikibanza cy\'abanyeshuri' : 'Student Dashboard'}
+        subtitle={isKinyarwanda ? 'Dashboard y\'umunyeshuri' : 'Student Dashboard'}
         hideAssignmentInfo={true}
         announcementCount={announcements.length}
         onAnnouncementsClick={() => setShowAnnouncements(true)}
@@ -332,7 +332,7 @@ export default function Dashboard({ language, onLanguageChange, onStartCoding, o
                 <div className="flex items-center gap-2">
                   <Megaphone size={16} style={{ color: '#f59e0b' }} />
                   <h2 className="font-bold" style={{ color: '#f1f5f9', fontSize: '16px' }}>
-                    {isKinyarwanda ? 'Inyandiko z\'Umwarimu' : 'Announcements'}
+                    {isKinyarwanda ? 'Amatangazo' : 'Announcements'}
                   </h2>
                   {announcements.length > 0 && (
                     <span className="px-2 py-0.5 rounded-full text-xs font-semibold"
@@ -355,10 +355,10 @@ export default function Dashboard({ language, onLanguageChange, onStartCoding, o
                   <div className="py-10 text-center">
                     <Megaphone size={28} className="mx-auto mb-3" style={{ color: '#334155' }} />
                     <p className="font-medium" style={{ color: '#475569', fontSize: '15px' }}>
-                      {isKinyarwanda ? 'Nta nyandiko zihari ubu' : 'No announcements yet'}
+                      {isKinyarwanda ? 'Nta matangazo arahari' : 'No announcements yet'}
                     </p>
                     <p className="text-sm mt-1" style={{ color: '#334155' }}>
-                      {isKinyarwanda ? 'Umwarimu wawe azashyira hano amakuru' : 'Your teacher will post updates here'}
+                      {isKinyarwanda ? 'Umwarimu wawe azashyira amakuru mashya hano' : 'Your teacher will post updates here'}
                     </p>
                   </div>
                 ) : (
@@ -410,7 +410,7 @@ export default function Dashboard({ language, onLanguageChange, onStartCoding, o
             <div className="rounded-2xl p-6" style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.06)' }}>
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-lg font-bold" style={{ color: '#f1f5f9' }}>
-                  {isKinyarwanda ? 'Ibisabwa' : 'Active Assignments'}
+                  {isKinyarwanda ? 'Imikoro ihari ubu' : 'Active Assignments'}
                 </h2>
                 <div className="flex items-center gap-2">
                   <button
@@ -447,7 +447,7 @@ export default function Dashboard({ language, onLanguageChange, onStartCoding, o
                     onMouseLeave={e => (e.currentTarget.style.background = 'rgba(0,212,170,0.08)')}
                   >
                     <Users size={13} />
-                    {isKinyarwanda ? 'Injira mu Somo' : 'Join Class'}
+                    {isKinyarwanda ? 'Injira mu Ishuri' : 'Join Class'}
                   </button>
                 </div>
               </div>
@@ -467,7 +467,7 @@ export default function Dashboard({ language, onLanguageChange, onStartCoding, o
                   </p>
                   <p className="text-xs mb-5" style={{ color: '#334155' }}>
                     {isKinyarwanda
-                      ? 'Shyiramo kode wahawe n\'umwarimu wawe kugirango ubone imishinga.'
+                      ? 'Shyiramo kode wahawe n\'umwarimu wawe kugirango ubone imikoro yawe.'
                       : 'Enter the invite code from your teacher to see your assignments.'}
                   </p>
                   <button
@@ -484,7 +484,7 @@ export default function Dashboard({ language, onLanguageChange, onStartCoding, o
                 /* Enrolled but no assignments yet */
                 <div className="py-10 text-center">
                   <p className="text-sm" style={{ color: '#475569' }}>
-                    {isKinyarwanda ? 'Nta mishinga igeze uhawe n\'umwarimu' : 'No assignments from your teacher yet.'}
+                    {isKinyarwanda ? 'Nta mikoro urahabwa n\'umwarimu wawe.' : 'No assignments from your teacher yet.'}
                   </p>
                 </div>
               ) : (
@@ -511,11 +511,11 @@ export default function Dashboard({ language, onLanguageChange, onStartCoding, o
                   <Code2 size={16} style={{ color: '#a78bfa' }} />
                 </div>
                 <p className="text-sm font-bold" style={{ color: '#f1f5f9' }}>
-                  {isKinyarwanda ? 'Ushaka Kwimenyereza?' : 'Want to Practice?'}
+                  {isKinyarwanda ? 'Ushaka kwimenyereza?' : 'Want to Practice?'}
                 </p>
               </div>
               <p className="text-xs mb-3" style={{ color: '#64748b' }}>
-                {isKinyarwanda ? 'Fungura editor ubure imishinga — AI igufasha' : 'Open the editor freely — AI feedback included'}
+                {isKinyarwanda ? 'Fungura editor uko ushaka — AI izagufasha' : 'Open the editor freely — AI feedback included'}
               </p>
               <button
                 onClick={() => onStartCoding?.()}
@@ -539,7 +539,7 @@ export default function Dashboard({ language, onLanguageChange, onStartCoding, o
         <div className="flex items-center justify-around">
           {[
             { icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M3 9L12 2L21 9V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9Z" stroke="#00d4aa" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>, label: isKinyarwanda ? 'Ahabanza' : 'Home', active: true },
-            { icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="#475569" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>, label: isKinyarwanda ? 'Imishinga' : 'Assignments', active: false },
+            { icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="#475569" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>, label: isKinyarwanda ? 'Imikoro' : 'Assignments', active: false },
             { icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 15C15.866 15 19 11.866 19 8C19 4.13401 15.866 1 12 1C8.13401 1 5 4.13401 5 8C5 11.866 8.13401 15 12 15Z" stroke="#475569" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><path d="M8.21 13.89L7 23L12 20L17 23L15.79 13.88" stroke="#475569" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>, label: isKinyarwanda ? 'Ibihembo' : 'Badges', active: false },
           ].map((item, i) => (
             <button key={i} className="flex flex-col items-center gap-1">

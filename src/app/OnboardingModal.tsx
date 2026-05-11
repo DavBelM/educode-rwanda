@@ -33,33 +33,33 @@ export default function OnboardingModal({ userType, userName, language, onDone }
       icon: <div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(0,212,170,0.12)', border: '1px solid rgba(0,212,170,0.2)' }}><Users size={28} style={{ color: '#00d4aa' }} /></div>,
       title: isKin ? 'Kora Ishuri Ryawe' : 'Create Your Class',
       description: isKin
-        ? 'Tangira no gukora ishuri. Buri ishuri rifite kode yihariye yo kwinjira — ushyiraho abanyeshuri bawe bakoresheje iyo kode.'
+        ? 'Tangira ukora ishuri. Buri shuri rihabwa kode yaryo — usangire n\'abanyeshuri bawe bayikoreshe binjira.'
         : 'Start by creating a class. Each class gets a unique invite code — share it with your students so they can join.',
       tip: isKin ? 'Urashobora gukora amashuri menshi.' : 'You can create multiple classes.',
     },
     {
       icon: <div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(139,92,246,0.12)', border: '1px solid rgba(139,92,246,0.2)' }}><ClipboardList size={28} style={{ color: '#8b5cf6' }} /></div>,
-      title: isKin ? 'Tanga Imishinga' : 'Create Assignments',
+      title: isKin ? 'Tanga imikoro' : 'Create Assignments',
       description: isKin
-        ? 'Tanga imishinga yo kwandika (theoretical) cyangwa ya code. Ushobora gushyira igihe, amanota, n\'imikino yo gusuzuma (exam mode) kugirango abanyeshuri bawe bige neza.'
+        ? 'Tanga imikoro yo kwandika cyangwa iya code. Shyiraho igihe ntarengwa, amanota, n\'uburyo bw\'ikizamini (Exam Mode) kugirango birinde gukopera.'
         : 'Create written (theoretical) or coding assignments. Set deadlines, marks, and enable Exam Mode to prevent cheating.',
-      tip: isKin ? 'Exam Mode ifunga screen kandi ikurikirane guhindura tab.' : 'Exam Mode locks the screen and tracks tab switches.',
+      tip: isKin ? 'Uburyo bw\'ikizamini (Exam Mode) bufunga screen kandi bukurikirana niba umunyeshuri ahinduye paji.' : 'Exam Mode locks the screen and tracks tab switches.',
     },
     {
       icon: <div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(245,158,11,0.12)', border: '1px solid rgba(245,158,11,0.2)' }}><BarChart2 size={28} style={{ color: '#f59e0b' }} /></div>,
-      title: isKin ? 'Subiramo no Guha Amanota' : 'Review & Grade',
+      title: isKin ? 'Suzuma kandi uhe amanota' : 'Review & Grade',
       description: isKin
         ? 'Reba ibisubizo bya buri munyeshuri, tanga amanota, wongere igitekerezo cyawe. Reba Analytics kugirango ubonee ikigereranyo cy\'ishuri ryawe.'
         : "Review each student's submission, assign marks, and leave feedback. Use Analytics to see your whole class performance at a glance.",
-      tip: isKin ? 'Abanyeshuri babona igitekerezo cyawe kuri dashboard yabo.' : 'Students see your feedback on their dashboard.',
+      tip: isKin ? 'Abanyeshuri babona ibitekerezo byawe kuri dashboard yabo.' : 'Students see your feedback on their dashboard.',
     },
     {
       icon: <div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(0,212,170,0.12)', border: '1px solid rgba(0,212,170,0.2)' }}><Megaphone size={28} style={{ color: '#00d4aa' }} /></div>,
-      title: isKin ? 'Ohereza Inkuru' : 'Post Announcements',
+      title: isKin ? 'Shyiraho amatangazo' : 'Post Announcements',
       description: isKin
-        ? 'Tumira abanyeshuri bawe inkuru ingenzi, nk\'igihe cy\'ikizamini cyangwa amakuru mashya. Abanyeshuri babona buri kintu kuri dashboard yabo.'
+        ? 'Yoherereza abanyeshuri bawe amakuru y\'ingenzi — nk\'amatariki y\'ibizamini n\'ibindi. Abanyeshuri bayabona ako kanya kuri dashboard yabo.'
         : 'Send your students important notices — exam dates, reminders, updates. Students see them instantly on their dashboard.',
-      tip: isKin ? 'Ushobora gushyira inkuru ndetse ukazisiba.' : 'You can pin announcements for extra visibility.',
+      tip: isKin ? 'Urashobora gushyira amatangazo hejuru kugirango agaragare cyane.' : 'You can pin announcements for extra visibility.',
     },
   ];
 
@@ -74,7 +74,7 @@ export default function OnboardingModal({ userType, userName, language, onDone }
     },
     {
       icon: <div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(0,212,170,0.12)', border: '1px solid rgba(0,212,170,0.2)' }}><Users size={28} style={{ color: '#00d4aa' }} /></div>,
-      title: isKin ? 'Injira mu Ishuri' : 'Join Your Class',
+      title: isKin ? 'Injira mu ishuri ryawe' : 'Join Your Class',
       description: isKin
         ? 'Baza umwarimu wawe kode yo kwinjira mu ishuri. Kanda "Join Class" kuri dashboard kuzuzamo iyo kode.'
         : 'Ask your teacher for the class invite code. Click "Join Class" on your dashboard and enter it.',
@@ -82,27 +82,27 @@ export default function OnboardingModal({ userType, userName, language, onDone }
     },
     {
       icon: <div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(139,92,246,0.12)', border: '1px solid rgba(139,92,246,0.2)' }}><BookOpen size={28} style={{ color: '#8b5cf6' }} /></div>,
-      title: isKin ? 'Kora Imishinga' : 'Complete Assignments',
+      title: isKin ? 'Kora imikoro' : 'Complete Assignments',
       description: isKin
-        ? 'Imishinga yawe igaragara kuri dashboard. Fungura umushinga, subiza ibibazo, cyangwa wandike code — hanyuma wohereze mbere y\'itariki.'
+        ? 'Imikoro yawe igaragara kuri dashboard. Fungura umwe, usubize ibibazo cyangwa wandike code — hanyuma uwohereze mbere y\'igihe ntarengwa.'
         : 'Your assignments appear on your dashboard. Open one, answer the questions or write your code — then submit before the deadline.',
-      tip: isKin ? 'Imishinga y\'ikizamini ifunga screen nkuko igihe gitemba.' : 'Exam assignments lock the screen and auto-submit when time runs out.',
+      tip: isKin ? 'Imikoro y\'ibizamini ifunga screen kandi ikoherezwa mu buryo bwikora iyo igihe kirangiye.' : 'Exam assignments lock the screen and auto-submit when time runs out.',
     },
     {
       icon: <div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(0,212,170,0.12)', border: '1px solid rgba(0,212,170,0.2)' }}><Code2 size={28} style={{ color: '#00d4aa' }} /></div>,
-      title: isKin ? 'Wige Gukora Code' : 'Practice Coding',
+      title: isKin ? 'Imenyereze gukora code' : 'Practice Coding',
       description: isKin
         ? 'Fungura "Courses" kugirango ubone amasomo. Jya muri Coding Workspace igihe icyo aricyo cyose kugirango ugerageze JavaScript yawe.'
         : 'Open Courses to follow structured lessons. Use the Coding Workspace anytime to experiment with JavaScript freely.',
-      tip: isKin ? 'AI izagufasha gusobanura amakosa mu code yawe.' : 'The AI will explain errors in your code as you learn.',
+      tip: isKin ? 'AI izajya igusobanurira amakosa mu gihe wandika code.' : 'The AI will explain errors in your code as you learn.',
     },
     {
       icon: <div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(245,158,11,0.12)', border: '1px solid rgba(245,158,11,0.2)' }}><CheckCircle size={28} style={{ color: '#f59e0b' }} /></div>,
-      title: isKin ? 'Kurikirana Iterambere Ryawe' : 'Track Your Progress',
+      title: isKin ? 'Kurikirana iterambere ryawe' : 'Track Your Progress',
       description: isKin
         ? 'Kanda "My Results" kugirango ubone amanota yawe yose, igitekerezo cy\'umwarimu, n\'iterambere ryawe. Buri munsi wakoze wongera streak yawe.'
         : 'Click "My Results" to see all your grades and teacher feedback. Log in every day to build your streak.',
-      tip: isKin ? 'Amanota menshi atera urwego rwawe gukura.' : 'More marks = higher level on the leaderboard.',
+      tip: isKin ? 'Amanota menshi = urwego rwo hejuru mu ntonde.' : 'More marks = higher level on the leaderboard.',
     },
   ];
 
@@ -176,7 +176,7 @@ export default function OnboardingModal({ userType, userName, language, onDone }
               style={{ background: 'rgba(255,255,255,0.04)', color: '#94a3b8', border: '1px solid rgba(255,255,255,0.08)' }}
               onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.08)')}
               onMouseLeave={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.04)')}>
-              {isKin ? 'Subira' : 'Back'}
+              {isKin ? 'Subira inyuma' : 'Back'}
             </button>
           )}
           <button

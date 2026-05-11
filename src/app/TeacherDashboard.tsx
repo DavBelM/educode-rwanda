@@ -35,7 +35,7 @@ function CreateClassModal({ language, onClose, onCreate }: {
       <div className="w-full max-w-md rounded-2xl p-6" style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.08)' }}>
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-lg font-bold" style={{ color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}>
-            {isKin ? 'Kora Ishuri Rishya' : 'Create New Class'}
+            {isKin ? 'Kora ishuri rishya' : 'Create New Class'}
           </h2>
           <button onClick={onClose} style={{ color: '#475569' }} onMouseEnter={e => (e.currentTarget.style.color = '#94a3b8')} onMouseLeave={e => (e.currentTarget.style.color = '#475569')}>
             <X size={20} />
@@ -45,13 +45,13 @@ function CreateClassModal({ language, onClose, onCreate }: {
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-semibold mb-2" style={{ color: '#94a3b8', fontFamily: 'Inter, sans-serif' }}>
-              {isKin ? 'Izina ry\'Ishuri' : 'Class Name'}
+              {isKin ? 'Izina ry’Ishuri' : 'Class Name'}
             </label>
             <input
               type="text"
               value={name}
               onChange={e => setName(e.target.value)}
-              placeholder={isKin ? 'Urugero: JS Level 3 - Ishuri IPRC Kigali' : 'e.g. JS Level 3 - IPRC Kigali'}
+              placeholder={isKin ? 'Urugero: JS Level 3 - IPRC Kigali' : 'e.g. JS Level 3 - IPRC Kigali'}
               className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none"
               style={{ background: '#0d0f14', border: '1px solid rgba(255,255,255,0.08)', color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}
               onFocus={e => (e.target.style.border = '1px solid rgba(0,212,170,0.4)')}
@@ -167,7 +167,7 @@ function CreateAssignmentModal({ language, classes, onClose, onCreate }: {
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg font-bold" style={{ color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}>
-              {isKin ? 'Kora Umushinga Mushya' : 'Create New Assignment'}
+              {isKin ? 'Tanga umukoro mushya' : 'Create New Assignment'}
             </h2>
             <button onClick={onClose} style={{ color: '#475569' }} onMouseEnter={e => (e.currentTarget.style.color = '#94a3b8')} onMouseLeave={e => (e.currentTarget.style.color = '#475569')}>
               <X size={20} />
@@ -177,12 +177,12 @@ function CreateAssignmentModal({ language, classes, onClose, onCreate }: {
           {step === 'type' ? (
             <>
               <p className="text-sm mb-5" style={{ color: '#64748b', fontFamily: 'Inter, sans-serif' }}>
-                {isKin ? 'Hitamo ubwoko bw\'umushinga:' : 'Choose the type of assignment:'}
+                {isKin ? 'Hitamo ubwoko bw’umukoro:' : 'Choose the type of assignment:'}
               </p>
               <div className="grid grid-cols-2 gap-4 mb-6">
                 {([
-                  { value: 'theoretical', icon: <BookOpen size={28} />, label: isKin ? 'Ibibazo bya Inyandiko' : 'Theoretical', desc: isKin ? 'Ibibazo by\'inyandiko abanyeshuri baza mu magambo' : 'Written questions students answer in text', color: '#8b5cf6' },
-                  { value: 'coding', icon: <Code2 size={28} />, label: isKin ? 'Umushinga wa Code' : 'Coding', desc: isKin ? 'Abanyeshuri bandika kode kandi bayigerageza' : 'Students write and run JavaScript code', color: '#00d4aa' },
+                  { value: 'theoretical', icon: <BookOpen size={28} />, label: isKin ? 'Ibibazo by’inyandiko' : 'Theoretical', desc: isKin ? 'Ibibazo by’inyandiko abanyeshuri basubiza mu magambo' : 'Written questions students answer in text', color: '#8b5cf6' },
+                  { value: 'coding', icon: <Code2 size={28} />, label: isKin ? 'Umukoro wa code' : 'Coding', desc: isKin ? 'Abanyeshuri bandika kandi bagatangiza (run) code ya JavaScript' : 'Students write and run JavaScript code', color: '#00d4aa' },
                 ] as const).map(type => (
                   <button
                     key={type.value}
@@ -232,7 +232,7 @@ function CreateAssignmentModal({ language, classes, onClose, onCreate }: {
               {/* Title EN */}
               <div>
                 <label className="block text-sm font-semibold mb-2" style={{ color: '#94a3b8', fontFamily: 'Inter, sans-serif' }}>
-                  {isKin ? 'Umutwe (Icyongereza)' : 'Title (English)'}
+                  {isKin ? 'Umutwe (mu Cyongereza)' : 'Title (English)'}
                 </label>
                 <input
                   type="text"
@@ -249,7 +249,7 @@ function CreateAssignmentModal({ language, classes, onClose, onCreate }: {
               {/* Title KIN */}
               <div>
                 <label className="block text-sm font-semibold mb-2" style={{ color: '#94a3b8', fontFamily: 'Inter, sans-serif' }}>
-                  {isKin ? 'Umutwe (Ikinyarwanda)' : 'Title (Kinyarwanda)'}
+                  {isKin ? 'Umutwe (mu Kinyarwanda)' : 'Title (Kinyarwanda)'}
                 </label>
                 <input
                   type="text"
@@ -266,12 +266,12 @@ function CreateAssignmentModal({ language, classes, onClose, onCreate }: {
               {/* Description */}
               <div>
                 <label className="block text-sm font-semibold mb-2" style={{ color: '#94a3b8', fontFamily: 'Inter, sans-serif' }}>
-                  {isKin ? 'Ibisobanuro (Icyongereza)' : 'Instructions (English)'}
+                  {isKin ? 'Amabwiriza (mu Cyongereza)' : 'Instructions (English)'}
                 </label>
                 <textarea
                   value={description}
                   onChange={e => setDescription(e.target.value)}
-                  placeholder={isKin ? 'Sobanura umushinga...' : 'Describe what students should do...'}
+                  placeholder={isKin ? 'Sobanura icyo abanyeshuri bagomba gukora...' : 'Describe what students should do...'}
                   rows={2}
                   className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none resize-none"
                   style={{ background: '#0d0f14', border: '1px solid rgba(255,255,255,0.08)', color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}
@@ -283,12 +283,12 @@ function CreateAssignmentModal({ language, classes, onClose, onCreate }: {
               {/* Description KIN */}
               <div>
                 <label className="block text-sm font-semibold mb-2" style={{ color: '#94a3b8', fontFamily: 'Inter, sans-serif' }}>
-                  {isKin ? 'Ibisobanuro (Ikinyarwanda)' : 'Instructions (Kinyarwanda)'}
+                  {isKin ? 'Amabwiriza (mu Kinyarwanda)' : 'Instructions (Kinyarwanda)'}
                 </label>
                 <textarea
                   value={descriptionKin}
                   onChange={e => setDescriptionKin(e.target.value)}
-                  placeholder={isKin ? 'Sobanura umushinga mu Kinyarwanda...' : 'Instructions in Kinyarwanda...'}
+                  placeholder={isKin ? 'Amabwiriza mu Kinyarwanda...' : 'Instructions in Kinyarwanda...'}
                   rows={2}
                   className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none resize-none"
                   style={{ background: '#0d0f14', border: '1px solid rgba(255,255,255,0.08)', color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}
@@ -300,7 +300,7 @@ function CreateAssignmentModal({ language, classes, onClose, onCreate }: {
               {/* Total Marks */}
               <div>
                 <label className="block text-sm font-semibold mb-2" style={{ color: '#94a3b8', fontFamily: 'Inter, sans-serif' }}>
-                  {isKin ? 'Amanota Yose (urugero: /20)' : 'Total Marks (e.g. /20)'}
+                  {isKin ? 'Amanota yose (urugero: /20)' : 'Total Marks (e.g. /20)'}
                 </label>
                 <input
                   type="number"
@@ -319,7 +319,7 @@ function CreateAssignmentModal({ language, classes, onClose, onCreate }: {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-sm font-semibold mb-2" style={{ color: '#94a3b8', fontFamily: 'Inter, sans-serif' }}>
-                    {isKin ? 'Urwego' : 'Difficulty'}
+                    {isKin ? 'Urwego rw’ingorabahizi' : 'Difficulty'}
                   </label>
                   <select
                     value={difficulty}
@@ -328,13 +328,13 @@ function CreateAssignmentModal({ language, classes, onClose, onCreate }: {
                     style={{ background: '#0d0f14', border: '1px solid rgba(255,255,255,0.08)', color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}
                   >
                     <option value="beginner">{isKin ? 'Intangiriro' : 'Beginner'}</option>
-                    <option value="intermediate">{isKin ? 'Hagati' : 'Intermediate'}</option>
-                    <option value="advanced">{isKin ? 'Ufite Ubunararibonye' : 'Advanced'}</option>
+                    <option value="intermediate">{isKin ? 'Urwego ruringaniye' : 'Intermediate'}</option>
+                    <option value="advanced">{isKin ? 'Urwego rwo hejuru' : 'Advanced'}</option>
                   </select>
                 </div>
                 <div>
                   <label className="block text-sm font-semibold mb-2" style={{ color: '#94a3b8', fontFamily: 'Inter, sans-serif' }}>
-                    {isKin ? 'Itariki yo Kurangiza' : 'Due Date'}
+                    {isKin ? 'Itariki ntarengwa' : 'Due Date'}
                   </label>
                   <input
                     type="date"
@@ -351,7 +351,7 @@ function CreateAssignmentModal({ language, classes, onClose, onCreate }: {
               {/* Weight % */}
               <div>
                 <label className="block text-sm font-semibold mb-2" style={{ color: '#94a3b8', fontFamily: 'Inter, sans-serif' }}>
-                  {isKin ? 'Uburemere bw\'Amanota (%)' : 'Grade Weight (%)'}
+                  {isKin ? 'Uburemere bw’amanota (%)' : 'Grade Weight (%)'}
                 </label>
                 <div className="flex items-center gap-3">
                   <input
@@ -376,10 +376,10 @@ function CreateAssignmentModal({ language, classes, onClose, onCreate }: {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-semibold" style={{ color: examMode ? '#f87171' : '#94a3b8', fontFamily: 'Inter, sans-serif' }}>
-                      {isKin ? '🔒 Imikino yo Gusuzuma' : '🔒 Exam Mode'}
+                      {isKin ? '🔒 Uburyo bw’Ikizamini (Exam Mode)' : '🔒 Exam Mode'}
                     </p>
                     <p className="text-xs mt-0.5" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
-                      {isKin ? 'Gufunga screen yuzuye, gukurikirana guhindura tab, no gusubiza igihe cyangiye' : 'Fullscreen lock, tab-switch tracking, auto-submit on timeout'}
+                      {isKin ? 'Gufunga screen, gukurikirana niba bahinduye paji, no kohereza mu buryo bwikora igihe cyangiye' : 'Fullscreen lock, tab-switch tracking, auto-submit on timeout'}
                     </p>
                   </div>
                   <button
@@ -393,7 +393,7 @@ function CreateAssignmentModal({ language, classes, onClose, onCreate }: {
                 {examMode && (
                   <div className="mt-3 flex items-center gap-3">
                     <label className="text-xs font-semibold shrink-0" style={{ color: '#f87171', fontFamily: 'Inter, sans-serif' }}>
-                      {isKin ? 'Igihe (Iminota)' : 'Duration (minutes)'}
+                      {isKin ? 'Igihe (iminota)' : 'Duration (minutes)'}
                     </label>
                     <input
                       type="number"
@@ -417,7 +417,7 @@ function CreateAssignmentModal({ language, classes, onClose, onCreate }: {
                     </label>
                     <button onClick={addQuestion} className="flex items-center gap-1 text-xs font-semibold transition-colors" style={{ color: '#00d4aa', fontFamily: 'Inter, sans-serif' }}>
                       <Plus size={14} />
-                      {isKin ? 'Ongeraho Ikibazo' : 'Add Question'}
+                      {isKin ? 'Ongeraho ikibazo' : 'Add Question'}
                     </button>
                   </div>
                   <div className="space-y-3">
@@ -425,7 +425,7 @@ function CreateAssignmentModal({ language, classes, onClose, onCreate }: {
                       <div key={q.id} className="rounded-xl p-4" style={{ background: '#0d0f14', border: '1px solid rgba(255,255,255,0.06)' }}>
                         <div className="flex items-center justify-between mb-2">
                           <span className="text-xs font-semibold uppercase" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
-                            {isKin ? `Ikibazo ${i + 1}` : `Q${i + 1}`}
+                            {isKin ? `Ikibazo cya ${i + 1}` : `Q${i + 1}`}
                           </span>
                           {questions.length > 1 && (
                             <button onClick={() => removeQuestion(q.id)} style={{ color: '#475569' }} onMouseEnter={e => (e.currentTarget.style.color = '#ef4444')} onMouseLeave={e => (e.currentTarget.style.color = '#475569')}>
@@ -538,7 +538,7 @@ function AnnouncementsModal({ cls, language, onClose }: {
             <Megaphone size={16} style={{ color: '#f59e0b' }} />
             <div>
               <h2 className="text-base font-bold" style={{ color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}>
-                {isKin ? 'Inyandiko z\'Umwarimu' : 'Announcements'}
+                {isKin ? 'Amatangazo' : 'Announcements'}
               </h2>
               <p className="text-xs" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>{cls.name}</p>
             </div>
@@ -562,7 +562,7 @@ function AnnouncementsModal({ cls, language, onClose }: {
                 fontFamily: 'Inter, sans-serif',
               }}
             >
-              {t === 'list' ? (isKin ? 'Reba' : 'View All') : (isKin ? 'Shyiraho Rishya' : 'Post New')}
+              {t === 'list' ? (isKin ? 'Reba byose' : 'View All') : (isKin ? 'Shyiraho rishya' : 'Post New')}
             </button>
           ))}
         </div>
@@ -578,14 +578,14 @@ function AnnouncementsModal({ cls, language, onClose }: {
               <div className="py-10 text-center">
                 <Megaphone size={28} className="mx-auto mb-3" style={{ color: '#334155' }} />
                 <p className="text-sm" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
-                  {isKin ? 'Nta nyandiko zihari' : 'No announcements yet'}
+                  {isKin ? 'Nta matangazo arahari ubu' : 'No announcements yet'}
                 </p>
                 <button
                   onClick={() => setTab('new')}
                   className="mt-4 px-4 py-2 rounded-xl text-xs font-semibold transition-all"
                   style={{ background: 'rgba(245,158,11,0.12)', color: '#f59e0b', border: '1px solid rgba(245,158,11,0.25)', fontFamily: 'Inter, sans-serif' }}
                 >
-                  {isKin ? 'Tangaza ubutumwa' : 'Post first announcement'}
+                  {isKin ? 'Shyiraho itangazo rya mbere' : 'Post first announcement'}
                 </button>
               </div>
             ) : (
@@ -640,7 +640,7 @@ function AnnouncementsModal({ cls, language, onClose }: {
                   value={body}
                   onChange={e => setBody(e.target.value)}
                   rows={5}
-                  placeholder={isKin ? 'Andika ubutumwa hano...' : 'Write your message here...'}
+                  placeholder={isKin ? 'Andika ubutumwa bwawe hano...' : 'Write your message here...'}
                   className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none resize-none"
                   style={{ background: '#0d0f14', border: '1px solid rgba(255,255,255,0.08)', color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}
                   onFocus={e => (e.target.style.border = '1px solid rgba(245,158,11,0.4)')}
@@ -656,7 +656,7 @@ function AnnouncementsModal({ cls, language, onClose }: {
                   {pinned && <Check size={10} style={{ color: '#0d0f14' }} />}
                 </div>
                 <span className="text-xs font-medium" style={{ color: '#94a3b8', fontFamily: 'Inter, sans-serif' }}>
-                  {isKin ? 'Shyira hejuru (pinned)' : 'Pin to top'}
+                  {isKin ? 'Shyira hejuru' : 'Pin to top'}
                 </span>
               </label>
               {postError && (
@@ -671,7 +671,7 @@ function AnnouncementsModal({ cls, language, onClose }: {
                 style={{ background: '#f59e0b', color: '#0d0f14', fontFamily: 'Inter, sans-serif' }}
               >
                 {posting ? <Loader size={16} className="animate-spin" /> : <Megaphone size={15} />}
-                {isKin ? 'Tangaza' : 'Post Announcement'}
+                {isKin ? 'Tangaza itangazo' : 'Post Announcement'}
               </button>
             </div>
           )}
@@ -733,7 +733,7 @@ function ClassAnalyticsModal({ cls, language, onClose }: { cls: Class & { studen
           <div>
             <h2 className="text-base font-bold" style={{ color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}>{cls.name}</h2>
             <p className="text-xs mt-0.5" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
-              {isKin ? 'Ibisobanuro by\'ishuri' : 'Class analytics'}
+              {isKin ? 'Isesengura ry\'ishuri' : 'Class analytics'}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -745,7 +745,7 @@ function ClassAnalyticsModal({ cls, language, onClose }: { cls: Class & { studen
               onMouseEnter={e => { if (!downloading && !loading) (e.currentTarget as HTMLButtonElement).style.background = 'rgba(0,212,170,0.18)'; }}
               onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(0,212,170,0.1)'; }}>
               {downloading ? <Loader size={12} className="animate-spin" /> : <Download size={12} />}
-              {isKin ? 'Pakurura CSV' : 'Export CSV'}
+              {isKin ? 'Pakurura (CSV)' : 'Export CSV'}
             </button>
             <button onClick={onClose} style={{ color: '#475569' }}
               onMouseEnter={e => (e.currentTarget.style.color = '#94a3b8')}
@@ -766,8 +766,8 @@ function ClassAnalyticsModal({ cls, language, onClose }: { cls: Class & { studen
               <div className="grid grid-cols-3 gap-3">
                 {[
                   { label: isKin ? 'Abanyeshuri' : 'Students',        value: analytics.total_students,                          color: '#00d4aa' },
-                  { label: isKin ? 'Amanota y\'ishuri' : 'Class avg',  value: analytics.class_avg_pct !== null ? `${analytics.class_avg_pct}%` : '—', color: analytics.class_avg_pct !== null && analytics.class_avg_pct >= 70 ? '#00d4aa' : analytics.class_avg_pct !== null && analytics.class_avg_pct >= 50 ? '#f59e0b' : '#ef4444' },
-                  { label: isKin ? 'Gutanga ibisubizo' : 'Submit rate', value: analytics.overall_submission_rate !== null ? `${analytics.overall_submission_rate}%` : '—', color: '#8b5cf6' },
+                  { label: isKin ? 'Ikigereranyo cy\'amanota y\'ishuri' : 'Class avg',  value: analytics.class_avg_pct !== null ? `${analytics.class_avg_pct}%` : '—', color: analytics.class_avg_pct !== null && analytics.class_avg_pct >= 70 ? '#00d4aa' : analytics.class_avg_pct !== null && analytics.class_avg_pct >= 50 ? '#f59e0b' : '#ef4444' },
+                  { label: isKin ? 'Igipimo cy\'imitangire y\'imikoro' : 'Submit rate', value: analytics.overall_submission_rate !== null ? `${analytics.overall_submission_rate}%` : '—', color: '#8b5cf6' },
                 ].map(s => (
                   <div key={s.label} className="rounded-xl p-4 text-center" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
                     <p className="text-2xl font-bold mb-1" style={{ color: s.color, fontFamily: 'Inter, sans-serif' }}>{s.value}</p>
@@ -780,7 +780,7 @@ function ClassAnalyticsModal({ cls, language, onClose }: { cls: Class & { studen
               {analytics.assignments.length === 0 ? (
                 <div className="py-10 text-center">
                   <p className="text-sm" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
-                    {isKin ? 'Nta mishinga ihari' : 'No assignments yet'}
+                    {isKin ? 'Nta mikoro arahari' : 'No assignments yet'}
                   </p>
                 </div>
               ) : analytics.assignments.map(a => {
@@ -828,9 +828,9 @@ function ClassAnalyticsModal({ cls, language, onClose }: { cls: Class & { studen
                         {/* Stats row */}
                         <div className="grid grid-cols-3 gap-2 pt-3">
                           {[
-                            { label: isKin ? 'Umubare w\'amanota' : 'Avg score', value: a.avg_score !== null ? `${a.avg_score}/${a.total_marks}` : '—', color: scoreColor },
-                            { label: isKin ? 'Amanota menshi' : 'Top score',    value: a.top_score !== null ? `${a.top_score}/${a.total_marks}` : '—', color: '#00d4aa' },
-                            { label: isKin ? 'Amanota make' : 'Low score',      value: a.low_score !== null ? `${a.low_score}/${a.total_marks}` : '—', color: '#f87171' },
+                            { label: isKin ? 'Amanota y\'ikigereranyo' : 'Avg score', value: a.avg_score !== null ? `${a.avg_score}/${a.total_marks}` : '—', color: scoreColor },
+                            { label: isKin ? 'Amanota yo hejuru' : 'Top score',    value: a.top_score !== null ? `${a.top_score}/${a.total_marks}` : '—', color: '#00d4aa' },
+                            { label: isKin ? 'Amanota yo hasi' : 'Low score',      value: a.low_score !== null ? `${a.low_score}/${a.total_marks}` : '—', color: '#f87171' },
                           ].map(s => (
                             <div key={s.label} className="rounded-lg p-3 text-center" style={{ background: 'rgba(255,255,255,0.03)' }}>
                               <p className="text-sm font-bold" style={{ color: s.color, fontFamily: 'Inter, sans-serif' }}>{s.value}</p>
@@ -842,7 +842,7 @@ function ClassAnalyticsModal({ cls, language, onClose }: { cls: Class & { studen
                         {/* Submission rate bar */}
                         <div>
                           <div className="flex justify-between text-xs mb-1.5" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
-                            <span>{isKin ? 'Gutanga ibisubizo' : 'Submission rate'}</span>
+                            <span>{isKin ? 'Igipimo cy\'imitangire y\'imikoro' : 'Submission rate'}</span>
                             <span style={{ color: '#f1f5f9', fontWeight: 600 }}>{a.submitted_count} / {analytics.total_students} ({subRate}%)</span>
                           </div>
                           <div className="h-2 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
@@ -854,7 +854,7 @@ function ClassAnalyticsModal({ cls, language, onClose }: { cls: Class & { studen
                         {totalDist > 0 && (
                           <div>
                             <p className="text-xs font-semibold mb-2" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
-                              {isKin ? 'Ikigereranyo cy\'amanota' : 'Score distribution'}
+                              {isKin ? 'Isaranganywa ry\'amanota' : 'Score distribution'}
                             </p>
                             <div className="flex h-6 rounded-lg overflow-hidden gap-px">
                               {a.dist.filter(d => d.count > 0).map(d => (
@@ -931,7 +931,7 @@ function ClassCard({ cls, language, onAnnouncements, onAnalytics }: { cls: Class
           </div>
           <div>
             <p className="text-lg font-bold" style={{ color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}>{cls.assignmentCount ?? 0}</p>
-            <p className="text-xs" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>{isKin ? 'Imishinga' : 'Assignments'}</p>
+            <p className="text-xs" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>{isKin ? 'Imikoro yose' : 'Assignments'}</p>
           </div>
         </div>
       </div>
@@ -939,7 +939,7 @@ function ClassCard({ cls, language, onAnnouncements, onAnalytics }: { cls: Class
       <div className="flex items-center justify-between px-4 py-2.5 rounded-xl" style={{ background: 'rgba(0,212,170,0.06)', border: '1px solid rgba(0,212,170,0.15)' }}>
         <div>
           <p className="text-xs mb-0.5" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
-            {isKin ? 'Kode yo Kwinjira' : 'Invite Code'}
+            {isKin ? 'Kode yo kwinjira' : 'Invite Code'}
           </p>
           <p className="text-lg font-bold tracking-widest" style={{ color: '#00d4aa', fontFamily: 'monospace' }}>{cls.invite_code}</p>
         </div>
@@ -949,7 +949,7 @@ function ClassCard({ cls, language, onAnnouncements, onAnalytics }: { cls: Class
           style={{ background: copied ? 'rgba(0,212,170,0.2)' : 'rgba(0,212,170,0.1)', color: '#00d4aa', border: '1px solid rgba(0,212,170,0.25)', fontFamily: 'Inter, sans-serif' }}
         >
           {copied ? <Check size={12} /> : <Copy size={12} />}
-          {copied ? (isKin ? 'Nakopiwemo!' : 'Copied!') : (isKin ? 'Kopi' : 'Copy')}
+          {copied ? (isKin ? 'Byakopewe!' : 'Copied!') : (isKin ? 'Kopeya' : 'Copy')}
         </button>
       </div>
 
@@ -962,7 +962,7 @@ function ClassCard({ cls, language, onAnnouncements, onAnalytics }: { cls: Class
           onMouseLeave={e => (e.currentTarget.style.background = 'rgba(0,212,170,0.08)')}
         >
           <BarChart2 size={13} />
-          {isKin ? 'Imibare' : 'Analytics'}
+          {isKin ? 'Isesengura' : 'Analytics'}
         </button>
         <button
           onClick={e => { e.stopPropagation(); onAnnouncements(); }}
@@ -972,7 +972,7 @@ function ClassCard({ cls, language, onAnnouncements, onAnalytics }: { cls: Class
           onMouseLeave={e => (e.currentTarget.style.background = 'rgba(245,158,11,0.08)')}
         >
           <Megaphone size={13} />
-          {isKin ? 'Inyandiko' : 'Announcements'}
+          {isKin ? 'Amatangazo' : 'Announcements'}
         </button>
       </div>
     </div>
@@ -1047,14 +1047,14 @@ function SubmissionsPanel({ assignment, language, onClose }: {
           <div>
             <h2 className="text-base font-bold" style={{ color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}>{title}</h2>
             <p className="text-xs mt-0.5" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
-              {submissions.length} {isKin ? 'byatanzwe' : 'submission(s)'}
+              {submissions.length} {isKin ? 'imikoro yatanzwe' : 'submission(s)'}
             </p>
           </div>
           <div className="flex items-center gap-2">
             {released ? (
               <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold"
                 style={{ background: 'rgba(0,212,170,0.1)', color: '#00d4aa', border: '1px solid rgba(0,212,170,0.2)' }}>
-                ✓ {isKin ? 'Amanota Yatangiwe' : 'Grades Released'}
+                ✓ {isKin ? 'Amanota yasohotse' : 'Grades Released'}
               </span>
             ) : (
               <button
@@ -1071,7 +1071,7 @@ function SubmissionsPanel({ assignment, language, onClose }: {
                 onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(0,212,170,0.1)'; }}
               >
                 {releasing ? <Loader size={12} className="animate-spin" /> : null}
-                {isKin ? 'Tanga Amanota' : 'Release Grades'}
+                {isKin ? 'Sohoka amanota' : 'Release Grades'}
               </button>
             )}
             <button onClick={onClose} style={{ color: '#475569' }} onMouseEnter={e => (e.currentTarget.style.color = '#94a3b8')} onMouseLeave={e => (e.currentTarget.style.color = '#475569')}>
@@ -1089,7 +1089,7 @@ function SubmissionsPanel({ assignment, language, onClose }: {
           ) : submissions.length === 0 ? (
             <div className="py-10 text-center">
               <p className="text-sm" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
-                {isKin ? 'Nta nyandiko zatanzwe' : 'No submissions yet'}
+                {isKin ? 'Nta mikoro yari yatangwa' : 'No submissions yet'}
               </p>
             </div>
           ) : submissions.map(sub => {
@@ -1147,7 +1147,7 @@ function SubmissionsPanel({ assignment, language, onClose }: {
                       return (
                         <div key={q.id} className="pt-3">
                           <p className="text-xs font-semibold mb-1" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
-                            {isKin ? `Ikibazo ${i + 1}` : `Q${i + 1}`}: {qText}
+                            {isKin ? `Ikibazo cya ${i + 1}` : `Q${i + 1}`}: {qText}
                           </p>
                           <p className="text-sm leading-relaxed px-3 py-2.5 rounded-lg" style={{ color: '#94a3b8', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.04)', fontFamily: 'Inter, sans-serif' }}>
                             {answer || <span style={{ color: '#334155' }}>{isKin ? '(Nta gisubizo)' : '(No answer)'}</span>}
@@ -1160,22 +1160,22 @@ function SubmissionsPanel({ assignment, language, onClose }: {
                     {((sub.tab_switches ?? 0) + (sub.paste_count ?? 0) + (sub.fullscreen_exits ?? 0)) > 0 && (
                       <div className="pt-3 rounded-xl px-3 py-2.5" style={{ background: 'rgba(239,68,68,0.06)', border: '1px solid rgba(239,68,68,0.15)' }}>
                         <p className="text-xs font-semibold mb-1.5" style={{ color: '#f87171', fontFamily: 'Inter, sans-serif' }}>
-                          ⚠️ {isKin ? 'Ibimenyetso byo Gukopya' : 'Integrity Flags'}
+                          ⚠️ {isKin ? 'Ibimenyetso by\'ubunyangamugayo' : 'Integrity Flags'}
                         </p>
                         <div className="flex gap-4">
                           {(sub.tab_switches ?? 0) > 0 && (
                             <span className="text-xs" style={{ color: '#94a3b8', fontFamily: 'Inter, sans-serif' }}>
-                              🔀 {isKin ? `Guhindura tab: ${sub.tab_switches}` : `Tab switches: ${sub.tab_switches}`}
+                              🔀 {isKin ? `Inshuro bahinduye paji: ${sub.tab_switches}` : `Tab switches: ${sub.tab_switches}`}
                             </span>
                           )}
                           {(sub.paste_count ?? 0) > 0 && (
                             <span className="text-xs" style={{ color: '#94a3b8', fontFamily: 'Inter, sans-serif' }}>
-                              📋 {isKin ? `Gukopya: ${sub.paste_count}` : `Pastes: ${sub.paste_count}`}
+                              📋 {isKin ? `Inshuro bakopeye: ${sub.paste_count}` : `Pastes: ${sub.paste_count}`}
                             </span>
                           )}
                           {(sub.fullscreen_exits ?? 0) > 0 && (
                             <span className="text-xs" style={{ color: '#94a3b8', fontFamily: 'Inter, sans-serif' }}>
-                              ↙️ {isKin ? `Gusohoka ku screen: ${sub.fullscreen_exits}` : `Fullscreen exits: ${sub.fullscreen_exits}`}
+                              ↙️ {isKin ? `Inshuro basohotse muri screen yuzuye: ${sub.fullscreen_exits}` : `Fullscreen exits: ${sub.fullscreen_exits}`}
                             </span>
                           )}
                         </div>
@@ -1207,7 +1207,7 @@ function SubmissionsPanel({ assignment, language, onClose }: {
                           style={{ background: '#00d4aa', color: '#0d0f14', fontFamily: 'Inter, sans-serif' }}
                         >
                           {grading[sub.id] ? <Loader size={12} className="animate-spin" /> : <Check size={12} />}
-                          {isKin ? 'Saba' : 'Save'}
+                          {isKin ? 'Bika' : 'Save'}
                         </button>
                         {gradeError[sub.id] && (
                           <span className="text-xs" style={{ color: '#f87171', fontFamily: 'Inter, sans-serif' }}>{gradeError[sub.id]}</span>
@@ -1222,7 +1222,7 @@ function SubmissionsPanel({ assignment, language, onClose }: {
                         rows={2}
                         value={feedbackInputs[sub.id] ?? ''}
                         onChange={e => setFeedbackInputs(prev => ({ ...prev, [sub.id]: e.target.value }))}
-                        placeholder={isKin ? 'Andika igitekerezo (bihitamo)...' : 'Write feedback for the student (optional)...'}
+                        placeholder={isKin ? 'Andika igitekerezo ku munyeshuri (si itegeko)...' : 'Write feedback for the student (optional)...'}
                         className="w-full px-3 py-2 rounded-lg text-xs leading-relaxed resize-none focus:outline-none"
                         style={{ background: '#0d0f14', border: '1px solid rgba(255,255,255,0.08)', color: '#94a3b8', fontFamily: 'Inter, sans-serif' }}
                         onFocus={e => (e.target.style.border = '1px solid rgba(0,212,170,0.4)')}
@@ -1279,14 +1279,14 @@ function AssignmentRow({ assignment, submissionCount, language, onClick }: {
             {submissionCount} {isKin ? 'byatanzwe' : submissionCount === 1 ? 'submission' : 'submissions'}
           </span>
           <span className="px-2 py-0.5 rounded-full text-xs font-semibold" style={{ background: typeColor.bg, color: typeColor.text, border: `1px solid ${typeColor.border}`, fontFamily: 'Inter, sans-serif' }}>
-            {assignment.assignment_type === 'theoretical' ? (isKin ? 'Inyandiko' : 'Theory') : 'Code'}
+            {assignment.assignment_type === 'theoretical' ? (isKin ? 'Inyandiko (Theory)' : 'Theory') : 'Code'}
           </span>
           <span className="px-2 py-0.5 rounded-full text-xs font-semibold" style={{ color: diffColors[assignment.difficulty], background: `${diffColors[assignment.difficulty]}18`, border: `1px solid ${diffColors[assignment.difficulty]}30`, fontFamily: 'Inter, sans-serif' }}>
             {assignment.difficulty}
           </span>
           {assignment.due_date && (
             <span className="text-xs" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
-              · {isKin ? 'Kurangira' : 'Due'}: {new Date(assignment.due_date).toLocaleDateString()}
+              · {isKin ? 'Itariki ntarengwa' : 'Due'}: {new Date(assignment.due_date).toLocaleDateString()}
             </span>
           )}
         </div>
@@ -1318,7 +1318,7 @@ function Leaderboard({ classId, language }: { classId: string; language: 'EN' | 
       <div className="flex items-center gap-2 mb-5">
         <Trophy size={16} style={{ color: '#f59e0b' }} />
         <h2 className="text-base font-bold" style={{ color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}>
-          {isKin ? 'Urutonde rw\'Amanota' : 'Class Leaderboard'}
+          {isKin ? 'Urutonde rw\'amanota mu ishuri' : 'Class Leaderboard'}
         </h2>
       </div>
 
@@ -1326,7 +1326,7 @@ function Leaderboard({ classId, language }: { classId: string; language: 'EN' | 
         <div className="flex justify-center py-6"><Loader size={18} className="animate-spin" style={{ color: '#00d4aa' }} /></div>
       ) : entries.length === 0 ? (
         <p className="text-sm text-center py-6" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
-          {isKin ? 'Nta manota yashyizweho' : 'No grades yet'}
+          {isKin ? 'Nta manota arahagaragara' : 'No grades yet'}
         </p>
       ) : (
         <div className="space-y-2">
@@ -1420,7 +1420,7 @@ export default function TeacherDashboard() {
       <Header
         language={language}
         onLanguageToggle={() => setLanguage(prev => prev === 'EN' ? 'KIN' : 'EN')}
-        subtitle={isKin ? 'Ikibanza cy\'Umwarimu' : 'Teacher Dashboard'}
+        subtitle={isKin ? 'Dashboard y\'umwarimu' : 'Teacher Dashboard'}
         hideAssignmentInfo={true}
       />
 
@@ -1435,10 +1435,10 @@ export default function TeacherDashboard() {
             {/* Stats row */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[
-                { label: isKin ? 'Amasomo' : 'Classes', value: classes.length, color: '#00d4aa' },
+                { label: isKin ? 'Amashuri' : 'Classes', value: classes.length, color: '#00d4aa' },
                 { label: isKin ? 'Abanyeshuri' : 'Students', value: totalStudents, color: '#8b5cf6' },
-                { label: isKin ? 'Imishinga Yose' : 'Assignments', value: classes.reduce((s, c) => s + (c.assignmentCount ?? 0), 0), color: '#f59e0b' },
-                { label: isKin ? 'Byatanzwe' : 'Submissions', value: totalSubmissions, color: '#0ea5e9' },
+                { label: isKin ? 'Imikoro yose' : 'Assignments', value: classes.reduce((s, c) => s + (c.assignmentCount ?? 0), 0), color: '#f59e0b' },
+                { label: isKin ? 'Imikoro yatanzwe' : 'Submissions', value: totalSubmissions, color: '#0ea5e9' },
               ].map((stat, i) => (
                 <div key={i} className="rounded-2xl p-5" style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.06)' }}>
                   <p className="text-2xl font-bold mb-1" style={{ color: stat.color, fontFamily: 'Inter, sans-serif' }}>{stat.value}</p>
@@ -1454,7 +1454,7 @@ export default function TeacherDashboard() {
               <div className="lg:col-span-5 space-y-4">
                 <div className="flex items-center justify-between">
                   <h2 className="text-base font-bold" style={{ color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}>
-                    {isKin ? 'Amasomo Yanjye' : 'My Classes'}
+                    {isKin ? 'Amashuri yanjye' : 'My Classes'}
                   </h2>
                   <button
                     onClick={() => setShowCreateClass(true)}
@@ -1464,7 +1464,7 @@ export default function TeacherDashboard() {
                     onMouseLeave={e => (e.currentTarget.style.background = 'rgba(0,212,170,0.1)')}
                   >
                     <Plus size={14} />
-                    {isKin ? 'Ongera Ishuri' : 'New Class'}
+                    {isKin ? 'Ishuri rishya' : 'New Class'}
                   </button>
                 </div>
 
@@ -1472,7 +1472,7 @@ export default function TeacherDashboard() {
                   <div className="rounded-2xl p-8 text-center" style={{ background: '#13161e', border: '1px dashed rgba(255,255,255,0.08)' }}>
                     <Users size={32} className="mx-auto mb-3" style={{ color: '#334155' }} />
                     <p className="text-sm font-medium mb-1" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
-                      {isKin ? 'Nta masomo ufite' : 'No classes yet'}
+                      {isKin ? 'Nta mashuri uragira' : 'No classes yet'}
                     </p>
                     <p className="text-xs mb-4" style={{ color: '#334155', fontFamily: 'Inter, sans-serif' }}>
                       {isKin ? 'Kora ishuri kugirango utangire' : 'Create a class to get started'}
@@ -1482,7 +1482,7 @@ export default function TeacherDashboard() {
                       className="px-4 py-2 rounded-lg text-xs font-semibold transition-all"
                       style={{ background: 'rgba(0,212,170,0.1)', color: '#00d4aa', border: '1px solid rgba(0,212,170,0.2)', fontFamily: 'Inter, sans-serif' }}
                     >
-                      {isKin ? 'Kora Ishuri' : 'Create Class'}
+                      {isKin ? 'Kora ishuri' : 'Create Class'}
                     </button>
                   </div>
                 ) : (
@@ -1499,7 +1499,7 @@ export default function TeacherDashboard() {
                 <div className="rounded-2xl p-6" style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.06)' }}>
                   <div className="flex items-center justify-between mb-5">
                     <h2 className="text-base font-bold" style={{ color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}>
-                      {isKin ? 'Imishinga' : 'Assignments'}
+                      {isKin ? 'Imikoro yose' : 'Assignments'}
                       {selectedClassId && classes.find(c => c.id === selectedClassId) && (
                         <span className="ml-2 text-xs font-normal" style={{ color: '#475569' }}>
                           — {classes.find(c => c.id === selectedClassId)?.name}
@@ -1515,7 +1515,7 @@ export default function TeacherDashboard() {
                       onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = '#00d4aa'; }}
                     >
                       <Plus size={14} />
-                      {isKin ? 'Kora Umushinga' : 'New Assignment'}
+                      {isKin ? 'Umukoro mushya' : 'New Assignment'}
                     </button>
                   </div>
 
@@ -1525,7 +1525,7 @@ export default function TeacherDashboard() {
                       <p className="text-sm" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
                         {classes.length === 0
                           ? (isKin ? 'Kora ishuri mbere' : 'Create a class first')
-                          : (isKin ? 'Nta mishinga iri muri iri somo' : 'No assignments in this class yet')}
+                          : (isKin ? 'Nta mukoro urashyirwa muri iri shuri' : 'No assignments in this class yet')}
                       </p>
                     </div>
                   ) : (

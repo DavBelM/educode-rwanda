@@ -39,7 +39,7 @@ function CourseCatalog({ courses, language, onSelect }: {
       </h2>
       <p className="text-sm mb-8" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
         {isKin
-          ? 'Hitamo isomo wandikaho — kwiga wigenga, nta muryango ukenewe.'
+          ? 'Amasomo wigenga — iga ku muvuduko wawe, nta shuri ukeneye.'
           : 'Self-paced courses — learn at your own speed, no class needed.'}
       </p>
 
@@ -137,7 +137,7 @@ function CourseDetail({ course, language, onBack, onOpenLesson }: {
         </p>
         <div className="flex items-center gap-4 mb-3">
           <span className="text-base font-semibold" style={{ color: '#00d4aa', fontFamily: 'Inter, sans-serif' }}>
-            {completedCount}/{totalLessons} {isKin ? 'imishomo' : 'lessons'}
+            {completedCount}/{totalLessons} {isKin ? 'amasomo' : 'lessons'}
           </span>
           <span className="text-base" style={{ color: '#475569' }}>{pct}%</span>
         </div>
@@ -241,7 +241,7 @@ export default function CoursesPage({ language, onBack, onOpenLesson }: Props) {
           style={{ color: '#475569' }}
           onMouseEnter={e => (e.currentTarget.style.color = '#94a3b8')}
           onMouseLeave={e => (e.currentTarget.style.color = '#475569')}>
-          <ArrowLeft size={18} /> {isKin ? 'Garuka' : 'Dashboard'}
+          <ArrowLeft size={18} /> {isKin ? 'Dashboard' : 'Dashboard'}
         </button>
         <span style={{ color: 'rgba(255,255,255,0.08)' }}>|</span>
         <span className="flex items-center gap-2 text-base font-semibold" style={{ color: '#f1f5f9' }}>

@@ -37,7 +37,7 @@ export function RunCodeButton({ onClick, isRunning, language, isMobile = false }
         ) : (
           <>
             <Play size={20} fill="white" />
-            <span>{isKinyarwanda ? 'Kora Code' : 'Run Code'}</span>
+            <span>{isKinyarwanda ? 'Tangiza Code' : 'Run Code'}</span>
           </>
         )}
       </button>

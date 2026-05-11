@@ -33,27 +33,27 @@ export default function SchoolSignupPage() {
         : "We offer a free 3-month trial. After that, it's RWF 100,000/year for unlimited students."
     },
     {
-      question: isKinyarwanda ? 'Trial imara igihe kingana iki?' : 'How long is the trial?',
+      question: isKinyarwanda ? 'Igihe cy’igerageza (trial) kimara igihe kingana iki?' : 'How long is the trial?',
       answer: isKinyarwanda
-        ? 'Trial imara amezi 3 kubusa, nta karita ya kirimiti ikenewe.'
+        ? 'Amezi 3 yose ni ubuntu, nta karita ya banki ukeneye.'
         : '3 months completely free, no credit card required.'
     },
     {
       question: isKinyarwanda ? 'Dukeneye mudasobwa zidasanzwe?' : 'Do we need special computers?',
       answer: isKinyarwanda
-        ? 'Oya. Igicuruzwa kirakora kuri mudasobwa zose n\'amatefoni. Gikora na offline.'
+        ? 'Oya. Irakora kuri mudasobwa zose n\'amatefoni. Ikora na offline.'
         : 'No. Works on any computer or phone. Even works offline.'
     },
     {
-      question: isKinyarwanda ? 'Abanyeshuri barashobora kubikoresha iwabo?' : 'Can students use it at home?',
+      question: isKinyarwanda ? 'Abanyeshuri barashobora kuyikoresha bari mu rugo?' : 'Can students use it at home?',
       answer: isKinyarwanda
-        ? 'Yego! Abanyeshuri barashobora gukora code iwabo cyangwa ishuriro. Sync yose igihe bahuye na interineti.'
+        ? 'Yego! Abanyeshuri barashobora kwandika code bari mu rugo cyangwa ku ishuri. Amakuru yikora sync iyo bahuye na interineti.'
         : 'Yes! Students can code at home or at school. Syncs whenever they connect.'
     },
     {
-      question: isKinyarwanda ? 'Ubufasha tubona bute?' : 'What support do we get?',
+      question: isKinyarwanda ? 'Ni ubuhe bufasha duhabwa?' : 'What support do we get?',
       answer: isKinyarwanda
-        ? 'Ubufasha bwihuse bwa email na telefoni, imyitozo y\'abarimu, na demo y\'ishuri.'
+        ? 'Ubufasha bwihuse kuri i-meyili na telefoni, amahugurwa y’abarimu, na demo ku ishuri.'
         : 'Priority email and phone support, teacher training, and in-school demos.'
     }
   ];
@@ -143,7 +143,7 @@ export default function SchoolSignupPage() {
           </h1>
           <p className="text-xl mb-8 text-blue-100">
             {isKinyarwanda
-              ? 'Kwinjira mu mashuri 50+ akoresha uburezi bw\'ikode bufashijwe na AI'
+              ? 'Injira mu mashuri arenga 50 akoresha uburezi bwa coding bufashijwe na AI'
               : 'Join 50+ schools using AI-powered coding education'}
           </p>
 
@@ -151,15 +151,15 @@ export default function SchoolSignupPage() {
           <div className="flex flex-wrap items-center justify-center gap-6">
             <div className="flex items-center gap-2 bg-white/20 px-4 py-2 rounded-lg backdrop-blur">
               <School className="w-5 h-5" />
-              <span className="font-semibold">{isKinyarwanda ? '50+ Amashuri' : '50+ Schools'}</span>
+              <span className="font-semibold">{isKinyarwanda ? 'Amashuri 50+' : '50+ Schools'}</span>
             </div>
             <div className="flex items-center gap-2 bg-white/20 px-4 py-2 rounded-lg backdrop-blur">
               <Users className="w-5 h-5" />
-              <span className="font-semibold">{isKinyarwanda ? '5,000+ Abanyeshuri' : '5,000+ Students'}</span>
+              <span className="font-semibold">{isKinyarwanda ? 'Abanyeshuri 5,000+' : '5,000+ Students'}</span>
             </div>
             <div className="flex items-center gap-2 bg-white/20 px-4 py-2 rounded-lg backdrop-blur">
               <Target className="w-5 h-5" />
-              <span className="font-semibold">95% {isKinyarwanda ? 'Gutsinda' : 'Success Rate'}</span>
+              <span className="font-semibold">95% {isKinyarwanda ? 'Igipimo cy’ubutsinda' : 'Success Rate'}</span>
             </div>
           </div>
         </div>
@@ -173,11 +173,11 @@ export default function SchoolSignupPage() {
               <div className="text-center py-8">
                 <div className="text-6xl mb-4">🎉</div>
                 <h2 className="text-2xl font-bold text-[#1e293b] mb-3">
-                  {isKinyarwanda ? 'Konto yawe yashyizweho!' : 'Account created!'}
+                  {isKinyarwanda ? 'Konti yafunguwe neza!' : 'Account created!'}
                 </h2>
                 <p className="text-gray-600 mb-2">
                   {isKinyarwanda
-                    ? 'Injira ukoresheje email na ijambo banga wahinze.'
+                    ? 'Injira ukoresheje i-meyili n’ijambo ry’ibanga umaze gushyiraho.'
                     : 'Log in with the email and password you just set.'}
                 </p>
                 <p className="text-sm text-gray-500 mb-6">
@@ -192,7 +192,7 @@ export default function SchoolSignupPage() {
             ) : (
             <>
             <h2 className="text-3xl font-bold text-[#1e293b] mb-2 text-center">
-              {isKinyarwanda ? 'Saba Trial yawe y\'Amezi 3 Kubusa' : 'Request Your Free 3-Month Trial'}
+              {isKinyarwanda ? 'Saba amezi 3 y’igerageza ku buntu' : 'Request Your Free 3-Month Trial'}
             </h2>
             <p className="text-gray-600 mb-8 text-center">
               {isKinyarwanda ? 'Uzuzanya uyu form tuzakuhamagara mu gihe cy\'amasaha 24' : "Fill out this form and we'll contact you within 24 hours"}
@@ -202,13 +202,13 @@ export default function SchoolSignupPage() {
               {/* School Information Section */}
               <div className="pb-6 border-b border-gray-200">
                 <h3 className="text-lg font-bold text-[#1e293b] mb-4">
-                  {isKinyarwanda ? 'Amakuru y\'Ishuri' : 'School Information'}
+                  {isKinyarwanda ? 'Amakuru y’Ishuri' : 'School Information'}
                 </h3>
 
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      {isKinyarwanda ? 'Izina ry\'Ishuri' : 'School Name'} *
+                      {isKinyarwanda ? 'Izina ry’Ishuri' : 'School Name'} *
                     </label>
                     <input
                       type="text"
@@ -222,7 +222,7 @@ export default function SchoolSignupPage() {
 
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      {isKinyarwanda ? 'Ubwoko bw\'Ishuri' : 'School Type'} *
+                      {isKinyarwanda ? 'Ubwoko bw’Ishuri' : 'School Type'} *
                     </label>
                     <div className="relative">
                       <select
@@ -235,7 +235,7 @@ export default function SchoolSignupPage() {
                         <option value="tvet">TVET</option>
                         <option value="secondary">{isKinyarwanda ? 'Ishuri ryisumbuye' : 'Secondary School'}</option>
                         <option value="university">{isKinyarwanda ? 'Kaminuza' : 'University'}</option>
-                        <option value="training">{isKinyarwanda ? 'Ikigo cy\'amahugurwa' : 'Training Center'}</option>
+                        <option value="training">{isKinyarwanda ? 'Ikigo cy’amahugurwa' : 'Training Center'}</option>
                       </select>
                       <ChevronDown className="absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
                     </div>
@@ -265,7 +265,7 @@ export default function SchoolSignupPage() {
 
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      {isKinyarwanda ? 'Umubare w\'Abanyeshuri' : 'Number of Students'} *
+                      {isKinyarwanda ? 'Umubare w’Abanyeshuri' : 'Number of Students'} *
                     </label>
                     <div className="relative">
                       <select
@@ -316,7 +316,7 @@ export default function SchoolSignupPage() {
                       type="text"
                       value={formData.position}
                       onChange={(e) => setFormData({ ...formData, position: e.target.value })}
-                      placeholder={isKinyarwanda ? 'Umuyobozi w\'amasomo' : 'Dean of Studies'}
+                      placeholder={isKinyarwanda ? 'Umuyobozi w’Amasomo' : 'Dean of Studies'}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]"
                       required
                     />
@@ -341,7 +341,7 @@ export default function SchoolSignupPage() {
 
                   <div>
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      {isKinyarwanda ? 'Ijambo Banga' : 'Password'} *
+                      {isKinyarwanda ? 'Ijambo ry’ibanga' : 'Password'} *
                     </label>
                     <div className="relative">
                       <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -383,13 +383,13 @@ export default function SchoolSignupPage() {
               {/* Challenges */}
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  {isKinyarwanda ? 'Ibibazo muhuye na byo?' : 'What challenges do you face?'} ({isKinyarwanda ? 'Ntibikenewe' : 'Optional'})
+                  {isKinyarwanda ? 'Ni izihe mbogamizi muhura nazo?' : 'What challenges do you face?'} ({isKinyarwanda ? 'Si itegeko' : 'Optional'})
                 </label>
                 <textarea
                   value={formData.challenges}
                   onChange={(e) => setFormData({ ...formData, challenges: e.target.value })}
                   placeholder={isKinyarwanda
-                    ? 'Tubare ibibazo mufite mu kwigisha programming...'
+                    ? 'Tubwire imbogamizi muhura nazo mu kwigisha programming...'
                     : 'Tell us about your current challenges with programming education...'}
                   rows={4}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]"
@@ -410,7 +410,7 @@ export default function SchoolSignupPage() {
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                 ) : (
                   <>
-                    {isKinyarwanda ? 'Saba Trial Kubusa' : 'Request Free Trial'}
+                    {isKinyarwanda ? 'Saba igerageza ry’ubuntu' : 'Request Free Trial'}
                     <ArrowRight className="w-5 h-5" />
                   </>
                 )}
@@ -421,7 +421,7 @@ export default function SchoolSignupPage() {
                 <div className="space-y-2 text-sm text-gray-700">
                   <div className="flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 text-[#22c55e] flex-shrink-0" />
-                    <span>{isKinyarwanda ? 'Nta kwiyemeza bikenewe' : 'No commitment required'}</span>
+                    <span>{isKinyarwanda ? 'Ntabwo ari itegeko gukomeza nyuma' : 'No commitment required'}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 text-[#22c55e] flex-shrink-0" />
@@ -429,7 +429,7 @@ export default function SchoolSignupPage() {
                   </div>
                   <div className="flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 text-[#22c55e] flex-shrink-0" />
-                    <span>{isKinyarwanda ? 'Kubusa amezi 3, hanyuma RWF 100,000/umwaka' : 'Free for 3 months, then RWF 100,000/year'}</span>
+                    <span>{isKinyarwanda ? 'Ni ubuntu mu mezi 3 ya mbere, hanyuma akaba 100,000 RWF ku mwaka.' : 'Free for 3 months, then RWF 100,000/year'}</span>
                   </div>
                 </div>
               </div>
@@ -441,7 +441,7 @@ export default function SchoolSignupPage() {
           {/* What Happens Next */}
           <div className="mt-16">
             <h2 className="text-3xl font-bold text-[#1e293b] mb-8 text-center">
-              {isKinyarwanda ? 'Iki Kizakurikira?' : 'What Happens Next'}
+              {isKinyarwanda ? 'Iki nicyo kizakurikira' : 'What Happens Next'}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {[
@@ -452,13 +452,13 @@ export default function SchoolSignupPage() {
                 },
                 {
                   step: '2',
-                  title: isKinyarwanda ? 'Shiraho Demo' : 'Schedule Demo',
-                  description: isKinyarwanda ? 'Tuza ku ishuri duherekeze abarimu' : 'We come to your school for a teacher demo'
+                  title: isKinyarwanda ? 'Shiraho igihe cya Demo' : 'Schedule Demo',
+                  description: isKinyarwanda ? 'Tuza ku ishuri ryanyu kumurika uko platform ikora ku barimu' : 'We come to your school for a teacher demo'
                 },
                 {
                   step: '3',
-                  title: isKinyarwanda ? 'Tangira Trial' : 'Start Trial',
-                  description: isKinyarwanda ? 'Tangira trial y\'amezi 3 kubusa' : 'Begin your free 3-month trial'
+                  title: isKinyarwanda ? 'Tangira igerageza' : 'Start Trial',
+                  description: isKinyarwanda ? 'Tangira amezi yawe 3 y’igerageza ku buntu' : 'Begin your free 3-month trial'
                 }
               ].map((item, index) => (
                 <div key={index} className="text-center">
@@ -510,7 +510,7 @@ export default function SchoolSignupPage() {
               href="#"
               className="inline-flex items-center gap-2 px-8 py-3 border-2 border-[#10b981] text-[#10b981] rounded-lg font-bold hover:bg-green-50 transition-all"
             >
-              {isKinyarwanda ? 'Hamagara Amagurisha' : 'Contact Sales'}
+              {isKinyarwanda ? 'Vugana n’abashinzwe kugurisha' : 'Contact Sales'}
               <ArrowRight className="w-5 h-5" />
             </a>
           </div>

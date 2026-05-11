@@ -47,7 +47,7 @@ export function SubmissionHistory({
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-6xl mx-auto px-6 py-8">
           <h1 className="text-3xl font-bold text-[#1e293b] mb-2" style={{ fontFamily: 'Inter, sans-serif' }}>
-            {isKinyarwanda ? 'Amateka y\'Gutanga' : 'Submission History'}
+            {isKinyarwanda ? 'Amateka y\'imitangire y\'imikoro' : 'Submission History'}
           </h1>
           <p className="text-lg text-gray-600" style={{ fontFamily: 'Inter, sans-serif' }}>
             {assignmentTitle}
@@ -60,7 +60,7 @@ export function SubmissionHistory({
         <div className="grid md:grid-cols-3 gap-6">
           <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
             <p className="text-sm text-gray-500 mb-2" style={{ fontFamily: 'Inter, sans-serif' }}>
-              {isKinyarwanda ? 'Amanota Meza' : 'Best Grade'}
+              {isKinyarwanda ? 'Amanota meza kurusha ayandi' : 'Best Grade'}
             </p>
             <p className="text-4xl font-bold text-[#10b981]" style={{ fontFamily: 'Inter, sans-serif' }}>
               {bestGrade}
@@ -69,7 +69,7 @@ export function SubmissionHistory({
           </div>
           <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
             <p className="text-sm text-gray-500 mb-2" style={{ fontFamily: 'Inter, sans-serif' }}>
-              {isKinyarwanda ? 'Umubare w\'Ibigeragezo' : 'Total Attempts'}
+              {isKinyarwanda ? 'Inshuro zose wakoze uyu mukoro' : 'Total Attempts'}
             </p>
             <p className="text-4xl font-bold text-[#0ea5e9]" style={{ fontFamily: 'Inter, sans-serif' }}>
               {submissions.length}
@@ -77,7 +77,7 @@ export function SubmissionHistory({
           </div>
           <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
             <p className="text-sm text-gray-500 mb-2" style={{ fontFamily: 'Inter, sans-serif' }}>
-              {isKinyarwanda ? 'Igihe cya Nyuma' : 'Latest Attempt'}
+              {isKinyarwanda ? 'Inshuro yaherutse' : 'Latest Attempt'}
             </p>
             <p className="text-xl font-bold text-[#1e293b]" style={{ fontFamily: 'Inter, sans-serif' }}>
               {submissions[0]?.date || 'N/A'}
@@ -89,7 +89,7 @@ export function SubmissionHistory({
         <div className="bg-white rounded-xl shadow-xl border border-gray-100 overflow-hidden">
           <div className="p-6 border-b border-gray-200">
             <h2 className="text-xl font-bold text-[#1e293b]" style={{ fontFamily: 'Inter, sans-serif' }}>
-              {isKinyarwanda ? 'Ibigeragezo Byose' : 'All Attempts'}
+              {isKinyarwanda ? 'Inshuro zose hamwe' : 'All Attempts'}
             </h2>
           </div>
 
@@ -97,7 +97,7 @@ export function SubmissionHistory({
           <div className="hidden md:grid md:grid-cols-7 gap-4 px-6 py-3 bg-[#f8fafc] border-b border-gray-200 text-sm font-semibold text-gray-600">
             <div style={{ fontFamily: 'Inter, sans-serif' }}>#</div>
             <div className="col-span-2" style={{ fontFamily: 'Inter, sans-serif' }}>
-              {isKinyarwanda ? 'Itariki & Igihe' : 'Date & Time'}
+              {isKinyarwanda ? 'Itariki n\'isaha' : 'Date & Time'}
             </div>
             <div style={{ fontFamily: 'Inter, sans-serif' }}>{isKinyarwanda ? 'Amanota' : 'Grade'}</div>
             <div style={{ fontFamily: 'Inter, sans-serif' }}>{isKinyarwanda ? 'Ibizamini' : 'Tests'}</div>
@@ -164,8 +164,8 @@ export function SubmissionHistory({
                       <StatusIcon size={16} />
                       <span className="text-xs font-semibold" style={{ fontFamily: 'Inter, sans-serif' }}>
                         {submission.status === 'passed' && (isKinyarwanda ? 'Byatsinze' : 'Passed')}
-                        {submission.status === 'failed' && (isKinyarwanda ? 'Byanze' : 'Failed')}
-                        {submission.status === 'partial' && (isKinyarwanda ? 'Bimwe' : 'Partial')}
+                        {submission.status === 'failed' && (isKinyarwanda ? 'Ntabwo yatsinzwe' : 'Failed')}
+                        {submission.status === 'partial' && (isKinyarwanda ? 'Yashyizweho igice' : 'Partial')}
                       </span>
                     </div>
                   </div>
@@ -182,7 +182,7 @@ export function SubmissionHistory({
                     <button
                       onClick={() => onDownloadCode(submission.id)}
                       className="p-2 hover:bg-gray-200 rounded-lg transition-all"
-                      title={isKinyarwanda ? 'Kuramo' : 'Download'}
+                      title={isKinyarwanda ? 'Kuramo (Download)' : 'Download'}
                     >
                       <Download size={18} className="text-gray-600" />
                     </button>
@@ -200,11 +200,11 @@ export function SubmissionHistory({
               <Clock size={48} className="text-gray-400" />
             </div>
             <h3 className="text-xl font-bold text-[#1e293b] mb-2" style={{ fontFamily: 'Inter, sans-serif' }}>
-              {isKinyarwanda ? 'Nta mateka' : 'No Submissions Yet'}
+              {isKinyarwanda ? 'Nta mateka arahagaragara' : 'No Submissions Yet'}
             </h3>
             <p className="text-gray-600" style={{ fontFamily: 'Inter, sans-serif' }}>
               {isKinyarwanda
-                ? 'Uzabona amateka yawe hano iyo utanze umushinga wawe wa mbere'
+                ? 'Amateka y\'imitangire y\'umukoro azagaragara hano umaze kuwohereza'
                 : 'Your submission history will appear here after you submit'}
             </p>
           </div>
@@ -213,13 +213,13 @@ export function SubmissionHistory({
         {/* Info Card */}
         <div className="bg-blue-50 border border-[#0ea5e9] rounded-xl p-6">
           <h3 className="font-bold text-[#0ea5e9] mb-2" style={{ fontFamily: 'Inter, sans-serif' }}>
-            {isKinyarwanda ? 'Menya' : 'Good to Know'}
+            {isKinyarwanda ? 'Ibyo ukwiye kumenya' : 'Good to Know'}
           </h3>
           <ul className="space-y-1 text-sm text-[#0369a1]" style={{ fontFamily: 'Inter, sans-serif' }}>
-            <li>• {isKinyarwanda ? 'Ushobora gutanga inshuro nyinshi' : 'You can submit multiple times'}</li>
-            <li>• {isKinyarwanda ? 'Amanota yawe meza azakurikirwa' : 'Your best grade will be recorded'}</li>
-            <li>• {isKinyarwanda ? 'Ushobora kureba ibigeragezo byawe byose' : 'You can review all your past attempts'}</li>
-            <li>• {isKinyarwanda ? 'Umwarimu azareba gusa ibigeragezo bya nyuma' : 'Teacher will review your latest submission'}</li>
+            <li>• {isKinyarwanda ? 'Urashobora gutanga umukoro inshuro nyinshi' : 'You can submit multiple times'}</li>
+            <li>• {isKinyarwanda ? 'Amanota yawe meza kurusha ayandi niyo azabikwa' : 'Your best grade will be recorded'}</li>
+            <li>• {isKinyarwanda ? 'Urashobora gusubiramo inshuro zose wakoze uyu mukoro' : 'You can review all your past attempts'}</li>
+            <li>• {isKinyarwanda ? 'Umwarimu azasuzuma gusa umukoro uheruka gutanga' : 'Teacher will review your latest submission'}</li>
           </ul>
         </div>
       </div>

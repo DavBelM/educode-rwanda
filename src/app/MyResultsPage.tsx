@@ -50,11 +50,11 @@ export default function MyResultsPage({ language, onBack }: Props) {
   const pct = totalPossible > 0 ? Math.round((totalEarned / totalPossible) * 100) : null;
 
   const level = (() => {
-    if (totalEarned >= 100) return isKin ? 'Inzobere' : 'Advanced';
-    if (totalEarned >= 50)  return isKin ? 'Hagati II' : 'Intermediate II';
-    if (totalEarned >= 25)  return isKin ? 'Hagati I'  : 'Intermediate I';
-    if (totalEarned >= 10)  return isKin ? 'Intangiriro II' : 'Beginner II';
-    return isKin ? 'Intangiriro I' : 'Beginner I';
+    if (totalEarned >= 100) return isKin ? 'Urwego rwo hejuru' : 'Advanced';
+    if (totalEarned >= 50)  return isKin ? 'Urwego ruringaniye II' : 'Intermediate II';
+    if (totalEarned >= 25)  return isKin ? 'Urwego ruringaniye I'  : 'Intermediate I';
+    if (totalEarned >= 10)  return isKin ? 'Urwego rw\'atangira II' : 'Beginner II';
+    return isKin ? 'Urwego rw\'atangira I' : 'Beginner I';
   })();
 
   const filtered = results.filter(r => {
@@ -66,8 +66,8 @@ export default function MyResultsPage({ language, onBack }: Props) {
 
   const filters: { key: Filter; label: string; count: number }[] = [
     { key: 'all',           label: isKin ? 'Byose'        : 'All',            count: results.length },
-    { key: 'graded',        label: isKin ? 'Byongeweho'   : 'Graded',         count: graded.length },
-    { key: 'pending',       label: isKin ? 'Bitegereje'   : 'Awaiting grade', count: submitted.length - graded.length },
+    { key: 'graded',        label: isKin ? 'Byahawe amanota'   : 'Graded',         count: graded.length },
+    { key: 'pending',       label: isKin ? 'Bitegereje amanota'   : 'Awaiting grade', count: submitted.length - graded.length },
     { key: 'not-submitted', label: isKin ? 'Bitaratanzwe' : 'Not submitted',  count: results.length - submitted.length },
   ];
 
@@ -83,7 +83,7 @@ export default function MyResultsPage({ language, onBack }: Props) {
           onMouseEnter={e => (e.currentTarget.style.color = '#f1f5f9')}
           onMouseLeave={e => (e.currentTarget.style.color = '#94a3b8')}>
           <ArrowLeft size={18} />
-          {isKin ? 'Subira Inyuma' : 'Back'}
+          {isKin ? 'Subira inyuma' : 'Back'}
         </button>
         <h1 className="font-bold" style={{ color: '#f1f5f9', fontSize: '18px' }}>
           {isKin ? 'Amanota Yanjye' : 'My Results'}
@@ -98,7 +98,7 @@ export default function MyResultsPage({ language, onBack }: Props) {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
             <div className="text-center">
               <p className="text-4xl font-bold mb-1" style={{ color: '#f1f5f9' }}>{results.length}</p>
-              <p className="text-sm" style={{ color: '#475569' }}>{isKin ? 'Imishinga yose' : 'Total assignments'}</p>
+              <p className="text-sm" style={{ color: '#475569' }}>{isKin ? 'Imikoro yose hamwe' : 'Total assignments'}</p>
             </div>
             <div className="text-center">
               <p className="text-4xl font-bold mb-1" style={{ color: '#00d4aa' }}>{submitted.length}</p>
@@ -108,7 +108,7 @@ export default function MyResultsPage({ language, onBack }: Props) {
               <p className="text-4xl font-bold mb-1" style={{ color: '#f59e0b' }}>
                 {pct !== null ? `${pct}%` : '—'}
               </p>
-              <p className="text-sm" style={{ color: '#475569' }}>{isKin ? 'Ikigero cy\'amanota' : 'Average score'}</p>
+              <p className="text-sm" style={{ color: '#475569' }}>{isKin ? 'Ikigereranyo cy\'amanota' : 'Average score'}</p>
             </div>
             <div className="text-center">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full font-bold mb-1"
@@ -123,7 +123,7 @@ export default function MyResultsPage({ language, onBack }: Props) {
           {totalPossible > 0 && (
             <div className="mt-6">
               <div className="flex justify-between text-sm mb-2" style={{ color: '#475569' }}>
-                <span>{isKin ? 'Amanota yose' : 'Overall score'}</span>
+                <span>{isKin ? 'Amanota yose hamwe' : 'Overall score'}</span>
                 <span style={{ color: '#f1f5f9', fontWeight: 600 }}>{totalEarned} / {totalPossible}</span>
               </div>
               <div className="h-3 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
@@ -163,7 +163,7 @@ export default function MyResultsPage({ language, onBack }: Props) {
         ) : filtered.length === 0 ? (
           <div className="rounded-2xl py-16 text-center" style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.06)' }}>
             <p style={{ color: '#475569', fontSize: '15px' }}>
-              {isKin ? 'Nta bisubizo bihari.' : 'Nothing here yet.'}
+              {isKin ? 'Nta bisubizo birahagaragara.' : 'Nothing here yet.'}
             </p>
           </div>
         ) : (
@@ -189,7 +189,7 @@ export default function MyResultsPage({ language, onBack }: Props) {
                       style={{ background: 'rgba(0,212,170,0.08)', border: '1px solid rgba(0,212,170,0.2)' }}>
                       <Bell size={13} style={{ color: '#00d4aa' }} />
                       <span style={{ color: '#00d4aa', fontSize: '13px', fontWeight: 600 }}>
-                        {isKin ? 'Amanota mashya!' : 'New grade released!'}
+                        {isKin ? 'Amanota mashya yasohotse!' : 'New grade released!'}
                       </span>
                     </div>
                   )}
@@ -229,7 +229,7 @@ export default function MyResultsPage({ language, onBack }: Props) {
                       ) : r.marks_earned === null ? (
                         <span className="px-3 py-1.5 rounded-full font-semibold"
                           style={{ background: 'rgba(245,158,11,0.1)', color: '#f59e0b', border: '1px solid rgba(245,158,11,0.2)', fontSize: '13px' }}>
-                          {isKin ? 'Bitegereje' : 'Awaiting grade'}
+                          {isKin ? 'Bitegereje amanota' : 'Awaiting grade'}
                         </span>
                       ) : (
                         <div>
@@ -261,7 +261,7 @@ export default function MyResultsPage({ language, onBack }: Props) {
                       <MessageSquare size={15} className="shrink-0 mt-0.5" style={{ color: '#8b5cf6' }} />
                       <div>
                         <p className="font-semibold mb-1" style={{ color: '#8b5cf6', fontSize: '13px' }}>
-                          {isKin ? 'Igitekerezo cy\'umwarimu' : 'Teacher feedback'}
+                          {isKin ? 'Ibitekerezo by\'umwarimu' : 'Teacher feedback'}
                         </p>
                         <p className="leading-relaxed" style={{ color: '#94a3b8', fontSize: '14px' }}>{r.teacher_feedback}</p>
                       </div>
@@ -272,7 +272,7 @@ export default function MyResultsPage({ language, onBack }: Props) {
                     <div className="flex items-center gap-2 mt-3">
                       <CheckCircle size={14} style={{ color: '#00d4aa' }} />
                       <span style={{ color: '#334155', fontSize: '13px' }}>
-                        {isKin ? 'Byakongeweho amanota' : 'Graded'}
+                        {isKin ? 'Byahawe amanota' : 'Graded'}
                       </span>
                     </div>
                   )}

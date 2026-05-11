@@ -34,13 +34,13 @@ export default function LandingPage({ onLogin, onSignup, onSchoolSignup }: Props
               onMouseEnter={e => (e.currentTarget.style.color = '#f1f5f9')}
               onMouseLeave={e => (e.currentTarget.style.color = '#94a3b8')}
             >
-              {isKin ? 'Ibiranga' : 'Features'}
+              {isKin ? 'Ibiranga platform' : 'Features'}
             </a>
             <a href="#for-schools" className="text-sm font-medium transition-colors" style={{ color: '#94a3b8' }}
               onMouseEnter={e => (e.currentTarget.style.color = '#f1f5f9')}
               onMouseLeave={e => (e.currentTarget.style.color = '#94a3b8')}
             >
-              {isKin ? 'Amashuri' : 'For Schools'}
+              {isKin ? 'Ku Mashuri' : 'For Schools'}
             </a>
 
             {/* Language toggle */}
@@ -75,7 +75,7 @@ export default function LandingPage({ onLogin, onSignup, onSchoolSignup }: Props
               onMouseEnter={e => (e.currentTarget.style.color = '#f1f5f9')}
               onMouseLeave={e => (e.currentTarget.style.color = '#94a3b8')}
             >
-              {isKin ? 'Injira' : 'Log In'}
+              {isKin ? 'Kwinjira' : 'Log In'}
             </button>
             <button
               onClick={onSignup}
@@ -84,7 +84,7 @@ export default function LandingPage({ onLogin, onSignup, onSchoolSignup }: Props
               onMouseEnter={e => (e.currentTarget.style.background = '#00bfa0')}
               onMouseLeave={e => (e.currentTarget.style.background = '#00d4aa')}
             >
-              {isKin ? 'Tangira Kubusa' : 'Get Started Free'}
+              {isKin ? 'Tangira ku buntu' : 'Get Started Free'}
             </button>
           </div>
 
@@ -102,14 +102,14 @@ export default function LandingPage({ onLogin, onSignup, onSchoolSignup }: Props
         {menuOpen && (
           <div className="md:hidden px-4 py-4 flex flex-col gap-4" style={{ borderTop: '1px solid rgba(255,255,255,0.06)', background: '#13161e' }}>
             <button onClick={onLogin} className="text-sm font-semibold text-left" style={{ color: '#94a3b8' }}>
-              {isKin ? 'Injira' : 'Log In'}
+              {isKin ? 'Kwinjira' : 'Log In'}
             </button>
             <button
               onClick={onSignup}
               className="px-4 py-2 rounded-lg text-sm font-semibold text-center"
               style={{ background: '#00d4aa', color: '#0d0f14' }}
             >
-              {isKin ? 'Tangira Kubusa' : 'Get Started Free'}
+              {isKin ? 'Tangira ku buntu' : 'Get Started Free'}
             </button>
           </div>
         )}
@@ -124,7 +124,7 @@ export default function LandingPage({ onLogin, onSignup, onSchoolSignup }: Props
         {/* Badge */}
         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold mb-8" style={{ background: 'rgba(139,92,246,0.12)', border: '1px solid rgba(139,92,246,0.25)', color: '#a78bfa' }}>
           <Sparkles size={12} />
-          {isKin ? 'Uburezi bwa Code mu Rwanda' : 'AI-Powered Coding Education for Rwanda'}
+          {isKin ? 'Uburezi bwa coding bufashijwe na AI ku bw\'u Rwanda' : 'AI-Powered Coding Education for Rwanda'}
         </div>
 
         <h1 className="text-4xl md:text-6xl font-bold leading-tight mb-6" style={{ color: '#f1f5f9', letterSpacing: '-0.02em' }}>
@@ -137,7 +137,7 @@ export default function LandingPage({ onLogin, onSignup, onSchoolSignup }: Props
 
         <p className="text-lg max-w-2xl mx-auto mb-10 leading-relaxed" style={{ color: '#64748b' }}>
           {isKin
-            ? 'Uburezi bwa JavaScript bufite AI ikuganirira mu rurimi rwawe. Buri kosa ukoze, ubona ibisobanuro bijyanye na we.'
+            ? 'Uburezi bwa JavaScript bufite AI igufasha gusobanukirwa amakosa mu Kinyarwanda. Byakorewe abanyeshuri n\'abarimu ba TVET mu Rwanda.'
             : 'JavaScript education with an AI tutor that explains your errors in Kinyarwanda. Built for Rwandan TVET students and teachers.'}
         </p>
 
@@ -149,7 +149,7 @@ export default function LandingPage({ onLogin, onSignup, onSchoolSignup }: Props
             onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = '#00bfa0'; (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 0 32px rgba(0,212,170,0.45)'; }}
             onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = '#00d4aa'; (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 0 24px rgba(0,212,170,0.3)'; }}
           >
-            {isKin ? 'Tangira Kwiga Kubusa' : 'Start Learning Free'}
+            {isKin ? 'Tangira kwiga ku buntu' : 'Start Learning Free'}
             <ArrowRight size={16} />
           </button>
           <button
@@ -159,7 +159,7 @@ export default function LandingPage({ onLogin, onSignup, onSchoolSignup }: Props
             onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.2)'; (e.currentTarget as HTMLButtonElement).style.color = '#f1f5f9'; }}
             onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.12)'; (e.currentTarget as HTMLButtonElement).style.color = '#94a3b8'; }}
           >
-            {isKin ? 'Ishuri Ryawe' : 'For Schools'}
+            {isKin ? 'Ku Mashuri' : 'For Schools'}
           </button>
         </div>
 
@@ -215,24 +215,24 @@ export default function LandingPage({ onLogin, onSignup, onSchoolSignup }: Props
                 </div>
                 <div>
                   <p className="text-sm font-semibold" style={{ color: '#f1f5f9' }}>AI Tutor</p>
-                  <p className="text-xs" style={{ color: '#475569' }}>{isKin ? 'Ibisobanuro by\'AI' : 'Personalized feedback'}</p>
+                  <p className="text-xs" style={{ color: '#475569' }}>{isKin ? 'Ibisobanuro byihariye kuri wowe' : 'Personalized feedback'}</p>
                 </div>
               </div>
               <div className="p-3 rounded-xl mb-3" style={{ background: 'rgba(0,212,170,0.08)', border: '1px solid rgba(0,212,170,0.2)' }}>
-                <p className="text-sm font-semibold mb-1" style={{ color: '#00d4aa' }}>✅ {isKin ? 'Byakoze neza!' : 'Well done!'}</p>
+                <p className="text-sm font-semibold mb-1" style={{ color: '#00d4aa' }}>✅ {isKin ? 'Birashimishije!' : 'Well done!'}</p>
                 <p className="text-xs leading-relaxed" style={{ color: '#94a3b8' }}>
                   {isKin
-                    ? 'Kode yawe ikora neza. Ukoresheje variables neza.'
+                    ? 'Code yawe ikora neza cyane. Wakoresheje variables neza.'
                     : 'Your code works perfectly. Variables used correctly.'}
                 </p>
               </div>
               <div className="p-3 rounded-xl" style={{ background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.2)' }}>
                 <p className="text-xs font-semibold mb-1" style={{ color: '#a78bfa' }}>
-                  {isKin ? 'Icyifuzo:' : 'Next challenge:'}
+                  {isKin ? 'Igerageza rikurikira:' : 'Next challenge:'}
                 </p>
                 <p className="text-xs leading-relaxed" style={{ color: '#94a3b8' }}>
                   {isKin
-                    ? 'Gerageza kongeraho discout niba umubare w\'ibicuruzwa uri hejuru ya 5.'
+                    ? 'Gerageza gukuraho 10% (discount) niba umubare w\'ibicuruzwa urenga 5.'
                     : 'Try adding a 10% discount when quantity is over 5.'}
                 </p>
               </div>
@@ -247,7 +247,7 @@ export default function LandingPage({ onLogin, onSignup, onSchoolSignup }: Props
           {[
             { value: 'TVET', label: isKin ? 'Amashuri' : 'Schools' },
             { value: 'EN + KIN', label: isKin ? 'Indimi' : 'Languages' },
-            { value: 'AI', label: isKin ? 'Igishishwa cy\'AI' : 'Powered' },
+            { value: 'AI', label: isKin ? 'Bifashijwemo na AI' : 'Powered' },
           ].map((s, i) => (
             <div key={i}>
               <p className="text-2xl font-bold mb-1" style={{ color: '#00d4aa' }}>{s.value}</p>
@@ -262,11 +262,11 @@ export default function LandingPage({ onLogin, onSignup, onSchoolSignup }: Props
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-14">
             <h2 className="text-3xl font-bold mb-4" style={{ color: '#f1f5f9', letterSpacing: '-0.01em' }}>
-              {isKin ? 'Ibiranga Byacu' : 'What Makes Us Different'}
+              {isKin ? 'Icyo twihariye' : 'What Makes Us Different'}
             </h2>
             <p className="max-w-xl mx-auto text-base leading-relaxed" style={{ color: '#64748b' }}>
               {isKin
-                ? 'Ntabwo ari porogaramu nk\'izindi. Yakozwe ku buryo bw\'abanyeshuri b\'u Rwanda.'
+                ? 'Ntabwo ari platform isanzwe nka zindi. Yakozwe hagendewe ku buryo abanyeshuri b\'u Rwanda biga.'
                 : 'Not another generic coding platform. Built around how Rwandan students actually learn.'}
             </p>
           </div>
@@ -278,7 +278,7 @@ export default function LandingPage({ onLogin, onSignup, onSchoolSignup }: Props
                 iconBg: 'rgba(139,92,246,0.12)',
                 iconBorder: 'rgba(139,92,246,0.25)',
                 accent: '#8b5cf6',
-                title: isKin ? 'AI Ikuganirira mu Kinyarwanda' : 'AI Feedback in Kinyarwanda',
+                title: isKin ? 'Ibisobanuro bya AI mu Kinyarwanda' : 'AI Feedback in Kinyarwanda',
                 description: isKin
                   ? 'Buri kosa ryawe risobanurwa mu rurimi rwawe. Ntabwo ugomba gusobanukirwa Icyongereza mbere yo gusobanukiwa kode.'
                   : "Every error explained in your language. You shouldn't need to understand English before you understand code."
@@ -288,9 +288,9 @@ export default function LandingPage({ onLogin, onSignup, onSchoolSignup }: Props
                 iconBg: 'rgba(0,212,170,0.12)',
                 iconBorder: 'rgba(0,212,170,0.25)',
                 accent: '#00d4aa',
-                title: isKin ? 'Amasomo ya JavaScript' : 'Structured JavaScript Course',
+                title: isKin ? 'Amasomo ya JavaScript akurikirana neza' : 'Structured JavaScript Course',
                 description: isKin
-                  ? 'Tangira ku basics ukagera ku mashusho. Variables, loops, functions, arrays — byose bifite ibisobanuro birambuye.'
+                  ? 'Kuva kuri variables kugeza kuri DOM projects. Porogaramu y\'amasomo yose ku batangira ifite imyitozo yakorewe abiga bigenga n\'abanyeshuri bo mu mashuri.'
                   : 'From variables to DOM projects. A full beginner curriculum with exercises built for self-learners and school students.'
               },
               {
@@ -298,7 +298,7 @@ export default function LandingPage({ onLogin, onSignup, onSchoolSignup }: Props
                 iconBg: 'rgba(245,158,11,0.12)',
                 iconBorder: 'rgba(245,158,11,0.25)',
                 accent: '#f59e0b',
-                title: isKin ? 'Dashboard y\'Abarimu' : 'Teacher Dashboard',
+                title: isKin ? 'Dashboard y\'umwarimu' : 'Teacher Dashboard',
                 description: isKin
                   ? 'Abarimu babona iterambere ry\'umunyeshuri wese. AI ibabwira uwabuze mbere yuko bashaka ubufasha.'
                   : "Teachers see every student's progress. AI alerts flag who needs help before they fall behind."
@@ -326,13 +326,13 @@ export default function LandingPage({ onLogin, onSignup, onSchoolSignup }: Props
       <section className="py-20" style={{ background: '#13161e', borderTop: '1px solid rgba(255,255,255,0.04)', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl font-bold mb-12" style={{ color: '#f1f5f9' }}>
-            {isKin ? 'Ukora Ite?' : 'How It Works'}
+            {isKin ? 'Uko bikora' : 'How It Works'}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
-              { step: '01', icon: <Globe size={20} style={{ color: '#00d4aa' }} />, title: isKin ? 'Iyandikishe' : 'Sign Up Free', desc: isKin ? 'Fungura konti mu masegonda make.' : 'Create your account in seconds. No credit card needed.' },
-              { step: '02', icon: <Code2 size={20} style={{ color: '#8b5cf6' }} />, title: isKin ? 'Wige no Gukora' : 'Learn & Code', desc: isKin ? 'Kora imyitozo ya JavaScript ikurikirana neza.' : 'Work through structured JavaScript exercises at your own pace.' },
-              { step: '03', icon: <Zap size={20} style={{ color: '#f59e0b' }} />, title: isKin ? 'Bona Ibisobanuro bya AI' : 'Get AI Feedback', desc: isKin ? 'AI ikuganirira ibisobanuro mu rurimi rwawe.' : 'Instant explanations in Kinyarwanda or English when you get stuck.' },
+              { step: '01', icon: <Globe size={20} style={{ color: '#00d4aa' }} />, title: isKin ? 'Iyandikishe ku buntu' : 'Sign Up Free', desc: isKin ? 'Fungura konti yawe mu masegonda make. Nta karita ya banki ukeneye.' : 'Create your account in seconds. No credit card needed.' },
+              { step: '02', icon: <Code2 size={20} style={{ color: '#8b5cf6' }} />, title: isKin ? 'Iga andika na code' : 'Learn & Code', desc: isKin ? 'Kora imyitozo ya JavaScript ikurikirana neza ku muvuduko wawe.' : 'Work through structured JavaScript exercises at your own pace.' },
+              { step: '03', icon: <Zap size={20} style={{ color: '#f59e0b' }} />, title: isKin ? 'Bona ibisobanuro bya AI' : 'Get AI Feedback', desc: isKin ? 'Ibisobanuro byihuse mu Kinyarwanda cyangwa mu Cyongereza mu gihe wagize aho uheranwa.' : 'Instant explanations in Kinyarwanda or English when you get stuck.' },
             ].map((s, i) => (
               <div key={i} className="flex flex-col items-center text-center">
                 <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-4 relative" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
@@ -358,10 +358,10 @@ export default function LandingPage({ onLogin, onSignup, onSchoolSignup }: Props
             <div className="relative z-10">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold mb-6" style={{ background: 'rgba(0,212,170,0.1)', border: '1px solid rgba(0,212,170,0.2)', color: '#00d4aa' }}>
                 <BookOpen size={12} />
-                {isKin ? 'Amashuri' : 'For Schools & Teachers'}
+                {isKin ? 'Ku Mashuri n\'Abarimu' : 'For Schools & Teachers'}
               </div>
               <h2 className="text-3xl font-bold mb-4" style={{ color: '#f1f5f9', letterSpacing: '-0.01em' }}>
-                {isKin ? 'Ishuri Ryawe Rikeneye EduCode?' : 'Bring EduCode to Your School'}
+                {isKin ? 'Zana EduCode mu ishuri ryawe' : 'Bring EduCode to Your School'}
               </h2>
               <p className="max-w-xl mx-auto mb-8 leading-relaxed" style={{ color: '#64748b' }}>
                 {isKin
@@ -375,7 +375,7 @@ export default function LandingPage({ onLogin, onSignup, onSchoolSignup }: Props
                 onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = '#00bfa0'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = '#00d4aa'; }}
               >
-                {isKin ? 'Saba Demo y\'Ubuntu' : 'Request a Free Demo'}
+                {isKin ? 'Saba Demo y\'ubuntu' : 'Request a Free Demo'}
               </button>
             </div>
           </div>
@@ -398,7 +398,7 @@ export default function LandingPage({ onLogin, onSignup, onSchoolSignup }: Props
               onMouseEnter={e => (e.currentTarget.style.color = '#94a3b8')}
               onMouseLeave={e => (e.currentTarget.style.color = '#475569')}
             >
-              {isKin ? 'Injira' : 'Log In'}
+              {isKin ? 'Kwinjira' : 'Log In'}
             </button>
             <button onClick={onSignup} className="transition-colors"
               onMouseEnter={e => (e.currentTarget.style.color = '#94a3b8')}

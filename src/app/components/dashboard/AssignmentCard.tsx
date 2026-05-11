@@ -106,7 +106,7 @@ export function AssignmentCard({ assignment, language, onClick }: AssignmentCard
           {assignment.status === 'not-started'
             ? (isKinyarwanda ? 'Tangira' : 'Start')
             : assignment.status === 'completed'
-            ? (isKinyarwanda ? 'Reba' : 'Review')
+            ? (isKinyarwanda ? 'Suzuma' : 'Review')
             : (isKinyarwanda ? 'Komeza' : 'Continue')}
           <ArrowRight size={14} />
         </button>

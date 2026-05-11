@@ -21,10 +21,10 @@ export function AIInsights({ language, insights }: AIInsightsProps) {
         </div>
         <div>
           <p className="text-base font-semibold" style={{ fontFamily: 'Inter, sans-serif', color: '#f1f5f9' }}>
-            {isKinyarwanda ? 'Ibisobanuro by\'AI' : 'AI Insights'}
+            {isKinyarwanda ? 'Inama za AI' : 'AI Insights'}
           </p>
           <p className="text-sm" style={{ fontFamily: 'Inter, sans-serif', color: '#475569' }}>
-            {isKinyarwanda ? 'Ibyo ukwiye kunoza' : 'Personalized for you'}
+            {isKinyarwanda ? 'Ibyakorewe wowe' : 'Personalized for you'}
           </p>
         </div>
       </div>
@@ -54,7 +54,7 @@ export function AIInsights({ language, insights }: AIInsightsProps) {
         onMouseEnter={e => (e.currentTarget.style.background = 'rgba(139,92,246,0.2)')}
         onMouseLeave={e => (e.currentTarget.style.background = 'rgba(139,92,246,0.12)')}
       >
-        {isKinyarwanda ? 'Bona Ubufasha Bwihariye' : 'Get Personalized Help'}
+        {isKinyarwanda ? 'Bona ubufasha bwihariye' : 'Get Personalized Help'}
       </button>
     </div>
   );

@@ -51,7 +51,7 @@ function AddTeacherModal({ schoolId, language, onClose, onAdded }: {
       <div className="w-full max-w-sm rounded-2xl p-6" style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.08)' }}>
         <div className="flex items-center justify-between mb-5">
           <h3 className="text-base font-bold" style={{ color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}>
-            {isKin ? 'Ongeramo Umwarimu' : 'Add Teacher'}
+            {isKin ? 'Ongeramo umwarimu' : 'Add Teacher'}
           </h3>
           <button onClick={onClose} style={{ color: '#475569' }}
             onMouseEnter={e => (e.currentTarget.style.color = '#94a3b8')}
@@ -64,14 +64,14 @@ function AddTeacherModal({ schoolId, language, onClose, onAdded }: {
           <div className="text-center py-4">
             <div className="text-3xl mb-2">✅</div>
             <p className="text-sm font-semibold" style={{ color: '#00d4aa', fontFamily: 'Inter, sans-serif' }}>
-              {isKin ? 'Umwarimu yongewe!' : 'Teacher added!'}
+              {isKin ? 'Umwarimu yongewe neza!' : 'Teacher added!'}
             </p>
           </div>
         ) : (
           <>
             <p className="text-xs mb-4" style={{ color: '#64748b', fontFamily: 'Inter, sans-serif' }}>
               {isKin
-                ? 'Shyiramo email y\'umwarimu wiyandikishije kuri EduCode Rwanda.'
+                ? 'Shyiramo i-meyili y\'umwarimu usanzwe afite konti muri EduCode Rwanda.'
                 : 'Enter the email of a teacher who has already signed up on EduCode Rwanda.'}
             </p>
             <input
@@ -79,7 +79,7 @@ function AddTeacherModal({ schoolId, language, onClose, onAdded }: {
               value={email}
               onChange={e => setEmail(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleAdd()}
-              placeholder={isKin ? 'email@ishuri.rw' : 'teacher@school.rw'}
+              placeholder={isKin ? 'mwarimu@ishuri.rw' : 'teacher@school.rw'}
               className="w-full px-4 py-3 rounded-xl text-sm mb-3 outline-none"
               style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}
             />
@@ -90,7 +90,7 @@ function AddTeacherModal({ schoolId, language, onClose, onAdded }: {
               className="w-full py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2"
               style={{ background: '#00d4aa', color: '#0d0f14', opacity: loading || !email.trim() ? 0.6 : 1 }}>
               {loading ? <Loader size={14} className="animate-spin" /> : <UserPlus size={14} />}
-              {isKin ? 'Ongeramo' : 'Add Teacher'}
+              {isKin ? 'Ongeramo umwarimu' : 'Add Teacher'}
             </button>
           </>
         )}
@@ -124,7 +124,7 @@ function AnnouncementModal({ schoolId, language, onClose, onCreated }: {
       <div className="w-full max-w-md rounded-2xl p-6" style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.08)' }}>
         <div className="flex items-center justify-between mb-5">
           <h3 className="text-base font-bold" style={{ color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}>
-            {isKin ? 'Inkuru Nshya' : 'New Announcement'}
+            {isKin ? 'Itangazo rishya' : 'New Announcement'}
           </h3>
           <button onClick={onClose} style={{ color: '#475569' }}
             onMouseEnter={e => (e.currentTarget.style.color = '#94a3b8')}
@@ -136,14 +136,14 @@ function AnnouncementModal({ schoolId, language, onClose, onCreated }: {
         <div className="space-y-3">
           <input
             value={title} onChange={e => setTitle(e.target.value)}
-            placeholder={isKin ? 'Umutwe w\'inkuru' : 'Announcement title'}
+            placeholder={isKin ? 'Umutwe w\'itangazo' : 'Announcement title'}
             className="w-full px-4 py-3 rounded-xl text-sm outline-none"
             style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}
           />
           <textarea
             value={body} onChange={e => setBody(e.target.value)}
             rows={4}
-            placeholder={isKin ? 'Ubutumwa bwawe...' : 'Message content...'}
+            placeholder={isKin ? 'Ibirimo mu butumwa...' : 'Message content...'}
             className="w-full px-4 py-3 rounded-xl text-sm outline-none resize-none"
             style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}
           />
@@ -155,7 +155,7 @@ function AnnouncementModal({ schoolId, language, onClose, onCreated }: {
               <div className="w-3 h-3 rounded-full bg-white transition-all" style={{ transform: pinned ? 'translateX(16px)' : 'translateX(0)' }} />
             </div>
             <span className="text-xs" style={{ color: '#64748b', fontFamily: 'Inter, sans-serif' }}>
-              {isKin ? 'Shyira hejuru (pin)' : 'Pin announcement'}
+              {isKin ? 'Shira itangazo hejuru' : 'Pin announcement'}
             </span>
           </label>
         </div>
@@ -168,7 +168,7 @@ function AnnouncementModal({ schoolId, language, onClose, onCreated }: {
           className="w-full mt-4 py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2"
           style={{ background: '#00d4aa', color: '#0d0f14', opacity: loading || !title.trim() || !body.trim() ? 0.6 : 1 }}>
           {loading ? <Loader size={14} className="animate-spin" /> : <Megaphone size={14} />}
-          {isKin ? 'Ohereza' : 'Post Announcement'}
+          {isKin ? 'Tangaza itangazo' : 'Post Announcement'}
         </button>
       </div>
     </div>
@@ -257,10 +257,10 @@ export default function SchoolAdminDashboard() {
         <div className="text-center max-w-sm">
           <div className="text-5xl mb-4">🏫</div>
           <h2 className="text-xl font-bold mb-2" style={{ color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}>
-            {isKin ? 'Nta shuri rihuye' : 'No school linked'}
+            {isKin ? 'Nta shuri rihujwe na yo' : 'No school linked'}
           </h2>
           <p className="text-sm" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
-            {isKin ? 'Vugana na EduCode Rwanda ngo bashyireho ishuri ryawe.' : 'Contact EduCode Rwanda to get your school set up.'}
+            {isKin ? 'Twandikire muri EduCode Rwanda kugirango dushyireho ishuri ryawe.' : 'Contact EduCode Rwanda to get your school set up.'}
           </p>
         </div>
       </div>
@@ -349,9 +349,9 @@ export default function SchoolAdminDashboard() {
               {[
                 { label: isKin ? 'Abarimu' : 'Teachers',         value: overview.teacher_count,                                               color: '#8b5cf6' },
                 { label: isKin ? 'Abanyeshuri' : 'Students',     value: overview.student_count,                                               color: '#00d4aa' },
-                { label: isKin ? 'Amazuru' : 'Classes',          value: overview.class_count,                                                 color: '#f59e0b' },
-                { label: isKin ? 'Amanota y\'ishuri' : 'Avg Score', value: overview.avg_score_pct !== null ? `${overview.avg_score_pct}%` : '—', color: overview.avg_score_pct !== null && overview.avg_score_pct >= 70 ? '#00d4aa' : '#f59e0b' },
-                { label: isKin ? 'Bakoresha iki cyumweru' : 'Active this week', value: overview.active_this_week, color: '#00d4aa' },
+                { label: isKin ? 'Amashuri (Classes)' : 'Classes',          value: overview.class_count,                                                 color: '#f59e0b' },
+                { label: isKin ? 'Amanota y\'ikigereranyo' : 'Avg Score', value: overview.avg_score_pct !== null ? `${overview.avg_score_pct}%` : '—', color: overview.avg_score_pct !== null && overview.avg_score_pct >= 70 ? '#00d4aa' : '#f59e0b' },
+                { label: isKin ? 'Abakoze muri iki cyumweru' : 'Active this week', value: overview.active_this_week, color: '#00d4aa' },
               ].map(s => (
                 <div key={s.label} className="rounded-2xl p-4 text-center" style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.06)' }}>
                   <p className="text-3xl font-bold mb-1" style={{ color: s.color }}>{s.value}</p>
@@ -364,13 +364,13 @@ export default function SchoolAdminDashboard() {
             {students.length > 0 && (
               <div className="rounded-2xl p-5" style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.06)' }}>
                 <h3 className="text-sm font-bold mb-4" style={{ color: '#f1f5f9' }}>
-                  {isKin ? 'Ikigereranyo cy\'ikoreshwa' : 'Engagement Snapshot'}
+                  {isKin ? 'Ishusho y’uko bakoresha platform' : 'Engagement Snapshot'}
                 </h3>
                 <div className="grid grid-cols-3 gap-3">
                   {[
-                    { label: isKin ? 'Bakora neza (≤7 iminsi)' : 'Engaged (≤7 days)', count: students.filter(s => s.days_inactive <= 7 && s.days_inactive !== 999).length, color: '#00d4aa', bg: 'rgba(0,212,170,0.06)' },
-                    { label: isKin ? 'Barenze 7 iminsi' : 'At risk (7–14 days)',  count: students.filter(s => s.days_inactive > 7 && s.days_inactive <= 14).length, color: '#f59e0b', bg: 'rgba(245,158,11,0.06)' },
-                    { label: isKin ? 'Ntibakoresha (+14 iminsi)' : 'Inactive (14+ days)', count: inactive2Weeks.length, color: '#ef4444', bg: 'rgba(239,68,68,0.06)' },
+                    { label: isKin ? 'Bakora neza (munsi y’iminsi 7)' : 'Engaged (≤7 days)', count: students.filter(s => s.days_inactive <= 7 && s.days_inactive !== 999).length, color: '#00d4aa', bg: 'rgba(0,212,170,0.06)' },
+                    { label: isKin ? 'Abashobora kurekeraho (iminsi 7–14)' : 'At risk (7–14 days)',  count: students.filter(s => s.days_inactive > 7 && s.days_inactive <= 14).length, color: '#f59e0b', bg: 'rgba(245,158,11,0.06)' },
+                    { label: isKin ? 'Batagikoresha platform (iminsi 14+)' : 'Inactive (14+ days)', count: inactive2Weeks.length, color: '#ef4444', bg: 'rgba(239,68,68,0.06)' },
                   ].map(s => (
                     <div key={s.label} className="rounded-xl p-4 text-center" style={{ background: s.bg, border: `1px solid ${s.color}20` }}>
                       <p className="text-2xl font-bold mb-1" style={{ color: s.color }}>{s.count}</p>
@@ -399,9 +399,9 @@ export default function SchoolAdminDashboard() {
             {announcements.length > 0 && (
               <div className="rounded-2xl p-5" style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.06)' }}>
                 <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-sm font-bold" style={{ color: '#f1f5f9' }}>{isKin ? 'Inkuru za Vuba' : 'Recent Announcements'}</h3>
+                  <h3 className="text-sm font-bold" style={{ color: '#f1f5f9' }}>{isKin ? 'Amatangazo ya vuba' : 'Recent Announcements'}</h3>
                   <button onClick={() => setActiveTab('announcements')} className="text-xs font-semibold" style={{ color: '#00d4aa' }}>
-                    {isKin ? 'Reba Zose' : 'See All'}
+                    {isKin ? 'Reba yose' : 'See All'}
                   </button>
                 </div>
                 {announcements.slice(0, 2).map(a => (
@@ -426,7 +426,7 @@ export default function SchoolAdminDashboard() {
                 onClick={() => setShowAddTeacher(true)}
                 className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold"
                 style={{ background: 'rgba(0,212,170,0.1)', color: '#00d4aa', border: '1px solid rgba(0,212,170,0.2)' }}>
-                <UserPlus size={13} /> {isKin ? 'Ongeramo' : 'Add Teacher'}
+                <UserPlus size={13} /> {isKin ? 'Ongeramo umwarimu' : 'Add Teacher'}
               </button>
             </div>
 
@@ -434,7 +434,7 @@ export default function SchoolAdminDashboard() {
               <div className="text-center py-16 rounded-2xl" style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.06)' }}>
                 <Users size={32} style={{ color: '#1e293b', margin: '0 auto 12px' }} />
                 <p className="text-sm" style={{ color: '#475569' }}>
-                  {isKin ? 'Nta mwarimu uhuye n\'ishuri ryawe.' : 'No teachers linked to your school yet.'}
+                  {isKin ? 'Nta mwarimu urahuzwa n’ishuri ryawe.' : 'No teachers linked to your school yet.'}
                 </p>
                 <p className="text-xs mt-1" style={{ color: '#334155' }}>
                   {isKin ? 'Kanda "Ongeramo" wongeye umwarimu.' : 'Click "Add Teacher" to link one.'}
@@ -460,7 +460,7 @@ export default function SchoolAdminDashboard() {
                     <div className="flex items-center gap-4 shrink-0">
                       <div className="hidden sm:flex gap-4 text-center">
                         {[
-                          { v: t.class_count,      l: isKin ? 'Amazuru' : 'Classes' },
+                          { v: t.class_count,      l: isKin ? 'Amashuri (Classes)' : 'Classes' },
                           { v: t.student_count,    l: isKin ? 'Abanyeshuri' : 'Students' },
                           { v: t.assignment_count, l: isKin ? 'Imishinga' : 'Assignments' },
                         ].map(s => (
@@ -478,7 +478,7 @@ export default function SchoolAdminDashboard() {
                         style={{ color: '#475569' }}
                         onMouseEnter={e => (e.currentTarget.style.color = '#ef4444')}
                         onMouseLeave={e => (e.currentTarget.style.color = '#475569')}
-                        title={isKin ? 'Kura umwarimu' : 'Remove teacher'}>
+                        title={isKin ? 'Kuramo umwarimu' : 'Remove teacher'}>
                         {removingId === t.id ? <Loader size={14} className="animate-spin" /> : <UserMinus size={14} />}
                       </button>
                     </div>
@@ -497,7 +497,7 @@ export default function SchoolAdminDashboard() {
                 {isKin ? `Abanyeshuri (${students.length})` : `Students (${students.length})`}
               </h2>
               <span className="text-xs px-3 py-1 rounded-lg" style={{ background: 'rgba(255,255,255,0.04)', color: '#475569' }}>
-                {isKin ? 'Gutondeka: Ntibakoresha' : 'Sorted: least active first'}
+                {isKin ? 'Bitondekanyijwe: Abadakoresha cyane nibo baza mbere' : 'Sorted: least active first'}
               </span>
             </div>
 
@@ -521,7 +521,7 @@ export default function SchoolAdminDashboard() {
                       <div className="min-w-0">
                         <p className="text-sm font-semibold truncate" style={{ color: '#f1f5f9' }}>{s.full_name}</p>
                         <p className="text-xs mt-0.5 truncate" style={{ color: '#475569' }}>
-                          {s.class_names.join(', ') || (isKin ? 'Nta ishuri' : 'No class')}
+                          {s.class_names.join(', ') || (isKin ? 'Nta shuri ririmo' : 'No class')}
                         </p>
                       </div>
                     </div>
@@ -549,11 +549,11 @@ export default function SchoolAdminDashboard() {
           <div className="space-y-5">
             <div>
               <h2 className="text-sm font-bold mb-1" style={{ color: '#f1f5f9' }}>
-                {isKin ? 'Abanyeshuri Batakoresha Platform' : 'Student Engagement Monitor'}
+                {isKin ? 'Kugenzura uko abanyeshuri bakoresha platform' : 'Student Engagement Monitor'}
               </h2>
               <p className="text-xs" style={{ color: '#475569' }}>
                 {isKin
-                  ? 'Abanyeshuri b\'iminsi 7+ ntibonekaga kuri platform. Bwira abarimu babo babahamagare.'
+                  ? 'Abanyeshuri bamaze iminsi 7+ batagaragara kuri platform. Bwira abarimu babo babakurikirane.'
                   : 'Students inactive for 7+ days. Advise their teachers to follow up.'}
               </p>
             </div>
@@ -562,7 +562,7 @@ export default function SchoolAdminDashboard() {
               <div className="text-center py-16 rounded-2xl" style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.06)' }}>
                 <div className="text-4xl mb-3">🎉</div>
                 <p className="text-sm font-semibold" style={{ color: '#00d4aa' }}>
-                  {isKin ? 'Abanyeshuri bose bakoresha platform!' : 'All students are actively using the platform!'}
+                  {isKin ? 'Abanyeshuri bose barimo gukoresha platform neza!' : 'All students are actively using the platform!'}
                 </p>
               </div>
             ) : (
@@ -570,9 +570,9 @@ export default function SchoolAdminDashboard() {
                 {/* Severity buckets */}
                 <div className="grid grid-cols-3 gap-3">
                   {[
-                    { label: isKin ? '7–14 iminsi' : '7–14 days inactive', count: students.filter(s => s.days_inactive >= 7 && s.days_inactive < 14).length, color: '#f59e0b', bg: 'rgba(245,158,11,0.06)' },
-                    { label: isKin ? '14+ iminsi' : '14+ days inactive',    count: students.filter(s => s.days_inactive >= 14 && s.days_inactive !== 999).length, color: '#ef4444', bg: 'rgba(239,68,68,0.06)' },
-                    { label: isKin ? 'Ntibarigeze kwinjira' : 'Never logged in', count: neverLoggedIn.length, color: '#ef4444', bg: 'rgba(239,68,68,0.08)' },
+                    { label: isKin ? 'Iminsi 7–14 batagaragara' : '7–14 days inactive', count: students.filter(s => s.days_inactive >= 7 && s.days_inactive < 14).length, color: '#f59e0b', bg: 'rgba(245,158,11,0.06)' },
+                    { label: isKin ? 'Iminsi 14+ batagaragara' : '14+ days inactive',    count: students.filter(s => s.days_inactive >= 14 && s.days_inactive !== 999).length, color: '#ef4444', bg: 'rgba(239,68,68,0.06)' },
+                    { label: isKin ? 'Ntibarigera binjira na rimwe' : 'Never logged in', count: neverLoggedIn.length, color: '#ef4444', bg: 'rgba(239,68,68,0.08)' },
                   ].map(s => (
                     <div key={s.label} className="rounded-xl p-3 text-center" style={{ background: s.bg, border: `1px solid ${s.color}25` }}>
                       <p className="text-2xl font-bold" style={{ color: s.color }}>{s.count}</p>
@@ -587,7 +587,7 @@ export default function SchoolAdminDashboard() {
                     <div className="flex items-center gap-2">
                       <AlertCircle size={14} style={{ color: '#f87171' }} />
                       <p className="text-xs font-bold" style={{ color: '#f87171' }}>
-                        {isKin ? `Basaba gukurikirana (${atRisk.length})` : `Need follow-up (${atRisk.length})`}
+                        {isKin ? `Bakeneye gukurikiranwa (${atRisk.length})` : `Need follow-up (${atRisk.length})`}
                       </p>
                     </div>
                   </div>
@@ -602,7 +602,7 @@ export default function SchoolAdminDashboard() {
                         <div>
                           <p className="text-sm font-semibold" style={{ color: '#f1f5f9' }}>{s.full_name}</p>
                           <p className="text-xs" style={{ color: '#475569' }}>
-                            {s.class_names.join(', ') || (isKin ? 'Nta ishuri' : 'No class')}
+                            {s.class_names.join(', ') || (isKin ? 'Nta shuri ririmo' : 'No class')}
                           </p>
                         </div>
                       </div>
@@ -625,13 +625,13 @@ export default function SchoolAdminDashboard() {
           <div>
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-sm font-bold" style={{ color: '#f1f5f9' }}>
-                {isKin ? 'Inkuru z\'Ishuri' : 'School Announcements'}
+                {isKin ? 'Amatangazo y’Ishuri' : 'School Announcements'}
               </h2>
               <button
                 onClick={() => setShowAnnouncement(true)}
                 className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold"
                 style={{ background: 'rgba(0,212,170,0.1)', color: '#00d4aa', border: '1px solid rgba(0,212,170,0.2)' }}>
-                <Plus size={13} /> {isKin ? 'Inkuru Nshya' : 'New Announcement'}
+                <Plus size={13} /> {isKin ? 'Itangazo rishya' : 'New Announcement'}
               </button>
             </div>
 
@@ -639,7 +639,7 @@ export default function SchoolAdminDashboard() {
               <div className="text-center py-16 rounded-2xl" style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.06)' }}>
                 <Megaphone size={32} style={{ color: '#1e293b', margin: '0 auto 12px' }} />
                 <p className="text-sm" style={{ color: '#475569' }}>
-                  {isKin ? 'Nta nkuru. Kanda hejuru wongeye inkuru.' : 'No announcements yet. Post one above.'}
+                  {isKin ? 'Nta matangazo arahari. Koresha uburyo bwo hejuru ushyireho rishya.' : 'No announcements yet. Post one above.'}
                 </p>
               </div>
             ) : (
