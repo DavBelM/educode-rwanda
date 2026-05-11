@@ -20,10 +20,10 @@ export function AIInsights({ language, insights }: AIInsightsProps) {
           <Sparkles size={18} style={{ color: '#8b5cf6' }} />
         </div>
         <div>
-          <p className="text-sm font-semibold" style={{ fontFamily: 'Inter, sans-serif', color: '#f1f5f9' }}>
+          <p className="text-base font-semibold" style={{ fontFamily: 'Inter, sans-serif', color: '#f1f5f9' }}>
             {isKinyarwanda ? 'Ibisobanuro by\'AI' : 'AI Insights'}
           </p>
-          <p className="text-xs" style={{ fontFamily: 'Inter, sans-serif', color: '#475569' }}>
+          <p className="text-sm" style={{ fontFamily: 'Inter, sans-serif', color: '#475569' }}>
             {isKinyarwanda ? 'Ibyo ukwiye kunoza' : 'Personalized for you'}
           </p>
         </div>
@@ -34,9 +34,9 @@ export function AIInsights({ language, insights }: AIInsightsProps) {
         {insights.map((insight, i) => (
           <div key={i} className="flex items-start gap-3 rounded-xl p-3" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.04)' }}>
             {insight.isPositive
-              ? <CheckCircle size={15} className="shrink-0 mt-0.5" style={{ color: '#00d4aa' }} />
-              : <Lightbulb size={15} className="shrink-0 mt-0.5" style={{ color: '#f59e0b' }} />}
-            <p className="text-xs leading-relaxed" style={{ fontFamily: 'Inter, sans-serif', color: '#94a3b8' }}>
+              ? <CheckCircle size={16} className="shrink-0 mt-0.5" style={{ color: '#00d4aa' }} />
+              : <Lightbulb size={16} className="shrink-0 mt-0.5" style={{ color: '#f59e0b' }} />}
+            <p className="text-sm leading-relaxed" style={{ fontFamily: 'Inter, sans-serif', color: '#94a3b8' }}>
               {insight.text}
             </p>
           </div>
@@ -44,7 +44,7 @@ export function AIInsights({ language, insights }: AIInsightsProps) {
       </div>
 
       <button
-        className="w-full py-2.5 rounded-xl text-sm font-semibold transition-all"
+        className="w-full py-3 rounded-xl text-base font-semibold transition-all"
         style={{
           fontFamily: 'Inter, sans-serif',
           background: 'rgba(139,92,246,0.12)',

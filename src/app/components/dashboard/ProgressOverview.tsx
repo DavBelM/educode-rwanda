@@ -21,7 +21,7 @@ export function ProgressOverview({ language, progress, assignmentsCompleted, ass
       border: '1px solid rgba(255,255,255,0.06)',
       boxShadow: '0 4px 24px rgba(0,0,0,0.3)'
     }}>
-      <h2 className="text-base font-semibold mb-6" style={{ fontFamily: 'Inter, sans-serif', color: '#94a3b8', letterSpacing: '0.05em', textTransform: 'uppercase', fontSize: '11px' }}>
+      <h2 className="font-semibold mb-6" style={{ fontFamily: 'Inter, sans-serif', color: '#94a3b8', letterSpacing: '0.05em', textTransform: 'uppercase', fontSize: '13px' }}>
         {isKinyarwanda ? 'Iterambere' : 'Progress Overview'}
       </h2>
 
@@ -70,9 +70,9 @@ export function ProgressOverview({ language, progress, assignmentsCompleted, ass
           { label: isKinyarwanda ? 'Urwego' : 'Level', value: level, small: true },
         ].map((stat, i) => (
           <div key={i} className="rounded-xl p-4" style={{ background: '#1a1e2a', border: '1px solid rgba(255,255,255,0.04)' }}>
-            <p className="text-xs mb-1" style={{ fontFamily: 'Inter, sans-serif', color: '#475569' }}>{stat.label}</p>
+            <p className="text-sm mb-1" style={{ fontFamily: 'Inter, sans-serif', color: '#475569' }}>{stat.label}</p>
             <div className="flex items-center gap-1.5">
-              <p className={`font-bold ${stat.small ? 'text-sm' : 'text-2xl'}`} style={{ fontFamily: 'Inter, sans-serif', color: '#f1f5f9' }}>
+              <p className={`font-bold ${stat.small ? 'text-base' : 'text-2xl'}`} style={{ fontFamily: 'Inter, sans-serif', color: '#f1f5f9' }}>
                 {stat.value}
               </p>
               {stat.icon}
@@ -83,7 +83,7 @@ export function ProgressOverview({ language, progress, assignmentsCompleted, ass
 
       {/* CTA */}
       <button
-        className="w-full py-3 rounded-xl font-semibold text-sm transition-all"
+        className="w-full py-3.5 rounded-xl font-semibold text-base transition-all"
         style={{
           fontFamily: 'Inter, sans-serif',
           background: 'rgba(0,212,170,0.12)',

@@ -68,22 +68,22 @@ function CourseCatalog({ courses, language, onSelect }: {
                   (e.currentTarget as HTMLDivElement).style.boxShadow = 'none';
                 }}
               >
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4"
+                <div className="w-14 h-14 rounded-xl flex items-center justify-center mb-4"
                   style={{ background: 'rgba(0,212,170,0.1)', border: '1px solid rgba(0,212,170,0.15)' }}>
-                  <Code2 size={22} style={{ color: '#00d4aa' }} />
+                  <Code2 size={26} style={{ color: '#00d4aa' }} />
                 </div>
-                <h3 className="font-bold mb-2" style={{ color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}>{title}</h3>
-                <p className="text-sm mb-4" style={{ color: '#475569', fontFamily: 'Inter, sans-serif',
+                <h3 className="text-lg font-bold mb-2" style={{ color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}>{title}</h3>
+                <p className="text-base mb-4" style={{ color: '#475569', fontFamily: 'Inter, sans-serif',
                   display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                   {desc}
                 </p>
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="px-2 py-0.5 rounded-full text-xs font-semibold"
+                  <span className="px-2.5 py-1 rounded-full text-sm font-semibold"
                     style={{ background: diff.bg, color: diff.text, border: `1px solid ${diff.border}` }}>
                     {c.difficulty.charAt(0).toUpperCase() + c.difficulty.slice(1)}
                   </span>
-                  <span className="flex items-center gap-1 text-xs" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
-                    <Clock size={11} /> {c.estimated_hours}h
+                  <span className="flex items-center gap-1 text-sm" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
+                    <Clock size={13} /> {c.estimated_hours}h
                   </span>
                 </div>
               </div>
@@ -122,24 +122,24 @@ function CourseDetail({ course, language, onBack, onOpenLesson }: {
 
   return (
     <div>
-      <button onClick={onBack} className="flex items-center gap-2 text-sm mb-6 transition-all"
+      <button onClick={onBack} className="flex items-center gap-2 text-base mb-6 transition-all"
         style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}
         onMouseEnter={e => (e.currentTarget.style.color = '#94a3b8')}
         onMouseLeave={e => (e.currentTarget.style.color = '#475569')}>
-        <ArrowLeft size={16} /> {isKin ? 'Garuka ku Masomo' : 'Back to Courses'}
+        <ArrowLeft size={18} /> {isKin ? 'Garuka ku Masomo' : 'Back to Courses'}
       </button>
 
       {/* Course header */}
       <div className="rounded-2xl p-6 mb-6" style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.06)' }}>
-        <h2 className="text-xl font-bold mb-2" style={{ color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}>{courseTitle}</h2>
-        <p className="text-sm mb-4" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
+        <h2 className="text-2xl font-bold mb-2" style={{ color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}>{courseTitle}</h2>
+        <p className="text-base mb-4" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
           {isKin && course.description_kin ? course.description_kin : course.description}
         </p>
         <div className="flex items-center gap-4 mb-3">
-          <span className="text-sm font-semibold" style={{ color: '#00d4aa', fontFamily: 'Inter, sans-serif' }}>
+          <span className="text-base font-semibold" style={{ color: '#00d4aa', fontFamily: 'Inter, sans-serif' }}>
             {completedCount}/{totalLessons} {isKin ? 'imishomo' : 'lessons'}
           </span>
-          <span className="text-sm" style={{ color: '#475569' }}>{pct}%</span>
+          <span className="text-base" style={{ color: '#475569' }}>{pct}%</span>
         </div>
         <div className="w-full h-2 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
           <div className="h-full rounded-full transition-all duration-500"
@@ -163,12 +163,12 @@ function CourseDetail({ course, language, onBack, onOpenLesson }: {
                 {/* Module header */}
                 <div className="px-5 py-4 flex items-center gap-3"
                   style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
-                  <div className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold"
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold"
                     style={{ background: modDone ? 'rgba(0,212,170,0.15)' : 'rgba(255,255,255,0.05)',
                       color: modDone ? '#00d4aa' : '#475569', fontFamily: 'Inter, sans-serif' }}>
                     {mi + 1}
                   </div>
-                  <h3 className="flex-1 font-semibold" style={{ color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}>
+                  <h3 className="flex-1 text-base font-semibold" style={{ color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}>
                     {modTitle}
                   </h3>
                   {modDone && <CheckCircle size={16} style={{ color: '#00d4aa' }} />}
@@ -183,7 +183,7 @@ function CourseDetail({ course, language, onBack, onOpenLesson }: {
                       <div
                         key={lesson.id}
                         onClick={() => onOpenLesson(lesson, allLessons)}
-                        className="flex items-center gap-3 px-5 py-3 cursor-pointer transition-all"
+                        className="flex items-center gap-3 px-5 py-4 cursor-pointer transition-all"
                         style={{ borderTop: li > 0 ? '1px solid rgba(255,255,255,0.04)' : 'none' }}
                         onMouseEnter={e => (e.currentTarget as HTMLDivElement).style.background = 'rgba(255,255,255,0.02)'}
                         onMouseLeave={e => (e.currentTarget as HTMLDivElement).style.background = 'transparent'}
@@ -194,18 +194,18 @@ function CourseDetail({ course, language, onBack, onOpenLesson }: {
                             : <div className="w-4 h-4 rounded-full border" style={{ borderColor: 'rgba(255,255,255,0.12)' }} />
                           }
                         </div>
-                        <span className="flex-1 text-sm" style={{ color: done ? '#64748b' : '#cbd5e1', fontFamily: 'Inter, sans-serif' }}>
+                        <span className="flex-1 text-base" style={{ color: done ? '#64748b' : '#cbd5e1', fontFamily: 'Inter, sans-serif' }}>
                           {lessonTitle}
                         </span>
                         <div className="flex items-center gap-2">
-                          <span className="flex items-center gap-1 px-2 py-0.5 rounded-full text-xs"
+                          <span className="flex items-center gap-1 px-2.5 py-1 rounded-full text-sm"
                             style={{ background: lt.bg, color: lt.text, border: `1px solid ${lt.border}` }}>
                             {lt.icon} {lt.label}
                           </span>
-                          <span className="flex items-center gap-1 text-xs" style={{ color: '#475569' }}>
-                            <Zap size={10} style={{ color: '#f59e0b' }} />{lesson.xp_reward}
+                          <span className="flex items-center gap-1 text-sm" style={{ color: '#475569' }}>
+                            <Zap size={12} style={{ color: '#f59e0b' }} />{lesson.xp_reward}
                           </span>
-                          <ChevronRight size={14} style={{ color: '#334155' }} />
+                          <ChevronRight size={16} style={{ color: '#334155' }} />
                         </div>
                       </div>
                     );
@@ -237,20 +237,20 @@ export default function CoursesPage({ language, onBack, onOpenLesson }: Props) {
       {/* Top bar */}
       <div className="border-b px-6 py-4 flex items-center gap-3"
         style={{ background: '#13161e', borderColor: 'rgba(255,255,255,0.06)' }}>
-        <button onClick={onBack} className="flex items-center gap-2 text-sm transition-all"
+        <button onClick={onBack} className="flex items-center gap-2 text-base transition-all"
           style={{ color: '#475569' }}
           onMouseEnter={e => (e.currentTarget.style.color = '#94a3b8')}
           onMouseLeave={e => (e.currentTarget.style.color = '#475569')}>
-          <ArrowLeft size={16} /> {isKin ? 'Garuka' : 'Dashboard'}
+          <ArrowLeft size={18} /> {isKin ? 'Garuka' : 'Dashboard'}
         </button>
         <span style={{ color: 'rgba(255,255,255,0.08)' }}>|</span>
-        <span className="flex items-center gap-2 text-sm font-semibold" style={{ color: '#f1f5f9' }}>
-          <BookOpen size={15} style={{ color: '#00d4aa' }} />
+        <span className="flex items-center gap-2 text-base font-semibold" style={{ color: '#f1f5f9' }}>
+          <BookOpen size={16} style={{ color: '#00d4aa' }} />
           {isKin ? 'Amasomo' : 'Courses'}
         </span>
       </div>
 
-      <div className="max-w-5xl mx-auto px-4 py-8">
+      <div className="max-w-5xl mx-auto px-6 py-8">
         {loading ? (
           <div className="flex justify-center py-24">
             <div className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin"
