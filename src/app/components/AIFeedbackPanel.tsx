@@ -164,7 +164,7 @@ export function AIFeedbackPanel({ feedback, language, isLoading = false, aiRespo
 
         {/* AI Model Response */}
         {(aiLoading || aiResponse) && (
-          <div className="mt-2 p-4 rounded-xl" style={{ background: 'linear-gradient(135deg, #1e1b4b, #2e1065)', border: '1px solid rgba(139,92,246,0.3)' }}>
+          <div className="mt-2 p-4 rounded-xl" style={{ background: 'var(--ec-gradient-ai)', border: '1px solid rgba(139,92,246,0.3)' }}>
             <div className="flex items-center gap-2 mb-2">
               <Sparkles size={14} style={{ color: '#a78bfa' }} />
               <span className="text-xs font-bold uppercase tracking-wide" style={{ color: '#a78bfa' }}>

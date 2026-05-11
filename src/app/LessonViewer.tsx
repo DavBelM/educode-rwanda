@@ -1,3 +1,4 @@
+import { ThemeToggle } from './components/ThemeToggle';
 import { useState, useCallback } from 'react';
 import { ArrowLeft, Play, CheckCircle, Loader, Zap, BookOpen, Code2, HelpCircle, Monitor } from 'lucide-react';
 import { completeLesson, type CourseLesson } from '../lib/db';
@@ -405,6 +406,7 @@ export default function LessonViewer({ lesson, courseTitle, language, nextLesson
           <ArrowLeft size={16} /> {courseTitle}
         </button>
         <span style={{ color: 'var(--ec-b2)' }}>|</span>
+        <div className="ml-auto"><ThemeToggle /></div>
         <span className="flex items-center gap-1 px-2 py-1 rounded-full text-xs"
           style={{ background: typeInfo.bg, color: typeInfo.color, border: `1px solid ${typeInfo.border}` }}>
           {typeInfo.icon} {typeInfo.label}

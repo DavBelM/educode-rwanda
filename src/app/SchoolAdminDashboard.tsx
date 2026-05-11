@@ -1,3 +1,4 @@
+import { ThemeToggle } from './components/ThemeToggle';
 import { useState, useEffect } from 'react';
 import { Users, BookOpen, BarChart2, Megaphone, X, Plus, Trash2, Pin, AlertCircle, Loader, Mail, MapPin, Copy, Check, UserMinus, UserPlus, Clock } from 'lucide-react';
 import {
@@ -302,6 +303,7 @@ export default function SchoolAdminDashboard() {
           </div>
           <div className="flex items-center gap-3">
             {/* Language toggle */}
+            <ThemeToggle />
             <div className="flex items-center gap-1 rounded-lg p-1" style={{ background: 'var(--ec-b3)', border: '1px solid var(--ec-b1)' }}>
               {(['EN', 'KIN'] as const).map(l => (
                 <button key={l} onClick={() => setLanguage(l)}

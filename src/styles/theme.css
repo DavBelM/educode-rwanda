@@ -150,3 +150,21 @@
   button { font-size: var(--text-base); font-weight: var(--font-weight-medium); line-height: 1.5; }
   input  { font-size: var(--text-base); font-weight: var(--font-weight-normal); line-height: 1.5; }
 }
+
+/* ── Gradient tokens ─────────────────────────────────────────────────────── */
+:root,
+:root[data-theme="dark"] {
+  --ec-gradient-hero:     linear-gradient(135deg, #13161e 0%, #1a1e2a 50%, #13161e 100%);
+  --ec-gradient-practice: linear-gradient(135deg, #0f2027, #1a1040);
+  --ec-gradient-ai:       linear-gradient(135deg, #1e1b4b, #2e1065);
+  --ec-footer-bg:         #0f172a;
+  --ec-about-hero-bg:     linear-gradient(135deg, #1e293b, #0f172a);
+}
+
+:root[data-theme="light"] {
+  --ec-gradient-hero:     linear-gradient(135deg, #ffffff 0%, #f1f5f9 50%, #ffffff 100%);
+  --ec-gradient-practice: linear-gradient(135deg, #ede9fe, #e0e7ff);
+  --ec-gradient-ai:       linear-gradient(135deg, #ede9fe, #ddd6fe);
+  --ec-footer-bg:         #1e293b;
+  --ec-about-hero-bg:     linear-gradient(135deg, #e2e8f0, #f1f5f9);
+}

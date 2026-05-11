@@ -1,3 +1,4 @@
+import { ThemeToggle } from './components/ThemeToggle';
 import { useState, useEffect } from 'react';
 import { Code2, BookOpen, Zap, Flame, ChevronRight, Loader, Bot, Star, ArrowRight } from 'lucide-react';
 import { useAuth } from '../lib/auth';
@@ -106,6 +107,7 @@ export default function SelfLearnerDashboard({ language, onLanguageChange, onSta
                 <span className="text-xs font-bold" style={{ color: '#f59e0b' }}>{streak}</span>
               </div>
             )}
+            <ThemeToggle />
             {/* Language toggle */}
             <div className="flex items-center gap-1 rounded-lg p-1" style={{ background: 'var(--ec-b3)', border: '1px solid var(--ec-b1)' }}>
               {(['EN', 'KIN'] as const).map(l => (

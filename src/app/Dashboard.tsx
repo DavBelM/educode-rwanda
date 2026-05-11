@@ -505,7 +505,7 @@ export default function Dashboard({ language, onLanguageChange, onStartCoding, o
           {/* Insights & Badges */}
           <div className="lg:col-span-3 space-y-6">
             {/* Practice card */}
-            <div className="rounded-2xl p-4" style={{ background: 'linear-gradient(135deg, #0f2027, #1a1040)', border: '1px solid rgba(139,92,246,0.25)' }}>
+            <div className="rounded-2xl p-4" style={{ background: 'var(--ec-gradient-practice)', border: '1px solid rgba(139,92,246,0.25)' }}>
               <div className="flex items-center gap-2 mb-3">
                 <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'rgba(139,92,246,0.15)', border: '1px solid rgba(139,92,246,0.3)' }}>
                   <Code2 size={16} style={{ color: '#a78bfa' }} />

@@ -1,3 +1,4 @@
+import { ThemeToggle } from './components/ThemeToggle';
 import { useState, useEffect } from 'react';
 import { ArrowLeft, BookOpen, Code2, CheckCircle, Clock, MessageSquare, TrendingUp, Bell } from 'lucide-react';
 import { getStudentResults, type StudentResult } from '../lib/db';
@@ -85,6 +86,7 @@ export default function MyResultsPage({ language, onBack }: Props) {
           <ArrowLeft size={18} />
           {isKin ? 'Subira inyuma' : 'Back'}
         </button>
+        <ThemeToggle />
         <h1 className="font-bold" style={{ color: 'var(--ec-text-1)', fontSize: '18px' }}>
           {isKin ? 'Amanota Yanjye' : 'My Results'}
         </h1>
