@@ -32,6 +32,59 @@ function getMockResponse(error: string | null, language: 'EN' | 'KIN'): string {
   return map.generic;
 }
 
+// Mock tutor responses for lesson context
+const TUTOR_MOCK_EN = [
+  "Good question! Look at the instructions again carefully — what output is expected? Try tracing through your code line by line to see what value each variable holds.",
+  "You're on the right track! Check that your variable names match exactly — JavaScript is case-sensitive. Also make sure you're using `console.log()` to see your output.",
+  "Think about the structure first: what do you need to declare? What calculation do you need to do? What do you need to display? Try tackling it one step at a time.",
+  "Look at the starter code — it gives you hints about what variables to use. Try running what you have first, then read the error message carefully.",
+];
+
+const TUTOR_MOCK_KIN = [
+  "Ikibazo cyiza! Subiramo amabwiriza neza — ni ikihe gisubizo gitegerezwa? Gerageza gusubiramo kode yawe umurongo ku murongo urebe agaciro ka buri variable.",
+  "Uri inzira nziza! Genzura ko amazina y'amagarama yanyu yingana neza — JavaScript ireba uburyo wandikiye. Kandi genzura ko ukoresha `console.log()` kugirango ubone ibisubizo.",
+  "Tekereza imiterere mbere: ni iki ugomba gushyiraho? Ni ikihe ibarura ugomba gukora? Ni iki ugomba kwerekana? Gerageza gukemura intambwe imwe imwe.",
+  "Reba kode ya tangira — igutangira. Gerageza kora ibyo ufite mbere, hanyuma soma neza ubutumwa bw'ikosa.",
+];
+
+export async function getLessonAIHelp(
+  question: string,
+  code: string,
+  instructions: string,
+  language: 'EN' | 'KIN'
+): Promise<string> {
+  if (!HF_API_URL) {
+    await new Promise(r => setTimeout(r, 1000));
+    const pool = language === 'KIN' ? TUTOR_MOCK_KIN : TUTOR_MOCK_EN;
+    return pool[Math.floor(Math.random() * pool.length)];
+  }
+
+  const context = language === 'KIN'
+    ? `Iri somo rigira aya mabwiriza:\n${instructions}\n\nCode y'umunyeshuri ubu:\n\`\`\`javascript\n${code}\n\`\`\`\n\nUmunyeshuri arabaza: ${question}`
+    : `This lesson has these instructions:\n${instructions}\n\nStudent's current code:\n\`\`\`javascript\n${code}\n\`\`\`\n\nStudent asks: ${question}`;
+
+  const response = await fetch(HF_API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      messages: [
+        { role: 'system', content: SYSTEM_PROMPT + ' The student is working on a course lesson. Guide them with hints and questions — do not give the full solution directly.' },
+        { role: 'user', content: context },
+      ],
+      max_tokens: 250,
+      temperature: 0.4,
+    }),
+  });
+
+  if (!response.ok) {
+    const pool = language === 'KIN' ? TUTOR_MOCK_KIN : TUTOR_MOCK_EN;
+    return pool[0];
+  }
+
+  const data = await response.json();
+  return data.choices?.[0]?.message?.content ?? TUTOR_MOCK_EN[0];
+}
+
 export async function getAIFeedback(
   code: string,
   error: string | null,
