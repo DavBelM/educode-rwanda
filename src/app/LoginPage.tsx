@@ -34,12 +34,12 @@ export default function LoginPage({ onSuccess, onSignupClick, onForgotPassword }
   };
 
   return (
-    <div className="min-h-screen flex" style={{ fontFamily: 'Inter, sans-serif', background: '#0d0f14' }}>
+    <div className="min-h-screen flex" style={{ fontFamily: 'Inter, sans-serif', background: 'var(--ec-bg)' }}>
 
       {/* Left Side - Brand panel */}
       <div
         className="hidden lg:flex lg:w-2/5 flex-col justify-between p-12 relative overflow-hidden"
-        style={{ background: '#13161e', borderRight: '1px solid rgba(255,255,255,0.06)' }}
+        style={{ background: 'var(--ec-surface)', borderRight: '1px solid var(--ec-b1)' }}
       >
         {/* Ambient glows */}
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-80 h-80 rounded-full pointer-events-none" style={{ background: 'radial-gradient(ellipse, rgba(0,212,170,0.08) 0%, transparent 70%)', filter: 'blur(40px)' }} />
@@ -52,7 +52,7 @@ export default function LoginPage({ onSuccess, onSignupClick, onForgotPassword }
               <path d="M8 6H16M8 12H16M8 18H13" stroke="white" strokeWidth="2" strokeLinecap="round"/>
             </svg>
           </div>
-          <span className="text-xl font-bold" style={{ color: '#f1f5f9' }}>EduCode Rwanda</span>
+          <span className="text-xl font-bold" style={{ color: 'var(--ec-text-1)' }}>EduCode Rwanda</span>
         </div>
 
         {/* Center visual */}
@@ -69,10 +69,10 @@ export default function LoginPage({ onSuccess, onSignupClick, onForgotPassword }
 
         {/* Tagline */}
         <div className="relative z-10">
-          <p className="text-base font-semibold mb-2" style={{ color: '#f1f5f9' }}>
+          <p className="text-base font-semibold mb-2" style={{ color: 'var(--ec-text-1)' }}>
             {isKinyarwanda ? 'Wige programming mu rurimi rwawe' : 'Learn programming in your language'}
           </p>
-          <p className="text-sm" style={{ color: '#475569' }}>
+          <p className="text-sm" style={{ color: 'var(--ec-text-6)' }}>
             {isKinyarwanda
               ? 'Ibisobanuro mu Kinyarwanda. Buri kosa risobanurwa.'
               : 'Error explanations in Kinyarwanda. Built for Rwanda.'}
@@ -81,7 +81,7 @@ export default function LoginPage({ onSuccess, onSignupClick, onForgotPassword }
       </div>
 
       {/* Right Side - Form */}
-      <div className="flex-1 flex items-center justify-center p-8" style={{ background: '#0d0f14' }}>
+      <div className="flex-1 flex items-center justify-center p-8" style={{ background: 'var(--ec-bg)' }}>
         <div className="w-full max-w-md">
 
           {/* Mobile Logo */}
@@ -91,19 +91,19 @@ export default function LoginPage({ onSuccess, onSignupClick, onForgotPassword }
                 <path d="M8 6H16M8 12H16M8 18H13" stroke="white" strokeWidth="2" strokeLinecap="round"/>
               </svg>
             </div>
-            <span className="text-xl font-bold" style={{ color: '#f1f5f9' }}>EduCode Rwanda</span>
+            <span className="text-xl font-bold" style={{ color: 'var(--ec-text-1)' }}>EduCode Rwanda</span>
           </div>
 
           {/* Language Toggle */}
           <div className="flex justify-end mb-8">
-            <div className="flex items-center rounded-lg overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.08)' }}>
+            <div className="flex items-center rounded-lg overflow-hidden" style={{ border: '1px solid var(--ec-b2)' }}>
               <button
                 onClick={() => setLanguage('EN')}
                 className="px-3 py-1.5 text-xs font-bold transition-all"
                 style={{
                   background: language === 'EN' ? 'rgba(0,212,170,0.15)' : 'transparent',
-                  color: language === 'EN' ? '#00d4aa' : '#475569',
-                  borderRight: '1px solid rgba(255,255,255,0.08)',
+                  color: language === 'EN' ? '#00d4aa' : 'var(--ec-text-6)',
+                  borderRight: '1px solid var(--ec-b2)',
                 }}
               >EN</button>
               <button
@@ -111,17 +111,17 @@ export default function LoginPage({ onSuccess, onSignupClick, onForgotPassword }
                 className="px-3 py-1.5 text-xs font-bold transition-all"
                 style={{
                   background: language === 'KIN' ? 'rgba(0,212,170,0.15)' : 'transparent',
-                  color: language === 'KIN' ? '#00d4aa' : '#475569',
+                  color: language === 'KIN' ? '#00d4aa' : 'var(--ec-text-6)',
                 }}
               >KIN</button>
             </div>
           </div>
 
           {/* Heading */}
-          <h1 className="text-3xl font-bold mb-2" style={{ color: '#f1f5f9', letterSpacing: '-0.01em' }}>
+          <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--ec-text-1)', letterSpacing: '-0.01em' }}>
             {isKinyarwanda ? 'Ikaze nanone' : 'Welcome Back'}
           </h1>
-          <p className="mb-8 text-sm" style={{ color: '#64748b' }}>
+          <p className="mb-8 text-sm" style={{ color: 'var(--ec-text-5)' }}>
             {isKinyarwanda ? 'Injira kugirango ukomeze kwiga' : 'Log in to continue learning'}
           </p>
 
@@ -130,11 +130,11 @@ export default function LoginPage({ onSuccess, onSignupClick, onForgotPassword }
 
             {/* Email */}
             <div>
-              <label className="block text-sm font-semibold mb-2" style={{ color: '#94a3b8' }}>
+              <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--ec-text-4)' }}>
                 {isKinyarwanda ? 'I-meyili (Email)' : 'Email'}
               </label>
               <div className="relative">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: '#475569' }} />
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--ec-text-6)' }} />
                 <input
                   type="text"
                   value={email}
@@ -143,23 +143,23 @@ export default function LoginPage({ onSuccess, onSignupClick, onForgotPassword }
                   className="w-full pl-11 pr-4 py-3 rounded-xl text-sm transition-all focus:outline-none"
                   style={{
                     height: '48px',
-                    background: '#13161e',
-                    border: error ? '1px solid rgba(239,68,68,0.5)' : '1px solid rgba(255,255,255,0.08)',
-                    color: '#f1f5f9',
+                    background: 'var(--ec-surface)',
+                    border: error ? '1px solid rgba(239,68,68,0.5)' : '1px solid var(--ec-b2)',
+                    color: 'var(--ec-text-1)',
                   }}
                   onFocus={e => { if (!error) e.target.style.border = '1px solid rgba(0,212,170,0.4)'; }}
-                  onBlur={e => { if (!error) e.target.style.border = '1px solid rgba(255,255,255,0.08)'; }}
+                  onBlur={e => { if (!error) e.target.style.border = '1px solid var(--ec-b2)'; }}
                 />
               </div>
             </div>
 
             {/* Password */}
             <div>
-              <label className="block text-sm font-semibold mb-2" style={{ color: '#94a3b8' }}>
+              <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--ec-text-4)' }}>
                 {isKinyarwanda ? 'Ijambo ry\'ibanga' : 'Password'}
               </label>
               <div className="relative">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: '#475569' }} />
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--ec-text-6)' }} />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={password}
@@ -168,20 +168,20 @@ export default function LoginPage({ onSuccess, onSignupClick, onForgotPassword }
                   className="w-full pl-11 pr-12 py-3 rounded-xl text-sm transition-all focus:outline-none"
                   style={{
                     height: '48px',
-                    background: '#13161e',
-                    border: error ? '1px solid rgba(239,68,68,0.5)' : '1px solid rgba(255,255,255,0.08)',
-                    color: '#f1f5f9',
+                    background: 'var(--ec-surface)',
+                    border: error ? '1px solid rgba(239,68,68,0.5)' : '1px solid var(--ec-b2)',
+                    color: 'var(--ec-text-1)',
                   }}
                   onFocus={e => { if (!error) e.target.style.border = '1px solid rgba(0,212,170,0.4)'; }}
-                  onBlur={e => { if (!error) e.target.style.border = '1px solid rgba(255,255,255,0.08)'; }}
+                  onBlur={e => { if (!error) e.target.style.border = '1px solid var(--ec-b2)'; }}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-4 top-1/2 -translate-y-1/2 transition-colors"
-                  style={{ color: '#475569' }}
-                  onMouseEnter={e => (e.currentTarget.style.color = '#94a3b8')}
-                  onMouseLeave={e => (e.currentTarget.style.color = '#475569')}
+                  style={{ color: 'var(--ec-text-6)' }}
+                  onMouseEnter={e => (e.currentTarget.style.color = 'var(--ec-text-4)')}
+                  onMouseLeave={e => (e.currentTarget.style.color = 'var(--ec-text-6)')}
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -197,9 +197,9 @@ export default function LoginPage({ onSuccess, onSignupClick, onForgotPassword }
 
             {/* Forgot password */}
             <div className="flex justify-end">
-              <button type="button" onClick={onForgotPassword} className="text-xs font-semibold transition-colors" style={{ color: '#475569' }}
+              <button type="button" onClick={onForgotPassword} className="text-xs font-semibold transition-colors" style={{ color: 'var(--ec-text-6)' }}
                 onMouseEnter={e => (e.currentTarget.style.color = '#00d4aa')}
-                onMouseLeave={e => (e.currentTarget.style.color = '#475569')}
+                onMouseLeave={e => (e.currentTarget.style.color = 'var(--ec-text-6)')}
               >
                 {isKinyarwanda ? 'Wibagiwe ijambo ryibanga?' : 'Forgot Password?'}
               </button>
@@ -210,12 +210,12 @@ export default function LoginPage({ onSuccess, onSignupClick, onForgotPassword }
               type="submit"
               disabled={loading}
               className="w-full rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all disabled:opacity-50"
-              style={{ height: '48px', background: '#00d4aa', color: '#0d0f14', boxShadow: '0 0 20px rgba(0,212,170,0.25)' }}
+              style={{ height: '48px', background: '#00d4aa', color: 'var(--ec-bg)', boxShadow: '0 0 20px rgba(0,212,170,0.25)' }}
               onMouseEnter={e => { if (!loading) (e.currentTarget as HTMLButtonElement).style.background = '#00bfa0'; }}
               onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = '#00d4aa'; }}
             >
               {loading ? (
-                <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" style={{ borderColor: '#0d0f14', borderTopColor: 'transparent' }} />
+                <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" style={{ borderColor: 'var(--ec-bg)', borderTopColor: 'transparent' }} />
               ) : (
                 <>
                   {isKinyarwanda ? 'Injira' : 'Log In'}
@@ -226,16 +226,16 @@ export default function LoginPage({ onSuccess, onSignupClick, onForgotPassword }
 
             {/* Divider */}
             <div className="relative flex items-center">
-              <div className="flex-1" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }} />
-              <span className="px-3 text-xs" style={{ color: '#334155' }}>
+              <div className="flex-1" style={{ borderTop: '1px solid var(--ec-b1)' }} />
+              <span className="px-3 text-xs" style={{ color: 'var(--ec-text-7)' }}>
                 {isKinyarwanda ? 'CYANGWA' : 'OR'}
               </span>
-              <div className="flex-1" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }} />
+              <div className="flex-1" style={{ borderTop: '1px solid var(--ec-b1)' }} />
             </div>
 
             {/* Sign Up Link */}
             <div className="text-center text-sm">
-              <span style={{ color: '#475569' }}>
+              <span style={{ color: 'var(--ec-text-6)' }}>
                 {isKinyarwanda ? 'Ntabwo ufite konti?' : "Don't have an account?"}{' '}
               </span>
               <button
@@ -252,7 +252,7 @@ export default function LoginPage({ onSuccess, onSignupClick, onForgotPassword }
           </form>
 
           {/* Security badge */}
-          <div className="mt-8 flex items-center justify-center gap-2 text-xs" style={{ color: '#334155' }}>
+          <div className="mt-8 flex items-center justify-center gap-2 text-xs" style={{ color: 'var(--ec-text-7)' }}>
             <Lock className="w-3 h-3" />
             <span>
               {isKinyarwanda

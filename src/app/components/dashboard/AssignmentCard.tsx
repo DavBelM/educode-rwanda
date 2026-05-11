@@ -42,22 +42,22 @@ export function AssignmentCard({ assignment, language, onClick }: AssignmentCard
       onClick={onClick}
       className="rounded-xl p-5 cursor-pointer transition-all group"
       style={{
-        background: '#13161e',
-        border: '1px solid rgba(255,255,255,0.06)',
+        background: 'var(--ec-surface)',
+        border: '1px solid var(--ec-b1)',
       }}
       onMouseEnter={e => {
         (e.currentTarget as HTMLDivElement).style.border = '1px solid rgba(0,212,170,0.2)';
         (e.currentTarget as HTMLDivElement).style.boxShadow = '0 0 20px rgba(0,212,170,0.06)';
       }}
       onMouseLeave={e => {
-        (e.currentTarget as HTMLDivElement).style.border = '1px solid rgba(255,255,255,0.06)';
+        (e.currentTarget as HTMLDivElement).style.border = '1px solid var(--ec-b1)';
         (e.currentTarget as HTMLDivElement).style.boxShadow = 'none';
       }}
     >
-      <h3 className="text-lg font-bold mb-1.5" style={{ fontFamily: 'Inter, sans-serif', color: '#f1f5f9' }}>
+      <h3 className="text-lg font-bold mb-1.5" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--ec-text-1)' }}>
         {assignment.title}
       </h3>
-      <p className="text-base mb-4" style={{ fontFamily: 'Inter, sans-serif', color: '#475569' }}>
+      <p className="text-base mb-4" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--ec-text-6)' }}>
         {assignment.description}
       </p>
 
@@ -91,11 +91,11 @@ export function AssignmentCard({ assignment, language, onClick }: AssignmentCard
               <div
                 key={i}
                 className="w-2.5 h-2.5 rounded-full transition-all"
-                style={{ background: i < assignment.testsCompleted ? '#00d4aa' : 'rgba(255,255,255,0.1)' }}
+                style={{ background: i < assignment.testsCompleted ? '#00d4aa' : 'var(--ec-b4)' }}
               />
             ))}
           </div>
-          <span className="text-sm" style={{ fontFamily: 'Inter, sans-serif', color: '#475569' }}>
+          <span className="text-sm" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--ec-text-6)' }}>
             {assignment.status === 'completed'
               ? (isKinyarwanda ? 'Byatanzwe' : 'Submitted')
               : `${assignment.testsCompleted}/${assignment.testsTotal} ${isKinyarwanda ? 'byatsinze' : 'passed'}`}

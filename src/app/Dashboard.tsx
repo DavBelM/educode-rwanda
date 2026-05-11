@@ -60,17 +60,17 @@ function JoinClassModal({ language, onClose, onJoined }: {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }}>
-      <div className="w-full max-w-sm rounded-2xl p-6" style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.08)', fontFamily: 'Inter, sans-serif' }}>
+      <div className="w-full max-w-sm rounded-2xl p-6" style={{ background: 'var(--ec-surface)', border: '1px solid var(--ec-b2)', fontFamily: 'Inter, sans-serif' }}>
         <div className="flex items-center justify-between mb-5">
-          <h2 className="text-base font-bold" style={{ color: '#f1f5f9' }}>
+          <h2 className="text-base font-bold" style={{ color: 'var(--ec-text-1)' }}>
             {isKin ? 'Injira mu Ishuri' : 'Join a Class'}
           </h2>
-          <button onClick={onClose} style={{ color: '#475569' }} onMouseEnter={e => (e.currentTarget.style.color = '#94a3b8')} onMouseLeave={e => (e.currentTarget.style.color = '#475569')}>
+          <button onClick={onClose} style={{ color: 'var(--ec-text-6)' }} onMouseEnter={e => (e.currentTarget.style.color = 'var(--ec-text-4)')} onMouseLeave={e => (e.currentTarget.style.color = 'var(--ec-text-6)')}>
             <X size={18} />
           </button>
         </div>
 
-        <p className="text-sm mb-4" style={{ color: '#64748b' }}>
+        <p className="text-sm mb-4" style={{ color: 'var(--ec-text-5)' }}>
           {isKin
             ? 'Shyiramo kode yo kwinjira wahawe n\'umwarimu wawe.'
             : 'Enter the invite code your teacher shared with you.'}
@@ -83,9 +83,9 @@ function JoinClassModal({ language, onClose, onJoined }: {
           placeholder="e.g. A3F8K2"
           maxLength={8}
           className="w-full px-4 py-3 rounded-xl text-center text-xl font-bold tracking-widest focus:outline-none mb-4"
-          style={{ background: '#0d0f14', border: '1px solid rgba(255,255,255,0.08)', color: '#00d4aa', letterSpacing: '0.15em' }}
+          style={{ background: 'var(--ec-bg)', border: '1px solid var(--ec-b2)', color: '#00d4aa', letterSpacing: '0.15em' }}
           onFocus={e => (e.target.style.border = '1px solid rgba(0,212,170,0.4)')}
-          onBlur={e => (e.target.style.border = '1px solid rgba(255,255,255,0.08)')}
+          onBlur={e => (e.target.style.border = '1px solid var(--ec-b2)')}
           onKeyDown={e => e.key === 'Enter' && handleJoin()}
         />
 
@@ -99,7 +99,7 @@ function JoinClassModal({ language, onClose, onJoined }: {
           onClick={handleJoin}
           disabled={code.trim().length < 4 || loading}
           className="w-full py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 disabled:opacity-40 transition-all"
-          style={{ background: '#00d4aa', color: '#0d0f14' }}
+          style={{ background: '#00d4aa', color: 'var(--ec-bg)' }}
           onMouseEnter={e => { if (!loading) (e.currentTarget as HTMLButtonElement).style.background = '#00bfa0'; }}
           onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = '#00d4aa'; }}
         >
@@ -305,7 +305,7 @@ export default function Dashboard({ language, onLanguageChange, onStartCoding, o
   ];
 
   return (
-    <div className="min-h-screen" style={{ fontFamily: 'Inter, sans-serif', background: '#0d0f14' }}>
+    <div className="min-h-screen" style={{ fontFamily: 'Inter, sans-serif', background: 'var(--ec-bg)' }}>
       <Header
         language={language}
         onLanguageToggle={toggleLanguage}
@@ -324,14 +324,14 @@ export default function Dashboard({ language, onLanguageChange, onStartCoding, o
             style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)' }}
             onClick={() => setShowAnnouncements(false)}>
             <div className="w-full max-w-lg rounded-2xl flex flex-col"
-              style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.08)', maxHeight: '80vh' }}
+              style={{ background: 'var(--ec-surface)', border: '1px solid var(--ec-b2)', maxHeight: '80vh' }}
               onClick={e => e.stopPropagation()}>
               {/* Header */}
               <div className="flex items-center justify-between px-5 py-4"
-                style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                style={{ borderBottom: '1px solid var(--ec-b1)' }}>
                 <div className="flex items-center gap-2">
                   <Megaphone size={16} style={{ color: '#f59e0b' }} />
-                  <h2 className="font-bold" style={{ color: '#f1f5f9', fontSize: '16px' }}>
+                  <h2 className="font-bold" style={{ color: 'var(--ec-text-1)', fontSize: '16px' }}>
                     {isKinyarwanda ? 'Amatangazo' : 'Announcements'}
                   </h2>
                   {announcements.length > 0 && (
@@ -342,9 +342,9 @@ export default function Dashboard({ language, onLanguageChange, onStartCoding, o
                   )}
                 </div>
                 <button onClick={() => setShowAnnouncements(false)}
-                  style={{ color: '#475569' }}
-                  onMouseEnter={e => (e.currentTarget.style.color = '#94a3b8')}
-                  onMouseLeave={e => (e.currentTarget.style.color = '#475569')}>
+                  style={{ color: 'var(--ec-text-6)' }}
+                  onMouseEnter={e => (e.currentTarget.style.color = 'var(--ec-text-4)')}
+                  onMouseLeave={e => (e.currentTarget.style.color = 'var(--ec-text-6)')}>
                   <X size={20} />
                 </button>
               </div>
@@ -353,11 +353,11 @@ export default function Dashboard({ language, onLanguageChange, onStartCoding, o
               <div className="overflow-y-auto p-5 space-y-3">
                 {announcements.length === 0 ? (
                   <div className="py-10 text-center">
-                    <Megaphone size={28} className="mx-auto mb-3" style={{ color: '#334155' }} />
-                    <p className="font-medium" style={{ color: '#475569', fontSize: '15px' }}>
+                    <Megaphone size={28} className="mx-auto mb-3" style={{ color: 'var(--ec-text-7)' }} />
+                    <p className="font-medium" style={{ color: 'var(--ec-text-6)', fontSize: '15px' }}>
                       {isKinyarwanda ? 'Nta matangazo arahari' : 'No announcements yet'}
                     </p>
-                    <p className="text-sm mt-1" style={{ color: '#334155' }}>
+                    <p className="text-sm mt-1" style={{ color: 'var(--ec-text-7)' }}>
                       {isKinyarwanda ? 'Umwarimu wawe azashyira amakuru mashya hano' : 'Your teacher will post updates here'}
                     </p>
                   </div>
@@ -366,10 +366,10 @@ export default function Dashboard({ language, onLanguageChange, onStartCoding, o
                     const cls = (a.classes as { name: string } | undefined)?.name;
                     return (
                       <div key={a.id} className="rounded-xl p-4"
-                        style={{ background: a.pinned ? 'rgba(245,158,11,0.06)' : '#1a1e2a', border: a.pinned ? '1px solid rgba(245,158,11,0.2)' : '1px solid rgba(255,255,255,0.05)' }}>
+                        style={{ background: a.pinned ? 'rgba(245,158,11,0.06)' : 'var(--ec-surface-2)', border: a.pinned ? '1px solid rgba(245,158,11,0.2)' : '1px solid var(--ec-b5)' }}>
                         <div className="flex items-start gap-2 mb-2">
                           {a.pinned && <Pin size={12} className="shrink-0 mt-0.5" style={{ color: '#f59e0b' }} />}
-                          <p className="font-semibold flex-1" style={{ color: '#f1f5f9', fontSize: '15px' }}>{a.title}</p>
+                          <p className="font-semibold flex-1" style={{ color: 'var(--ec-text-1)', fontSize: '15px' }}>{a.title}</p>
                           {cls && (
                             <span className="px-2 py-0.5 rounded-full text-xs font-semibold shrink-0"
                               style={{ background: 'rgba(0,212,170,0.08)', color: '#00d4aa', border: '1px solid rgba(0,212,170,0.15)' }}>
@@ -377,8 +377,8 @@ export default function Dashboard({ language, onLanguageChange, onStartCoding, o
                             </span>
                           )}
                         </div>
-                        <p className="leading-relaxed mb-2" style={{ color: '#94a3b8', fontSize: '14px', whiteSpace: 'pre-wrap' }}>{a.body}</p>
-                        <p className="text-xs" style={{ color: '#334155' }}>
+                        <p className="leading-relaxed mb-2" style={{ color: 'var(--ec-text-4)', fontSize: '14px', whiteSpace: 'pre-wrap' }}>{a.body}</p>
+                        <p className="text-xs" style={{ color: 'var(--ec-text-7)' }}>
                           {new Date(a.created_at).toLocaleString()}
                         </p>
                       </div>
@@ -407,9 +407,9 @@ export default function Dashboard({ language, onLanguageChange, onStartCoding, o
 
           {/* Assignments */}
           <div className="lg:col-span-6">
-            <div className="rounded-2xl p-6" style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.06)' }}>
+            <div className="rounded-2xl p-6" style={{ background: 'var(--ec-surface)', border: '1px solid var(--ec-b1)' }}>
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg font-bold" style={{ color: '#f1f5f9' }}>
+                <h2 className="text-lg font-bold" style={{ color: 'var(--ec-text-1)' }}>
                   {isKinyarwanda ? 'Imikoro ihari ubu' : 'Active Assignments'}
                 </h2>
                 <div className="flex items-center gap-2">
@@ -459,13 +459,13 @@ export default function Dashboard({ language, onLanguageChange, onStartCoding, o
               ) : hasClass === false ? (
                 /* No class enrolled */
                 <div className="py-10 text-center">
-                  <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
-                    <Users size={24} style={{ color: '#334155' }} />
+                  <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ background: 'var(--ec-b3)', border: '1px solid var(--ec-b2)' }}>
+                    <Users size={24} style={{ color: 'var(--ec-text-7)' }} />
                   </div>
-                  <p className="text-sm font-medium mb-1" style={{ color: '#64748b' }}>
+                  <p className="text-sm font-medium mb-1" style={{ color: 'var(--ec-text-5)' }}>
                     {isKinyarwanda ? 'Ntabwo uri mu ishuri' : 'You\'re not in a class yet'}
                   </p>
-                  <p className="text-xs mb-5" style={{ color: '#334155' }}>
+                  <p className="text-xs mb-5" style={{ color: 'var(--ec-text-7)' }}>
                     {isKinyarwanda
                       ? 'Shyiramo kode wahawe n\'umwarimu wawe kugirango ubone imikoro yawe.'
                       : 'Enter the invite code from your teacher to see your assignments.'}
@@ -473,7 +473,7 @@ export default function Dashboard({ language, onLanguageChange, onStartCoding, o
                   <button
                     onClick={() => setShowJoinModal(true)}
                     className="px-5 py-2.5 rounded-xl text-sm font-semibold transition-all"
-                    style={{ background: '#00d4aa', color: '#0d0f14' }}
+                    style={{ background: '#00d4aa', color: 'var(--ec-bg)' }}
                     onMouseEnter={e => (e.currentTarget.style.background = '#00bfa0')}
                     onMouseLeave={e => (e.currentTarget.style.background = '#00d4aa')}
                   >
@@ -483,7 +483,7 @@ export default function Dashboard({ language, onLanguageChange, onStartCoding, o
               ) : assignments.length === 0 ? (
                 /* Enrolled but no assignments yet */
                 <div className="py-10 text-center">
-                  <p className="text-sm" style={{ color: '#475569' }}>
+                  <p className="text-sm" style={{ color: 'var(--ec-text-6)' }}>
                     {isKinyarwanda ? 'Nta mikoro urahabwa n\'umwarimu wawe.' : 'No assignments from your teacher yet.'}
                   </p>
                 </div>
@@ -510,11 +510,11 @@ export default function Dashboard({ language, onLanguageChange, onStartCoding, o
                 <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'rgba(139,92,246,0.15)', border: '1px solid rgba(139,92,246,0.3)' }}>
                   <Code2 size={16} style={{ color: '#a78bfa' }} />
                 </div>
-                <p className="text-sm font-bold" style={{ color: '#f1f5f9' }}>
+                <p className="text-sm font-bold" style={{ color: 'var(--ec-text-1)' }}>
                   {isKinyarwanda ? 'Ushaka kwimenyereza?' : 'Want to Practice?'}
                 </p>
               </div>
-              <p className="text-xs mb-3" style={{ color: '#64748b' }}>
+              <p className="text-xs mb-3" style={{ color: 'var(--ec-text-5)' }}>
                 {isKinyarwanda ? 'Fungura editor uko ushaka — AI izagufasha' : 'Open the editor freely — AI feedback included'}
               </p>
               <button
@@ -535,16 +535,16 @@ export default function Dashboard({ language, onLanguageChange, onStartCoding, o
       </div>
 
       {/* Mobile nav */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 border-t px-4 py-3 z-40" style={{ background: '#13161e', borderColor: 'rgba(255,255,255,0.06)' }}>
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 border-t px-4 py-3 z-40" style={{ background: 'var(--ec-surface)', borderColor: 'var(--ec-b1)' }}>
         <div className="flex items-center justify-around">
           {[
             { icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M3 9L12 2L21 9V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9Z" stroke="#00d4aa" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>, label: isKinyarwanda ? 'Ahabanza' : 'Home', active: true },
-            { icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="#475569" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>, label: isKinyarwanda ? 'Imikoro' : 'Assignments', active: false },
-            { icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 15C15.866 15 19 11.866 19 8C19 4.13401 15.866 1 12 1C8.13401 1 5 4.13401 5 8C5 11.866 8.13401 15 12 15Z" stroke="#475569" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><path d="M8.21 13.89L7 23L12 20L17 23L15.79 13.88" stroke="#475569" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>, label: isKinyarwanda ? 'Ibihembo' : 'Badges', active: false },
+            { icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="var(--ec-text-6)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>, label: isKinyarwanda ? 'Imikoro' : 'Assignments', active: false },
+            { icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 15C15.866 15 19 11.866 19 8C19 4.13401 15.866 1 12 1C8.13401 1 5 4.13401 5 8C5 11.866 8.13401 15 12 15Z" stroke="var(--ec-text-6)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><path d="M8.21 13.89L7 23L12 20L17 23L15.79 13.88" stroke="var(--ec-text-6)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>, label: isKinyarwanda ? 'Ibihembo' : 'Badges', active: false },
           ].map((item, i) => (
             <button key={i} className="flex flex-col items-center gap-1">
               {item.icon}
-              <span className="text-xs font-medium" style={{ color: item.active ? '#00d4aa' : '#475569' }}>{item.label}</span>
+              <span className="text-xs font-medium" style={{ color: item.active ? '#00d4aa' : 'var(--ec-text-6)' }}>{item.label}</span>
             </button>
           ))}
         </div>

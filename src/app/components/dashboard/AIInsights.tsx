@@ -10,7 +10,7 @@ export function AIInsights({ language, insights }: AIInsightsProps) {
 
   return (
     <div className="rounded-2xl p-6" style={{
-      background: '#13161e',
+      background: 'var(--ec-surface)',
       border: '1px solid rgba(139,92,246,0.2)',
       boxShadow: '0 0 30px rgba(139,92,246,0.05)'
     }}>
@@ -20,10 +20,10 @@ export function AIInsights({ language, insights }: AIInsightsProps) {
           <Sparkles size={18} style={{ color: '#8b5cf6' }} />
         </div>
         <div>
-          <p className="text-base font-semibold" style={{ fontFamily: 'Inter, sans-serif', color: '#f1f5f9' }}>
+          <p className="text-base font-semibold" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--ec-text-1)' }}>
             {isKinyarwanda ? 'Inama za AI' : 'AI Insights'}
           </p>
-          <p className="text-sm" style={{ fontFamily: 'Inter, sans-serif', color: '#475569' }}>
+          <p className="text-sm" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--ec-text-6)' }}>
             {isKinyarwanda ? 'Ibyakorewe wowe' : 'Personalized for you'}
           </p>
         </div>
@@ -32,11 +32,11 @@ export function AIInsights({ language, insights }: AIInsightsProps) {
       {/* Insights */}
       <div className="space-y-2.5 mb-5">
         {insights.map((insight, i) => (
-          <div key={i} className="flex items-start gap-3 rounded-xl p-3" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.04)' }}>
+          <div key={i} className="flex items-start gap-3 rounded-xl p-3" style={{ background: 'var(--ec-b6)', border: '1px solid var(--ec-b3)' }}>
             {insight.isPositive
               ? <CheckCircle size={16} className="shrink-0 mt-0.5" style={{ color: '#00d4aa' }} />
               : <Lightbulb size={16} className="shrink-0 mt-0.5" style={{ color: '#f59e0b' }} />}
-            <p className="text-sm leading-relaxed" style={{ fontFamily: 'Inter, sans-serif', color: '#94a3b8' }}>
+            <p className="text-sm leading-relaxed" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--ec-text-4)' }}>
               {insight.text}
             </p>
           </div>

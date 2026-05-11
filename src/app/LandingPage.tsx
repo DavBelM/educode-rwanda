@@ -13,10 +13,10 @@ export default function LandingPage({ onLogin, onSignup, onSchoolSignup }: Props
   const isKin = language === 'KIN';
 
   return (
-    <div className="min-h-screen" style={{ fontFamily: 'Inter, sans-serif', background: '#0d0f14', color: '#f1f5f9' }}>
+    <div className="min-h-screen" style={{ fontFamily: 'Inter, sans-serif', background: 'var(--ec-bg)', color: 'var(--ec-text-1)' }}>
 
       {/* Navbar */}
-      <nav className="sticky top-0 z-50" style={{ background: 'rgba(13,15,20,0.85)', backdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+      <nav className="sticky top-0 z-50" style={{ background: 'var(--ec-bg-a85)', backdropFilter: 'blur(12px)', borderBottom: '1px solid var(--ec-b1)' }}>
         <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center gap-3">
@@ -25,33 +25,33 @@ export default function LandingPage({ onLogin, onSignup, onSchoolSignup }: Props
                 <path d="M8 6H16M8 12H16M8 18H13" stroke="white" strokeWidth="2" strokeLinecap="round"/>
               </svg>
             </div>
-            <span className="text-base font-bold" style={{ color: '#f1f5f9' }}>EduCode Rwanda</span>
+            <span className="text-base font-bold" style={{ color: 'var(--ec-text-1)' }}>EduCode Rwanda</span>
           </div>
 
           {/* Desktop nav */}
           <div className="hidden md:flex items-center gap-8">
-            <a href="#features" className="text-sm font-medium transition-colors" style={{ color: '#94a3b8' }}
-              onMouseEnter={e => (e.currentTarget.style.color = '#f1f5f9')}
-              onMouseLeave={e => (e.currentTarget.style.color = '#94a3b8')}
+            <a href="#features" className="text-sm font-medium transition-colors" style={{ color: 'var(--ec-text-4)' }}
+              onMouseEnter={e => (e.currentTarget.style.color = 'var(--ec-text-1)')}
+              onMouseLeave={e => (e.currentTarget.style.color = 'var(--ec-text-4)')}
             >
               {isKin ? 'Ibiranga platform' : 'Features'}
             </a>
-            <a href="#for-schools" className="text-sm font-medium transition-colors" style={{ color: '#94a3b8' }}
-              onMouseEnter={e => (e.currentTarget.style.color = '#f1f5f9')}
-              onMouseLeave={e => (e.currentTarget.style.color = '#94a3b8')}
+            <a href="#for-schools" className="text-sm font-medium transition-colors" style={{ color: 'var(--ec-text-4)' }}
+              onMouseEnter={e => (e.currentTarget.style.color = 'var(--ec-text-1)')}
+              onMouseLeave={e => (e.currentTarget.style.color = 'var(--ec-text-4)')}
             >
               {isKin ? 'Ku Mashuri' : 'For Schools'}
             </a>
 
             {/* Language toggle */}
-            <div className="flex items-center rounded-lg overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.08)' }}>
+            <div className="flex items-center rounded-lg overflow-hidden" style={{ border: '1px solid var(--ec-b2)' }}>
               <button
                 onClick={() => setLanguage('EN')}
                 className="px-3 py-1.5 text-xs font-bold transition-all"
                 style={{
                   background: language === 'EN' ? 'rgba(0,212,170,0.15)' : 'transparent',
-                  color: language === 'EN' ? '#00d4aa' : '#475569',
-                  borderRight: '1px solid rgba(255,255,255,0.08)',
+                  color: language === 'EN' ? '#00d4aa' : 'var(--ec-text-6)',
+                  borderRight: '1px solid var(--ec-b2)',
                 }}
               >
                 EN
@@ -61,7 +61,7 @@ export default function LandingPage({ onLogin, onSignup, onSchoolSignup }: Props
                 className="px-3 py-1.5 text-xs font-bold transition-all"
                 style={{
                   background: language === 'KIN' ? 'rgba(0,212,170,0.15)' : 'transparent',
-                  color: language === 'KIN' ? '#00d4aa' : '#475569',
+                  color: language === 'KIN' ? '#00d4aa' : 'var(--ec-text-6)',
                 }}
               >
                 KIN
@@ -71,16 +71,16 @@ export default function LandingPage({ onLogin, onSignup, onSchoolSignup }: Props
             <button
               onClick={onLogin}
               className="text-sm font-semibold transition-colors"
-              style={{ color: '#94a3b8' }}
-              onMouseEnter={e => (e.currentTarget.style.color = '#f1f5f9')}
-              onMouseLeave={e => (e.currentTarget.style.color = '#94a3b8')}
+              style={{ color: 'var(--ec-text-4)' }}
+              onMouseEnter={e => (e.currentTarget.style.color = 'var(--ec-text-1)')}
+              onMouseLeave={e => (e.currentTarget.style.color = 'var(--ec-text-4)')}
             >
               {isKin ? 'Kwinjira' : 'Log In'}
             </button>
             <button
               onClick={onSignup}
               className="px-4 py-2 rounded-lg text-sm font-semibold transition-all"
-              style={{ background: '#00d4aa', color: '#0d0f14' }}
+              style={{ background: '#00d4aa', color: 'var(--ec-bg)' }}
               onMouseEnter={e => (e.currentTarget.style.background = '#00bfa0')}
               onMouseLeave={e => (e.currentTarget.style.background = '#00d4aa')}
             >
@@ -91,7 +91,7 @@ export default function LandingPage({ onLogin, onSignup, onSchoolSignup }: Props
           {/* Mobile menu button */}
           <button
             className="md:hidden transition-colors"
-            style={{ color: '#94a3b8' }}
+            style={{ color: 'var(--ec-text-4)' }}
             onClick={() => setMenuOpen(!menuOpen)}
           >
             {menuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -100,14 +100,14 @@ export default function LandingPage({ onLogin, onSignup, onSchoolSignup }: Props
 
         {/* Mobile menu */}
         {menuOpen && (
-          <div className="md:hidden px-4 py-4 flex flex-col gap-4" style={{ borderTop: '1px solid rgba(255,255,255,0.06)', background: '#13161e' }}>
-            <button onClick={onLogin} className="text-sm font-semibold text-left" style={{ color: '#94a3b8' }}>
+          <div className="md:hidden px-4 py-4 flex flex-col gap-4" style={{ borderTop: '1px solid var(--ec-b1)', background: 'var(--ec-surface)' }}>
+            <button onClick={onLogin} className="text-sm font-semibold text-left" style={{ color: 'var(--ec-text-4)' }}>
               {isKin ? 'Kwinjira' : 'Log In'}
             </button>
             <button
               onClick={onSignup}
               className="px-4 py-2 rounded-lg text-sm font-semibold text-center"
-              style={{ background: '#00d4aa', color: '#0d0f14' }}
+              style={{ background: '#00d4aa', color: 'var(--ec-bg)' }}
             >
               {isKin ? 'Tangira ku buntu' : 'Get Started Free'}
             </button>
@@ -127,7 +127,7 @@ export default function LandingPage({ onLogin, onSignup, onSchoolSignup }: Props
           {isKin ? 'Uburezi bwa coding bufashijwe na AI ku bw\'u Rwanda' : 'AI-Powered Coding Education for Rwanda'}
         </div>
 
-        <h1 className="text-4xl md:text-6xl font-bold leading-tight mb-6" style={{ color: '#f1f5f9', letterSpacing: '-0.02em' }}>
+        <h1 className="text-4xl md:text-6xl font-bold leading-tight mb-6" style={{ color: 'var(--ec-text-1)', letterSpacing: '-0.02em' }}>
           {isKin ? (
             <>Wige Programming<br /><span style={{ color: '#00d4aa' }}>mu Kinyarwanda</span></>
           ) : (
@@ -135,7 +135,7 @@ export default function LandingPage({ onLogin, onSignup, onSchoolSignup }: Props
           )}
         </h1>
 
-        <p className="text-lg max-w-2xl mx-auto mb-10 leading-relaxed" style={{ color: '#64748b' }}>
+        <p className="text-lg max-w-2xl mx-auto mb-10 leading-relaxed" style={{ color: 'var(--ec-text-5)' }}>
           {isKin
             ? 'Uburezi bwa JavaScript bufite AI igufasha gusobanukirwa amakosa mu Kinyarwanda. Byakorewe abanyeshuri n\'abarimu ba TVET mu Rwanda.'
             : 'JavaScript education with an AI tutor that explains your errors in Kinyarwanda. Built for Rwandan TVET students and teachers.'}
@@ -145,7 +145,7 @@ export default function LandingPage({ onLogin, onSignup, onSchoolSignup }: Props
           <button
             onClick={onSignup}
             className="flex items-center gap-2 px-7 py-3.5 rounded-xl font-semibold text-sm transition-all"
-            style={{ background: '#00d4aa', color: '#0d0f14', boxShadow: '0 0 24px rgba(0,212,170,0.3)' }}
+            style={{ background: '#00d4aa', color: 'var(--ec-bg)', boxShadow: '0 0 24px rgba(0,212,170,0.3)' }}
             onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = '#00bfa0'; (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 0 32px rgba(0,212,170,0.45)'; }}
             onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = '#00d4aa'; (e.currentTarget as HTMLButtonElement).style.boxShadow = '0 0 24px rgba(0,212,170,0.3)'; }}
           >
@@ -155,72 +155,72 @@ export default function LandingPage({ onLogin, onSignup, onSchoolSignup }: Props
           <button
             onClick={onSchoolSignup}
             className="flex items-center gap-2 px-7 py-3.5 rounded-xl font-semibold text-sm transition-all"
-            style={{ border: '1px solid rgba(255,255,255,0.12)', color: '#94a3b8', background: 'rgba(255,255,255,0.04)' }}
-            onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.2)'; (e.currentTarget as HTMLButtonElement).style.color = '#f1f5f9'; }}
-            onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.12)'; (e.currentTarget as HTMLButtonElement).style.color = '#94a3b8'; }}
+            style={{ border: '1px solid var(--ec-b7)', color: 'var(--ec-text-4)', background: 'var(--ec-b3)' }}
+            onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(255,255,255,0.2)'; (e.currentTarget as HTMLButtonElement).style.color = 'var(--ec-text-1)'; }}
+            onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--ec-b7)'; (e.currentTarget as HTMLButtonElement).style.color = 'var(--ec-text-4)'; }}
           >
             {isKin ? 'Ku Mashuri' : 'For Schools'}
           </button>
         </div>
 
         {/* Product preview */}
-        <div className="rounded-2xl overflow-hidden max-w-4xl mx-auto" style={{ border: '1px solid rgba(255,255,255,0.08)', boxShadow: '0 32px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04)' }}>
+        <div className="rounded-2xl overflow-hidden max-w-4xl mx-auto" style={{ border: '1px solid var(--ec-b2)', boxShadow: '0 32px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.04)' }}>
           {/* Window chrome */}
-          <div className="px-4 py-3 flex items-center gap-2" style={{ background: '#1a1e2a', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+          <div className="px-4 py-3 flex items-center gap-2" style={{ background: 'var(--ec-surface-2)', borderBottom: '1px solid var(--ec-b1)' }}>
             <div className="w-3 h-3 rounded-full" style={{ background: '#ef4444' }} />
             <div className="w-3 h-3 rounded-full" style={{ background: '#f59e0b' }} />
             <div className="w-3 h-3 rounded-full" style={{ background: '#10b981' }} />
-            <span className="ml-3 text-xs font-mono" style={{ color: '#475569' }}>variables-practice.js</span>
+            <span className="ml-3 text-xs font-mono" style={{ color: 'var(--ec-text-6)' }}>variables-practice.js</span>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2">
             {/* Code editor preview */}
             <div className="p-6 text-left font-mono text-sm" style={{ background: '#0d1117' }}>
-              <div style={{ color: '#475569' }} className="mb-1">{'// Calculate total price'}</div>
+              <div style={{ color: 'var(--ec-text-6)' }} className="mb-1">{'// Calculate total price'}</div>
               <div>
                 <span style={{ color: '#c792ea' }}>const </span>
                 <span style={{ color: '#82aaff' }}>price</span>
-                <span style={{ color: '#f1f5f9' }}> = </span>
+                <span style={{ color: 'var(--ec-text-1)' }}> = </span>
                 <span style={{ color: '#f78c6c' }}>500000</span>
-                <span style={{ color: '#f1f5f9' }}>;</span>
+                <span style={{ color: 'var(--ec-text-1)' }}>;</span>
               </div>
               <div>
                 <span style={{ color: '#c792ea' }}>const </span>
                 <span style={{ color: '#82aaff' }}>quantity</span>
-                <span style={{ color: '#f1f5f9' }}> = </span>
+                <span style={{ color: 'var(--ec-text-1)' }}> = </span>
                 <span style={{ color: '#f78c6c' }}>2</span>
-                <span style={{ color: '#f1f5f9' }}>;</span>
+                <span style={{ color: 'var(--ec-text-1)' }}>;</span>
               </div>
               <div className="mt-2">
                 <span style={{ color: '#c792ea' }}>const </span>
                 <span style={{ color: '#82aaff' }}>total</span>
-                <span style={{ color: '#f1f5f9' }}> = price * quantity;</span>
+                <span style={{ color: 'var(--ec-text-1)' }}> = price * quantity;</span>
               </div>
               <div className="mt-2">
                 <span style={{ color: '#82aaff' }}>console</span>
-                <span style={{ color: '#f1f5f9' }}>.log(</span>
+                <span style={{ color: 'var(--ec-text-1)' }}>.log(</span>
                 <span style={{ color: '#c3e88d' }}>"Total: "</span>
-                <span style={{ color: '#f1f5f9' }}> + total);</span>
+                <span style={{ color: 'var(--ec-text-1)' }}> + total);</span>
               </div>
-              <div className="mt-4 pt-4" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-                <span style={{ color: '#475569' }}>{'> '}</span>
+              <div className="mt-4 pt-4" style={{ borderTop: '1px solid var(--ec-b1)' }}>
+                <span style={{ color: 'var(--ec-text-6)' }}>{'> '}</span>
                 <span style={{ color: '#00d4aa' }}>Total: 1000000</span>
               </div>
             </div>
 
             {/* AI feedback preview */}
-            <div className="p-6 text-left" style={{ background: '#13161e', borderLeft: '1px solid rgba(255,255,255,0.06)' }}>
+            <div className="p-6 text-left" style={{ background: 'var(--ec-surface)', borderLeft: '1px solid var(--ec-b1)' }}>
               <div className="flex items-center gap-2 mb-4">
                 <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ background: 'rgba(139,92,246,0.15)', border: '1px solid rgba(139,92,246,0.25)' }}>
                   <Sparkles size={16} style={{ color: '#8b5cf6' }} />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold" style={{ color: '#f1f5f9' }}>AI Tutor</p>
-                  <p className="text-xs" style={{ color: '#475569' }}>{isKin ? 'Ibisobanuro byihariye kuri wowe' : 'Personalized feedback'}</p>
+                  <p className="text-sm font-semibold" style={{ color: 'var(--ec-text-1)' }}>AI Tutor</p>
+                  <p className="text-xs" style={{ color: 'var(--ec-text-6)' }}>{isKin ? 'Ibisobanuro byihariye kuri wowe' : 'Personalized feedback'}</p>
                 </div>
               </div>
               <div className="p-3 rounded-xl mb-3" style={{ background: 'rgba(0,212,170,0.08)', border: '1px solid rgba(0,212,170,0.2)' }}>
                 <p className="text-sm font-semibold mb-1" style={{ color: '#00d4aa' }}>✅ {isKin ? 'Birashimishije!' : 'Well done!'}</p>
-                <p className="text-xs leading-relaxed" style={{ color: '#94a3b8' }}>
+                <p className="text-xs leading-relaxed" style={{ color: 'var(--ec-text-4)' }}>
                   {isKin
                     ? 'Code yawe ikora neza cyane. Wakoresheje variables neza.'
                     : 'Your code works perfectly. Variables used correctly.'}
@@ -230,7 +230,7 @@ export default function LandingPage({ onLogin, onSignup, onSchoolSignup }: Props
                 <p className="text-xs font-semibold mb-1" style={{ color: '#a78bfa' }}>
                   {isKin ? 'Igerageza rikurikira:' : 'Next challenge:'}
                 </p>
-                <p className="text-xs leading-relaxed" style={{ color: '#94a3b8' }}>
+                <p className="text-xs leading-relaxed" style={{ color: 'var(--ec-text-4)' }}>
                   {isKin
                     ? 'Gerageza gukuraho 10% (discount) niba umubare w\'ibicuruzwa urenga 5.'
                     : 'Try adding a 10% discount when quantity is over 5.'}
@@ -242,7 +242,7 @@ export default function LandingPage({ onLogin, onSignup, onSchoolSignup }: Props
       </section>
 
       {/* Stats strip */}
-      <section className="py-10" style={{ borderTop: '1px solid rgba(255,255,255,0.04)', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+      <section className="py-10" style={{ borderTop: '1px solid var(--ec-b3)', borderBottom: '1px solid var(--ec-b3)' }}>
         <div className="max-w-4xl mx-auto px-4 grid grid-cols-3 gap-4 text-center">
           {[
             { value: 'TVET', label: isKin ? 'Amashuri' : 'Schools' },
@@ -251,7 +251,7 @@ export default function LandingPage({ onLogin, onSignup, onSchoolSignup }: Props
           ].map((s, i) => (
             <div key={i}>
               <p className="text-2xl font-bold mb-1" style={{ color: '#00d4aa' }}>{s.value}</p>
-              <p className="text-sm" style={{ color: '#475569' }}>{s.label}</p>
+              <p className="text-sm" style={{ color: 'var(--ec-text-6)' }}>{s.label}</p>
             </div>
           ))}
         </div>
@@ -261,10 +261,10 @@ export default function LandingPage({ onLogin, onSignup, onSchoolSignup }: Props
       <section id="features" className="py-24">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-14">
-            <h2 className="text-3xl font-bold mb-4" style={{ color: '#f1f5f9', letterSpacing: '-0.01em' }}>
+            <h2 className="text-3xl font-bold mb-4" style={{ color: 'var(--ec-text-1)', letterSpacing: '-0.01em' }}>
               {isKin ? 'Icyo twihariye' : 'What Makes Us Different'}
             </h2>
-            <p className="max-w-xl mx-auto text-base leading-relaxed" style={{ color: '#64748b' }}>
+            <p className="max-w-xl mx-auto text-base leading-relaxed" style={{ color: 'var(--ec-text-5)' }}>
               {isKin
                 ? 'Ntabwo ari platform isanzwe nka zindi. Yakozwe hagendewe ku buryo abanyeshuri b\'u Rwanda biga.'
                 : 'Not another generic coding platform. Built around how Rwandan students actually learn.'}
@@ -307,15 +307,15 @@ export default function LandingPage({ onLogin, onSignup, onSchoolSignup }: Props
               <div
                 key={i}
                 className="rounded-2xl p-6 transition-all"
-                style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.06)' }}
+                style={{ background: 'var(--ec-surface)', border: '1px solid var(--ec-b1)' }}
                 onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.border = `1px solid ${f.accent}33`; (e.currentTarget as HTMLDivElement).style.boxShadow = `0 0 24px ${f.accent}10`; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.border = '1px solid rgba(255,255,255,0.06)'; (e.currentTarget as HTMLDivElement).style.boxShadow = 'none'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.border = '1px solid var(--ec-b1)'; (e.currentTarget as HTMLDivElement).style.boxShadow = 'none'; }}
               >
                 <div className="w-11 h-11 rounded-xl flex items-center justify-center mb-5" style={{ background: f.iconBg, border: `1px solid ${f.iconBorder}` }}>
                   {f.icon}
                 </div>
-                <h3 className="text-base font-bold mb-2" style={{ color: '#f1f5f9' }}>{f.title}</h3>
-                <p className="text-sm leading-relaxed" style={{ color: '#64748b' }}>{f.description}</p>
+                <h3 className="text-base font-bold mb-2" style={{ color: 'var(--ec-text-1)' }}>{f.title}</h3>
+                <p className="text-sm leading-relaxed" style={{ color: 'var(--ec-text-5)' }}>{f.description}</p>
               </div>
             ))}
           </div>
@@ -323,9 +323,9 @@ export default function LandingPage({ onLogin, onSignup, onSchoolSignup }: Props
       </section>
 
       {/* How it works */}
-      <section className="py-20" style={{ background: '#13161e', borderTop: '1px solid rgba(255,255,255,0.04)', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+      <section className="py-20" style={{ background: 'var(--ec-surface)', borderTop: '1px solid var(--ec-b3)', borderBottom: '1px solid var(--ec-b3)' }}>
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-2xl font-bold mb-12" style={{ color: '#f1f5f9' }}>
+          <h2 className="text-2xl font-bold mb-12" style={{ color: 'var(--ec-text-1)' }}>
             {isKin ? 'Uko bikora' : 'How It Works'}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -335,12 +335,12 @@ export default function LandingPage({ onLogin, onSignup, onSchoolSignup }: Props
               { step: '03', icon: <Zap size={20} style={{ color: '#f59e0b' }} />, title: isKin ? 'Bona ibisobanuro bya AI' : 'Get AI Feedback', desc: isKin ? 'Ibisobanuro byihuse mu Kinyarwanda cyangwa mu Cyongereza mu gihe wagize aho uheranwa.' : 'Instant explanations in Kinyarwanda or English when you get stuck.' },
             ].map((s, i) => (
               <div key={i} className="flex flex-col items-center text-center">
-                <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-4 relative" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                <div className="w-12 h-12 rounded-2xl flex items-center justify-center mb-4 relative" style={{ background: 'var(--ec-b3)', border: '1px solid var(--ec-b2)' }}>
                   {s.icon}
-                  <span className="absolute -top-2 -right-2 w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold" style={{ background: '#0d0f14', border: '1px solid rgba(255,255,255,0.12)', color: '#475569' }}>{i + 1}</span>
+                  <span className="absolute -top-2 -right-2 w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold" style={{ background: 'var(--ec-bg)', border: '1px solid var(--ec-b7)', color: 'var(--ec-text-6)' }}>{i + 1}</span>
                 </div>
-                <h3 className="text-sm font-bold mb-2" style={{ color: '#f1f5f9' }}>{s.title}</h3>
-                <p className="text-xs leading-relaxed" style={{ color: '#64748b' }}>{s.desc}</p>
+                <h3 className="text-sm font-bold mb-2" style={{ color: 'var(--ec-text-1)' }}>{s.title}</h3>
+                <p className="text-xs leading-relaxed" style={{ color: 'var(--ec-text-5)' }}>{s.desc}</p>
               </div>
             ))}
           </div>
@@ -350,7 +350,7 @@ export default function LandingPage({ onLogin, onSignup, onSchoolSignup }: Props
       {/* For Schools CTA */}
       <section id="for-schools" className="py-24">
         <div className="max-w-6xl mx-auto px-4">
-          <div className="rounded-2xl p-10 md:p-16 text-center relative overflow-hidden" style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.06)' }}>
+          <div className="rounded-2xl p-10 md:p-16 text-center relative overflow-hidden" style={{ background: 'var(--ec-surface)', border: '1px solid var(--ec-b1)' }}>
             {/* Ambient glows */}
             <div className="absolute top-0 right-0 w-80 h-80 rounded-full pointer-events-none" style={{ background: 'radial-gradient(ellipse, rgba(0,212,170,0.08) 0%, transparent 70%)', filter: 'blur(40px)' }} />
             <div className="absolute bottom-0 left-0 w-80 h-80 rounded-full pointer-events-none" style={{ background: 'radial-gradient(ellipse, rgba(139,92,246,0.06) 0%, transparent 70%)', filter: 'blur(40px)' }} />
@@ -360,10 +360,10 @@ export default function LandingPage({ onLogin, onSignup, onSchoolSignup }: Props
                 <BookOpen size={12} />
                 {isKin ? 'Ku Mashuri n\'Abarimu' : 'For Schools & Teachers'}
               </div>
-              <h2 className="text-3xl font-bold mb-4" style={{ color: '#f1f5f9', letterSpacing: '-0.01em' }}>
+              <h2 className="text-3xl font-bold mb-4" style={{ color: 'var(--ec-text-1)', letterSpacing: '-0.01em' }}>
                 {isKin ? 'Zana EduCode mu ishuri ryawe' : 'Bring EduCode to Your School'}
               </h2>
-              <p className="max-w-xl mx-auto mb-8 leading-relaxed" style={{ color: '#64748b' }}>
+              <p className="max-w-xl mx-auto mb-8 leading-relaxed" style={{ color: 'var(--ec-text-5)' }}>
                 {isKin
                   ? 'Twebwe dukora na mashuri menshi mu Rwanda. Tanga ubusabe ubone demo y\'ubuntu.'
                   : "We're partnering with TVET schools across Rwanda. Request a free demo and see how teachers can track every student's progress."}
@@ -371,7 +371,7 @@ export default function LandingPage({ onLogin, onSignup, onSchoolSignup }: Props
               <button
                 onClick={onSchoolSignup}
                 className="px-8 py-3.5 rounded-xl font-semibold text-sm transition-all"
-                style={{ background: '#00d4aa', color: '#0d0f14', boxShadow: '0 0 24px rgba(0,212,170,0.25)' }}
+                style={{ background: '#00d4aa', color: 'var(--ec-bg)', boxShadow: '0 0 24px rgba(0,212,170,0.25)' }}
                 onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = '#00bfa0'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = '#00d4aa'; }}
               >
@@ -383,7 +383,7 @@ export default function LandingPage({ onLogin, onSignup, onSchoolSignup }: Props
       </section>
 
       {/* Footer */}
-      <footer className="py-10" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+      <footer className="py-10" style={{ borderTop: '1px solid var(--ec-b1)' }}>
         <div className="max-w-6xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: '#0ea5e9' }}>
@@ -391,18 +391,18 @@ export default function LandingPage({ onLogin, onSignup, onSchoolSignup }: Props
                 <path d="M8 6H16M8 12H16M8 18H13" stroke="white" strokeWidth="2" strokeLinecap="round"/>
               </svg>
             </div>
-            <span className="text-sm font-bold" style={{ color: '#f1f5f9' }}>EduCode Rwanda</span>
+            <span className="text-sm font-bold" style={{ color: 'var(--ec-text-1)' }}>EduCode Rwanda</span>
           </div>
-          <div className="flex items-center gap-6 text-sm" style={{ color: '#475569' }}>
+          <div className="flex items-center gap-6 text-sm" style={{ color: 'var(--ec-text-6)' }}>
             <button onClick={onLogin} className="transition-colors"
-              onMouseEnter={e => (e.currentTarget.style.color = '#94a3b8')}
-              onMouseLeave={e => (e.currentTarget.style.color = '#475569')}
+              onMouseEnter={e => (e.currentTarget.style.color = 'var(--ec-text-4)')}
+              onMouseLeave={e => (e.currentTarget.style.color = 'var(--ec-text-6)')}
             >
               {isKin ? 'Kwinjira' : 'Log In'}
             </button>
             <button onClick={onSignup} className="transition-colors"
-              onMouseEnter={e => (e.currentTarget.style.color = '#94a3b8')}
-              onMouseLeave={e => (e.currentTarget.style.color = '#475569')}
+              onMouseEnter={e => (e.currentTarget.style.color = 'var(--ec-text-4)')}
+              onMouseLeave={e => (e.currentTarget.style.color = 'var(--ec-text-6)')}
             >
               {isKin ? 'Iyandikishe' : 'Sign Up'}
             </button>

@@ -34,10 +34,10 @@ function CourseCatalog({ courses, language, onSelect }: {
 
   return (
     <div>
-      <h2 className="text-xl font-bold mb-1" style={{ color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}>
+      <h2 className="text-xl font-bold mb-1" style={{ color: 'var(--ec-text-1)', fontFamily: 'Inter, sans-serif' }}>
         {isKin ? 'Amasomo' : 'Courses'}
       </h2>
-      <p className="text-sm mb-8" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
+      <p className="text-sm mb-8" style={{ color: 'var(--ec-text-6)', fontFamily: 'Inter, sans-serif' }}>
         {isKin
           ? 'Amasomo wigenga — iga ku muvuduko wawe, nta shuri ukeneye.'
           : 'Self-paced courses — learn at your own speed, no class needed.'}
@@ -45,7 +45,7 @@ function CourseCatalog({ courses, language, onSelect }: {
 
       {courses.length === 0 ? (
         <div className="py-16 text-center">
-          <p className="text-sm" style={{ color: '#475569' }}>No courses available yet.</p>
+          <p className="text-sm" style={{ color: 'var(--ec-text-6)' }}>No courses available yet.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -58,13 +58,13 @@ function CourseCatalog({ courses, language, onSelect }: {
                 key={c.id}
                 onClick={() => onSelect(c)}
                 className="rounded-2xl p-6 cursor-pointer transition-all"
-                style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.06)' }}
+                style={{ background: 'var(--ec-surface)', border: '1px solid var(--ec-b1)' }}
                 onMouseEnter={e => {
                   (e.currentTarget as HTMLDivElement).style.border = '1px solid rgba(0,212,170,0.2)';
                   (e.currentTarget as HTMLDivElement).style.boxShadow = '0 0 24px rgba(0,212,170,0.06)';
                 }}
                 onMouseLeave={e => {
-                  (e.currentTarget as HTMLDivElement).style.border = '1px solid rgba(255,255,255,0.06)';
+                  (e.currentTarget as HTMLDivElement).style.border = '1px solid var(--ec-b1)';
                   (e.currentTarget as HTMLDivElement).style.boxShadow = 'none';
                 }}
               >
@@ -72,8 +72,8 @@ function CourseCatalog({ courses, language, onSelect }: {
                   style={{ background: 'rgba(0,212,170,0.1)', border: '1px solid rgba(0,212,170,0.15)' }}>
                   <Code2 size={26} style={{ color: '#00d4aa' }} />
                 </div>
-                <h3 className="text-lg font-bold mb-2" style={{ color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}>{title}</h3>
-                <p className="text-base mb-4" style={{ color: '#475569', fontFamily: 'Inter, sans-serif',
+                <h3 className="text-lg font-bold mb-2" style={{ color: 'var(--ec-text-1)', fontFamily: 'Inter, sans-serif' }}>{title}</h3>
+                <p className="text-base mb-4" style={{ color: 'var(--ec-text-6)', fontFamily: 'Inter, sans-serif',
                   display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                   {desc}
                 </p>
@@ -82,7 +82,7 @@ function CourseCatalog({ courses, language, onSelect }: {
                     style={{ background: diff.bg, color: diff.text, border: `1px solid ${diff.border}` }}>
                     {c.difficulty.charAt(0).toUpperCase() + c.difficulty.slice(1)}
                   </span>
-                  <span className="flex items-center gap-1 text-sm" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
+                  <span className="flex items-center gap-1 text-sm" style={{ color: 'var(--ec-text-6)', fontFamily: 'Inter, sans-serif' }}>
                     <Clock size={13} /> {c.estimated_hours}h
                   </span>
                 </div>
@@ -123,25 +123,25 @@ function CourseDetail({ course, language, onBack, onOpenLesson }: {
   return (
     <div>
       <button onClick={onBack} className="flex items-center gap-2 text-base mb-6 transition-all"
-        style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}
-        onMouseEnter={e => (e.currentTarget.style.color = '#94a3b8')}
-        onMouseLeave={e => (e.currentTarget.style.color = '#475569')}>
+        style={{ color: 'var(--ec-text-6)', fontFamily: 'Inter, sans-serif' }}
+        onMouseEnter={e => (e.currentTarget.style.color = 'var(--ec-text-4)')}
+        onMouseLeave={e => (e.currentTarget.style.color = 'var(--ec-text-6)')}>
         <ArrowLeft size={18} /> {isKin ? 'Garuka ku Masomo' : 'Back to Courses'}
       </button>
 
       {/* Course header */}
-      <div className="rounded-2xl p-6 mb-6" style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.06)' }}>
-        <h2 className="text-2xl font-bold mb-2" style={{ color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}>{courseTitle}</h2>
-        <p className="text-base mb-4" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
+      <div className="rounded-2xl p-6 mb-6" style={{ background: 'var(--ec-surface)', border: '1px solid var(--ec-b1)' }}>
+        <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--ec-text-1)', fontFamily: 'Inter, sans-serif' }}>{courseTitle}</h2>
+        <p className="text-base mb-4" style={{ color: 'var(--ec-text-6)', fontFamily: 'Inter, sans-serif' }}>
           {isKin && course.description_kin ? course.description_kin : course.description}
         </p>
         <div className="flex items-center gap-4 mb-3">
           <span className="text-base font-semibold" style={{ color: '#00d4aa', fontFamily: 'Inter, sans-serif' }}>
             {completedCount}/{totalLessons} {isKin ? 'amasomo' : 'lessons'}
           </span>
-          <span className="text-base" style={{ color: '#475569' }}>{pct}%</span>
+          <span className="text-base" style={{ color: 'var(--ec-text-6)' }}>{pct}%</span>
         </div>
-        <div className="w-full h-2 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+        <div className="w-full h-2 rounded-full overflow-hidden" style={{ background: 'var(--ec-b1)' }}>
           <div className="h-full rounded-full transition-all duration-500"
             style={{ width: `${pct}%`, background: 'linear-gradient(90deg, #00d4aa, #8b5cf6)' }} />
         </div>
@@ -159,16 +159,16 @@ function CourseDetail({ course, language, onBack, onOpenLesson }: {
             const modDone = mod.lessons.length > 0 && mod.lessons.every(l => completedIds.has(l.id));
             return (
               <div key={mod.id} className="rounded-2xl overflow-hidden"
-                style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.06)' }}>
+                style={{ background: 'var(--ec-surface)', border: '1px solid var(--ec-b1)' }}>
                 {/* Module header */}
                 <div className="px-5 py-4 flex items-center gap-3"
-                  style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                  style={{ borderBottom: '1px solid var(--ec-b3)' }}>
                   <div className="w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold"
-                    style={{ background: modDone ? 'rgba(0,212,170,0.15)' : 'rgba(255,255,255,0.05)',
-                      color: modDone ? '#00d4aa' : '#475569', fontFamily: 'Inter, sans-serif' }}>
+                    style={{ background: modDone ? 'rgba(0,212,170,0.15)' : 'var(--ec-b5)',
+                      color: modDone ? '#00d4aa' : 'var(--ec-text-6)', fontFamily: 'Inter, sans-serif' }}>
                     {mi + 1}
                   </div>
-                  <h3 className="flex-1 text-base font-semibold" style={{ color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}>
+                  <h3 className="flex-1 text-base font-semibold" style={{ color: 'var(--ec-text-1)', fontFamily: 'Inter, sans-serif' }}>
                     {modTitle}
                   </h3>
                   {modDone && <CheckCircle size={16} style={{ color: '#00d4aa' }} />}
@@ -184,17 +184,17 @@ function CourseDetail({ course, language, onBack, onOpenLesson }: {
                         key={lesson.id}
                         onClick={() => onOpenLesson(lesson, allLessons)}
                         className="flex items-center gap-3 px-5 py-4 cursor-pointer transition-all"
-                        style={{ borderTop: li > 0 ? '1px solid rgba(255,255,255,0.04)' : 'none' }}
+                        style={{ borderTop: li > 0 ? '1px solid var(--ec-b3)' : 'none' }}
                         onMouseEnter={e => (e.currentTarget as HTMLDivElement).style.background = 'rgba(255,255,255,0.02)'}
                         onMouseLeave={e => (e.currentTarget as HTMLDivElement).style.background = 'transparent'}
                       >
                         <div className="w-5 flex-shrink-0">
                           {done
                             ? <CheckCircle size={16} style={{ color: '#00d4aa' }} />
-                            : <div className="w-4 h-4 rounded-full border" style={{ borderColor: 'rgba(255,255,255,0.12)' }} />
+                            : <div className="w-4 h-4 rounded-full border" style={{ borderColor: 'var(--ec-b7)' }} />
                           }
                         </div>
-                        <span className="flex-1 text-base" style={{ color: done ? '#64748b' : '#cbd5e1', fontFamily: 'Inter, sans-serif' }}>
+                        <span className="flex-1 text-base" style={{ color: done ? 'var(--ec-text-5)' : 'var(--ec-text-3)', fontFamily: 'Inter, sans-serif' }}>
                           {lessonTitle}
                         </span>
                         <div className="flex items-center gap-2">
@@ -202,10 +202,10 @@ function CourseDetail({ course, language, onBack, onOpenLesson }: {
                             style={{ background: lt.bg, color: lt.text, border: `1px solid ${lt.border}` }}>
                             {lt.icon} {lt.label}
                           </span>
-                          <span className="flex items-center gap-1 text-sm" style={{ color: '#475569' }}>
+                          <span className="flex items-center gap-1 text-sm" style={{ color: 'var(--ec-text-6)' }}>
                             <Zap size={12} style={{ color: '#f59e0b' }} />{lesson.xp_reward}
                           </span>
-                          <ChevronRight size={16} style={{ color: '#334155' }} />
+                          <ChevronRight size={16} style={{ color: 'var(--ec-text-7)' }} />
                         </div>
                       </div>
                     );
@@ -233,18 +233,18 @@ export default function CoursesPage({ language, onBack, onOpenLesson }: Props) {
   }, []);
 
   return (
-    <div className="min-h-screen" style={{ background: '#0d0f14', fontFamily: 'Inter, sans-serif' }}>
+    <div className="min-h-screen" style={{ background: 'var(--ec-bg)', fontFamily: 'Inter, sans-serif' }}>
       {/* Top bar */}
       <div className="border-b px-6 py-4 flex items-center gap-3"
-        style={{ background: '#13161e', borderColor: 'rgba(255,255,255,0.06)' }}>
+        style={{ background: 'var(--ec-surface)', borderColor: 'var(--ec-b1)' }}>
         <button onClick={onBack} className="flex items-center gap-2 text-base transition-all"
-          style={{ color: '#475569' }}
-          onMouseEnter={e => (e.currentTarget.style.color = '#94a3b8')}
-          onMouseLeave={e => (e.currentTarget.style.color = '#475569')}>
+          style={{ color: 'var(--ec-text-6)' }}
+          onMouseEnter={e => (e.currentTarget.style.color = 'var(--ec-text-4)')}
+          onMouseLeave={e => (e.currentTarget.style.color = 'var(--ec-text-6)')}>
           <ArrowLeft size={18} /> {isKin ? 'Dashboard' : 'Dashboard'}
         </button>
-        <span style={{ color: 'rgba(255,255,255,0.08)' }}>|</span>
-        <span className="flex items-center gap-2 text-base font-semibold" style={{ color: '#f1f5f9' }}>
+        <span style={{ color: 'var(--ec-b2)' }}>|</span>
+        <span className="flex items-center gap-2 text-base font-semibold" style={{ color: 'var(--ec-text-1)' }}>
           <BookOpen size={16} style={{ color: '#00d4aa' }} />
           {isKin ? 'Amasomo' : 'Courses'}
         </span>

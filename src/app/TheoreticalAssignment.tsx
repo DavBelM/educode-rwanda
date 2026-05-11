@@ -107,7 +107,7 @@ export default function TheoreticalAssignment({ assignment, language, onBack }: 
   const diff = difficultyColor[assignment.difficulty] ?? difficultyColor.beginner;
 
   return (
-    <div className="min-h-screen" style={{ fontFamily: 'Inter, sans-serif', background: '#0d0f14' }} onPaste={examMode ? onPaste : undefined}>
+    <div className="min-h-screen" style={{ fontFamily: 'Inter, sans-serif', background: 'var(--ec-bg)' }} onPaste={examMode ? onPaste : undefined}>
 
       {/* Violation warning toast */}
       {violationWarning && (
@@ -130,13 +130,13 @@ export default function TheoreticalAssignment({ assignment, language, onBack }: 
       )}
 
       {/* Top bar */}
-      <div className="sticky top-0 z-10 px-6 py-4 flex items-center justify-between" style={{ background: 'rgba(13,15,20,0.9)', backdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+      <div className="sticky top-0 z-10 px-6 py-4 flex items-center justify-between" style={{ background: 'var(--ec-bg-a90)', backdropFilter: 'blur(12px)', borderBottom: '1px solid var(--ec-b1)' }}>
         <button
           onClick={onBack}
           className="flex items-center gap-2 text-sm font-medium transition-colors"
-          style={{ color: '#94a3b8' }}
-          onMouseEnter={e => (e.currentTarget.style.color = '#f1f5f9')}
-          onMouseLeave={e => (e.currentTarget.style.color = '#94a3b8')}
+          style={{ color: 'var(--ec-text-4)' }}
+          onMouseEnter={e => (e.currentTarget.style.color = 'var(--ec-text-1)')}
+          onMouseLeave={e => (e.currentTarget.style.color = 'var(--ec-text-4)')}
         >
           <ArrowLeft size={16} />
           {isKin ? 'Garuka kuri Dashboard' : 'Back to Dashboard'}
@@ -144,7 +144,7 @@ export default function TheoreticalAssignment({ assignment, language, onBack }: 
 
         <div className="flex items-center gap-3">
           {examMode && !submitted && (
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-mono text-sm font-bold" style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid ${timerColor}40`, color: timerColor }}>
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-mono text-sm font-bold" style={{ background: 'var(--ec-b5)', border: `1px solid ${timerColor}40`, color: timerColor }}>
               <Clock size={14} />
               {timerDisplay}
             </div>
@@ -156,7 +156,7 @@ export default function TheoreticalAssignment({ assignment, language, onBack }: 
             {examMode ? (isKin ? '🔒 Ikizamini' : '🔒 Exam') : (<><BookOpen size={11} className="inline mr-1" />{isKin ? 'Ibibazo bya Inyandiko' : 'Theoretical'}</>)}
           </span>
           {!examMode && assignment.due_date && (
-            <span className="hidden sm:flex items-center gap-1 text-xs" style={{ color: '#475569' }}>
+            <span className="hidden sm:flex items-center gap-1 text-xs" style={{ color: 'var(--ec-text-6)' }}>
               <Clock size={12} />
               {new Date(assignment.due_date).toLocaleDateString()}
             </span>
@@ -169,11 +169,11 @@ export default function TheoreticalAssignment({ assignment, language, onBack }: 
 
         {/* Header */}
         <div className="mb-10">
-          <h1 className="text-2xl font-bold mb-3" style={{ color: '#f1f5f9', letterSpacing: '-0.01em' }}>
+          <h1 className="text-2xl font-bold mb-3" style={{ color: 'var(--ec-text-1)', letterSpacing: '-0.01em' }}>
             {title}
           </h1>
           {description && (
-            <p className="text-base leading-relaxed" style={{ color: '#64748b' }}>
+            <p className="text-base leading-relaxed" style={{ color: 'var(--ec-text-5)' }}>
               {description}
             </p>
           )}
@@ -181,14 +181,14 @@ export default function TheoreticalAssignment({ assignment, language, onBack }: 
 
         {/* Submitted state */}
         {submitted ? (
-          <div className="rounded-2xl p-10 text-center" style={{ background: '#13161e', border: '1px solid rgba(0,212,170,0.2)' }}>
+          <div className="rounded-2xl p-10 text-center" style={{ background: 'var(--ec-surface)', border: '1px solid rgba(0,212,170,0.2)' }}>
             <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: 'rgba(0,212,170,0.12)', border: '1px solid rgba(0,212,170,0.25)' }}>
               <CheckCircle size={32} style={{ color: '#00d4aa' }} />
             </div>
-            <h2 className="text-xl font-bold mb-2" style={{ color: '#f1f5f9' }}>
+            <h2 className="text-xl font-bold mb-2" style={{ color: 'var(--ec-text-1)' }}>
               {isKin ? 'Byatanzwe!' : 'Submitted!'}
             </h2>
-            <p className="text-sm" style={{ color: '#64748b' }}>
+            <p className="text-sm" style={{ color: 'var(--ec-text-5)' }}>
               {isKin
                 ? 'Ibisubizo byawe byoherejwe neza. Umwarimu wawe azabisuzuma.'
                 : 'Your answers have been submitted. Your teacher will review them.'}
@@ -210,12 +210,12 @@ export default function TheoreticalAssignment({ assignment, language, onBack }: 
               {questions.map((q, index) => {
                 const questionText = isKin ? (q.text_kin || q.text) : q.text;
                 return (
-                  <div key={q.id} className="rounded-2xl p-6" style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.06)' }}>
+                  <div key={q.id} className="rounded-2xl p-6" style={{ background: 'var(--ec-surface)', border: '1px solid var(--ec-b1)' }}>
                     <label className="block mb-3">
-                      <span className="text-xs font-semibold uppercase tracking-wide" style={{ color: '#475569' }}>
+                      <span className="text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--ec-text-6)' }}>
                         {isKin ? `Ikibazo cya ${index + 1}` : `Question ${index + 1}`}
                       </span>
-                      <p className="text-base font-medium mt-1" style={{ color: '#f1f5f9' }}>
+                      <p className="text-base font-medium mt-1" style={{ color: 'var(--ec-text-1)' }}>
                         {questionText}
                       </p>
                     </label>
@@ -226,16 +226,16 @@ export default function TheoreticalAssignment({ assignment, language, onBack }: 
                       rows={4}
                       className="w-full rounded-xl p-4 text-sm resize-none transition-all focus:outline-none"
                       style={{
-                        background: '#0d0f14',
-                        border: '1px solid rgba(255,255,255,0.08)',
-                        color: '#f1f5f9',
+                        background: 'var(--ec-bg)',
+                        border: '1px solid var(--ec-b2)',
+                        color: 'var(--ec-text-1)',
                         lineHeight: '1.6',
                       }}
                       onFocus={e => (e.target.style.border = '1px solid rgba(0,212,170,0.4)')}
-                      onBlur={e => (e.target.style.border = '1px solid rgba(255,255,255,0.08)')}
+                      onBlur={e => (e.target.style.border = '1px solid var(--ec-b2)')}
                     />
                     <div className="mt-1.5 flex justify-end">
-                      <span className="text-xs" style={{ color: (answers[q.id] ?? '').trim().length > 0 ? '#475569' : '#334155' }}>
+                      <span className="text-xs" style={{ color: (answers[q.id] ?? '').trim().length > 0 ? 'var(--ec-text-6)' : 'var(--ec-text-7)' }}>
                         {(answers[q.id] ?? '').trim().split(/\s+/).filter(Boolean).length} {isKin ? 'amagambo' : 'words'}
                       </span>
                     </div>
@@ -253,7 +253,7 @@ export default function TheoreticalAssignment({ assignment, language, onBack }: 
 
             {/* Progress indicator */}
             <div className="flex items-center justify-between mb-6">
-              <span className="text-sm" style={{ color: '#475569' }}>
+              <span className="text-sm" style={{ color: 'var(--ec-text-6)' }}>
                 {questions.filter(q => (answers[q.id] ?? '').trim().length > 0).length} / {questions.length} {isKin ? 'byasubijwe' : 'answered'}
               </span>
               <div className="flex gap-1">
@@ -261,7 +261,7 @@ export default function TheoreticalAssignment({ assignment, language, onBack }: 
                   <div
                     key={q.id}
                     className="w-2 h-2 rounded-full transition-all"
-                    style={{ background: (answers[q.id] ?? '').trim().length > 0 ? '#00d4aa' : 'rgba(255,255,255,0.1)' }}
+                    style={{ background: (answers[q.id] ?? '').trim().length > 0 ? '#00d4aa' : 'var(--ec-b4)' }}
                   />
                 ))}
               </div>
@@ -272,12 +272,12 @@ export default function TheoreticalAssignment({ assignment, language, onBack }: 
               onClick={handleSubmit}
               disabled={!allAnswered || submitting}
               className="w-full rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-              style={{ height: '52px', background: '#00d4aa', color: '#0d0f14', boxShadow: allAnswered ? '0 0 24px rgba(0,212,170,0.25)' : 'none' }}
+              style={{ height: '52px', background: '#00d4aa', color: 'var(--ec-bg)', boxShadow: allAnswered ? '0 0 24px rgba(0,212,170,0.25)' : 'none' }}
               onMouseEnter={e => { if (allAnswered) (e.currentTarget as HTMLButtonElement).style.background = '#00bfa0'; }}
               onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = '#00d4aa'; }}
             >
               {submitting ? (
-                <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" style={{ borderColor: '#0d0f14', borderTopColor: 'transparent' }} />
+                <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" style={{ borderColor: 'var(--ec-bg)', borderTopColor: 'transparent' }} />
               ) : (
                 <>
                   <Send size={16} />
@@ -287,7 +287,7 @@ export default function TheoreticalAssignment({ assignment, language, onBack }: 
             </button>
 
             {!allAnswered && (
-              <p className="text-center text-xs mt-3" style={{ color: '#334155' }}>
+              <p className="text-center text-xs mt-3" style={{ color: 'var(--ec-text-7)' }}>
                 {isKin ? 'Subiza ibibazo byose mbere yo kohereza' : 'Answer all questions before submitting'}
               </p>
             )}

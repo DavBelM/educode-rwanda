@@ -48,14 +48,14 @@ function AddTeacherModal({ schoolId, language, onClose, onAdded }: {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }}>
-      <div className="w-full max-w-sm rounded-2xl p-6" style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.08)' }}>
+      <div className="w-full max-w-sm rounded-2xl p-6" style={{ background: 'var(--ec-surface)', border: '1px solid var(--ec-b2)' }}>
         <div className="flex items-center justify-between mb-5">
-          <h3 className="text-base font-bold" style={{ color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}>
+          <h3 className="text-base font-bold" style={{ color: 'var(--ec-text-1)', fontFamily: 'Inter, sans-serif' }}>
             {isKin ? 'Ongeramo umwarimu' : 'Add Teacher'}
           </h3>
-          <button onClick={onClose} style={{ color: '#475569' }}
-            onMouseEnter={e => (e.currentTarget.style.color = '#94a3b8')}
-            onMouseLeave={e => (e.currentTarget.style.color = '#475569')}>
+          <button onClick={onClose} style={{ color: 'var(--ec-text-6)' }}
+            onMouseEnter={e => (e.currentTarget.style.color = 'var(--ec-text-4)')}
+            onMouseLeave={e => (e.currentTarget.style.color = 'var(--ec-text-6)')}>
             <X size={18} />
           </button>
         </div>
@@ -69,7 +69,7 @@ function AddTeacherModal({ schoolId, language, onClose, onAdded }: {
           </div>
         ) : (
           <>
-            <p className="text-xs mb-4" style={{ color: '#64748b', fontFamily: 'Inter, sans-serif' }}>
+            <p className="text-xs mb-4" style={{ color: 'var(--ec-text-5)', fontFamily: 'Inter, sans-serif' }}>
               {isKin
                 ? 'Shyiramo i-meyili y\'umwarimu usanzwe afite konti muri EduCode Rwanda.'
                 : 'Enter the email of a teacher who has already signed up on EduCode Rwanda.'}
@@ -81,14 +81,14 @@ function AddTeacherModal({ schoolId, language, onClose, onAdded }: {
               onKeyDown={e => e.key === 'Enter' && handleAdd()}
               placeholder={isKin ? 'mwarimu@ishuri.rw' : 'teacher@school.rw'}
               className="w-full px-4 py-3 rounded-xl text-sm mb-3 outline-none"
-              style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}
+              style={{ background: 'var(--ec-b3)', border: '1px solid var(--ec-b2)', color: 'var(--ec-text-1)', fontFamily: 'Inter, sans-serif' }}
             />
             {error && <p className="text-xs mb-3" style={{ color: '#f87171', fontFamily: 'Inter, sans-serif' }}>{error}</p>}
             <button
               onClick={handleAdd}
               disabled={loading || !email.trim()}
               className="w-full py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2"
-              style={{ background: '#00d4aa', color: '#0d0f14', opacity: loading || !email.trim() ? 0.6 : 1 }}>
+              style={{ background: '#00d4aa', color: 'var(--ec-bg)', opacity: loading || !email.trim() ? 0.6 : 1 }}>
               {loading ? <Loader size={14} className="animate-spin" /> : <UserPlus size={14} />}
               {isKin ? 'Ongeramo umwarimu' : 'Add Teacher'}
             </button>
@@ -121,14 +121,14 @@ function AnnouncementModal({ schoolId, language, onClose, onCreated }: {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }}>
-      <div className="w-full max-w-md rounded-2xl p-6" style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.08)' }}>
+      <div className="w-full max-w-md rounded-2xl p-6" style={{ background: 'var(--ec-surface)', border: '1px solid var(--ec-b2)' }}>
         <div className="flex items-center justify-between mb-5">
-          <h3 className="text-base font-bold" style={{ color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}>
+          <h3 className="text-base font-bold" style={{ color: 'var(--ec-text-1)', fontFamily: 'Inter, sans-serif' }}>
             {isKin ? 'Itangazo rishya' : 'New Announcement'}
           </h3>
-          <button onClick={onClose} style={{ color: '#475569' }}
-            onMouseEnter={e => (e.currentTarget.style.color = '#94a3b8')}
-            onMouseLeave={e => (e.currentTarget.style.color = '#475569')}>
+          <button onClick={onClose} style={{ color: 'var(--ec-text-6)' }}
+            onMouseEnter={e => (e.currentTarget.style.color = 'var(--ec-text-4)')}
+            onMouseLeave={e => (e.currentTarget.style.color = 'var(--ec-text-6)')}>
             <X size={18} />
           </button>
         </div>
@@ -138,23 +138,23 @@ function AnnouncementModal({ schoolId, language, onClose, onCreated }: {
             value={title} onChange={e => setTitle(e.target.value)}
             placeholder={isKin ? 'Umutwe w\'itangazo' : 'Announcement title'}
             className="w-full px-4 py-3 rounded-xl text-sm outline-none"
-            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}
+            style={{ background: 'var(--ec-b3)', border: '1px solid var(--ec-b2)', color: 'var(--ec-text-1)', fontFamily: 'Inter, sans-serif' }}
           />
           <textarea
             value={body} onChange={e => setBody(e.target.value)}
             rows={4}
             placeholder={isKin ? 'Ibirimo mu butumwa...' : 'Message content...'}
             className="w-full px-4 py-3 rounded-xl text-sm outline-none resize-none"
-            style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}
+            style={{ background: 'var(--ec-b3)', border: '1px solid var(--ec-b2)', color: 'var(--ec-text-1)', fontFamily: 'Inter, sans-serif' }}
           />
           <label className="flex items-center gap-2 cursor-pointer">
             <div
               onClick={() => setPinned(p => !p)}
               className="w-8 h-4 rounded-full transition-all flex items-center px-0.5"
-              style={{ background: pinned ? '#00d4aa' : 'rgba(255,255,255,0.1)' }}>
+              style={{ background: pinned ? '#00d4aa' : 'var(--ec-b4)' }}>
               <div className="w-3 h-3 rounded-full bg-white transition-all" style={{ transform: pinned ? 'translateX(16px)' : 'translateX(0)' }} />
             </div>
-            <span className="text-xs" style={{ color: '#64748b', fontFamily: 'Inter, sans-serif' }}>
+            <span className="text-xs" style={{ color: 'var(--ec-text-5)', fontFamily: 'Inter, sans-serif' }}>
               {isKin ? 'Shira itangazo hejuru' : 'Pin announcement'}
             </span>
           </label>
@@ -166,7 +166,7 @@ function AnnouncementModal({ schoolId, language, onClose, onCreated }: {
           onClick={handleCreate}
           disabled={loading || !title.trim() || !body.trim()}
           className="w-full mt-4 py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2"
-          style={{ background: '#00d4aa', color: '#0d0f14', opacity: loading || !title.trim() || !body.trim() ? 0.6 : 1 }}>
+          style={{ background: '#00d4aa', color: 'var(--ec-bg)', opacity: loading || !title.trim() || !body.trim() ? 0.6 : 1 }}>
           {loading ? <Loader size={14} className="animate-spin" /> : <Megaphone size={14} />}
           {isKin ? 'Tangaza itangazo' : 'Post Announcement'}
         </button>
@@ -245,7 +245,7 @@ export default function SchoolAdminDashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: '#0d0f14' }}>
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--ec-bg)' }}>
         <Loader size={24} className="animate-spin" style={{ color: '#00d4aa' }} />
       </div>
     );
@@ -253,13 +253,13 @@ export default function SchoolAdminDashboard() {
 
   if (!school) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-8" style={{ background: '#0d0f14' }}>
+      <div className="min-h-screen flex items-center justify-center p-8" style={{ background: 'var(--ec-bg)' }}>
         <div className="text-center max-w-sm">
           <div className="text-5xl mb-4">🏫</div>
-          <h2 className="text-xl font-bold mb-2" style={{ color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}>
+          <h2 className="text-xl font-bold mb-2" style={{ color: 'var(--ec-text-1)', fontFamily: 'Inter, sans-serif' }}>
             {isKin ? 'Nta shuri rihujwe na yo' : 'No school linked'}
           </h2>
-          <p className="text-sm" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
+          <p className="text-sm" style={{ color: 'var(--ec-text-6)', fontFamily: 'Inter, sans-serif' }}>
             {isKin ? 'Twandikire muri EduCode Rwanda kugirango dushyireho ishuri ryawe.' : 'Contact EduCode Rwanda to get your school set up.'}
           </p>
         </div>
@@ -276,17 +276,17 @@ export default function SchoolAdminDashboard() {
   ];
 
   return (
-    <div className="min-h-screen" style={{ background: '#0d0f14', fontFamily: 'Inter, sans-serif' }}>
+    <div className="min-h-screen" style={{ background: 'var(--ec-bg)', fontFamily: 'Inter, sans-serif' }}>
       {/* Header */}
-      <header style={{ background: '#13161e', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+      <header style={{ background: 'var(--ec-surface)', borderBottom: '1px solid var(--ec-b1)' }}>
         <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <span className="text-2xl">🏫</span>
             <div>
-              <h1 className="text-base font-bold" style={{ color: '#f1f5f9' }}>{school.name}</h1>
+              <h1 className="text-base font-bold" style={{ color: 'var(--ec-text-1)' }}>{school.name}</h1>
               <div className="flex items-center gap-3 mt-0.5">
                 {school.location && (
-                  <span className="flex items-center gap-1 text-xs" style={{ color: '#475569' }}>
+                  <span className="flex items-center gap-1 text-xs" style={{ color: 'var(--ec-text-6)' }}>
                     <MapPin size={10} /> {school.location}
                   </span>
                 )}
@@ -302,16 +302,16 @@ export default function SchoolAdminDashboard() {
           </div>
           <div className="flex items-center gap-3">
             {/* Language toggle */}
-            <div className="flex items-center gap-1 rounded-lg p-1" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}>
+            <div className="flex items-center gap-1 rounded-lg p-1" style={{ background: 'var(--ec-b3)', border: '1px solid var(--ec-b1)' }}>
               {(['EN', 'KIN'] as const).map(l => (
                 <button key={l} onClick={() => setLanguage(l)}
                   className="px-2.5 py-1 rounded-md text-xs font-semibold transition-all"
-                  style={{ background: language === l ? 'rgba(0,212,170,0.15)' : 'transparent', color: language === l ? '#00d4aa' : '#475569' }}>
+                  style={{ background: language === l ? 'rgba(0,212,170,0.15)' : 'transparent', color: language === l ? '#00d4aa' : 'var(--ec-text-6)' }}>
                   {l}
                 </button>
               ))}
             </div>
-            <span className="text-sm" style={{ color: '#475569' }}>{profile?.full_name}</span>
+            <span className="text-sm" style={{ color: 'var(--ec-text-6)' }}>{profile?.full_name}</span>
           </div>
         </div>
 
@@ -323,7 +323,7 @@ export default function SchoolAdminDashboard() {
               onClick={() => setActiveTab(tab.id)}
               className="flex items-center gap-1.5 px-4 py-3 text-xs font-semibold whitespace-nowrap transition-all border-b-2"
               style={{
-                color: activeTab === tab.id ? '#00d4aa' : '#475569',
+                color: activeTab === tab.id ? '#00d4aa' : 'var(--ec-text-6)',
                 borderColor: activeTab === tab.id ? '#00d4aa' : 'transparent',
                 background: 'transparent',
               }}>
@@ -353,17 +353,17 @@ export default function SchoolAdminDashboard() {
                 { label: isKin ? 'Amanota y\'ikigereranyo' : 'Avg Score', value: overview.avg_score_pct !== null ? `${overview.avg_score_pct}%` : '—', color: overview.avg_score_pct !== null && overview.avg_score_pct >= 70 ? '#00d4aa' : '#f59e0b' },
                 { label: isKin ? 'Abakoze muri iki cyumweru' : 'Active this week', value: overview.active_this_week, color: '#00d4aa' },
               ].map(s => (
-                <div key={s.label} className="rounded-2xl p-4 text-center" style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.06)' }}>
+                <div key={s.label} className="rounded-2xl p-4 text-center" style={{ background: 'var(--ec-surface)', border: '1px solid var(--ec-b1)' }}>
                   <p className="text-3xl font-bold mb-1" style={{ color: s.color }}>{s.value}</p>
-                  <p className="text-xs" style={{ color: '#475569' }}>{s.label}</p>
+                  <p className="text-xs" style={{ color: 'var(--ec-text-6)' }}>{s.label}</p>
                 </div>
               ))}
             </div>
 
             {/* Engagement snapshot */}
             {students.length > 0 && (
-              <div className="rounded-2xl p-5" style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.06)' }}>
-                <h3 className="text-sm font-bold mb-4" style={{ color: '#f1f5f9' }}>
+              <div className="rounded-2xl p-5" style={{ background: 'var(--ec-surface)', border: '1px solid var(--ec-b1)' }}>
+                <h3 className="text-sm font-bold mb-4" style={{ color: 'var(--ec-text-1)' }}>
                   {isKin ? 'Ishusho y’uko bakoresha platform' : 'Engagement Snapshot'}
                 </h3>
                 <div className="grid grid-cols-3 gap-3">
@@ -374,7 +374,7 @@ export default function SchoolAdminDashboard() {
                   ].map(s => (
                     <div key={s.label} className="rounded-xl p-4 text-center" style={{ background: s.bg, border: `1px solid ${s.color}20` }}>
                       <p className="text-2xl font-bold mb-1" style={{ color: s.color }}>{s.count}</p>
-                      <p className="text-xs" style={{ color: '#475569' }}>{s.label}</p>
+                      <p className="text-xs" style={{ color: 'var(--ec-text-6)' }}>{s.label}</p>
                     </div>
                   ))}
                 </div>
@@ -397,17 +397,17 @@ export default function SchoolAdminDashboard() {
 
             {/* Recent announcements preview */}
             {announcements.length > 0 && (
-              <div className="rounded-2xl p-5" style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.06)' }}>
+              <div className="rounded-2xl p-5" style={{ background: 'var(--ec-surface)', border: '1px solid var(--ec-b1)' }}>
                 <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-sm font-bold" style={{ color: '#f1f5f9' }}>{isKin ? 'Amatangazo ya vuba' : 'Recent Announcements'}</h3>
+                  <h3 className="text-sm font-bold" style={{ color: 'var(--ec-text-1)' }}>{isKin ? 'Amatangazo ya vuba' : 'Recent Announcements'}</h3>
                   <button onClick={() => setActiveTab('announcements')} className="text-xs font-semibold" style={{ color: '#00d4aa' }}>
                     {isKin ? 'Reba yose' : 'See All'}
                   </button>
                 </div>
                 {announcements.slice(0, 2).map(a => (
-                  <div key={a.id} className="py-2 border-b last:border-0" style={{ borderColor: 'rgba(255,255,255,0.04)' }}>
-                    <p className="text-sm font-semibold" style={{ color: '#f1f5f9' }}>{a.title}</p>
-                    <p className="text-xs mt-0.5 line-clamp-1" style={{ color: '#475569' }}>{a.body}</p>
+                  <div key={a.id} className="py-2 border-b last:border-0" style={{ borderColor: 'var(--ec-b3)' }}>
+                    <p className="text-sm font-semibold" style={{ color: 'var(--ec-text-1)' }}>{a.title}</p>
+                    <p className="text-xs mt-0.5 line-clamp-1" style={{ color: 'var(--ec-text-6)' }}>{a.body}</p>
                   </div>
                 ))}
               </div>
@@ -419,7 +419,7 @@ export default function SchoolAdminDashboard() {
         {activeTab === 'teachers' && (
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-sm font-bold" style={{ color: '#f1f5f9' }}>
+              <h2 className="text-sm font-bold" style={{ color: 'var(--ec-text-1)' }}>
                 {isKin ? `Abarimu (${teachers.length})` : `Teachers (${teachers.length})`}
               </h2>
               <button
@@ -431,12 +431,12 @@ export default function SchoolAdminDashboard() {
             </div>
 
             {teachers.length === 0 ? (
-              <div className="text-center py-16 rounded-2xl" style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.06)' }}>
+              <div className="text-center py-16 rounded-2xl" style={{ background: 'var(--ec-surface)', border: '1px solid var(--ec-b1)' }}>
                 <Users size={32} style={{ color: '#1e293b', margin: '0 auto 12px' }} />
-                <p className="text-sm" style={{ color: '#475569' }}>
+                <p className="text-sm" style={{ color: 'var(--ec-text-6)' }}>
                   {isKin ? 'Nta mwarimu urahuzwa n’ishuri ryawe.' : 'No teachers linked to your school yet.'}
                 </p>
-                <p className="text-xs mt-1" style={{ color: '#334155' }}>
+                <p className="text-xs mt-1" style={{ color: 'var(--ec-text-7)' }}>
                   {isKin ? 'Kanda "Ongeramo" wongeye umwarimu.' : 'Click "Add Teacher" to link one.'}
                 </p>
               </div>
@@ -444,15 +444,15 @@ export default function SchoolAdminDashboard() {
               <div className="space-y-2">
                 {teachers.map(t => (
                   <div key={t.id} className="rounded-2xl p-4 flex items-center justify-between gap-4"
-                    style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.06)' }}>
+                    style={{ background: 'var(--ec-surface)', border: '1px solid var(--ec-b1)' }}>
                     <div className="flex items-center gap-3 min-w-0">
                       <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 text-sm font-bold"
                         style={{ background: 'rgba(139,92,246,0.12)', color: '#8b5cf6' }}>
                         {t.full_name.charAt(0).toUpperCase()}
                       </div>
                       <div className="min-w-0">
-                        <p className="text-sm font-semibold truncate" style={{ color: '#f1f5f9' }}>{t.full_name}</p>
-                        <p className="text-xs flex items-center gap-1 mt-0.5 truncate" style={{ color: '#475569' }}>
+                        <p className="text-sm font-semibold truncate" style={{ color: 'var(--ec-text-1)' }}>{t.full_name}</p>
+                        <p className="text-xs flex items-center gap-1 mt-0.5 truncate" style={{ color: 'var(--ec-text-6)' }}>
                           <Mail size={10} /> {t.email}
                         </p>
                       </div>
@@ -465,8 +465,8 @@ export default function SchoolAdminDashboard() {
                           { v: t.assignment_count, l: isKin ? 'Imishinga' : 'Assignments' },
                         ].map(s => (
                           <div key={s.l}>
-                            <p className="text-sm font-bold" style={{ color: '#f1f5f9' }}>{s.v}</p>
-                            <p className="text-xs" style={{ color: '#475569' }}>{s.l}</p>
+                            <p className="text-sm font-bold" style={{ color: 'var(--ec-text-1)' }}>{s.v}</p>
+                            <p className="text-xs" style={{ color: 'var(--ec-text-6)' }}>{s.l}</p>
                           </div>
                         ))}
                       </div>
@@ -475,9 +475,9 @@ export default function SchoolAdminDashboard() {
                         onClick={() => handleRemoveTeacher(t.id)}
                         disabled={removingId === t.id}
                         className="p-1.5 rounded-lg transition-all"
-                        style={{ color: '#475569' }}
+                        style={{ color: 'var(--ec-text-6)' }}
                         onMouseEnter={e => (e.currentTarget.style.color = '#ef4444')}
-                        onMouseLeave={e => (e.currentTarget.style.color = '#475569')}
+                        onMouseLeave={e => (e.currentTarget.style.color = 'var(--ec-text-6)')}
                         title={isKin ? 'Kuramo umwarimu' : 'Remove teacher'}>
                         {removingId === t.id ? <Loader size={14} className="animate-spin" /> : <UserMinus size={14} />}
                       </button>
@@ -493,18 +493,18 @@ export default function SchoolAdminDashboard() {
         {activeTab === 'students' && (
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-sm font-bold" style={{ color: '#f1f5f9' }}>
+              <h2 className="text-sm font-bold" style={{ color: 'var(--ec-text-1)' }}>
                 {isKin ? `Abanyeshuri (${students.length})` : `Students (${students.length})`}
               </h2>
-              <span className="text-xs px-3 py-1 rounded-lg" style={{ background: 'rgba(255,255,255,0.04)', color: '#475569' }}>
+              <span className="text-xs px-3 py-1 rounded-lg" style={{ background: 'var(--ec-b3)', color: 'var(--ec-text-6)' }}>
                 {isKin ? 'Bitondekanyijwe: Abadakoresha cyane nibo baza mbere' : 'Sorted: least active first'}
               </span>
             </div>
 
             {students.length === 0 ? (
-              <div className="text-center py-16 rounded-2xl" style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.06)' }}>
+              <div className="text-center py-16 rounded-2xl" style={{ background: 'var(--ec-surface)', border: '1px solid var(--ec-b1)' }}>
                 <BookOpen size={32} style={{ color: '#1e293b', margin: '0 auto 12px' }} />
-                <p className="text-sm" style={{ color: '#475569' }}>
+                <p className="text-sm" style={{ color: 'var(--ec-text-6)' }}>
                   {isKin ? 'Nta munyeshuri uhuye n\'abarimu b\'ishuri ryawe.' : 'No students enrolled in your school\'s classes yet.'}
                 </p>
               </div>
@@ -512,15 +512,15 @@ export default function SchoolAdminDashboard() {
               <div className="space-y-2">
                 {students.map(s => (
                   <div key={s.id} className="rounded-2xl p-4 flex items-center justify-between gap-4"
-                    style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.06)' }}>
+                    style={{ background: 'var(--ec-surface)', border: '1px solid var(--ec-b1)' }}>
                     <div className="flex items-center gap-3 min-w-0">
                       <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 text-sm font-bold"
                         style={{ background: 'rgba(0,212,170,0.1)', color: '#00d4aa' }}>
                         {s.full_name.charAt(0).toUpperCase()}
                       </div>
                       <div className="min-w-0">
-                        <p className="text-sm font-semibold truncate" style={{ color: '#f1f5f9' }}>{s.full_name}</p>
-                        <p className="text-xs mt-0.5 truncate" style={{ color: '#475569' }}>
+                        <p className="text-sm font-semibold truncate" style={{ color: 'var(--ec-text-1)' }}>{s.full_name}</p>
+                        <p className="text-xs mt-0.5 truncate" style={{ color: 'var(--ec-text-6)' }}>
                           {s.class_names.join(', ') || (isKin ? 'Nta shuri ririmo' : 'No class')}
                         </p>
                       </div>
@@ -548,10 +548,10 @@ export default function SchoolAdminDashboard() {
         {activeTab === 'engagement' && (
           <div className="space-y-5">
             <div>
-              <h2 className="text-sm font-bold mb-1" style={{ color: '#f1f5f9' }}>
+              <h2 className="text-sm font-bold mb-1" style={{ color: 'var(--ec-text-1)' }}>
                 {isKin ? 'Kugenzura uko abanyeshuri bakoresha platform' : 'Student Engagement Monitor'}
               </h2>
-              <p className="text-xs" style={{ color: '#475569' }}>
+              <p className="text-xs" style={{ color: 'var(--ec-text-6)' }}>
                 {isKin
                   ? 'Abanyeshuri bamaze iminsi 7+ batagaragara kuri platform. Bwira abarimu babo babakurikirane.'
                   : 'Students inactive for 7+ days. Advise their teachers to follow up.'}
@@ -559,7 +559,7 @@ export default function SchoolAdminDashboard() {
             </div>
 
             {atRisk.length === 0 ? (
-              <div className="text-center py-16 rounded-2xl" style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.06)' }}>
+              <div className="text-center py-16 rounded-2xl" style={{ background: 'var(--ec-surface)', border: '1px solid var(--ec-b1)' }}>
                 <div className="text-4xl mb-3">🎉</div>
                 <p className="text-sm font-semibold" style={{ color: '#00d4aa' }}>
                   {isKin ? 'Abanyeshuri bose barimo gukoresha platform neza!' : 'All students are actively using the platform!'}
@@ -576,14 +576,14 @@ export default function SchoolAdminDashboard() {
                   ].map(s => (
                     <div key={s.label} className="rounded-xl p-3 text-center" style={{ background: s.bg, border: `1px solid ${s.color}25` }}>
                       <p className="text-2xl font-bold" style={{ color: s.color }}>{s.count}</p>
-                      <p className="text-xs mt-0.5" style={{ color: '#475569' }}>{s.label}</p>
+                      <p className="text-xs mt-0.5" style={{ color: 'var(--ec-text-6)' }}>{s.label}</p>
                     </div>
                   ))}
                 </div>
 
                 {/* At-risk list */}
-                <div className="rounded-2xl overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.06)' }}>
-                  <div className="px-4 py-3" style={{ background: 'rgba(239,68,68,0.05)', borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                <div className="rounded-2xl overflow-hidden" style={{ border: '1px solid var(--ec-b1)' }}>
+                  <div className="px-4 py-3" style={{ background: 'rgba(239,68,68,0.05)', borderBottom: '1px solid var(--ec-b3)' }}>
                     <div className="flex items-center gap-2">
                       <AlertCircle size={14} style={{ color: '#f87171' }} />
                       <p className="text-xs font-bold" style={{ color: '#f87171' }}>
@@ -593,22 +593,22 @@ export default function SchoolAdminDashboard() {
                   </div>
                   {atRisk.map(s => (
                     <div key={s.id} className="px-4 py-3 flex items-center justify-between border-b last:border-0"
-                      style={{ borderColor: 'rgba(255,255,255,0.04)', background: '#13161e' }}>
+                      style={{ borderColor: 'var(--ec-b3)', background: 'var(--ec-surface)' }}>
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold shrink-0"
                           style={{ background: 'rgba(239,68,68,0.1)', color: '#f87171' }}>
                           {s.full_name.charAt(0).toUpperCase()}
                         </div>
                         <div>
-                          <p className="text-sm font-semibold" style={{ color: '#f1f5f9' }}>{s.full_name}</p>
-                          <p className="text-xs" style={{ color: '#475569' }}>
+                          <p className="text-sm font-semibold" style={{ color: 'var(--ec-text-1)' }}>{s.full_name}</p>
+                          <p className="text-xs" style={{ color: 'var(--ec-text-6)' }}>
                             {s.class_names.join(', ') || (isKin ? 'Nta shuri ririmo' : 'No class')}
                           </p>
                         </div>
                       </div>
                       <div className="flex items-center gap-3 shrink-0">
                         {s.avg_score_pct !== null && (
-                          <span className="text-xs" style={{ color: '#475569' }}>{s.avg_score_pct}%</span>
+                          <span className="text-xs" style={{ color: 'var(--ec-text-6)' }}>{s.avg_score_pct}%</span>
                         )}
                         <EngagementBadge days={s.days_inactive} />
                       </div>
@@ -624,7 +624,7 @@ export default function SchoolAdminDashboard() {
         {activeTab === 'announcements' && (
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-sm font-bold" style={{ color: '#f1f5f9' }}>
+              <h2 className="text-sm font-bold" style={{ color: 'var(--ec-text-1)' }}>
                 {isKin ? 'Amatangazo y’Ishuri' : 'School Announcements'}
               </h2>
               <button
@@ -636,23 +636,23 @@ export default function SchoolAdminDashboard() {
             </div>
 
             {announcements.length === 0 ? (
-              <div className="text-center py-16 rounded-2xl" style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.06)' }}>
+              <div className="text-center py-16 rounded-2xl" style={{ background: 'var(--ec-surface)', border: '1px solid var(--ec-b1)' }}>
                 <Megaphone size={32} style={{ color: '#1e293b', margin: '0 auto 12px' }} />
-                <p className="text-sm" style={{ color: '#475569' }}>
+                <p className="text-sm" style={{ color: 'var(--ec-text-6)' }}>
                   {isKin ? 'Nta matangazo arahari. Koresha uburyo bwo hejuru ushyireho rishya.' : 'No announcements yet. Post one above.'}
                 </p>
               </div>
             ) : (
               <div className="space-y-3">
                 {announcements.map(a => (
-                  <div key={a.id} className="rounded-2xl p-4" style={{ background: '#13161e', border: a.pinned ? '1px solid rgba(0,212,170,0.2)' : '1px solid rgba(255,255,255,0.06)' }}>
+                  <div key={a.id} className="rounded-2xl p-4" style={{ background: 'var(--ec-surface)', border: a.pinned ? '1px solid rgba(0,212,170,0.2)' : '1px solid var(--ec-b1)' }}>
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-start gap-2 min-w-0">
                         {a.pinned && <Pin size={13} style={{ color: '#00d4aa', flexShrink: 0, marginTop: 2 }} />}
                         <div className="min-w-0">
-                          <p className="text-sm font-bold" style={{ color: '#f1f5f9' }}>{a.title}</p>
-                          <p className="text-xs mt-1 leading-relaxed" style={{ color: '#64748b' }}>{a.body}</p>
-                          <p className="text-xs mt-2" style={{ color: '#334155' }}>
+                          <p className="text-sm font-bold" style={{ color: 'var(--ec-text-1)' }}>{a.title}</p>
+                          <p className="text-xs mt-1 leading-relaxed" style={{ color: 'var(--ec-text-5)' }}>{a.body}</p>
+                          <p className="text-xs mt-2" style={{ color: 'var(--ec-text-7)' }}>
                             {new Date(a.created_at).toLocaleDateString()}
                           </p>
                         </div>
@@ -661,9 +661,9 @@ export default function SchoolAdminDashboard() {
                         onClick={() => handleDeleteAnnouncement(a.id)}
                         disabled={deletingAnnId === a.id}
                         className="p-1.5 rounded-lg transition-all shrink-0"
-                        style={{ color: '#475569' }}
+                        style={{ color: 'var(--ec-text-6)' }}
                         onMouseEnter={e => (e.currentTarget.style.color = '#ef4444')}
-                        onMouseLeave={e => (e.currentTarget.style.color = '#475569')}>
+                        onMouseLeave={e => (e.currentTarget.style.color = 'var(--ec-text-6)')}>
                         {deletingAnnId === a.id ? <Loader size={13} className="animate-spin" /> : <Trash2 size={13} />}
                       </button>
                     </div>

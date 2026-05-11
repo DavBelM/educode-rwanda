@@ -21,11 +21,11 @@ export function AchievementBadges({ language, badges }: AchievementBadgesProps) 
 
   return (
     <div className="rounded-2xl p-6" style={{
-      background: '#13161e',
-      border: '1px solid rgba(255,255,255,0.06)',
+      background: 'var(--ec-surface)',
+      border: '1px solid var(--ec-b1)',
     }}>
       <div className="flex items-center justify-between mb-5">
-        <p className="font-semibold" style={{ fontFamily: 'Inter, sans-serif', color: '#94a3b8', letterSpacing: '0.05em', textTransform: 'uppercase', fontSize: '13px' }}>
+        <p className="font-semibold" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--ec-text-4)', letterSpacing: '0.05em', textTransform: 'uppercase', fontSize: '13px' }}>
           {isKinyarwanda ? 'Ibihembo (Achievements)' : 'Achievements'}
         </p>
         <button className="text-sm font-semibold" style={{ color: '#00d4aa', fontFamily: 'Inter, sans-serif' }}>
@@ -46,9 +46,9 @@ export function AchievementBadges({ language, badges }: AchievementBadgesProps) 
                     boxShadow: '0 0 14px rgba(245,158,11,0.15)',
                   }
                 : {
-                    background: 'rgba(255,255,255,0.03)',
-                    border: '1px solid rgba(255,255,255,0.06)',
-                    color: '#334155',
+                    background: 'var(--ec-b6)',
+                    border: '1px solid var(--ec-b1)',
+                    color: 'var(--ec-text-7)',
                   }
               }
             >
@@ -56,7 +56,7 @@ export function AchievementBadges({ language, badges }: AchievementBadgesProps) 
             </div>
             <p className="text-sm text-center leading-tight" style={{
               fontFamily: 'Inter, sans-serif',
-              color: badge.earned ? '#94a3b8' : '#334155',
+              color: badge.earned ? 'var(--ec-text-4)' : 'var(--ec-text-7)',
               maxWidth: '72px'
             }}>
               {badge.name}

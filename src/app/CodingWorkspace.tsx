@@ -244,16 +244,16 @@ export default function CodingWorkspace({ onBack, assignment, language: initialL
 
       {/* Assignment banner */}
       {assignment && (
-        <div className="shrink-0 px-6 py-3 flex items-center justify-between" style={{ background: '#13161e', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+        <div className="shrink-0 px-6 py-3 flex items-center justify-between" style={{ background: 'var(--ec-surface)', borderBottom: '1px solid var(--ec-b1)' }}>
           <div className="min-w-0">
-            <p className="text-xs font-semibold uppercase mb-0.5" style={{ color: '#475569', letterSpacing: '0.05em' }}>
+            <p className="text-xs font-semibold uppercase mb-0.5" style={{ color: 'var(--ec-text-6)', letterSpacing: '0.05em' }}>
               {examMode ? (isKin ? '🔒 Ikizamini' : '🔒 Exam') : (isKin ? 'Umukoro' : 'Assignment')}
             </p>
-            <p className="text-sm font-bold truncate" style={{ color: '#f1f5f9' }}>
+            <p className="text-sm font-bold truncate" style={{ color: 'var(--ec-text-1)' }}>
               {isKin && assignment.title_kin ? assignment.title_kin : assignment.title}
             </p>
             {assignment.description && (
-              <p className="text-xs mt-0.5 truncate" style={{ color: '#475569' }}>
+              <p className="text-xs mt-0.5 truncate" style={{ color: 'var(--ec-text-6)' }}>
                 {isKin && assignment.description_kin ? assignment.description_kin : assignment.description}
               </p>
             )}
@@ -262,7 +262,7 @@ export default function CodingWorkspace({ onBack, assignment, language: initialL
           <div className="flex items-center gap-3 shrink-0 ml-4">
             {/* Countdown timer */}
             {examMode && !submitted && (
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-mono text-sm font-bold" style={{ background: 'rgba(255,255,255,0.05)', border: `1px solid ${timerColor}40`, color: timerColor }}>
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-mono text-sm font-bold" style={{ background: 'var(--ec-b5)', border: `1px solid ${timerColor}40`, color: timerColor }}>
                 <Clock size={14} />
                 {timerDisplay}
               </div>
@@ -280,7 +280,7 @@ export default function CodingWorkspace({ onBack, assignment, language: initialL
                 onClick={handleSubmit}
                 disabled={submitting}
                 className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold transition-all disabled:opacity-50"
-                style={{ background: '#00d4aa', color: '#0d0f14' }}
+                style={{ background: '#00d4aa', color: 'var(--ec-bg)' }}
                 onMouseEnter={e => { if (!submitting) (e.currentTarget as HTMLButtonElement).style.background = '#00bfa0'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = '#00d4aa'; }}
               >
@@ -362,7 +362,7 @@ export default function CodingWorkspace({ onBack, assignment, language: initialL
               onClick={handleSubmit}
               disabled={submitting}
               className="flex-1 flex items-center justify-center gap-1.5 py-3 rounded-xl text-sm font-bold disabled:opacity-50"
-              style={{ background: '#00d4aa', color: '#0d0f14' }}
+              style={{ background: '#00d4aa', color: 'var(--ec-bg)' }}
             >
               {submitting ? <Loader size={14} className="animate-spin" /> : <Send size={14} />}
               {isKin ? 'Ohereza' : 'Submit'}

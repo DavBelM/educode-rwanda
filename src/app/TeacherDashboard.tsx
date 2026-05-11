@@ -32,19 +32,19 @@ function CreateClassModal({ language, onClose, onCreate }: {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }}>
-      <div className="w-full max-w-md rounded-2xl p-6" style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.08)' }}>
+      <div className="w-full max-w-md rounded-2xl p-6" style={{ background: 'var(--ec-surface)', border: '1px solid var(--ec-b2)' }}>
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-lg font-bold" style={{ color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}>
+          <h2 className="text-lg font-bold" style={{ color: 'var(--ec-text-1)', fontFamily: 'Inter, sans-serif' }}>
             {isKin ? 'Kora ishuri rishya' : 'Create New Class'}
           </h2>
-          <button onClick={onClose} style={{ color: '#475569' }} onMouseEnter={e => (e.currentTarget.style.color = '#94a3b8')} onMouseLeave={e => (e.currentTarget.style.color = '#475569')}>
+          <button onClick={onClose} style={{ color: 'var(--ec-text-6)' }} onMouseEnter={e => (e.currentTarget.style.color = 'var(--ec-text-4)')} onMouseLeave={e => (e.currentTarget.style.color = 'var(--ec-text-6)')}>
             <X size={20} />
           </button>
         </div>
 
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-semibold mb-2" style={{ color: '#94a3b8', fontFamily: 'Inter, sans-serif' }}>
+            <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--ec-text-4)', fontFamily: 'Inter, sans-serif' }}>
               {isKin ? 'Izina ry’Ishuri' : 'Class Name'}
             </label>
             <input
@@ -53,21 +53,21 @@ function CreateClassModal({ language, onClose, onCreate }: {
               onChange={e => setName(e.target.value)}
               placeholder={isKin ? 'Urugero: JS Level 3 - IPRC Kigali' : 'e.g. JS Level 3 - IPRC Kigali'}
               className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none"
-              style={{ background: '#0d0f14', border: '1px solid rgba(255,255,255,0.08)', color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}
+              style={{ background: 'var(--ec-bg)', border: '1px solid var(--ec-b2)', color: 'var(--ec-text-1)', fontFamily: 'Inter, sans-serif' }}
               onFocus={e => (e.target.style.border = '1px solid rgba(0,212,170,0.4)')}
-              onBlur={e => (e.target.style.border = '1px solid rgba(255,255,255,0.08)')}
+              onBlur={e => (e.target.style.border = '1px solid var(--ec-b2)')}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-semibold mb-2" style={{ color: '#94a3b8', fontFamily: 'Inter, sans-serif' }}>
+            <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--ec-text-4)', fontFamily: 'Inter, sans-serif' }}>
               {isKin ? 'Isomo' : 'Subject'}
             </label>
             <select
               value={subject}
               onChange={e => setSubject(e.target.value)}
               className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none"
-              style={{ background: '#0d0f14', border: '1px solid rgba(255,255,255,0.08)', color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}
+              style={{ background: 'var(--ec-bg)', border: '1px solid var(--ec-b2)', color: 'var(--ec-text-1)', fontFamily: 'Inter, sans-serif' }}
             >
               <option value="JavaScript">JavaScript</option>
               <option value="HTML & CSS">HTML &amp; CSS</option>
@@ -84,14 +84,14 @@ function CreateClassModal({ language, onClose, onCreate }: {
         </div>
 
         <div className="flex gap-3 mt-6">
-          <button onClick={onClose} className="flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all" style={{ border: '1px solid rgba(255,255,255,0.08)', color: '#94a3b8', fontFamily: 'Inter, sans-serif' }}>
+          <button onClick={onClose} className="flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all" style={{ border: '1px solid var(--ec-b2)', color: 'var(--ec-text-4)', fontFamily: 'Inter, sans-serif' }}>
             {isKin ? 'Reka' : 'Cancel'}
           </button>
           <button
             onClick={handleCreate}
             disabled={!name.trim() || loading}
             className="flex-1 py-2.5 rounded-xl text-sm font-bold transition-all disabled:opacity-50 flex items-center justify-center gap-2"
-            style={{ background: '#00d4aa', color: '#0d0f14', fontFamily: 'Inter, sans-serif' }}
+            style={{ background: '#00d4aa', color: 'var(--ec-bg)', fontFamily: 'Inter, sans-serif' }}
           >
             {loading ? <Loader size={16} className="animate-spin" /> : (isKin ? 'Kora' : 'Create')}
           </button>
@@ -163,20 +163,20 @@ function CreateAssignmentModal({ language, classes, onClose, onCreate }: {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }}>
-      <div className="w-full max-w-2xl rounded-2xl" style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.08)', maxHeight: '90vh', overflowY: 'auto' }}>
+      <div className="w-full max-w-2xl rounded-2xl" style={{ background: 'var(--ec-surface)', border: '1px solid var(--ec-b2)', maxHeight: '90vh', overflowY: 'auto' }}>
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-bold" style={{ color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}>
+            <h2 className="text-lg font-bold" style={{ color: 'var(--ec-text-1)', fontFamily: 'Inter, sans-serif' }}>
               {isKin ? 'Tanga umukoro mushya' : 'Create New Assignment'}
             </h2>
-            <button onClick={onClose} style={{ color: '#475569' }} onMouseEnter={e => (e.currentTarget.style.color = '#94a3b8')} onMouseLeave={e => (e.currentTarget.style.color = '#475569')}>
+            <button onClick={onClose} style={{ color: 'var(--ec-text-6)' }} onMouseEnter={e => (e.currentTarget.style.color = 'var(--ec-text-4)')} onMouseLeave={e => (e.currentTarget.style.color = 'var(--ec-text-6)')}>
               <X size={20} />
             </button>
           </div>
 
           {step === 'type' ? (
             <>
-              <p className="text-sm mb-5" style={{ color: '#64748b', fontFamily: 'Inter, sans-serif' }}>
+              <p className="text-sm mb-5" style={{ color: 'var(--ec-text-5)', fontFamily: 'Inter, sans-serif' }}>
                 {isKin ? 'Hitamo ubwoko bw’umukoro:' : 'Choose the type of assignment:'}
               </p>
               <div className="grid grid-cols-2 gap-4 mb-6">
@@ -190,19 +190,19 @@ function CreateAssignmentModal({ language, classes, onClose, onCreate }: {
                     className="p-5 rounded-xl text-left transition-all"
                     style={{
                       background: assignmentType === type.value ? `rgba(${type.color === '#8b5cf6' ? '139,92,246' : '0,212,170'},0.08)` : 'rgba(255,255,255,0.02)',
-                      border: assignmentType === type.value ? `1px solid ${type.color}50` : '1px solid rgba(255,255,255,0.06)',
+                      border: assignmentType === type.value ? `1px solid ${type.color}50` : '1px solid var(--ec-b1)',
                     }}
                   >
-                    <div className="mb-3" style={{ color: assignmentType === type.value ? type.color : '#475569' }}>{type.icon}</div>
-                    <p className="text-sm font-bold mb-1" style={{ color: assignmentType === type.value ? '#f1f5f9' : '#94a3b8', fontFamily: 'Inter, sans-serif' }}>{type.label}</p>
-                    <p className="text-xs leading-relaxed" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>{type.desc}</p>
+                    <div className="mb-3" style={{ color: assignmentType === type.value ? type.color : 'var(--ec-text-6)' }}>{type.icon}</div>
+                    <p className="text-sm font-bold mb-1" style={{ color: assignmentType === type.value ? 'var(--ec-text-1)' : 'var(--ec-text-4)', fontFamily: 'Inter, sans-serif' }}>{type.label}</p>
+                    <p className="text-xs leading-relaxed" style={{ color: 'var(--ec-text-6)', fontFamily: 'Inter, sans-serif' }}>{type.desc}</p>
                   </button>
                 ))}
               </div>
               <button
                 onClick={() => setStep('form')}
                 className="w-full py-3 rounded-xl text-sm font-bold transition-all"
-                style={{ background: '#00d4aa', color: '#0d0f14', fontFamily: 'Inter, sans-serif' }}
+                style={{ background: '#00d4aa', color: 'var(--ec-bg)', fontFamily: 'Inter, sans-serif' }}
               >
                 {isKin ? 'Komeza' : 'Continue'}
               </button>
@@ -211,7 +211,7 @@ function CreateAssignmentModal({ language, classes, onClose, onCreate }: {
             <div className="space-y-4">
               {/* Class selector */}
               <div>
-                <label className="block text-sm font-semibold mb-2" style={{ color: '#94a3b8', fontFamily: 'Inter, sans-serif' }}>
+                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--ec-text-4)', fontFamily: 'Inter, sans-serif' }}>
                   {isKin ? 'Ishuri' : 'Class'}
                 </label>
                 <div className="relative">
@@ -219,19 +219,19 @@ function CreateAssignmentModal({ language, classes, onClose, onCreate }: {
                     value={classId}
                     onChange={e => setClassId(e.target.value)}
                     className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none appearance-none"
-                    style={{ background: '#0d0f14', border: '1px solid rgba(255,255,255,0.08)', color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}
+                    style={{ background: 'var(--ec-bg)', border: '1px solid var(--ec-b2)', color: 'var(--ec-text-1)', fontFamily: 'Inter, sans-serif' }}
                   >
                     {classes.map(cls => (
                       <option key={cls.id} value={cls.id}>{cls.name}</option>
                     ))}
                   </select>
-                  <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: '#475569' }} />
+                  <ChevronDown size={16} className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" style={{ color: 'var(--ec-text-6)' }} />
                 </div>
               </div>
 
               {/* Title EN */}
               <div>
-                <label className="block text-sm font-semibold mb-2" style={{ color: '#94a3b8', fontFamily: 'Inter, sans-serif' }}>
+                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--ec-text-4)', fontFamily: 'Inter, sans-serif' }}>
                   {isKin ? 'Umutwe (mu Cyongereza)' : 'Title (English)'}
                 </label>
                 <input
@@ -240,15 +240,15 @@ function CreateAssignmentModal({ language, classes, onClose, onCreate }: {
                   onChange={e => setTitle(e.target.value)}
                   placeholder={isKin ? 'Urugero: Introduction to Variables' : 'e.g. Introduction to Variables'}
                   className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none"
-                  style={{ background: '#0d0f14', border: '1px solid rgba(255,255,255,0.08)', color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}
+                  style={{ background: 'var(--ec-bg)', border: '1px solid var(--ec-b2)', color: 'var(--ec-text-1)', fontFamily: 'Inter, sans-serif' }}
                   onFocus={e => (e.target.style.border = '1px solid rgba(0,212,170,0.4)')}
-                  onBlur={e => (e.target.style.border = '1px solid rgba(255,255,255,0.08)')}
+                  onBlur={e => (e.target.style.border = '1px solid var(--ec-b2)')}
                 />
               </div>
 
               {/* Title KIN */}
               <div>
-                <label className="block text-sm font-semibold mb-2" style={{ color: '#94a3b8', fontFamily: 'Inter, sans-serif' }}>
+                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--ec-text-4)', fontFamily: 'Inter, sans-serif' }}>
                   {isKin ? 'Umutwe (mu Kinyarwanda)' : 'Title (Kinyarwanda)'}
                 </label>
                 <input
@@ -257,15 +257,15 @@ function CreateAssignmentModal({ language, classes, onClose, onCreate }: {
                   onChange={e => setTitleKin(e.target.value)}
                   placeholder={isKin ? 'Urugero: Intangiriro ya Variables' : 'e.g. Intangiriro ya Variables'}
                   className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none"
-                  style={{ background: '#0d0f14', border: '1px solid rgba(255,255,255,0.08)', color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}
+                  style={{ background: 'var(--ec-bg)', border: '1px solid var(--ec-b2)', color: 'var(--ec-text-1)', fontFamily: 'Inter, sans-serif' }}
                   onFocus={e => (e.target.style.border = '1px solid rgba(0,212,170,0.4)')}
-                  onBlur={e => (e.target.style.border = '1px solid rgba(255,255,255,0.08)')}
+                  onBlur={e => (e.target.style.border = '1px solid var(--ec-b2)')}
                 />
               </div>
 
               {/* Description */}
               <div>
-                <label className="block text-sm font-semibold mb-2" style={{ color: '#94a3b8', fontFamily: 'Inter, sans-serif' }}>
+                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--ec-text-4)', fontFamily: 'Inter, sans-serif' }}>
                   {isKin ? 'Amabwiriza (mu Cyongereza)' : 'Instructions (English)'}
                 </label>
                 <textarea
@@ -274,15 +274,15 @@ function CreateAssignmentModal({ language, classes, onClose, onCreate }: {
                   placeholder={isKin ? 'Sobanura icyo abanyeshuri bagomba gukora...' : 'Describe what students should do...'}
                   rows={2}
                   className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none resize-none"
-                  style={{ background: '#0d0f14', border: '1px solid rgba(255,255,255,0.08)', color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}
+                  style={{ background: 'var(--ec-bg)', border: '1px solid var(--ec-b2)', color: 'var(--ec-text-1)', fontFamily: 'Inter, sans-serif' }}
                   onFocus={e => (e.target.style.border = '1px solid rgba(0,212,170,0.4)')}
-                  onBlur={e => (e.target.style.border = '1px solid rgba(255,255,255,0.08)')}
+                  onBlur={e => (e.target.style.border = '1px solid var(--ec-b2)')}
                 />
               </div>
 
               {/* Description KIN */}
               <div>
-                <label className="block text-sm font-semibold mb-2" style={{ color: '#94a3b8', fontFamily: 'Inter, sans-serif' }}>
+                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--ec-text-4)', fontFamily: 'Inter, sans-serif' }}>
                   {isKin ? 'Amabwiriza (mu Kinyarwanda)' : 'Instructions (Kinyarwanda)'}
                 </label>
                 <textarea
@@ -291,15 +291,15 @@ function CreateAssignmentModal({ language, classes, onClose, onCreate }: {
                   placeholder={isKin ? 'Amabwiriza mu Kinyarwanda...' : 'Instructions in Kinyarwanda...'}
                   rows={2}
                   className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none resize-none"
-                  style={{ background: '#0d0f14', border: '1px solid rgba(255,255,255,0.08)', color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}
+                  style={{ background: 'var(--ec-bg)', border: '1px solid var(--ec-b2)', color: 'var(--ec-text-1)', fontFamily: 'Inter, sans-serif' }}
                   onFocus={e => (e.target.style.border = '1px solid rgba(0,212,170,0.4)')}
-                  onBlur={e => (e.target.style.border = '1px solid rgba(255,255,255,0.08)')}
+                  onBlur={e => (e.target.style.border = '1px solid var(--ec-b2)')}
                 />
               </div>
 
               {/* Total Marks */}
               <div>
-                <label className="block text-sm font-semibold mb-2" style={{ color: '#94a3b8', fontFamily: 'Inter, sans-serif' }}>
+                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--ec-text-4)', fontFamily: 'Inter, sans-serif' }}>
                   {isKin ? 'Amanota yose (urugero: /20)' : 'Total Marks (e.g. /20)'}
                 </label>
                 <input
@@ -309,23 +309,23 @@ function CreateAssignmentModal({ language, classes, onClose, onCreate }: {
                   value={totalMarks}
                   onChange={e => setTotalMarks(Math.max(1, Number(e.target.value)))}
                   className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none"
-                  style={{ background: '#0d0f14', border: '1px solid rgba(255,255,255,0.08)', color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}
+                  style={{ background: 'var(--ec-bg)', border: '1px solid var(--ec-b2)', color: 'var(--ec-text-1)', fontFamily: 'Inter, sans-serif' }}
                   onFocus={e => (e.target.style.border = '1px solid rgba(0,212,170,0.4)')}
-                  onBlur={e => (e.target.style.border = '1px solid rgba(255,255,255,0.08)')}
+                  onBlur={e => (e.target.style.border = '1px solid var(--ec-b2)')}
                 />
               </div>
 
               {/* Difficulty + Due date row */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm font-semibold mb-2" style={{ color: '#94a3b8', fontFamily: 'Inter, sans-serif' }}>
+                  <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--ec-text-4)', fontFamily: 'Inter, sans-serif' }}>
                     {isKin ? 'Urwego rw’ingorabahizi' : 'Difficulty'}
                   </label>
                   <select
                     value={difficulty}
                     onChange={e => setDifficulty(e.target.value as typeof difficulty)}
                     className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none appearance-none"
-                    style={{ background: '#0d0f14', border: '1px solid rgba(255,255,255,0.08)', color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}
+                    style={{ background: 'var(--ec-bg)', border: '1px solid var(--ec-b2)', color: 'var(--ec-text-1)', fontFamily: 'Inter, sans-serif' }}
                   >
                     <option value="beginner">{isKin ? 'Intangiriro' : 'Beginner'}</option>
                     <option value="intermediate">{isKin ? 'Urwego ruringaniye' : 'Intermediate'}</option>
@@ -333,7 +333,7 @@ function CreateAssignmentModal({ language, classes, onClose, onCreate }: {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold mb-2" style={{ color: '#94a3b8', fontFamily: 'Inter, sans-serif' }}>
+                  <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--ec-text-4)', fontFamily: 'Inter, sans-serif' }}>
                     {isKin ? 'Itariki ntarengwa' : 'Due Date'}
                   </label>
                   <input
@@ -341,16 +341,16 @@ function CreateAssignmentModal({ language, classes, onClose, onCreate }: {
                     value={dueDate}
                     onChange={e => setDueDate(e.target.value)}
                     className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none"
-                    style={{ background: '#0d0f14', border: '1px solid rgba(255,255,255,0.08)', color: '#f1f5f9', fontFamily: 'Inter, sans-serif', colorScheme: 'dark' }}
+                    style={{ background: 'var(--ec-bg)', border: '1px solid var(--ec-b2)', color: 'var(--ec-text-1)', fontFamily: 'Inter, sans-serif', colorScheme: 'dark' }}
                     onFocus={e => (e.target.style.border = '1px solid rgba(0,212,170,0.4)')}
-                    onBlur={e => (e.target.style.border = '1px solid rgba(255,255,255,0.08)')}
+                    onBlur={e => (e.target.style.border = '1px solid var(--ec-b2)')}
                   />
                 </div>
               </div>
 
               {/* Weight % */}
               <div>
-                <label className="block text-sm font-semibold mb-2" style={{ color: '#94a3b8', fontFamily: 'Inter, sans-serif' }}>
+                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--ec-text-4)', fontFamily: 'Inter, sans-serif' }}>
                   {isKin ? 'Uburemere bw’amanota (%)' : 'Grade Weight (%)'}
                 </label>
                 <div className="flex items-center gap-3">
@@ -361,9 +361,9 @@ function CreateAssignmentModal({ language, classes, onClose, onCreate }: {
                     value={weightPct}
                     onChange={e => setWeightPct(Math.max(1, Math.min(100, Number(e.target.value))))}
                     className="w-24 px-3 py-2 rounded-xl text-sm text-center focus:outline-none"
-                    style={{ background: '#0d0f14', border: '1px solid rgba(255,255,255,0.08)', color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}
+                    style={{ background: 'var(--ec-bg)', border: '1px solid var(--ec-b2)', color: 'var(--ec-text-1)', fontFamily: 'Inter, sans-serif' }}
                   />
-                  <p className="text-xs" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
+                  <p className="text-xs" style={{ color: 'var(--ec-text-6)', fontFamily: 'Inter, sans-serif' }}>
                     {isKin
                       ? weightPct === 100 ? 'Ibarwa yuzuye mu manota ya term' : `Ibarwa ${weightPct}% mu manota ya term`
                       : weightPct === 100 ? 'Counts fully toward term grade' : `Counts as ${weightPct}% toward term grade`}
@@ -372,20 +372,20 @@ function CreateAssignmentModal({ language, classes, onClose, onCreate }: {
               </div>
 
               {/* Exam Mode */}
-              <div className="rounded-xl p-4" style={{ background: examMode ? 'rgba(239,68,68,0.05)' : 'rgba(255,255,255,0.02)', border: examMode ? '1px solid rgba(239,68,68,0.2)' : '1px solid rgba(255,255,255,0.06)' }}>
+              <div className="rounded-xl p-4" style={{ background: examMode ? 'rgba(239,68,68,0.05)' : 'rgba(255,255,255,0.02)', border: examMode ? '1px solid rgba(239,68,68,0.2)' : '1px solid var(--ec-b1)' }}>
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-semibold" style={{ color: examMode ? '#f87171' : '#94a3b8', fontFamily: 'Inter, sans-serif' }}>
+                    <p className="text-sm font-semibold" style={{ color: examMode ? '#f87171' : 'var(--ec-text-4)', fontFamily: 'Inter, sans-serif' }}>
                       {isKin ? '🔒 Uburyo bw’Ikizamini (Exam Mode)' : '🔒 Exam Mode'}
                     </p>
-                    <p className="text-xs mt-0.5" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
+                    <p className="text-xs mt-0.5" style={{ color: 'var(--ec-text-6)', fontFamily: 'Inter, sans-serif' }}>
                       {isKin ? 'Gufunga screen, gukurikirana niba bahinduye paji, no kohereza mu buryo bwikora igihe cyangiye' : 'Fullscreen lock, tab-switch tracking, auto-submit on timeout'}
                     </p>
                   </div>
                   <button
                     onClick={() => setExamMode(p => !p)}
                     className="relative w-11 h-6 rounded-full transition-all shrink-0"
-                    style={{ background: examMode ? '#ef4444' : 'rgba(255,255,255,0.1)' }}
+                    style={{ background: examMode ? '#ef4444' : 'var(--ec-b4)' }}
                   >
                     <span className="absolute top-0.5 w-5 h-5 rounded-full bg-white transition-all" style={{ left: examMode ? '22px' : '2px' }} />
                   </button>
@@ -402,7 +402,7 @@ function CreateAssignmentModal({ language, classes, onClose, onCreate }: {
                       value={durationMinutes}
                       onChange={e => setDurationMinutes(Math.max(5, Math.min(240, Number(e.target.value))))}
                       className="w-24 px-3 py-1.5 rounded-lg text-sm text-center focus:outline-none"
-                      style={{ background: '#0d0f14', border: '1px solid rgba(239,68,68,0.3)', color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}
+                      style={{ background: 'var(--ec-bg)', border: '1px solid rgba(239,68,68,0.3)', color: 'var(--ec-text-1)', fontFamily: 'Inter, sans-serif' }}
                     />
                   </div>
                 )}
@@ -412,7 +412,7 @@ function CreateAssignmentModal({ language, classes, onClose, onCreate }: {
               {assignmentType === 'theoretical' && (
                 <div>
                   <div className="flex items-center justify-between mb-3">
-                    <label className="text-sm font-semibold" style={{ color: '#94a3b8', fontFamily: 'Inter, sans-serif' }}>
+                    <label className="text-sm font-semibold" style={{ color: 'var(--ec-text-4)', fontFamily: 'Inter, sans-serif' }}>
                       {isKin ? 'Ibibazo' : 'Questions'}
                     </label>
                     <button onClick={addQuestion} className="flex items-center gap-1 text-xs font-semibold transition-colors" style={{ color: '#00d4aa', fontFamily: 'Inter, sans-serif' }}>
@@ -422,13 +422,13 @@ function CreateAssignmentModal({ language, classes, onClose, onCreate }: {
                   </div>
                   <div className="space-y-3">
                     {questions.map((q, i) => (
-                      <div key={q.id} className="rounded-xl p-4" style={{ background: '#0d0f14', border: '1px solid rgba(255,255,255,0.06)' }}>
+                      <div key={q.id} className="rounded-xl p-4" style={{ background: 'var(--ec-bg)', border: '1px solid var(--ec-b1)' }}>
                         <div className="flex items-center justify-between mb-2">
-                          <span className="text-xs font-semibold uppercase" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
+                          <span className="text-xs font-semibold uppercase" style={{ color: 'var(--ec-text-6)', fontFamily: 'Inter, sans-serif' }}>
                             {isKin ? `Ikibazo cya ${i + 1}` : `Q${i + 1}`}
                           </span>
                           {questions.length > 1 && (
-                            <button onClick={() => removeQuestion(q.id)} style={{ color: '#475569' }} onMouseEnter={e => (e.currentTarget.style.color = '#ef4444')} onMouseLeave={e => (e.currentTarget.style.color = '#475569')}>
+                            <button onClick={() => removeQuestion(q.id)} style={{ color: 'var(--ec-text-6)' }} onMouseEnter={e => (e.currentTarget.style.color = '#ef4444')} onMouseLeave={e => (e.currentTarget.style.color = 'var(--ec-text-6)')}>
                               <X size={14} />
                             </button>
                           )}
@@ -439,7 +439,7 @@ function CreateAssignmentModal({ language, classes, onClose, onCreate }: {
                           onChange={e => updateQuestion(q.id, 'text', e.target.value)}
                           placeholder={isKin ? 'Ikibazo mu Cyongereza...' : 'Question in English...'}
                           className="w-full px-3 py-2 rounded-lg text-sm focus:outline-none mb-2"
-                          style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.06)', color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}
+                          style={{ background: 'var(--ec-surface)', border: '1px solid var(--ec-b1)', color: 'var(--ec-text-1)', fontFamily: 'Inter, sans-serif' }}
                         />
                         <input
                           type="text"
@@ -447,7 +447,7 @@ function CreateAssignmentModal({ language, classes, onClose, onCreate }: {
                           onChange={e => updateQuestion(q.id, 'text_kin', e.target.value)}
                           placeholder={isKin ? 'Ikibazo mu Kinyarwanda...' : 'Question in Kinyarwanda...'}
                           className="w-full px-3 py-2 rounded-lg text-sm focus:outline-none"
-                          style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.06)', color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}
+                          style={{ background: 'var(--ec-surface)', border: '1px solid var(--ec-b1)', color: 'var(--ec-text-1)', fontFamily: 'Inter, sans-serif' }}
                         />
                       </div>
                     ))}
@@ -462,14 +462,14 @@ function CreateAssignmentModal({ language, classes, onClose, onCreate }: {
               )}
 
               <div className="flex gap-3 pt-2">
-                <button onClick={() => setStep('type')} className="flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all" style={{ border: '1px solid rgba(255,255,255,0.08)', color: '#94a3b8', fontFamily: 'Inter, sans-serif' }}>
+                <button onClick={() => setStep('type')} className="flex-1 py-2.5 rounded-xl text-sm font-semibold transition-all" style={{ border: '1px solid var(--ec-b2)', color: 'var(--ec-text-4)', fontFamily: 'Inter, sans-serif' }}>
                   {isKin ? 'Subira Inyuma' : 'Back'}
                 </button>
                 <button
                   onClick={handleCreate}
                   disabled={!title.trim() || !classId || loading}
                   className="flex-1 py-2.5 rounded-xl text-sm font-bold flex items-center justify-center gap-2 disabled:opacity-50 transition-all"
-                  style={{ background: '#00d4aa', color: '#0d0f14', fontFamily: 'Inter, sans-serif' }}
+                  style={{ background: '#00d4aa', color: 'var(--ec-bg)', fontFamily: 'Inter, sans-serif' }}
                 >
                   {loading ? <Loader size={16} className="animate-spin" /> : (isKin ? 'Tangaza' : 'Publish')}
                 </button>
@@ -531,19 +531,19 @@ function AnnouncementsModal({ cls, language, onClose }: {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }}>
-      <div className="w-full max-w-lg rounded-2xl flex flex-col" style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.08)', maxHeight: '80vh' }}>
+      <div className="w-full max-w-lg rounded-2xl flex flex-col" style={{ background: 'var(--ec-surface)', border: '1px solid var(--ec-b2)', maxHeight: '80vh' }}>
         {/* Header */}
-        <div className="flex items-center justify-between p-5" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+        <div className="flex items-center justify-between p-5" style={{ borderBottom: '1px solid var(--ec-b1)' }}>
           <div className="flex items-center gap-2">
             <Megaphone size={16} style={{ color: '#f59e0b' }} />
             <div>
-              <h2 className="text-base font-bold" style={{ color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}>
+              <h2 className="text-base font-bold" style={{ color: 'var(--ec-text-1)', fontFamily: 'Inter, sans-serif' }}>
                 {isKin ? 'Amatangazo' : 'Announcements'}
               </h2>
-              <p className="text-xs" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>{cls.name}</p>
+              <p className="text-xs" style={{ color: 'var(--ec-text-6)', fontFamily: 'Inter, sans-serif' }}>{cls.name}</p>
             </div>
           </div>
-          <button onClick={onClose} style={{ color: '#475569' }} onMouseEnter={e => (e.currentTarget.style.color = '#94a3b8')} onMouseLeave={e => (e.currentTarget.style.color = '#475569')}>
+          <button onClick={onClose} style={{ color: 'var(--ec-text-6)' }} onMouseEnter={e => (e.currentTarget.style.color = 'var(--ec-text-4)')} onMouseLeave={e => (e.currentTarget.style.color = 'var(--ec-text-6)')}>
             <X size={20} />
           </button>
         </div>
@@ -557,7 +557,7 @@ function AnnouncementsModal({ cls, language, onClose }: {
               className="px-4 py-1.5 rounded-lg text-xs font-semibold transition-all"
               style={{
                 background: tab === t ? 'rgba(245,158,11,0.12)' : 'transparent',
-                color: tab === t ? '#f59e0b' : '#475569',
+                color: tab === t ? '#f59e0b' : 'var(--ec-text-6)',
                 border: tab === t ? '1px solid rgba(245,158,11,0.25)' : '1px solid transparent',
                 fontFamily: 'Inter, sans-serif',
               }}
@@ -576,8 +576,8 @@ function AnnouncementsModal({ cls, language, onClose }: {
               </div>
             ) : announcements.length === 0 ? (
               <div className="py-10 text-center">
-                <Megaphone size={28} className="mx-auto mb-3" style={{ color: '#334155' }} />
-                <p className="text-sm" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
+                <Megaphone size={28} className="mx-auto mb-3" style={{ color: 'var(--ec-text-7)' }} />
+                <p className="text-sm" style={{ color: 'var(--ec-text-6)', fontFamily: 'Inter, sans-serif' }}>
                   {isKin ? 'Nta matangazo arahari ubu' : 'No announcements yet'}
                 </p>
                 <button
@@ -591,24 +591,24 @@ function AnnouncementsModal({ cls, language, onClose }: {
             ) : (
               <div className="space-y-3">
                 {announcements.map(a => (
-                  <div key={a.id} className="rounded-xl p-4" style={{ background: a.pinned ? 'rgba(245,158,11,0.05)' : '#1a1e2a', border: a.pinned ? '1px solid rgba(245,158,11,0.2)' : '1px solid rgba(255,255,255,0.05)' }}>
+                  <div key={a.id} className="rounded-xl p-4" style={{ background: a.pinned ? 'rgba(245,158,11,0.05)' : 'var(--ec-surface-2)', border: a.pinned ? '1px solid rgba(245,158,11,0.2)' : '1px solid var(--ec-b5)' }}>
                     <div className="flex items-start justify-between gap-2 mb-1">
                       <div className="flex items-center gap-1.5 flex-1 min-w-0">
                         {a.pinned && <Pin size={12} style={{ color: '#f59e0b', flexShrink: 0 }} />}
-                        <p className="text-sm font-semibold truncate" style={{ color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}>{a.title}</p>
+                        <p className="text-sm font-semibold truncate" style={{ color: 'var(--ec-text-1)', fontFamily: 'Inter, sans-serif' }}>{a.title}</p>
                       </div>
                       <button
                         onClick={() => handleDelete(a.id)}
                         disabled={deleting === a.id}
-                        style={{ color: '#475569', flexShrink: 0 }}
+                        style={{ color: 'var(--ec-text-6)', flexShrink: 0 }}
                         onMouseEnter={e => (e.currentTarget.style.color = '#ef4444')}
-                        onMouseLeave={e => (e.currentTarget.style.color = '#475569')}
+                        onMouseLeave={e => (e.currentTarget.style.color = 'var(--ec-text-6)')}
                       >
                         {deleting === a.id ? <Loader size={13} className="animate-spin" /> : <Trash2 size={13} />}
                       </button>
                     </div>
-                    <p className="text-xs leading-relaxed mb-2" style={{ color: '#94a3b8', fontFamily: 'Inter, sans-serif', whiteSpace: 'pre-wrap' }}>{a.body}</p>
-                    <p className="text-xs" style={{ color: '#334155', fontFamily: 'Inter, sans-serif' }}>
+                    <p className="text-xs leading-relaxed mb-2" style={{ color: 'var(--ec-text-4)', fontFamily: 'Inter, sans-serif', whiteSpace: 'pre-wrap' }}>{a.body}</p>
+                    <p className="text-xs" style={{ color: 'var(--ec-text-7)', fontFamily: 'Inter, sans-serif' }}>
                       {new Date(a.created_at).toLocaleString()}
                     </p>
                   </div>
@@ -618,7 +618,7 @@ function AnnouncementsModal({ cls, language, onClose }: {
           ) : (
             <div className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold mb-1.5" style={{ color: '#94a3b8', fontFamily: 'Inter, sans-serif' }}>
+                <label className="block text-xs font-semibold mb-1.5" style={{ color: 'var(--ec-text-4)', fontFamily: 'Inter, sans-serif' }}>
                   {isKin ? 'Umutwe' : 'Title'}
                 </label>
                 <input
@@ -627,13 +627,13 @@ function AnnouncementsModal({ cls, language, onClose }: {
                   onChange={e => setTitle(e.target.value)}
                   placeholder={isKin ? 'Urugero: Isomo rya ejo hazaza rihagaritswe' : 'e.g. Tomorrow\'s class is cancelled'}
                   className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none"
-                  style={{ background: '#0d0f14', border: '1px solid rgba(255,255,255,0.08)', color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}
+                  style={{ background: 'var(--ec-bg)', border: '1px solid var(--ec-b2)', color: 'var(--ec-text-1)', fontFamily: 'Inter, sans-serif' }}
                   onFocus={e => (e.target.style.border = '1px solid rgba(245,158,11,0.4)')}
-                  onBlur={e => (e.target.style.border = '1px solid rgba(255,255,255,0.08)')}
+                  onBlur={e => (e.target.style.border = '1px solid var(--ec-b2)')}
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold mb-1.5" style={{ color: '#94a3b8', fontFamily: 'Inter, sans-serif' }}>
+                <label className="block text-xs font-semibold mb-1.5" style={{ color: 'var(--ec-text-4)', fontFamily: 'Inter, sans-serif' }}>
                   {isKin ? 'Ubutumwa' : 'Message'}
                 </label>
                 <textarea
@@ -642,9 +642,9 @@ function AnnouncementsModal({ cls, language, onClose }: {
                   rows={5}
                   placeholder={isKin ? 'Andika ubutumwa bwawe hano...' : 'Write your message here...'}
                   className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none resize-none"
-                  style={{ background: '#0d0f14', border: '1px solid rgba(255,255,255,0.08)', color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}
+                  style={{ background: 'var(--ec-bg)', border: '1px solid var(--ec-b2)', color: 'var(--ec-text-1)', fontFamily: 'Inter, sans-serif' }}
                   onFocus={e => (e.target.style.border = '1px solid rgba(245,158,11,0.4)')}
-                  onBlur={e => (e.target.style.border = '1px solid rgba(255,255,255,0.08)')}
+                  onBlur={e => (e.target.style.border = '1px solid var(--ec-b2)')}
                 />
               </div>
               <label className="flex items-center gap-2.5 cursor-pointer select-none">
@@ -653,9 +653,9 @@ function AnnouncementsModal({ cls, language, onClose }: {
                   className="w-4 h-4 rounded flex items-center justify-center transition-all"
                   style={{ background: pinned ? '#f59e0b' : 'transparent', border: pinned ? '1px solid #f59e0b' : '1px solid rgba(255,255,255,0.2)' }}
                 >
-                  {pinned && <Check size={10} style={{ color: '#0d0f14' }} />}
+                  {pinned && <Check size={10} style={{ color: 'var(--ec-bg)' }} />}
                 </div>
-                <span className="text-xs font-medium" style={{ color: '#94a3b8', fontFamily: 'Inter, sans-serif' }}>
+                <span className="text-xs font-medium" style={{ color: 'var(--ec-text-4)', fontFamily: 'Inter, sans-serif' }}>
                   {isKin ? 'Shyira hejuru' : 'Pin to top'}
                 </span>
               </label>
@@ -668,7 +668,7 @@ function AnnouncementsModal({ cls, language, onClose }: {
                 onClick={handlePost}
                 disabled={!title.trim() || !body.trim() || posting}
                 className="w-full py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2 disabled:opacity-50 transition-all"
-                style={{ background: '#f59e0b', color: '#0d0f14', fontFamily: 'Inter, sans-serif' }}
+                style={{ background: '#f59e0b', color: 'var(--ec-bg)', fontFamily: 'Inter, sans-serif' }}
               >
                 {posting ? <Loader size={16} className="animate-spin" /> : <Megaphone size={15} />}
                 {isKin ? 'Tangaza itangazo' : 'Post Announcement'}
@@ -726,13 +726,13 @@ function ClassAnalyticsModal({ cls, language, onClose }: { cls: Class & { studen
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }}>
-      <div className="w-full max-w-2xl rounded-2xl flex flex-col" style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.08)', maxHeight: '88vh' }}>
+      <div className="w-full max-w-2xl rounded-2xl flex flex-col" style={{ background: 'var(--ec-surface)', border: '1px solid var(--ec-b2)', maxHeight: '88vh' }}>
 
         {/* Header */}
-        <div className="flex items-center justify-between p-5 shrink-0" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+        <div className="flex items-center justify-between p-5 shrink-0" style={{ borderBottom: '1px solid var(--ec-b1)' }}>
           <div>
-            <h2 className="text-base font-bold" style={{ color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}>{cls.name}</h2>
-            <p className="text-xs mt-0.5" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
+            <h2 className="text-base font-bold" style={{ color: 'var(--ec-text-1)', fontFamily: 'Inter, sans-serif' }}>{cls.name}</h2>
+            <p className="text-xs mt-0.5" style={{ color: 'var(--ec-text-6)', fontFamily: 'Inter, sans-serif' }}>
               {isKin ? 'Isesengura ry\'ishuri' : 'Class analytics'}
             </p>
           </div>
@@ -747,9 +747,9 @@ function ClassAnalyticsModal({ cls, language, onClose }: { cls: Class & { studen
               {downloading ? <Loader size={12} className="animate-spin" /> : <Download size={12} />}
               {isKin ? 'Pakurura (CSV)' : 'Export CSV'}
             </button>
-            <button onClick={onClose} style={{ color: '#475569' }}
-              onMouseEnter={e => (e.currentTarget.style.color = '#94a3b8')}
-              onMouseLeave={e => (e.currentTarget.style.color = '#475569')}>
+            <button onClick={onClose} style={{ color: 'var(--ec-text-6)' }}
+              onMouseEnter={e => (e.currentTarget.style.color = 'var(--ec-text-4)')}
+              onMouseLeave={e => (e.currentTarget.style.color = 'var(--ec-text-6)')}>
               <X size={20} />
             </button>
           </div>
@@ -769,9 +769,9 @@ function ClassAnalyticsModal({ cls, language, onClose }: { cls: Class & { studen
                   { label: isKin ? 'Ikigereranyo cy\'amanota y\'ishuri' : 'Class avg',  value: analytics.class_avg_pct !== null ? `${analytics.class_avg_pct}%` : '—', color: analytics.class_avg_pct !== null && analytics.class_avg_pct >= 70 ? '#00d4aa' : analytics.class_avg_pct !== null && analytics.class_avg_pct >= 50 ? '#f59e0b' : '#ef4444' },
                   { label: isKin ? 'Igipimo cy\'imitangire y\'imikoro' : 'Submit rate', value: analytics.overall_submission_rate !== null ? `${analytics.overall_submission_rate}%` : '—', color: '#8b5cf6' },
                 ].map(s => (
-                  <div key={s.label} className="rounded-xl p-4 text-center" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                  <div key={s.label} className="rounded-xl p-4 text-center" style={{ background: 'var(--ec-b6)', border: '1px solid var(--ec-b1)' }}>
                     <p className="text-2xl font-bold mb-1" style={{ color: s.color, fontFamily: 'Inter, sans-serif' }}>{s.value}</p>
-                    <p className="text-xs" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>{s.label}</p>
+                    <p className="text-xs" style={{ color: 'var(--ec-text-6)', fontFamily: 'Inter, sans-serif' }}>{s.label}</p>
                   </div>
                 ))}
               </div>
@@ -779,36 +779,36 @@ function ClassAnalyticsModal({ cls, language, onClose }: { cls: Class & { studen
               {/* ── Per-assignment list ── */}
               {analytics.assignments.length === 0 ? (
                 <div className="py-10 text-center">
-                  <p className="text-sm" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
+                  <p className="text-sm" style={{ color: 'var(--ec-text-6)', fontFamily: 'Inter, sans-serif' }}>
                     {isKin ? 'Nta mikoro arahari' : 'No assignments yet'}
                   </p>
                 </div>
               ) : analytics.assignments.map(a => {
                 const isOpen = expanded === a.id;
                 const subRate = analytics.total_students > 0 ? Math.round((a.submitted_count / analytics.total_students) * 100) : 0;
-                const scoreColor = a.avg_pct === null ? '#475569' : a.avg_pct >= 70 ? '#00d4aa' : a.avg_pct >= 50 ? '#f59e0b' : '#ef4444';
+                const scoreColor = a.avg_pct === null ? 'var(--ec-text-6)' : a.avg_pct >= 70 ? '#00d4aa' : a.avg_pct >= 50 ? '#f59e0b' : '#ef4444';
                 const totalDist = a.dist.reduce((s, d) => s + d.count, 0);
 
                 return (
-                  <div key={a.id} className="rounded-xl overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.06)' }}>
+                  <div key={a.id} className="rounded-xl overflow-hidden" style={{ border: '1px solid var(--ec-b1)' }}>
                     {/* Row */}
                     <button
                       onClick={() => setExpanded(isOpen ? null : a.id)}
                       className="w-full flex items-center justify-between p-4 text-left transition-all"
-                      style={{ background: isOpen ? 'rgba(255,255,255,0.03)' : 'transparent' }}
+                      style={{ background: isOpen ? 'var(--ec-b6)' : 'transparent' }}
                       onMouseEnter={e => { if (!isOpen) (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.02)'; }}
                       onMouseLeave={e => { if (!isOpen) (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; }}>
                       <div className="flex items-center gap-3 min-w-0">
                         {a.assignment_type === 'coding'
                           ? <Code2 size={14} style={{ color: '#00d4aa', flexShrink: 0 }} />
                           : <BookOpen size={14} style={{ color: '#8b5cf6', flexShrink: 0 }} />}
-                        <p className="text-sm font-semibold truncate" style={{ color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}>
+                        <p className="text-sm font-semibold truncate" style={{ color: 'var(--ec-text-1)', fontFamily: 'Inter, sans-serif' }}>
                           {isKin && a.title_kin ? a.title_kin : a.title}
                         </p>
                       </div>
                       <div className="flex items-center gap-3 shrink-0 ml-3">
                         {/* Submission count */}
-                        <span className="text-xs font-semibold" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
+                        <span className="text-xs font-semibold" style={{ color: 'var(--ec-text-6)', fontFamily: 'Inter, sans-serif' }}>
                           {a.submitted_count}/{analytics.total_students}
                         </span>
                         {/* Avg score */}
@@ -817,13 +817,13 @@ function ClassAnalyticsModal({ cls, language, onClose }: { cls: Class & { studen
                             {a.avg_pct}%
                           </span>
                         )}
-                        <ChevronDown size={14} style={{ color: '#475569', transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+                        <ChevronDown size={14} style={{ color: 'var(--ec-text-6)', transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
                       </div>
                     </button>
 
                     {/* Expanded detail */}
                     {isOpen && (
-                      <div className="px-4 pb-4 space-y-4" style={{ borderTop: '1px solid rgba(255,255,255,0.04)' }}>
+                      <div className="px-4 pb-4 space-y-4" style={{ borderTop: '1px solid var(--ec-b3)' }}>
 
                         {/* Stats row */}
                         <div className="grid grid-cols-3 gap-2 pt-3">
@@ -832,20 +832,20 @@ function ClassAnalyticsModal({ cls, language, onClose }: { cls: Class & { studen
                             { label: isKin ? 'Amanota yo hejuru' : 'Top score',    value: a.top_score !== null ? `${a.top_score}/${a.total_marks}` : '—', color: '#00d4aa' },
                             { label: isKin ? 'Amanota yo hasi' : 'Low score',      value: a.low_score !== null ? `${a.low_score}/${a.total_marks}` : '—', color: '#f87171' },
                           ].map(s => (
-                            <div key={s.label} className="rounded-lg p-3 text-center" style={{ background: 'rgba(255,255,255,0.03)' }}>
+                            <div key={s.label} className="rounded-lg p-3 text-center" style={{ background: 'var(--ec-b6)' }}>
                               <p className="text-sm font-bold" style={{ color: s.color, fontFamily: 'Inter, sans-serif' }}>{s.value}</p>
-                              <p className="text-xs mt-0.5" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>{s.label}</p>
+                              <p className="text-xs mt-0.5" style={{ color: 'var(--ec-text-6)', fontFamily: 'Inter, sans-serif' }}>{s.label}</p>
                             </div>
                           ))}
                         </div>
 
                         {/* Submission rate bar */}
                         <div>
-                          <div className="flex justify-between text-xs mb-1.5" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
+                          <div className="flex justify-between text-xs mb-1.5" style={{ color: 'var(--ec-text-6)', fontFamily: 'Inter, sans-serif' }}>
                             <span>{isKin ? 'Igipimo cy\'imitangire y\'imikoro' : 'Submission rate'}</span>
-                            <span style={{ color: '#f1f5f9', fontWeight: 600 }}>{a.submitted_count} / {analytics.total_students} ({subRate}%)</span>
+                            <span style={{ color: 'var(--ec-text-1)', fontWeight: 600 }}>{a.submitted_count} / {analytics.total_students} ({subRate}%)</span>
                           </div>
-                          <div className="h-2 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+                          <div className="h-2 rounded-full overflow-hidden" style={{ background: 'var(--ec-b1)' }}>
                             <div className="h-full rounded-full" style={{ width: `${subRate}%`, background: subRate >= 70 ? '#00d4aa' : subRate >= 40 ? '#f59e0b' : '#ef4444', transition: 'width 0.6s ease' }} />
                           </div>
                         </div>
@@ -853,7 +853,7 @@ function ClassAnalyticsModal({ cls, language, onClose }: { cls: Class & { studen
                         {/* Score distribution */}
                         {totalDist > 0 && (
                           <div>
-                            <p className="text-xs font-semibold mb-2" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
+                            <p className="text-xs font-semibold mb-2" style={{ color: 'var(--ec-text-6)', fontFamily: 'Inter, sans-serif' }}>
                               {isKin ? 'Isaranganywa ry\'amanota' : 'Score distribution'}
                             </p>
                             <div className="flex h-6 rounded-lg overflow-hidden gap-px">
@@ -867,7 +867,7 @@ function ClassAnalyticsModal({ cls, language, onClose }: { cls: Class & { studen
                               {a.dist.map(d => (
                                 <div key={d.label} className="flex items-center gap-1">
                                   <div className="w-2.5 h-2.5 rounded-sm" style={{ background: d.color }} />
-                                  <span className="text-xs" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>{d.label}: {d.count}</span>
+                                  <span className="text-xs" style={{ color: 'var(--ec-text-6)', fontFamily: 'Inter, sans-serif' }}>{d.label}: {d.count}</span>
                                 </div>
                               ))}
                             </div>
@@ -918,27 +918,27 @@ function ClassCard({ cls, language, onAnnouncements, onAnalytics }: { cls: Class
   };
 
   return (
-    <div className="rounded-2xl p-5" style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.06)' }}>
+    <div className="rounded-2xl p-5" style={{ background: 'var(--ec-surface)', border: '1px solid var(--ec-b1)' }}>
       <div className="flex items-start justify-between mb-4">
         <div>
-          <h3 className="text-base font-bold mb-0.5" style={{ color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}>{cls.name}</h3>
-          <p className="text-xs" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>{cls.subject}</p>
+          <h3 className="text-base font-bold mb-0.5" style={{ color: 'var(--ec-text-1)', fontFamily: 'Inter, sans-serif' }}>{cls.name}</h3>
+          <p className="text-xs" style={{ color: 'var(--ec-text-6)', fontFamily: 'Inter, sans-serif' }}>{cls.subject}</p>
         </div>
         <div className="flex gap-3 text-center">
           <div>
-            <p className="text-lg font-bold" style={{ color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}>{cls.studentCount ?? 0}</p>
-            <p className="text-xs" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>{isKin ? 'Abanyeshuri' : 'Students'}</p>
+            <p className="text-lg font-bold" style={{ color: 'var(--ec-text-1)', fontFamily: 'Inter, sans-serif' }}>{cls.studentCount ?? 0}</p>
+            <p className="text-xs" style={{ color: 'var(--ec-text-6)', fontFamily: 'Inter, sans-serif' }}>{isKin ? 'Abanyeshuri' : 'Students'}</p>
           </div>
           <div>
-            <p className="text-lg font-bold" style={{ color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}>{cls.assignmentCount ?? 0}</p>
-            <p className="text-xs" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>{isKin ? 'Imikoro yose' : 'Assignments'}</p>
+            <p className="text-lg font-bold" style={{ color: 'var(--ec-text-1)', fontFamily: 'Inter, sans-serif' }}>{cls.assignmentCount ?? 0}</p>
+            <p className="text-xs" style={{ color: 'var(--ec-text-6)', fontFamily: 'Inter, sans-serif' }}>{isKin ? 'Imikoro yose' : 'Assignments'}</p>
           </div>
         </div>
       </div>
 
       <div className="flex items-center justify-between px-4 py-2.5 rounded-xl" style={{ background: 'rgba(0,212,170,0.06)', border: '1px solid rgba(0,212,170,0.15)' }}>
         <div>
-          <p className="text-xs mb-0.5" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
+          <p className="text-xs mb-0.5" style={{ color: 'var(--ec-text-6)', fontFamily: 'Inter, sans-serif' }}>
             {isKin ? 'Kode yo kwinjira' : 'Invite Code'}
           </p>
           <p className="text-lg font-bold tracking-widest" style={{ color: '#00d4aa', fontFamily: 'monospace' }}>{cls.invite_code}</p>
@@ -1041,12 +1041,12 @@ function SubmissionsPanel({ assignment, language, onClose }: {
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }}>
-      <div className="w-full max-w-2xl rounded-2xl" style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.08)', maxHeight: '85vh', display: 'flex', flexDirection: 'column' }}>
+      <div className="w-full max-w-2xl rounded-2xl" style={{ background: 'var(--ec-surface)', border: '1px solid var(--ec-b2)', maxHeight: '85vh', display: 'flex', flexDirection: 'column' }}>
         {/* Header */}
-        <div className="flex items-center justify-between p-5" style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+        <div className="flex items-center justify-between p-5" style={{ borderBottom: '1px solid var(--ec-b1)' }}>
           <div>
-            <h2 className="text-base font-bold" style={{ color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}>{title}</h2>
-            <p className="text-xs mt-0.5" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
+            <h2 className="text-base font-bold" style={{ color: 'var(--ec-text-1)', fontFamily: 'Inter, sans-serif' }}>{title}</h2>
+            <p className="text-xs mt-0.5" style={{ color: 'var(--ec-text-6)', fontFamily: 'Inter, sans-serif' }}>
               {submissions.length} {isKin ? 'imikoro yatanzwe' : 'submission(s)'}
             </p>
           </div>
@@ -1074,7 +1074,7 @@ function SubmissionsPanel({ assignment, language, onClose }: {
                 {isKin ? 'Sohoka amanota' : 'Release Grades'}
               </button>
             )}
-            <button onClick={onClose} style={{ color: '#475569' }} onMouseEnter={e => (e.currentTarget.style.color = '#94a3b8')} onMouseLeave={e => (e.currentTarget.style.color = '#475569')}>
+            <button onClick={onClose} style={{ color: 'var(--ec-text-6)' }} onMouseEnter={e => (e.currentTarget.style.color = 'var(--ec-text-4)')} onMouseLeave={e => (e.currentTarget.style.color = 'var(--ec-text-6)')}>
               <X size={20} />
             </button>
           </div>
@@ -1088,7 +1088,7 @@ function SubmissionsPanel({ assignment, language, onClose }: {
             </div>
           ) : submissions.length === 0 ? (
             <div className="py-10 text-center">
-              <p className="text-sm" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
+              <p className="text-sm" style={{ color: 'var(--ec-text-6)', fontFamily: 'Inter, sans-serif' }}>
                 {isKin ? 'Nta mikoro yari yatangwa' : 'No submissions yet'}
               </p>
             </div>
@@ -1098,7 +1098,7 @@ function SubmissionsPanel({ assignment, language, onClose }: {
             const isOpen = expanded === sub.id;
 
             return (
-              <div key={sub.id} className="rounded-xl overflow-hidden" style={{ border: '1px solid rgba(255,255,255,0.06)' }}>
+              <div key={sub.id} className="rounded-xl overflow-hidden" style={{ border: '1px solid var(--ec-b1)' }}>
                 {/* Student row */}
                 <button
                   onClick={() => setExpanded(isOpen ? null : sub.id)}
@@ -1112,8 +1112,8 @@ function SubmissionsPanel({ assignment, language, onClose }: {
                       {initials}
                     </div>
                     <div>
-                      <p className="text-sm font-semibold" style={{ color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}>{studentName}</p>
-                      <p className="text-xs" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
+                      <p className="text-sm font-semibold" style={{ color: 'var(--ec-text-1)', fontFamily: 'Inter, sans-serif' }}>{studentName}</p>
+                      <p className="text-xs" style={{ color: 'var(--ec-text-6)', fontFamily: 'Inter, sans-serif' }}>
                         {new Date(sub.submitted_at).toLocaleString()}
                       </p>
                     </div>
@@ -1133,24 +1133,24 @@ function SubmissionsPanel({ assignment, language, onClose }: {
                         ⚠️ {(sub.tab_switches ?? 0) + (sub.paste_count ?? 0) + (sub.fullscreen_exits ?? 0)}
                       </span>
                     )}
-                    <ChevronDown size={14} style={{ color: '#475569', transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+                    <ChevronDown size={14} style={{ color: 'var(--ec-text-6)', transform: isOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
                   </div>
                 </button>
 
                 {/* Answers + Grade */}
                 {isOpen && (
-                  <div className="px-4 pb-4 space-y-3" style={{ borderTop: '1px solid rgba(255,255,255,0.04)' }}>
+                  <div className="px-4 pb-4 space-y-3" style={{ borderTop: '1px solid var(--ec-b3)' }}>
                     {/* Answers (theoretical) */}
                     {assignment.assignment_type === 'theoretical' && sub.text_answers && questions.map((q, i) => {
                       const answer = (sub.text_answers ?? []).find(a => a.question_id === q.id)?.answer ?? '';
                       const qText = isKin ? (q.text_kin || q.text) : q.text;
                       return (
                         <div key={q.id} className="pt-3">
-                          <p className="text-xs font-semibold mb-1" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
+                          <p className="text-xs font-semibold mb-1" style={{ color: 'var(--ec-text-6)', fontFamily: 'Inter, sans-serif' }}>
                             {isKin ? `Ikibazo cya ${i + 1}` : `Q${i + 1}`}: {qText}
                           </p>
-                          <p className="text-sm leading-relaxed px-3 py-2.5 rounded-lg" style={{ color: '#94a3b8', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.04)', fontFamily: 'Inter, sans-serif' }}>
-                            {answer || <span style={{ color: '#334155' }}>{isKin ? '(Nta gisubizo)' : '(No answer)'}</span>}
+                          <p className="text-sm leading-relaxed px-3 py-2.5 rounded-lg" style={{ color: 'var(--ec-text-4)', background: 'var(--ec-b6)', border: '1px solid var(--ec-b3)', fontFamily: 'Inter, sans-serif' }}>
+                            {answer || <span style={{ color: 'var(--ec-text-7)' }}>{isKin ? '(Nta gisubizo)' : '(No answer)'}</span>}
                           </p>
                         </div>
                       );
@@ -1164,17 +1164,17 @@ function SubmissionsPanel({ assignment, language, onClose }: {
                         </p>
                         <div className="flex gap-4">
                           {(sub.tab_switches ?? 0) > 0 && (
-                            <span className="text-xs" style={{ color: '#94a3b8', fontFamily: 'Inter, sans-serif' }}>
+                            <span className="text-xs" style={{ color: 'var(--ec-text-4)', fontFamily: 'Inter, sans-serif' }}>
                               🔀 {isKin ? `Inshuro bahinduye paji: ${sub.tab_switches}` : `Tab switches: ${sub.tab_switches}`}
                             </span>
                           )}
                           {(sub.paste_count ?? 0) > 0 && (
-                            <span className="text-xs" style={{ color: '#94a3b8', fontFamily: 'Inter, sans-serif' }}>
+                            <span className="text-xs" style={{ color: 'var(--ec-text-4)', fontFamily: 'Inter, sans-serif' }}>
                               📋 {isKin ? `Inshuro bakopeye: ${sub.paste_count}` : `Pastes: ${sub.paste_count}`}
                             </span>
                           )}
                           {(sub.fullscreen_exits ?? 0) > 0 && (
-                            <span className="text-xs" style={{ color: '#94a3b8', fontFamily: 'Inter, sans-serif' }}>
+                            <span className="text-xs" style={{ color: 'var(--ec-text-4)', fontFamily: 'Inter, sans-serif' }}>
                               ↙️ {isKin ? `Inshuro basohotse muri screen yuzuye: ${sub.fullscreen_exits}` : `Fullscreen exits: ${sub.fullscreen_exits}`}
                             </span>
                           )}
@@ -1183,9 +1183,9 @@ function SubmissionsPanel({ assignment, language, onClose }: {
                     )}
 
                     {/* Grading row */}
-                    <div className="pt-3 space-y-2.5" style={{ borderTop: '1px solid rgba(255,255,255,0.04)' }}>
+                    <div className="pt-3 space-y-2.5" style={{ borderTop: '1px solid var(--ec-b3)' }}>
                       <div className="flex items-center gap-3">
-                        <label className="text-xs font-semibold shrink-0" style={{ color: '#94a3b8', fontFamily: 'Inter, sans-serif' }}>
+                        <label className="text-xs font-semibold shrink-0" style={{ color: 'var(--ec-text-4)', fontFamily: 'Inter, sans-serif' }}>
                           {isKin ? `Amanota (/${totalMarks})` : `Grade (/${totalMarks})`}
                         </label>
                         <input
@@ -1196,15 +1196,15 @@ function SubmissionsPanel({ assignment, language, onClose }: {
                           onChange={e => setMarkInputs(prev => ({ ...prev, [sub.id]: e.target.value }))}
                           placeholder={`0 – ${totalMarks}`}
                           className="w-24 px-3 py-1.5 rounded-lg text-sm text-center focus:outline-none"
-                          style={{ background: '#0d0f14', border: gradeError[sub.id] ? '1px solid rgba(239,68,68,0.5)' : '1px solid rgba(255,255,255,0.08)', color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}
+                          style={{ background: 'var(--ec-bg)', border: gradeError[sub.id] ? '1px solid rgba(239,68,68,0.5)' : '1px solid var(--ec-b2)', color: 'var(--ec-text-1)', fontFamily: 'Inter, sans-serif' }}
                           onFocus={e => (e.target.style.border = '1px solid rgba(0,212,170,0.4)')}
-                          onBlur={e => (e.target.style.border = gradeError[sub.id] ? '1px solid rgba(239,68,68,0.5)' : '1px solid rgba(255,255,255,0.08)')}
+                          onBlur={e => (e.target.style.border = gradeError[sub.id] ? '1px solid rgba(239,68,68,0.5)' : '1px solid var(--ec-b2)')}
                         />
                         <button
                           onClick={() => handleGrade(sub.id)}
                           disabled={grading[sub.id] || !markInputs[sub.id]}
                           className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all disabled:opacity-40"
-                          style={{ background: '#00d4aa', color: '#0d0f14', fontFamily: 'Inter, sans-serif' }}
+                          style={{ background: '#00d4aa', color: 'var(--ec-bg)', fontFamily: 'Inter, sans-serif' }}
                         >
                           {grading[sub.id] ? <Loader size={12} className="animate-spin" /> : <Check size={12} />}
                           {isKin ? 'Bika' : 'Save'}
@@ -1224,9 +1224,9 @@ function SubmissionsPanel({ assignment, language, onClose }: {
                         onChange={e => setFeedbackInputs(prev => ({ ...prev, [sub.id]: e.target.value }))}
                         placeholder={isKin ? 'Andika igitekerezo ku munyeshuri (si itegeko)...' : 'Write feedback for the student (optional)...'}
                         className="w-full px-3 py-2 rounded-lg text-xs leading-relaxed resize-none focus:outline-none"
-                        style={{ background: '#0d0f14', border: '1px solid rgba(255,255,255,0.08)', color: '#94a3b8', fontFamily: 'Inter, sans-serif' }}
+                        style={{ background: 'var(--ec-bg)', border: '1px solid var(--ec-b2)', color: 'var(--ec-text-4)', fontFamily: 'Inter, sans-serif' }}
                         onFocus={e => (e.target.style.border = '1px solid rgba(0,212,170,0.4)')}
-                        onBlur={e => (e.target.style.border = '1px solid rgba(255,255,255,0.08)')}
+                        onBlur={e => (e.target.style.border = '1px solid var(--ec-b2)')}
                       />
                     </div>
                   </div>
@@ -1259,8 +1259,8 @@ function AssignmentRow({ assignment, submissionCount, language, onClick }: {
     <button
       onClick={onClick}
       className="w-full flex items-start gap-3 py-3 px-4 rounded-xl transition-all text-left"
-      style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}
-      onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,255,255,0.03)')}
+      style={{ borderBottom: '1px solid var(--ec-b3)' }}
+      onMouseEnter={e => (e.currentTarget.style.background = 'var(--ec-b6)')}
       onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
     >
       {/* Type icon */}
@@ -1271,7 +1271,7 @@ function AssignmentRow({ assignment, submissionCount, language, onClick }: {
       {/* Content */}
       <div className="flex-1 min-w-0">
         {/* Title */}
-        <p className="text-sm font-semibold leading-snug" style={{ color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}>{title}</p>
+        <p className="text-sm font-semibold leading-snug" style={{ color: 'var(--ec-text-1)', fontFamily: 'Inter, sans-serif' }}>{title}</p>
 
         {/* Badges row */}
         <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
@@ -1285,7 +1285,7 @@ function AssignmentRow({ assignment, submissionCount, language, onClick }: {
             {assignment.difficulty}
           </span>
           {assignment.due_date && (
-            <span className="text-xs" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
+            <span className="text-xs" style={{ color: 'var(--ec-text-6)', fontFamily: 'Inter, sans-serif' }}>
               · {isKin ? 'Itariki ntarengwa' : 'Due'}: {new Date(assignment.due_date).toLocaleDateString()}
             </span>
           )}
@@ -1308,16 +1308,16 @@ function Leaderboard({ classId, language }: { classId: string; language: 'EN' | 
 
   const rankIcon = (rank: number) => {
     if (rank === 1) return <Trophy size={14} style={{ color: '#f59e0b' }} />;
-    if (rank === 2) return <Medal size={14} style={{ color: '#94a3b8' }} />;
+    if (rank === 2) return <Medal size={14} style={{ color: 'var(--ec-text-4)' }} />;
     if (rank === 3) return <Medal size={14} style={{ color: '#cd7c2e' }} />;
-    return <span className="text-xs font-bold" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>#{rank}</span>;
+    return <span className="text-xs font-bold" style={{ color: 'var(--ec-text-6)', fontFamily: 'Inter, sans-serif' }}>#{rank}</span>;
   };
 
   return (
-    <div className="rounded-2xl p-6" style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.06)' }}>
+    <div className="rounded-2xl p-6" style={{ background: 'var(--ec-surface)', border: '1px solid var(--ec-b1)' }}>
       <div className="flex items-center gap-2 mb-5">
         <Trophy size={16} style={{ color: '#f59e0b' }} />
-        <h2 className="text-base font-bold" style={{ color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}>
+        <h2 className="text-base font-bold" style={{ color: 'var(--ec-text-1)', fontFamily: 'Inter, sans-serif' }}>
           {isKin ? 'Urutonde rw\'amanota mu ishuri' : 'Class Leaderboard'}
         </h2>
       </div>
@@ -1325,7 +1325,7 @@ function Leaderboard({ classId, language }: { classId: string; language: 'EN' | 
       {loading ? (
         <div className="flex justify-center py-6"><Loader size={18} className="animate-spin" style={{ color: '#00d4aa' }} /></div>
       ) : entries.length === 0 ? (
-        <p className="text-sm text-center py-6" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
+        <p className="text-sm text-center py-6" style={{ color: 'var(--ec-text-6)', fontFamily: 'Inter, sans-serif' }}>
           {isKin ? 'Nta manota arahagaragara' : 'No grades yet'}
         </p>
       ) : (
@@ -1334,18 +1334,18 @@ function Leaderboard({ classId, language }: { classId: string; language: 'EN' | 
             const initials = e.full_name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
             const isTop = e.rank <= 3;
             return (
-              <div key={e.student_id} className="flex items-center gap-3 px-3 py-2.5 rounded-xl" style={{ background: isTop ? 'rgba(245,158,11,0.04)' : 'rgba(255,255,255,0.02)', border: isTop ? '1px solid rgba(245,158,11,0.12)' : '1px solid rgba(255,255,255,0.04)' }}>
+              <div key={e.student_id} className="flex items-center gap-3 px-3 py-2.5 rounded-xl" style={{ background: isTop ? 'rgba(245,158,11,0.04)' : 'rgba(255,255,255,0.02)', border: isTop ? '1px solid rgba(245,158,11,0.12)' : '1px solid var(--ec-b3)' }}>
                 <div className="w-6 flex items-center justify-center shrink-0">{rankIcon(e.rank)}</div>
                 <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0" style={{ background: 'rgba(0,212,170,0.1)', color: '#00d4aa', border: '1px solid rgba(0,212,170,0.2)' }}>
                   {initials}
                 </div>
-                <p className="flex-1 text-sm font-semibold truncate" style={{ color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}>{e.full_name}</p>
+                <p className="flex-1 text-sm font-semibold truncate" style={{ color: 'var(--ec-text-1)', fontFamily: 'Inter, sans-serif' }}>{e.full_name}</p>
                 <div className="text-right shrink-0">
-                  <p className="text-sm font-bold" style={{ color: isTop ? '#f59e0b' : '#f1f5f9', fontFamily: 'Inter, sans-serif' }}>
+                  <p className="text-sm font-bold" style={{ color: isTop ? '#f59e0b' : 'var(--ec-text-1)', fontFamily: 'Inter, sans-serif' }}>
                     {e.total_marks_earned} pts
                   </p>
                   {e.submissions_graded > 0 && (
-                    <p className="text-xs" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>{e.percentage}%</p>
+                    <p className="text-xs" style={{ color: 'var(--ec-text-6)', fontFamily: 'Inter, sans-serif' }}>{e.percentage}%</p>
                   )}
                 </div>
               </div>
@@ -1416,7 +1416,7 @@ export default function TeacherDashboard() {
   const totalSubmissions = Object.values(submissionCounts).reduce((s, n) => s + n, 0);
 
   return (
-    <div className="min-h-screen" style={{ fontFamily: 'Inter, sans-serif', background: '#0d0f14' }}>
+    <div className="min-h-screen" style={{ fontFamily: 'Inter, sans-serif', background: 'var(--ec-bg)' }}>
       <Header
         language={language}
         onLanguageToggle={() => setLanguage(prev => prev === 'EN' ? 'KIN' : 'EN')}
@@ -1440,9 +1440,9 @@ export default function TeacherDashboard() {
                 { label: isKin ? 'Imikoro yose' : 'Assignments', value: classes.reduce((s, c) => s + (c.assignmentCount ?? 0), 0), color: '#f59e0b' },
                 { label: isKin ? 'Imikoro yatanzwe' : 'Submissions', value: totalSubmissions, color: '#0ea5e9' },
               ].map((stat, i) => (
-                <div key={i} className="rounded-2xl p-5" style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.06)' }}>
+                <div key={i} className="rounded-2xl p-5" style={{ background: 'var(--ec-surface)', border: '1px solid var(--ec-b1)' }}>
                   <p className="text-2xl font-bold mb-1" style={{ color: stat.color, fontFamily: 'Inter, sans-serif' }}>{stat.value}</p>
-                  <p className="text-xs" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>{stat.label}</p>
+                  <p className="text-xs" style={{ color: 'var(--ec-text-6)', fontFamily: 'Inter, sans-serif' }}>{stat.label}</p>
                 </div>
               ))}
             </div>
@@ -1453,7 +1453,7 @@ export default function TeacherDashboard() {
               {/* Classes column */}
               <div className="lg:col-span-5 space-y-4">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-base font-bold" style={{ color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}>
+                  <h2 className="text-base font-bold" style={{ color: 'var(--ec-text-1)', fontFamily: 'Inter, sans-serif' }}>
                     {isKin ? 'Amashuri yanjye' : 'My Classes'}
                   </h2>
                   <button
@@ -1469,12 +1469,12 @@ export default function TeacherDashboard() {
                 </div>
 
                 {classes.length === 0 ? (
-                  <div className="rounded-2xl p-8 text-center" style={{ background: '#13161e', border: '1px dashed rgba(255,255,255,0.08)' }}>
-                    <Users size={32} className="mx-auto mb-3" style={{ color: '#334155' }} />
-                    <p className="text-sm font-medium mb-1" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
+                  <div className="rounded-2xl p-8 text-center" style={{ background: 'var(--ec-surface)', border: '1px dashed rgba(255,255,255,0.08)' }}>
+                    <Users size={32} className="mx-auto mb-3" style={{ color: 'var(--ec-text-7)' }} />
+                    <p className="text-sm font-medium mb-1" style={{ color: 'var(--ec-text-6)', fontFamily: 'Inter, sans-serif' }}>
                       {isKin ? 'Nta mashuri uragira' : 'No classes yet'}
                     </p>
-                    <p className="text-xs mb-4" style={{ color: '#334155', fontFamily: 'Inter, sans-serif' }}>
+                    <p className="text-xs mb-4" style={{ color: 'var(--ec-text-7)', fontFamily: 'Inter, sans-serif' }}>
                       {isKin ? 'Kora ishuri kugirango utangire' : 'Create a class to get started'}
                     </p>
                     <button
@@ -1496,12 +1496,12 @@ export default function TeacherDashboard() {
 
               {/* Assignments column */}
               <div className="lg:col-span-4">
-                <div className="rounded-2xl p-6" style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.06)' }}>
+                <div className="rounded-2xl p-6" style={{ background: 'var(--ec-surface)', border: '1px solid var(--ec-b1)' }}>
                   <div className="flex items-center justify-between mb-5">
-                    <h2 className="text-base font-bold" style={{ color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}>
+                    <h2 className="text-base font-bold" style={{ color: 'var(--ec-text-1)', fontFamily: 'Inter, sans-serif' }}>
                       {isKin ? 'Imikoro yose' : 'Assignments'}
                       {selectedClassId && classes.find(c => c.id === selectedClassId) && (
-                        <span className="ml-2 text-xs font-normal" style={{ color: '#475569' }}>
+                        <span className="ml-2 text-xs font-normal" style={{ color: 'var(--ec-text-6)' }}>
                           — {classes.find(c => c.id === selectedClassId)?.name}
                         </span>
                       )}
@@ -1510,7 +1510,7 @@ export default function TeacherDashboard() {
                       onClick={() => setShowCreateAssignment(true)}
                       disabled={classes.length === 0}
                       className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all disabled:opacity-40"
-                      style={{ background: '#00d4aa', color: '#0d0f14', fontFamily: 'Inter, sans-serif' }}
+                      style={{ background: '#00d4aa', color: 'var(--ec-bg)', fontFamily: 'Inter, sans-serif' }}
                       onMouseEnter={e => { if (classes.length > 0) (e.currentTarget as HTMLButtonElement).style.background = '#00bfa0'; }}
                       onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = '#00d4aa'; }}
                     >
@@ -1521,8 +1521,8 @@ export default function TeacherDashboard() {
 
                   {assignments.length === 0 ? (
                     <div className="py-10 text-center">
-                      <FileText size={28} className="mx-auto mb-3" style={{ color: '#334155' }} />
-                      <p className="text-sm" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
+                      <FileText size={28} className="mx-auto mb-3" style={{ color: 'var(--ec-text-7)' }} />
+                      <p className="text-sm" style={{ color: 'var(--ec-text-6)', fontFamily: 'Inter, sans-serif' }}>
                         {classes.length === 0
                           ? (isKin ? 'Kora ishuri mbere' : 'Create a class first')
                           : (isKin ? 'Nta mukoro urashyirwa muri iri shuri' : 'No assignments in this class yet')}
@@ -1549,9 +1549,9 @@ export default function TeacherDashboard() {
                 {selectedClassId
                   ? <Leaderboard classId={selectedClassId} language={language} />
                   : (
-                    <div className="rounded-2xl p-6 text-center" style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.06)' }}>
-                      <Trophy size={24} className="mx-auto mb-2" style={{ color: '#334155' }} />
-                      <p className="text-sm" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
+                    <div className="rounded-2xl p-6 text-center" style={{ background: 'var(--ec-surface)', border: '1px solid var(--ec-b1)' }}>
+                      <Trophy size={24} className="mx-auto mb-2" style={{ color: 'var(--ec-text-7)' }} />
+                      <p className="text-sm" style={{ color: 'var(--ec-text-6)', fontFamily: 'Inter, sans-serif' }}>
                         {isKin ? 'Hitamo ishuri' : 'Select a class'}
                       </p>
                     </div>
