@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Header } from './components/Header';
 import { HeroBanner } from './components/dashboard/HeroBanner';
 import { ProgressOverview } from './components/dashboard/ProgressOverview';
@@ -131,7 +131,7 @@ export default function Dashboard({ language, onLanguageChange, onStartCoding, o
   const [loadingAssignments, setLoadingAssignments] = useState(true);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [newGradeCount, setNewGradeCount] = useState(0);
-  const announcementsRef = useRef<HTMLDivElement>(null);
+  const [showAnnouncements, setShowAnnouncements] = useState(false);
 
   const loadAssignments = async () => {
     setLoadingAssignments(true);
@@ -312,61 +312,83 @@ export default function Dashboard({ language, onLanguageChange, onStartCoding, o
         subtitle={isKinyarwanda ? 'Ikibanza cy\'abanyeshuri' : 'Student Dashboard'}
         hideAssignmentInfo={true}
         announcementCount={announcements.length}
-        onAnnouncementsClick={() => announcementsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+        onAnnouncementsClick={() => setShowAnnouncements(true)}
       />
 
       <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
         <HeroBanner language={language} studentName={studentName} />
 
-        {/* Announcements */}
-        <div ref={announcementsRef} className="rounded-2xl p-5" style={{ background: '#13161e', border: `1px solid ${announcements.length > 0 ? 'rgba(245,158,11,0.25)' : 'rgba(255,255,255,0.06)'}` }}>
-          <div className="flex items-center gap-2 mb-4">
-            <Megaphone size={15} style={{ color: '#f59e0b' }} />
-            <h2 className="text-sm font-bold" style={{ color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}>
-              {isKinyarwanda ? 'Inyandiko z\'Umwarimu' : 'Announcements'}
-            </h2>
-            {announcements.length > 0 && (
-              <span className="ml-auto text-xs px-2 py-0.5 rounded-full font-semibold" style={{ background: 'rgba(245,158,11,0.12)', color: '#f59e0b', border: '1px solid rgba(245,158,11,0.25)', fontFamily: 'Inter, sans-serif' }}>
-                {announcements.length}
-              </span>
-            )}
-          </div>
+        {/* Announcements modal */}
+        {showAnnouncements && (
+          <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4"
+            style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)' }}
+            onClick={() => setShowAnnouncements(false)}>
+            <div className="w-full max-w-lg rounded-2xl flex flex-col"
+              style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.08)', maxHeight: '80vh' }}
+              onClick={e => e.stopPropagation()}>
+              {/* Header */}
+              <div className="flex items-center justify-between px-5 py-4"
+                style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                <div className="flex items-center gap-2">
+                  <Megaphone size={16} style={{ color: '#f59e0b' }} />
+                  <h2 className="font-bold" style={{ color: '#f1f5f9', fontSize: '16px' }}>
+                    {isKinyarwanda ? 'Inyandiko z\'Umwarimu' : 'Announcements'}
+                  </h2>
+                  {announcements.length > 0 && (
+                    <span className="px-2 py-0.5 rounded-full text-xs font-semibold"
+                      style={{ background: 'rgba(245,158,11,0.12)', color: '#f59e0b', border: '1px solid rgba(245,158,11,0.25)' }}>
+                      {announcements.length}
+                    </span>
+                  )}
+                </div>
+                <button onClick={() => setShowAnnouncements(false)}
+                  style={{ color: '#475569' }}
+                  onMouseEnter={e => (e.currentTarget.style.color = '#94a3b8')}
+                  onMouseLeave={e => (e.currentTarget.style.color = '#475569')}>
+                  <X size={20} />
+                </button>
+              </div>
 
-          {announcements.length === 0 ? (
-            <div className="py-6 text-center">
-              <Megaphone size={24} className="mx-auto mb-2" style={{ color: '#334155' }} />
-              <p className="text-sm" style={{ color: '#475569', fontFamily: 'Inter, sans-serif' }}>
-                {isKinyarwanda ? 'Nta nyandiko zihari ubu' : 'No announcements yet'}
-              </p>
-              <p className="text-xs mt-1" style={{ color: '#334155', fontFamily: 'Inter, sans-serif' }}>
-                {isKinyarwanda ? 'Umwarimu wawe azashyira hano amakuru' : 'Your teacher will post updates here'}
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {announcements.slice(0, 5).map(a => {
-                const cls = (a.classes as { name: string } | undefined)?.name;
-                return (
-                  <div key={a.id} className="rounded-xl p-4" style={{ background: a.pinned ? 'rgba(245,158,11,0.06)' : '#1a1e2a', border: a.pinned ? '1px solid rgba(245,158,11,0.2)' : '1px solid rgba(255,255,255,0.05)' }}>
-                    <div className="flex items-center gap-1.5 mb-1">
-                      {a.pinned && <Pin size={11} style={{ color: '#f59e0b' }} />}
-                      <p className="text-sm font-semibold" style={{ color: '#f1f5f9', fontFamily: 'Inter, sans-serif' }}>{a.title}</p>
-                      {cls && (
-                        <span className="ml-auto text-xs px-2 py-0.5 rounded-full shrink-0" style={{ background: 'rgba(0,212,170,0.08)', color: '#00d4aa', border: '1px solid rgba(0,212,170,0.15)', fontFamily: 'Inter, sans-serif' }}>
-                          {cls}
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-xs leading-relaxed mb-1.5" style={{ color: '#94a3b8', fontFamily: 'Inter, sans-serif', whiteSpace: 'pre-wrap' }}>{a.body}</p>
-                    <p className="text-xs" style={{ color: '#334155', fontFamily: 'Inter, sans-serif' }}>
-                      {new Date(a.created_at).toLocaleString()}
+              {/* Body */}
+              <div className="overflow-y-auto p-5 space-y-3">
+                {announcements.length === 0 ? (
+                  <div className="py-10 text-center">
+                    <Megaphone size={28} className="mx-auto mb-3" style={{ color: '#334155' }} />
+                    <p className="font-medium" style={{ color: '#475569', fontSize: '15px' }}>
+                      {isKinyarwanda ? 'Nta nyandiko zihari ubu' : 'No announcements yet'}
+                    </p>
+                    <p className="text-sm mt-1" style={{ color: '#334155' }}>
+                      {isKinyarwanda ? 'Umwarimu wawe azashyira hano amakuru' : 'Your teacher will post updates here'}
                     </p>
                   </div>
-                );
-              })}
+                ) : (
+                  announcements.map(a => {
+                    const cls = (a.classes as { name: string } | undefined)?.name;
+                    return (
+                      <div key={a.id} className="rounded-xl p-4"
+                        style={{ background: a.pinned ? 'rgba(245,158,11,0.06)' : '#1a1e2a', border: a.pinned ? '1px solid rgba(245,158,11,0.2)' : '1px solid rgba(255,255,255,0.05)' }}>
+                        <div className="flex items-start gap-2 mb-2">
+                          {a.pinned && <Pin size={12} className="shrink-0 mt-0.5" style={{ color: '#f59e0b' }} />}
+                          <p className="font-semibold flex-1" style={{ color: '#f1f5f9', fontSize: '15px' }}>{a.title}</p>
+                          {cls && (
+                            <span className="px-2 py-0.5 rounded-full text-xs font-semibold shrink-0"
+                              style={{ background: 'rgba(0,212,170,0.08)', color: '#00d4aa', border: '1px solid rgba(0,212,170,0.15)' }}>
+                              {cls}
+                            </span>
+                          )}
+                        </div>
+                        <p className="leading-relaxed mb-2" style={{ color: '#94a3b8', fontSize: '14px', whiteSpace: 'pre-wrap' }}>{a.body}</p>
+                        <p className="text-xs" style={{ color: '#334155' }}>
+                          {new Date(a.created_at).toLocaleString()}
+                        </p>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
             </div>
-          )}
-        </div>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Progress */}
