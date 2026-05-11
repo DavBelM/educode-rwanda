@@ -6,7 +6,7 @@ import { AssignmentCard } from './components/dashboard/AssignmentCard';
 import { AIInsights } from './components/dashboard/AIInsights';
 import { AchievementBadges } from './components/dashboard/AchievementBadges';
 import { useAuth } from '../lib/auth';
-import { getStudentAssignments, getStudentClasses, getClassWithInviteCode, joinClass, getSubmittedAssignmentIds, getStudentGrades, recordDailyLogin, getStreak, getStudentAnnouncements, type Assignment, type Announcement } from '../lib/db';
+import { getStudentAssignments, getStudentClasses, getClassWithInviteCode, joinClass, getSubmittedAssignmentIds, getStudentGrades, recordDailyLogin, getStreak, getStudentAnnouncements, getNewGradeCount, type Assignment, type Announcement } from '../lib/db';
 import { Users, ArrowRight, Loader, X, BookOpen, Megaphone, Pin, Code2 } from 'lucide-react';
 
 interface Props {
@@ -130,18 +130,21 @@ export default function Dashboard({ language, onLanguageChange, onStartCoding, o
   const [showJoinModal, setShowJoinModal] = useState(false);
   const [loadingAssignments, setLoadingAssignments] = useState(true);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+  const [newGradeCount, setNewGradeCount] = useState(0);
   const announcementsRef = useRef<HTMLDivElement>(null);
 
   const loadAssignments = async () => {
     setLoadingAssignments(true);
-    const [{ data: classes }, { data: asgns }, submitted, grades, currentStreak, { data: ann }] = await Promise.all([
+    const [{ data: classes }, { data: asgns }, submitted, grades, currentStreak, { data: ann }, newGrades] = await Promise.all([
       getStudentClasses(),
       getStudentAssignments(),
       getSubmittedAssignmentIds(),
       getStudentGrades(),
       getStreak(),
       getStudentAnnouncements(),
+      getNewGradeCount(),
     ]);
+    setNewGradeCount(newGrades);
     setAnnouncements(ann ?? []);
     setStreak(currentStreak);
     setHasClass(classes.length > 0);
@@ -390,13 +393,19 @@ export default function Dashboard({ language, onLanguageChange, onStartCoding, o
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => onOpenResults?.()}
-                    className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg transition-all"
+                    className="relative flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg transition-all"
                     style={{ color: '#f59e0b', background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.2)' }}
                     onMouseEnter={e => (e.currentTarget.style.background = 'rgba(245,158,11,0.15)')}
                     onMouseLeave={e => (e.currentTarget.style.background = 'rgba(245,158,11,0.08)')}
                   >
                     <ArrowRight size={12} />
                     {isKinyarwanda ? 'Amanota Yanjye' : 'My Results'}
+                    {newGradeCount > 0 && (
+                      <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full flex items-center justify-center text-xs font-bold"
+                        style={{ background: '#ef4444', color: '#fff', fontSize: '10px' }}>
+                        {newGradeCount}
+                      </span>
+                    )}
                   </button>
                   <button
                     onClick={() => onOpenCourses?.()}

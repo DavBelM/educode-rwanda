@@ -34,6 +34,7 @@ export interface Assignment {
   exam_mode: boolean;
   weight_pct: number;
   is_published: boolean;
+  grades_released: boolean;
   created_at: string;
 }
 
@@ -433,6 +434,31 @@ export async function getStudentResults(): Promise<StudentResult[]> {
       teacher_feedback: sub?.teacher_feedback ?? null,
     };
   });
+}
+
+export async function releaseGrades(assignmentId: string): Promise<{ error: string | null }> {
+  const { error } = await supabase
+    .from('assignments')
+    .update({ grades_released: true })
+    .eq('id', assignmentId);
+  if (error) return { error: error.message };
+  return { error: null };
+}
+
+export async function getNewGradeCount(): Promise<number> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return 0;
+
+  const seen: string[] = JSON.parse(localStorage.getItem('educode_seen_grades') ?? '[]');
+
+  const { data } = await supabase
+    .from('student_submissions')
+    .select('assignment_id')
+    .eq('student_id', user.id)
+    .not('marks_earned', 'is', null);
+
+  const newGrades = (data ?? []).filter((s: { assignment_id: string }) => !seen.includes(s.assignment_id));
+  return newGrades.length;
 }
 
 // ─── Self-Learner ─────────────────────────────────────────────────────────────

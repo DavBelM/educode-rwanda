@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, BookOpen, Code2, CheckCircle, Clock, MessageSquare, TrendingUp } from 'lucide-react';
+import { ArrowLeft, BookOpen, Code2, CheckCircle, Clock, MessageSquare, TrendingUp, Bell } from 'lucide-react';
 import { getStudentResults, type StudentResult } from '../lib/db';
 
 interface Props {
@@ -20,6 +20,10 @@ export default function MyResultsPage({ language, onBack }: Props) {
   const [results, setResults] = useState<StudentResult[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<Filter>('all');
+  const [seenGrades, setSeenGrades] = useState<Set<string>>(() => {
+    const saved = localStorage.getItem('educode_seen_grades');
+    return new Set(saved ? JSON.parse(saved) : []);
+  });
 
   useEffect(() => {
     getStudentResults().then(data => {
@@ -28,7 +32,17 @@ export default function MyResultsPage({ language, onBack }: Props) {
     });
   }, []);
 
-  // ── Summary stats ──────────────────────────────────────────────────────────
+  // Mark all graded results as seen when page opens
+  useEffect(() => {
+    if (results.length === 0) return;
+    const newGraded = results
+      .filter(r => r.marks_earned !== null)
+      .map(r => r.assignment_id);
+    const updated = new Set([...seenGrades, ...newGraded]);
+    setSeenGrades(updated);
+    localStorage.setItem('educode_seen_grades', JSON.stringify([...updated]));
+  }, [results]);
+
   const submitted = results.filter(r => r.submitted);
   const graded = results.filter(r => r.marks_earned !== null);
   const totalEarned = graded.reduce((s, r) => s + (r.marks_earned ?? 0), 0);
@@ -43,36 +57,35 @@ export default function MyResultsPage({ language, onBack }: Props) {
     return isKin ? 'Intangiriro I' : 'Beginner I';
   })();
 
-  // ── Filter ─────────────────────────────────────────────────────────────────
   const filtered = results.filter(r => {
-    if (filter === 'graded')       return r.marks_earned !== null;
-    if (filter === 'pending')      return r.submitted && r.marks_earned === null;
+    if (filter === 'graded')        return r.marks_earned !== null;
+    if (filter === 'pending')       return r.submitted && r.marks_earned === null;
     if (filter === 'not-submitted') return !r.submitted;
     return true;
   });
 
   const filters: { key: Filter; label: string; count: number }[] = [
-    { key: 'all',           label: isKin ? 'Byose'          : 'All',           count: results.length },
-    { key: 'graded',        label: isKin ? 'Byongeweho'     : 'Graded',        count: graded.length },
-    { key: 'pending',       label: isKin ? 'Bitegereje'     : 'Awaiting grade', count: submitted.length - graded.length },
-    { key: 'not-submitted', label: isKin ? 'Bitaratanzwe'   : 'Not submitted',  count: results.length - submitted.length },
+    { key: 'all',           label: isKin ? 'Byose'        : 'All',            count: results.length },
+    { key: 'graded',        label: isKin ? 'Byongeweho'   : 'Graded',         count: graded.length },
+    { key: 'pending',       label: isKin ? 'Bitegereje'   : 'Awaiting grade', count: submitted.length - graded.length },
+    { key: 'not-submitted', label: isKin ? 'Bitaratanzwe' : 'Not submitted',  count: results.length - submitted.length },
   ];
 
   return (
     <div className="min-h-screen" style={{ fontFamily: 'Inter, sans-serif', background: '#0d0f14' }}>
 
       {/* Top bar */}
-      <div className="sticky top-0 z-10 px-6 py-4 flex items-center justify-between"
+      <div className="sticky top-0 z-10 px-6 py-5 flex items-center justify-between"
         style={{ background: 'rgba(13,15,20,0.95)', backdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
         <button onClick={onBack}
-          className="flex items-center gap-2 text-sm font-medium transition-colors"
-          style={{ color: '#94a3b8' }}
+          className="flex items-center gap-2 font-medium transition-colors"
+          style={{ color: '#94a3b8', fontSize: '15px' }}
           onMouseEnter={e => (e.currentTarget.style.color = '#f1f5f9')}
           onMouseLeave={e => (e.currentTarget.style.color = '#94a3b8')}>
-          <ArrowLeft size={16} />
+          <ArrowLeft size={18} />
           {isKin ? 'Subira Inyuma' : 'Back'}
         </button>
-        <h1 className="text-sm font-bold" style={{ color: '#f1f5f9' }}>
+        <h1 className="font-bold" style={{ color: '#f1f5f9', fontSize: '18px' }}>
           {isKin ? 'Amanota Yanjye' : 'My Results'}
         </h1>
         <div className="w-16" />
@@ -80,41 +93,40 @@ export default function MyResultsPage({ language, onBack }: Props) {
 
       <div className="max-w-3xl mx-auto px-4 py-8 space-y-6">
 
-        {/* ── Summary card ── */}
-        <div className="rounded-2xl p-6" style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.06)' }}>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        {/* Summary card */}
+        <div className="rounded-2xl p-8" style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.06)' }}>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
             <div className="text-center">
-              <p className="text-2xl font-bold" style={{ color: '#f1f5f9' }}>{results.length}</p>
-              <p className="text-xs mt-1" style={{ color: '#475569' }}>{isKin ? 'Imishinga yose' : 'Total assignments'}</p>
+              <p className="text-4xl font-bold mb-1" style={{ color: '#f1f5f9' }}>{results.length}</p>
+              <p className="text-sm" style={{ color: '#475569' }}>{isKin ? 'Imishinga yose' : 'Total assignments'}</p>
             </div>
             <div className="text-center">
-              <p className="text-2xl font-bold" style={{ color: '#00d4aa' }}>{submitted.length}</p>
-              <p className="text-xs mt-1" style={{ color: '#475569' }}>{isKin ? 'Byatanzwe' : 'Submitted'}</p>
+              <p className="text-4xl font-bold mb-1" style={{ color: '#00d4aa' }}>{submitted.length}</p>
+              <p className="text-sm" style={{ color: '#475569' }}>{isKin ? 'Byatanzwe' : 'Submitted'}</p>
             </div>
             <div className="text-center">
-              <p className="text-2xl font-bold" style={{ color: '#f59e0b' }}>
+              <p className="text-4xl font-bold mb-1" style={{ color: '#f59e0b' }}>
                 {pct !== null ? `${pct}%` : '—'}
               </p>
-              <p className="text-xs mt-1" style={{ color: '#475569' }}>{isKin ? 'Ikigero cy\'amanota' : 'Average score'}</p>
+              <p className="text-sm" style={{ color: '#475569' }}>{isKin ? 'Ikigero cy\'amanota' : 'Average score'}</p>
             </div>
             <div className="text-center">
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold"
-                style={{ background: 'rgba(139,92,246,0.12)', color: '#8b5cf6', border: '1px solid rgba(139,92,246,0.2)' }}>
-                <TrendingUp size={11} />
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full font-bold mb-1"
+                style={{ background: 'rgba(139,92,246,0.12)', color: '#8b5cf6', border: '1px solid rgba(139,92,246,0.2)', fontSize: '14px' }}>
+                <TrendingUp size={14} />
                 {level}
               </div>
-              <p className="text-xs mt-1" style={{ color: '#475569' }}>{isKin ? 'Urwego' : 'Level'}</p>
+              <p className="text-sm" style={{ color: '#475569' }}>{isKin ? 'Urwego' : 'Level'}</p>
             </div>
           </div>
 
-          {/* Score bar */}
           {totalPossible > 0 && (
-            <div className="mt-5">
-              <div className="flex justify-between text-xs mb-1.5" style={{ color: '#475569' }}>
+            <div className="mt-6">
+              <div className="flex justify-between text-sm mb-2" style={{ color: '#475569' }}>
                 <span>{isKin ? 'Amanota yose' : 'Overall score'}</span>
                 <span style={{ color: '#f1f5f9', fontWeight: 600 }}>{totalEarned} / {totalPossible}</span>
               </div>
-              <div className="h-2 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+              <div className="h-3 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
                 <div className="h-full rounded-full transition-all duration-700"
                   style={{ width: `${pct}%`, background: pct! >= 70 ? '#00d4aa' : pct! >= 50 ? '#f59e0b' : '#ef4444' }} />
               </div>
@@ -122,18 +134,19 @@ export default function MyResultsPage({ language, onBack }: Props) {
           )}
         </div>
 
-        {/* ── Filter tabs ── */}
+        {/* Filter tabs */}
         <div className="flex gap-2 overflow-x-auto pb-1">
           {filters.map(f => (
             <button key={f.key} onClick={() => setFilter(f.key)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all shrink-0"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl font-semibold whitespace-nowrap transition-all shrink-0"
               style={{
+                fontSize: '14px',
                 background: filter === f.key ? 'rgba(0,212,170,0.12)' : 'rgba(255,255,255,0.04)',
                 color: filter === f.key ? '#00d4aa' : '#475569',
                 border: filter === f.key ? '1px solid rgba(0,212,170,0.25)' : '1px solid rgba(255,255,255,0.06)',
               }}>
               {f.label}
-              <span className="px-1.5 py-0.5 rounded-full text-xs"
+              <span className="px-2 py-0.5 rounded-full text-xs"
                 style={{ background: 'rgba(255,255,255,0.08)', color: '#94a3b8' }}>
                 {f.count}
               </span>
@@ -141,7 +154,7 @@ export default function MyResultsPage({ language, onBack }: Props) {
           ))}
         </div>
 
-        {/* ── Results list ── */}
+        {/* Results list */}
         {loading ? (
           <div className="flex items-center justify-center py-20">
             <div className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin"
@@ -149,42 +162,57 @@ export default function MyResultsPage({ language, onBack }: Props) {
           </div>
         ) : filtered.length === 0 ? (
           <div className="rounded-2xl py-16 text-center" style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.06)' }}>
-            <p className="text-sm" style={{ color: '#475569' }}>
+            <p style={{ color: '#475569', fontSize: '15px' }}>
               {isKin ? 'Nta bisubizo bihari.' : 'Nothing here yet.'}
             </p>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-4">
             {filtered.map(r => {
               const diff = difficultyStyle[r.difficulty] ?? difficultyStyle.beginner;
               const scoreColor = r.marks_earned === null ? '#475569'
                 : (r.marks_earned / r.total_marks) >= 0.7 ? '#00d4aa'
                 : (r.marks_earned / r.total_marks) >= 0.5 ? '#f59e0b'
                 : '#ef4444';
+              const isNew = r.marks_earned !== null && !seenGrades.has(r.assignment_id);
 
               return (
-                <div key={r.assignment_id} className="rounded-2xl p-5"
-                  style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.06)' }}>
+                <div key={r.assignment_id} className="rounded-2xl p-6"
+                  style={{
+                    background: '#13161e',
+                    border: isNew ? '1px solid rgba(0,212,170,0.3)' : '1px solid rgba(255,255,255,0.06)',
+                  }}>
+
+                  {/* New grade banner */}
+                  {isNew && (
+                    <div className="flex items-center gap-2 mb-3 px-3 py-1.5 rounded-lg"
+                      style={{ background: 'rgba(0,212,170,0.08)', border: '1px solid rgba(0,212,170,0.2)' }}>
+                      <Bell size={13} style={{ color: '#00d4aa' }} />
+                      <span style={{ color: '#00d4aa', fontSize: '13px', fontWeight: 600 }}>
+                        {isKin ? 'Amanota mashya!' : 'New grade released!'}
+                      </span>
+                    </div>
+                  )}
 
                   {/* Header row */}
-                  <div className="flex items-start justify-between gap-3 mb-3">
+                  <div className="flex items-start justify-between gap-4 mb-4">
                     <div className="min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
+                      <div className="flex items-center gap-2 mb-2">
                         {r.assignment_type === 'coding'
-                          ? <Code2 size={13} style={{ color: '#00d4aa', flexShrink: 0 }} />
-                          : <BookOpen size={13} style={{ color: '#8b5cf6', flexShrink: 0 }} />}
-                        <p className="text-sm font-semibold truncate" style={{ color: '#f1f5f9' }}>
+                          ? <Code2 size={16} style={{ color: '#00d4aa', flexShrink: 0 }} />
+                          : <BookOpen size={16} style={{ color: '#8b5cf6', flexShrink: 0 }} />}
+                        <p className="font-semibold truncate" style={{ color: '#f1f5f9', fontSize: '16px' }}>
                           {isKin && r.title_kin ? r.title_kin : r.title}
                         </p>
                       </div>
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="px-2 py-0.5 rounded-full text-xs font-semibold"
-                          style={{ background: diff.bg, color: diff.text, border: `1px solid ${diff.border}` }}>
+                        <span className="px-2.5 py-1 rounded-full font-semibold"
+                          style={{ background: diff.bg, color: diff.text, border: `1px solid ${diff.border}`, fontSize: '13px' }}>
                           {r.difficulty.charAt(0).toUpperCase() + r.difficulty.slice(1)}
                         </span>
                         {r.submitted_at && (
-                          <span className="flex items-center gap-1 text-xs" style={{ color: '#334155' }}>
-                            <Clock size={10} />
+                          <span className="flex items-center gap-1" style={{ color: '#334155', fontSize: '13px' }}>
+                            <Clock size={12} />
                             {new Date(r.submitted_at).toLocaleDateString()}
                           </span>
                         )}
@@ -194,21 +222,21 @@ export default function MyResultsPage({ language, onBack }: Props) {
                     {/* Score badge */}
                     <div className="shrink-0 text-right">
                       {!r.submitted ? (
-                        <span className="px-2.5 py-1 rounded-full text-xs font-semibold"
-                          style={{ background: 'rgba(255,255,255,0.04)', color: '#334155', border: '1px solid rgba(255,255,255,0.06)' }}>
+                        <span className="px-3 py-1.5 rounded-full font-semibold"
+                          style={{ background: 'rgba(255,255,255,0.04)', color: '#334155', border: '1px solid rgba(255,255,255,0.06)', fontSize: '13px' }}>
                           {isKin ? 'Bitaratanzwe' : 'Not submitted'}
                         </span>
                       ) : r.marks_earned === null ? (
-                        <span className="px-2.5 py-1 rounded-full text-xs font-semibold"
-                          style={{ background: 'rgba(245,158,11,0.1)', color: '#f59e0b', border: '1px solid rgba(245,158,11,0.2)' }}>
+                        <span className="px-3 py-1.5 rounded-full font-semibold"
+                          style={{ background: 'rgba(245,158,11,0.1)', color: '#f59e0b', border: '1px solid rgba(245,158,11,0.2)', fontSize: '13px' }}>
                           {isKin ? 'Bitegereje' : 'Awaiting grade'}
                         </span>
                       ) : (
                         <div>
-                          <p className="text-xl font-bold" style={{ color: scoreColor }}>
-                            {r.marks_earned}<span className="text-sm font-medium" style={{ color: '#475569' }}>/{r.total_marks}</span>
+                          <p className="text-3xl font-bold" style={{ color: scoreColor }}>
+                            {r.marks_earned}<span className="text-base font-medium" style={{ color: '#475569' }}>/{r.total_marks}</span>
                           </p>
-                          <p className="text-xs" style={{ color: scoreColor }}>
+                          <p className="font-semibold" style={{ color: scoreColor, fontSize: '15px' }}>
                             {Math.round((r.marks_earned / r.total_marks) * 100)}%
                           </p>
                         </div>
@@ -216,25 +244,34 @@ export default function MyResultsPage({ language, onBack }: Props) {
                     </div>
                   </div>
 
-                  {/* Teacher feedback */}
-                  {r.teacher_feedback && (
-                    <div className="flex items-start gap-2 px-3 py-2.5 rounded-xl mt-2"
-                      style={{ background: 'rgba(139,92,246,0.07)', border: '1px solid rgba(139,92,246,0.15)' }}>
-                      <MessageSquare size={13} className="shrink-0 mt-0.5" style={{ color: '#8b5cf6' }} />
-                      <div>
-                        <p className="text-xs font-semibold mb-0.5" style={{ color: '#8b5cf6' }}>
-                          {isKin ? 'Igitekerezo cy\'umwarimu' : 'Teacher feedback'}
-                        </p>
-                        <p className="text-xs leading-relaxed" style={{ color: '#94a3b8' }}>{r.teacher_feedback}</p>
+                  {/* Score bar for graded */}
+                  {r.marks_earned !== null && (
+                    <div className="mb-4">
+                      <div className="h-2 rounded-full overflow-hidden" style={{ background: 'rgba(255,255,255,0.06)' }}>
+                        <div className="h-full rounded-full transition-all duration-700"
+                          style={{ width: `${Math.round((r.marks_earned / r.total_marks) * 100)}%`, background: scoreColor }} />
                       </div>
                     </div>
                   )}
 
-                  {/* Submitted state indicator */}
+                  {/* Teacher feedback */}
+                  {r.teacher_feedback && (
+                    <div className="flex items-start gap-3 px-4 py-3 rounded-xl"
+                      style={{ background: 'rgba(139,92,246,0.07)', border: '1px solid rgba(139,92,246,0.15)' }}>
+                      <MessageSquare size={15} className="shrink-0 mt-0.5" style={{ color: '#8b5cf6' }} />
+                      <div>
+                        <p className="font-semibold mb-1" style={{ color: '#8b5cf6', fontSize: '13px' }}>
+                          {isKin ? 'Igitekerezo cy\'umwarimu' : 'Teacher feedback'}
+                        </p>
+                        <p className="leading-relaxed" style={{ color: '#94a3b8', fontSize: '14px' }}>{r.teacher_feedback}</p>
+                      </div>
+                    </div>
+                  )}
+
                   {r.submitted && r.marks_earned !== null && (
-                    <div className="flex items-center gap-1.5 mt-3">
-                      <CheckCircle size={12} style={{ color: '#00d4aa' }} />
-                      <span className="text-xs" style={{ color: '#334155' }}>
+                    <div className="flex items-center gap-2 mt-3">
+                      <CheckCircle size={14} style={{ color: '#00d4aa' }} />
+                      <span style={{ color: '#334155', fontSize: '13px' }}>
                         {isKin ? 'Byakongeweho amanota' : 'Graded'}
                       </span>
                     </div>
