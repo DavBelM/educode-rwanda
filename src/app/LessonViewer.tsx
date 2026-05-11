@@ -76,7 +76,7 @@ function ReadingLesson({ lesson, language, onComplete, completing }: {
         onMouseEnter={e => { if (!completing) (e.currentTarget as HTMLButtonElement).style.background = '#00bfa0'; }}
         onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = '#00d4aa'; }}>
         {completing ? <Loader size={16} className="animate-spin" /> : <CheckCircle size={16} />}
-        {isKin ? 'Soma Rangije' : 'Mark as Read'}
+        {isKin ? 'Shyira ko wasomye' : 'Mark as Read'}
       </button>
     </div>
   );
@@ -151,7 +151,7 @@ function CodingLesson({ lesson, language, onComplete, completing }: {
                 onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = '#00bfa0'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = '#00d4aa'; }}>
                 <Monitor size={12} />
-                {isKin ? 'Reba' : 'Preview'}
+                {isKin ? 'Reba uko bimeze' : 'Preview'}
               </button>
             </div>
             <CodeMirror
@@ -199,7 +199,7 @@ function CodingLesson({ lesson, language, onComplete, completing }: {
                 onMouseEnter={e => { if (!running) (e.currentTarget as HTMLButtonElement).style.background = '#00bfa0'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = '#00d4aa'; }}>
                 {running ? <Loader size={12} className="animate-spin" /> : <Play size={12} />}
-                {isKin ? 'Kora' : 'Run'}
+                {isKin ? 'Tangiza (Run)' : 'Run'}
               </button>
             </div>
             <CodeMirror
@@ -232,7 +232,7 @@ function CodingLesson({ lesson, language, onComplete, completing }: {
           onMouseEnter={e => { if (!completing) (e.currentTarget as HTMLButtonElement).style.background = '#00bfa0'; }}
           onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = '#00d4aa'; }}>
           {completing ? <Loader size={16} className="animate-spin" /> : <CheckCircle size={16} />}
-          {isKin ? 'Rangije Isomo' : 'Complete Lesson'}
+          {isKin ? 'Rangiza Isomo' : 'Complete Lesson'}
         </button>
       )}
     </div>
@@ -307,8 +307,8 @@ function QuizLesson({ lesson, language, onComplete, completing }: {
             </div>
             <p className="text-sm" style={{ color: '#94a3b8', fontFamily: 'Inter, sans-serif' }}>
               {perfect
-                ? (isKin ? 'Birenze! Wasubije neza ibibazo byose.' : 'Perfect! You got everything right.')
-                : (isKin ? 'Nziza! Subira ibibazo wabuze.' : 'Good effort! Review the ones you missed.')}
+                ? (isKin ? 'Ni byiza cyane! Wasubije neza byose.' : 'Perfect! You got everything right.')
+                : (isKin ? 'Wagerageje! Ongera usuzume ibyo utatsinze.' : 'Good effort! Review the ones you missed.')}
             </p>
           </div>
           <button onClick={() => onComplete(score)} disabled={completing}
@@ -317,7 +317,7 @@ function QuizLesson({ lesson, language, onComplete, completing }: {
             onMouseEnter={e => { if (!completing) (e.currentTarget as HTMLButtonElement).style.background = '#00bfa0'; }}
             onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = '#00d4aa'; }}>
             {completing ? <Loader size={16} className="animate-spin" /> : <CheckCircle size={16} />}
-            {isKin ? 'Rangije Isomo' : 'Complete Lesson'}
+            {isKin ? 'Rangiza Isomo' : 'Complete Lesson'}
           </button>
         </div>
       )}
@@ -336,8 +336,8 @@ export default function LessonViewer({ lesson, courseTitle, language, nextLesson
 
   const typeInfo = {
     reading: { icon: <BookOpen size={13} />, label: isKin ? 'Gusoma' : 'Reading', color: '#0ea5e9', bg: 'rgba(14,165,233,0.1)', border: 'rgba(14,165,233,0.2)' },
-    coding:  { icon: <Code2 size={13} />,    label: isKin ? 'Gukora' : 'Coding',  color: '#00d4aa', bg: 'rgba(0,212,170,0.1)',   border: 'rgba(0,212,170,0.2)' },
-    quiz:    { icon: <HelpCircle size={13} />,label: isKin ? 'Ikizamini' : 'Quiz', color: '#8b5cf6', bg: 'rgba(139,92,246,0.1)',  border: 'rgba(139,92,246,0.2)' },
+    coding:  { icon: <Code2 size={13} />,    label: isKin ? 'Gukora Code' : 'Coding',  color: '#00d4aa', bg: 'rgba(0,212,170,0.1)',   border: 'rgba(0,212,170,0.2)' },
+    quiz:    { icon: <HelpCircle size={13} />,label: isKin ? 'Ibibazo (Quiz)' : 'Quiz', color: '#8b5cf6', bg: 'rgba(139,92,246,0.1)',  border: 'rgba(139,92,246,0.2)' },
   }[lesson.lesson_type];
 
   const handleComplete = async (score?: number) => {

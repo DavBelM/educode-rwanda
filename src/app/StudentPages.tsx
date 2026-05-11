@@ -30,7 +30,7 @@ export default function StudentPages() {
       <Header
         language={language}
         onLanguageToggle={toggleLanguage}
-        subtitle={isKinyarwanda ? 'Amapaji y\'umwalimu' : 'Student Pages'}
+        subtitle={isKinyarwanda ? 'Amapaji y’umunyeshuri' : 'Student Pages'}
         hideAssignmentInfo={true}
       />
 

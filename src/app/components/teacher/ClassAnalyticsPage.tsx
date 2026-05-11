@@ -76,8 +76,8 @@ export function ClassAnalyticsPage({ language }: ClassAnalyticsPageProps) {
 
   const getMasteryLabel = (mastery: number) => {
     if (mastery >= 80) return isKinyarwanda ? 'Byiza' : 'Strong';
-    if (mastery >= 60) return isKinyarwanda ? 'Bigenda' : 'Moderate';
-    return isKinyarwanda ? 'Bigoye' : 'Weak';
+    if (mastery >= 60) return isKinyarwanda ? 'Biraringaniye' : 'Moderate';
+    return isKinyarwanda ? 'Biracyari hasi' : 'Weak';
   };
 
   return (
@@ -87,10 +87,10 @@ export function ClassAnalyticsPage({ language }: ClassAnalyticsPageProps) {
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
           <div>
             <h1 className="text-3xl font-bold text-[#1e293b] mb-2">
-              {isKinyarwanda ? 'Isesengura ry\'ishuri' : 'Class Analytics'}
+              {isKinyarwanda ? 'Isesengura ry’ishuri' : 'Class Analytics'}
             </h1>
             <p className="text-gray-600">
-              {isKinyarwanda ? 'Amakuru y\'imikorere y\'ishuri ryawe' : 'Comprehensive insights into your class performance'}
+              {isKinyarwanda ? 'Amakuru arambuye ku mikorere y\'ishuri ryawe' : 'Comprehensive insights into your class performance'}
             </p>
           </div>
           <div className="flex gap-3">
@@ -98,7 +98,7 @@ export function ClassAnalyticsPage({ language }: ClassAnalyticsPageProps) {
               {[
                 { id: 'week', label: isKinyarwanda ? 'Icyumweru' : 'Week' },
                 { id: 'month', label: isKinyarwanda ? 'Ukwezi' : 'Month' },
-                { id: 'semester', label: isKinyarwanda ? 'Iherezo' : 'Semester' }
+                { id: 'semester', label: isKinyarwanda ? 'Igihembwe (Semester)' : 'Semester' }
               ].map((range) => (
                 <button
                   key={range.id}
@@ -115,7 +115,7 @@ export function ClassAnalyticsPage({ language }: ClassAnalyticsPageProps) {
             </div>
             <button className="px-6 py-2 bg-white text-[#10b981] border-2 border-[#10b981] rounded-lg font-semibold hover:bg-green-50 transition-all flex items-center gap-2">
               <Download className="w-4 h-4" />
-              {isKinyarwanda ? 'Gufata' : 'Export'}
+              {isKinyarwanda ? 'Gukuramo amakuru (Export)' : 'Export'}
             </button>
           </div>
         </div>
@@ -139,7 +139,7 @@ export function ClassAnalyticsPage({ language }: ClassAnalyticsPageProps) {
               <CheckCircle2 className="w-6 h-6 text-[#0ea5e9]" />
             </div>
             <div className="text-3xl font-bold text-[#1e293b] mb-1">{overallStats.completionRate}%</div>
-            <div className="text-sm text-gray-600">{isKinyarwanda ? 'Byuzuye' : 'Completion'}</div>
+            <div className="text-sm text-gray-600">{isKinyarwanda ? 'Imirangirize' : 'Completion'}</div>
           </div>
 
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
@@ -147,7 +147,7 @@ export function ClassAnalyticsPage({ language }: ClassAnalyticsPageProps) {
               <Users className="w-6 h-6 text-[#8b5cf6]" />
             </div>
             <div className="text-3xl font-bold text-[#1e293b] mb-1">{overallStats.activeStudents}</div>
-            <div className="text-sm text-gray-600">{isKinyarwanda ? 'Barakora' : 'Active'}</div>
+            <div className="text-sm text-gray-600">{isKinyarwanda ? 'Abakora neza' : 'Active'}</div>
             <div className="text-xs text-gray-500 mt-2">
               {isKinyarwanda ? 'kuri' : 'of'} {overallStats.totalStudents}
             </div>
@@ -158,7 +158,7 @@ export function ClassAnalyticsPage({ language }: ClassAnalyticsPageProps) {
               <Clock className="w-6 h-6 text-[#f59e0b]" />
             </div>
             <div className="text-3xl font-bold text-[#1e293b] mb-1">{overallStats.avgTimeSpent.split(' ')[0]}</div>
-            <div className="text-sm text-gray-600">{isKinyarwanda ? 'Igihe' : 'Avg Time'}</div>
+            <div className="text-sm text-gray-600">{isKinyarwanda ? 'Ikigereranyo cy\'igihe' : 'Avg Time'}</div>
           </div>
 
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
@@ -166,7 +166,7 @@ export function ClassAnalyticsPage({ language }: ClassAnalyticsPageProps) {
               <Award className="w-6 h-6 text-[#22c55e]" />
             </div>
             <div className="text-3xl font-bold text-[#1e293b] mb-1">{topPerformers.length}</div>
-            <div className="text-sm text-gray-600">{isKinyarwanda ? 'Barusha' : 'Top'}</div>
+            <div className="text-sm text-gray-600">{isKinyarwanda ? 'Aba mbere' : 'Top'}</div>
           </div>
 
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
@@ -174,7 +174,7 @@ export function ClassAnalyticsPage({ language }: ClassAnalyticsPageProps) {
               <AlertTriangle className="w-6 h-6 text-[#ef4444]" />
             </div>
             <div className="text-3xl font-bold text-[#1e293b] mb-1">{strugglingStudents.length}</div>
-            <div className="text-sm text-gray-600">{isKinyarwanda ? 'Bakenera' : 'Need Help'}</div>
+            <div className="text-sm text-gray-600">{isKinyarwanda ? 'Abakeneye ubufasha' : 'Need Help'}</div>
           </div>
         </div>
 
@@ -184,7 +184,7 @@ export function ClassAnalyticsPage({ language }: ClassAnalyticsPageProps) {
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <h2 className="text-xl font-bold text-[#1e293b] mb-6 flex items-center gap-2">
               <BarChart3 className="w-5 h-5 text-[#10b981]" />
-              {isKinyarwanda ? 'Ikigabanywa cy\'amanota' : 'Grade Distribution'}
+              {isKinyarwanda ? 'Isaranganywa ry’amanota' : 'Grade Distribution'}
             </h2>
 
             <div className="space-y-4">
@@ -209,7 +209,7 @@ export function ClassAnalyticsPage({ language }: ClassAnalyticsPageProps) {
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <h2 className="text-xl font-bold text-[#1e293b] mb-6 flex items-center gap-2">
               <Users className="w-5 h-5 text-[#10b981]" />
-              {isKinyarwanda ? 'Kwitabira buri cyumweru' : 'Weekly Engagement'}
+              {isKinyarwanda ? 'Uko bitabiriye mu cyumweru' : 'Weekly Engagement'}
             </h2>
 
             <div className="h-64 flex items-end justify-between gap-3">
@@ -237,7 +237,7 @@ export function ClassAnalyticsPage({ language }: ClassAnalyticsPageProps) {
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <h2 className="text-xl font-bold text-[#1e293b] mb-6 flex items-center gap-2">
               <Target className="w-5 h-5 text-[#10b981]" />
-              {isKinyarwanda ? 'Ugereranya imishinga' : 'Assignment Comparison'}
+              {isKinyarwanda ? 'Kugereranya imikoro' : 'Assignment Comparison'}
             </h2>
 
             <div className="space-y-4">
@@ -264,7 +264,7 @@ export function ClassAnalyticsPage({ language }: ClassAnalyticsPageProps) {
                       </div>
                     </div>
                     <div className="flex-1">
-                      <div className="text-xs text-gray-600 mb-1">{isKinyarwanda ? 'Byuzuye' : 'Done'}</div>
+                      <div className="text-xs text-gray-600 mb-1">{isKinyarwanda ? 'Byarangiye' : 'Done'}</div>
                       <div className="w-full bg-gray-200 rounded-full h-2">
                         <div
                           className="bg-[#0ea5e9] h-2 rounded-full"
@@ -282,7 +282,7 @@ export function ClassAnalyticsPage({ language }: ClassAnalyticsPageProps) {
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <h2 className="text-xl font-bold text-[#1e293b] mb-6 flex items-center gap-2">
               <BarChart3 className="w-5 h-5 text-[#10b981]" />
-              {isKinyarwanda ? 'Ubumenyi bw\'ishuri' : 'Class Skills Overview'}
+              {isKinyarwanda ? 'Inshamake y\'ubumenyi bw\'ishuri' : 'Class Skills Overview'}
             </h2>
 
             <div className="space-y-4">
@@ -326,7 +326,7 @@ export function ClassAnalyticsPage({ language }: ClassAnalyticsPageProps) {
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <h2 className="text-xl font-bold text-[#1e293b] mb-6 flex items-center gap-2">
               <Award className="w-5 h-5 text-[#22c55e]" />
-              {isKinyarwanda ? 'Abakora neza' : 'Top Performers'}
+              {isKinyarwanda ? 'Abakora neza kurusha abandi' : 'Top Performers'}
             </h2>
 
             <div className="space-y-4">
@@ -354,7 +354,7 @@ export function ClassAnalyticsPage({ language }: ClassAnalyticsPageProps) {
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <h2 className="text-xl font-bold text-[#1e293b] mb-6 flex items-center gap-2">
               <AlertTriangle className="w-5 h-5 text-[#ef4444]" />
-              {isKinyarwanda ? 'Bakenera ubufasha' : 'Students Needing Help'}
+              {isKinyarwanda ? 'Abanyeshuri bakeneye ubufasha' : 'Students Needing Help'}
             </h2>
 
             <div className="space-y-4">

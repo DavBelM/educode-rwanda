@@ -22,9 +22,9 @@ export default function SignupPage({ onSuccess, onLoginClick }: { onSuccess?: ()
 
   const getPasswordStrength = (password: string) => {
     if (password.length === 0) return { strength: 0, label: '' };
-    if (password.length < 6) return { strength: 1, label: isKinyarwanda ? 'Ntacyo bitwaye' : 'Weak' };
-    if (password.length < 10) return { strength: 2, label: isKinyarwanda ? 'Hagati' : 'Medium' };
-    return { strength: 3, label: isKinyarwanda ? 'Byiza' : 'Strong' };
+    if (password.length < 6) return { strength: 1, label: isKinyarwanda ? 'Ryoroshye' : 'Weak' };
+    if (password.length < 10) return { strength: 2, label: isKinyarwanda ? 'Riringaniye' : 'Medium' };
+    return { strength: 3, label: isKinyarwanda ? 'Rikomeye' : 'Strong' };
   };
 
   const passwordStrength = getPasswordStrength(formData.password);
@@ -106,9 +106,9 @@ export default function SignupPage({ onSuccess, onLoginClick }: { onSuccess?: ()
         {/* Benefits */}
         <div className="relative z-10 space-y-3">
           {[
-            isKinyarwanda ? 'Nta karita ya kirimiti ikenewe' : 'No credit card required',
-            isKinyarwanda ? 'Imishinga 5 kubusa kugirango utangire' : '5 free assignments to get started',
-            isKinyarwanda ? 'Ibisobanuro mu Kinyarwanda' : 'AI feedback in Kinyarwanda',
+            isKinyarwanda ? 'Nta karita ya banki ukeneye' : 'No credit card required',
+            isKinyarwanda ? 'Imikoro 5 y’ubuntu kugirango utangire' : '5 free assignments to get started',
+            isKinyarwanda ? 'Ibisobanuro bya AI mu Kinyarwanda' : 'AI feedback in Kinyarwanda',
           ].map((benefit, i) => (
             <div key={i} className="flex items-center gap-2">
               <CheckCircle2 size={14} style={{ color: '#00d4aa' }} />
@@ -161,7 +161,7 @@ export default function SignupPage({ onSuccess, onLoginClick }: { onSuccess?: ()
           </h1>
           <p className="mb-8 text-sm" style={{ color: '#64748b' }}>
             {isKinyarwanda
-              ? 'Kora konti yawe kubusa mu masegonda 30'
+              ? 'Fungura konti yawe ku buntu mu masegonda 30'
               : 'Create your free account in 30 seconds'}
           </p>
 
@@ -260,7 +260,7 @@ export default function SignupPage({ onSuccess, onLoginClick }: { onSuccess?: ()
                     ))}
                   </div>
                   <p className="text-xs" style={{ color: '#475569' }}>
-                    {passwordStrength.label} {isKinyarwanda ? 'imbaraga' : 'strength'}
+                    {passwordStrength.label} {isKinyarwanda ? 'gukomera' : 'strength'}
                   </p>
                 </div>
               )}
@@ -275,7 +275,7 @@ export default function SignupPage({ onSuccess, onLoginClick }: { onSuccess?: ()
                 {[
                   { value: 'student', label: isKinyarwanda ? 'Umunyeshuri' : 'Student' },
                   { value: 'teacher', label: isKinyarwanda ? 'Umwarimu' : 'Teacher' },
-                  { value: 'self-learner', label: isKinyarwanda ? 'Nwiga wenyine' : 'Self-Learner' }
+                  { value: 'self-learner', label: isKinyarwanda ? 'Uwiga wigenga' : 'Self-Learner' }
                 ].map((type) => (
                   <label
                     key={type.value}
@@ -303,13 +303,13 @@ export default function SignupPage({ onSuccess, onLoginClick }: { onSuccess?: ()
             {/* Preferred Language */}
             <div>
               <label className="block text-sm font-semibold mb-3" style={{ color: '#94a3b8' }}>
-                {isKinyarwanda ? 'Ururimi nkunda:' : 'Preferred language:'}
+                {isKinyarwanda ? 'Ururimi ukunda:' : 'Preferred language:'}
               </label>
               <div className="flex gap-2">
                 {[
                   { value: 'english', label: 'English' },
                   { value: 'kinyarwanda', label: 'Kinyarwanda' },
-                  { value: 'both', label: isKinyarwanda ? 'Byombi' : 'Both' }
+                  { value: 'both', label: isKinyarwanda ? 'Zombi' : 'Both' }
                 ].map((lang) => (
                   <label
                     key={lang.value}
@@ -349,9 +349,9 @@ export default function SignupPage({ onSuccess, onLoginClick }: { onSuccess?: ()
                 </div>
                 <input type="checkbox" checked={agreedToTerms} onChange={(e) => setAgreedToTerms(e.target.checked)} className="sr-only" />
                 <span className="text-xs" style={{ color: '#64748b' }}>
-                  {isKinyarwanda ? 'Nemera' : 'I agree to the'}{' '}
+                  {isKinyarwanda ? 'Nemeye' : 'I agree to the'}{' '}
                   <span className="font-semibold" style={{ color: '#00d4aa' }}>
-                    {isKinyarwanda ? 'Amabwiriza' : 'Terms of Service'}
+                    {isKinyarwanda ? 'Amabwiriza n’Amategeko y’Ikoreshwa' : 'Terms of Service'}
                   </span>{' '}
                   {isKinyarwanda ? 'na' : 'and'}{' '}
                   <span className="font-semibold" style={{ color: '#00d4aa' }}>
@@ -372,7 +372,7 @@ export default function SignupPage({ onSuccess, onLoginClick }: { onSuccess?: ()
             {success && (
               <div className="p-3 rounded-xl text-sm" style={{ background: 'rgba(0,212,170,0.08)', border: '1px solid rgba(0,212,170,0.2)', color: '#00d4aa' }}>
                 {isKinyarwanda
-                  ? 'Konti yakozwe! Reba email yawe kugirango wemeze.'
+                  ? 'Konti yafunguwe neza! Reba i-meyili yawe kugirango wemeze.'
                   : 'Account created! Check your email to confirm.'}
               </div>
             )}

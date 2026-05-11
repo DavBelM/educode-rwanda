@@ -45,19 +45,19 @@ export function ProgressAnalyticsPage({ language }: ProgressAnalyticsPageProps) 
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-[#1e293b] mb-2">
-            {isKinyarwanda ? 'Isesengura ry\'Iterambere' : 'Progress Analytics'}
+            {isKinyarwanda ? 'Isesengura ry’iterambere' : 'Progress Analytics'}
           </h1>
           <p className="text-gray-600">
-            {isKinyarwanda ? 'Reba amakuru arambuye yerekeye iterambere ryawe' : 'Detailed insights into your learning progress'}
+            {isKinyarwanda ? 'Amakuru arambuye ku iterambere ryawe mu kwiga' : 'Detailed insights into your learning progress'}
           </p>
         </div>
 
         {/* Time Range Selector */}
         <div className="flex gap-3 mb-8">
           {[
-            { id: 'week', label: isKinyarwanda ? 'Icyumweru' : 'This Week' },
+            { id: 'week', label: isKinyarwanda ? 'Iki cyumweru' : 'This Week' },
             { id: 'month', label: isKinyarwanda ? 'Ukwezi' : 'This Month' },
-            { id: 'all', label: isKinyarwanda ? 'Byose' : 'All Time' }
+            { id: 'all', label: isKinyarwanda ? 'Igihe cyose' : 'All Time' }
           ].map((range) => (
             <button
               key={range.id}
@@ -83,8 +83,8 @@ export function ProgressAnalyticsPage({ language }: ProgressAnalyticsPageProps) 
               <TrendingUp className="w-5 h-5 text-[#22c55e]" />
             </div>
             <div className="text-3xl font-bold text-[#1e293b] mb-1">{totalHours.toFixed(1)}h</div>
-            <div className="text-sm text-gray-600">{isKinyarwanda ? 'Igihe cyose' : 'Total Time'}</div>
-            <div className="text-xs text-[#22c55e] mt-2">+12% {isKinyarwanda ? 'kuruta icyumweru' : 'vs last week'}</div>
+            <div className="text-sm text-gray-600">{isKinyarwanda ? 'Igihe cyose umazeho' : 'Total Time'}</div>
+            <div className="text-xs text-[#22c55e] mt-2">+12% {isKinyarwanda ? 'ugereranyije n\'icyumweru gishize' : 'vs last week'}</div>
           </div>
 
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
@@ -95,8 +95,8 @@ export function ProgressAnalyticsPage({ language }: ProgressAnalyticsPageProps) 
               <TrendingUp className="w-5 h-5 text-[#22c55e]" />
             </div>
             <div className="text-3xl font-bold text-[#1e293b] mb-1">82%</div>
-            <div className="text-sm text-gray-600">{isKinyarwanda ? 'Ibizamini byatsinzwe' : 'Test Pass Rate'}</div>
-            <div className="text-xs text-[#22c55e] mt-2">+22% {isKinyarwanda ? 'kuruta icyumweru' : 'vs last week'}</div>
+            <div className="text-sm text-gray-600">{isKinyarwanda ? 'Igipimo cy\'amagerageza yatsinzwe' : 'Test Pass Rate'}</div>
+            <div className="text-xs text-[#22c55e] mt-2">+22% {isKinyarwanda ? 'ugereranyije n\'icyumweru gishize' : 'vs last week'}</div>
           </div>
 
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
@@ -107,7 +107,7 @@ export function ProgressAnalyticsPage({ language }: ProgressAnalyticsPageProps) 
               <TrendingUp className="w-5 h-5 text-[#22c55e]" />
             </div>
             <div className="text-3xl font-bold text-[#1e293b] mb-1">75%</div>
-            <div className="text-sm text-gray-600">{isKinyarwanda ? 'Imishinga yarangiye' : 'Assignments Done'}</div>
+            <div className="text-sm text-gray-600">{isKinyarwanda ? 'Imikoro yarangiye' : 'Assignments Done'}</div>
             <div className="text-xs text-[#22c55e] mt-2">12/16 {isKinyarwanda ? 'byarangiye' : 'completed'}</div>
           </div>
 
@@ -120,7 +120,7 @@ export function ProgressAnalyticsPage({ language }: ProgressAnalyticsPageProps) 
             </div>
             <div className="text-3xl font-bold text-[#1e293b] mb-1">{avgHoursPerDay.toFixed(1)}h</div>
             <div className="text-sm text-gray-600">{isKinyarwanda ? 'Ikigereranyo ku munsi' : 'Avg per Day'}</div>
-            <div className="text-xs text-gray-500 mt-2">{isKinyarwanda ? 'Icyumweru gishya' : 'This week'}</div>
+            <div className="text-xs text-gray-500 mt-2">{isKinyarwanda ? 'Iki cyumweru' : 'This week'}</div>
           </div>
         </div>
 
@@ -130,7 +130,7 @@ export function ProgressAnalyticsPage({ language }: ProgressAnalyticsPageProps) 
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <h2 className="text-xl font-bold text-[#1e293b] mb-6 flex items-center gap-2">
               <Clock className="w-5 h-5 text-[#0ea5e9]" />
-              {isKinyarwanda ? 'Ibikorwa by\'icyumweru' : 'Weekly Activity'}
+              {isKinyarwanda ? 'Ibikorwa by’icyumweru' : 'Weekly Activity'}
             </h2>
 
             <div className="space-y-4">
@@ -157,7 +157,7 @@ export function ProgressAnalyticsPage({ language }: ProgressAnalyticsPageProps) 
 
             <div className="mt-6 pt-6 border-t border-gray-200">
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">{isKinyarwanda ? 'Igihe cyose cy\'icyumweru' : 'Total this week'}</span>
+                <span className="text-sm text-gray-600">{isKinyarwanda ? 'Igiteranyo cy\'iki cyumweru' : 'Total this week'}</span>
                 <span className="text-lg font-bold text-[#1e293b]">{totalHours.toFixed(1)} {isKinyarwanda ? 'amasaha' : 'hours'}</span>
               </div>
             </div>
@@ -167,7 +167,7 @@ export function ProgressAnalyticsPage({ language }: ProgressAnalyticsPageProps) 
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <h2 className="text-xl font-bold text-[#1e293b] mb-6 flex items-center gap-2">
               <CheckCircle2 className="w-5 h-5 text-[#22c55e]" />
-              {isKinyarwanda ? 'Iterambere ry\'ibizamini' : 'Test Pass Rate Trend'}
+              {isKinyarwanda ? 'Imiterere y\'ibyatsinzwe' : 'Test Pass Rate Trend'}
             </h2>
 
             <div className="h-64 flex items-end justify-between gap-4">
@@ -202,7 +202,7 @@ export function ProgressAnalyticsPage({ language }: ProgressAnalyticsPageProps) 
           <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <h2 className="text-xl font-bold text-[#1e293b] mb-6 flex items-center gap-2">
               <Target className="w-5 h-5 text-[#8b5cf6]" />
-              {isKinyarwanda ? 'Ubumenyi bwawe' : 'Skills Breakdown'}
+              {isKinyarwanda ? 'Inshamake y\'ubumenyi' : 'Skills Breakdown'}
             </h2>
 
             <div className="space-y-5">
@@ -235,7 +235,7 @@ export function ProgressAnalyticsPage({ language }: ProgressAnalyticsPageProps) 
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <h2 className="text-xl font-bold text-[#1e293b] mb-6 flex items-center gap-2">
               <Lightbulb className="w-5 h-5 text-[#f59e0b]" />
-              {isKinyarwanda ? 'Inama' : 'Insights'}
+              {isKinyarwanda ? 'Inama (Insights)' : 'Insights'}
             </h2>
 
             <div className="space-y-4">
@@ -248,7 +248,7 @@ export function ProgressAnalyticsPage({ language }: ProgressAnalyticsPageProps) 
                     </div>
                     <div className="text-sm text-gray-700">
                       {isKinyarwanda
-                        ? 'Uri cyane kuri Variables n\'Conditionals!'
+                        ? 'Urakora neza cyane kuri Variables na Conditionals!'
                         : 'You excel at Variables and Conditionals!'}
                     </div>
                   </div>
@@ -260,11 +260,11 @@ export function ProgressAnalyticsPage({ language }: ProgressAnalyticsPageProps) 
                   <AlertCircle className="w-5 h-5 text-[#f59e0b] flex-shrink-0 mt-0.5" />
                   <div>
                     <div className="font-semibold text-[#f59e0b] mb-1">
-                      {isKinyarwanda ? 'Kwiyongera' : 'Focus Area'}
+                      {isKinyarwanda ? 'Aho kwitaho' : 'Focus Area'}
                     </div>
                     <div className="text-sm text-gray-700">
                       {isKinyarwanda
-                        ? 'Wiga cyane Objects n\'Loops'
+                        ? 'Imenyereze cyane gukoresha Objects na Loops'
                         : 'Practice more with Objects and Loops'}
                     </div>
                   </div>
@@ -280,7 +280,7 @@ export function ProgressAnalyticsPage({ language }: ProgressAnalyticsPageProps) 
                     </div>
                     <div className="text-sm text-gray-700">
                       {isKinyarwanda
-                        ? 'Iterambere ryawe rikiri hejuru kuruta 68% by\'abagenzi bawe'
+                        ? 'Iterambere ryawe riri imbere ya 68% by\'abagenzi bawe'
                         : 'Your progress is ahead of 68% of your peers'}
                     </div>
                   </div>

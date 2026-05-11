@@ -334,7 +334,7 @@ export function formatFeedbackForUI(
   return feedbacks.map(f => ({
     type: f.type,
     message: isKin
-      ? `${f.titleKIN}\n\n${f.explanationKIN}${f.fix ? '\n\n' + (isKin ? 'Igisubizo:' : 'Fix:') + '\n' + f.fix : ''}`
+      ? `${f.titleKIN}\n\n${f.explanationKIN}${f.fix ? '\n\n' + (isKin ? 'Kosora:' : 'Fix:') + '\n' + f.fix : ''}`
       : `${f.titleEN}\n\n${f.explanationEN}${f.fix ? '\n\nSuggested fix:\n' + f.fix : ''}`
   }));
 }

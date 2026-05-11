@@ -24,11 +24,11 @@ export default function ResetPasswordPage({ onDone }: Props) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isStrong) {
-      setError(isKin ? 'Ijambo ryibanga rigomba kuba nibura inyuguti 8.' : 'Password must be at least 8 characters.');
+      setError(isKin ? 'Ijambo ry\'ibanga rigomba kuba rifite nibura inyuguti 8.' : 'Password must be at least 8 characters.');
       return;
     }
     if (!matches) {
-      setError(isKin ? 'Amagambo yombi ntahuye.' : 'Passwords do not match.');
+      setError(isKin ? 'Amagambo y\'ibanga ntahuye.' : 'Passwords do not match.');
       return;
     }
     setLoading(true);
@@ -99,33 +99,33 @@ export default function ResetPasswordPage({ onDone }: Props) {
                 <CheckCircle size={32} style={{ color: '#00d4aa' }} />
               </div>
               <h1 className="text-2xl font-bold mb-3" style={{ color: '#f1f5f9', letterSpacing: '-0.01em' }}>
-                {isKin ? 'Ijambo ryibanga ryahinduwe!' : 'Password updated!'}
+                {isKin ? 'Ijambo ry\'ibanga ryahinduwe neza!' : 'Password updated!'}
               </h1>
               <p className="text-sm mb-8" style={{ color: '#64748b' }}>
-                {isKin ? 'Injira ukoresheje ijambo ryibanga rishya.' : 'You can now log in with your new password.'}
+                {isKin ? 'Urashobora kwinjira ukoresheje ijambo ry\'ibanga rishya.' : 'You can now log in with your new password.'}
               </p>
               <button onClick={onDone}
                 className="w-full rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all"
                 style={{ height: '48px', background: '#00d4aa', color: '#0d0f14' }}
                 onMouseEnter={e => (e.currentTarget.style.background = '#00bfa0')}
                 onMouseLeave={e => (e.currentTarget.style.background = '#00d4aa')}>
-                {isKin ? 'Injira' : 'Go to Login'} <ArrowRight size={16} />
+                {isKin ? 'Jya kwinjira' : 'Go to Login'} <ArrowRight size={16} />
               </button>
             </div>
           ) : (
             <>
               <h1 className="text-3xl font-bold mb-2" style={{ color: '#f1f5f9', letterSpacing: '-0.01em' }}>
-                {isKin ? 'Hinda ijambo ryibanga' : 'Set new password'}
+                {isKin ? 'Shyiraho ijambo ry\'ibanga rishya' : 'Set new password'}
               </h1>
               <p className="text-sm mb-8" style={{ color: '#64748b' }}>
-                {isKin ? 'Hitamo ijambo ryibanga rishya kandi rikomeye.' : 'Choose a strong new password for your account.'}
+                {isKin ? 'Hitamo ijambo ry\'ibanga rishya kandi rikomeye.' : 'Choose a strong new password for your account.'}
               </p>
 
               <form onSubmit={handleSubmit} className="space-y-5">
                 {/* New password */}
                 <div>
                   <label className="block text-sm font-semibold mb-2" style={{ color: '#94a3b8' }}>
-                    {isKin ? 'Ijambo ryibanga rishya' : 'New password'}
+                    {isKin ? 'Ijambo ry\'ibanga rishya' : 'New password'}
                   </label>
                   <div className="relative">
                     <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: '#475569' }} />
@@ -158,7 +158,7 @@ export default function ResetPasswordPage({ onDone }: Props) {
                         ))}
                       </div>
                       <span className="text-xs" style={{ color: password.length >= 10 ? '#00d4aa' : password.length >= 8 ? '#f59e0b' : '#f87171' }}>
-                        {password.length >= 10 ? (isKin ? 'Rikomeye' : 'Strong') : password.length >= 8 ? (isKin ? 'Rirakwiye' : 'Fair') : (isKin ? 'Riraseseka' : 'Weak')}
+                        {password.length >= 10 ? (isKin ? 'Rikomeye' : 'Strong') : password.length >= 8 ? (isKin ? 'Ririringaniye' : 'Fair') : (isKin ? 'Ni ryoroshye cyane' : 'Weak')}
                       </span>
                     </div>
                   )}
@@ -167,7 +167,7 @@ export default function ResetPasswordPage({ onDone }: Props) {
                 {/* Confirm password */}
                 <div>
                   <label className="block text-sm font-semibold mb-2" style={{ color: '#94a3b8' }}>
-                    {isKin ? 'Porosha ijambo ryibanga' : 'Confirm password'}
+                    {isKin ? 'Subiramo ijambo ry\'ibanga' : 'Confirm password'}
                   </label>
                   <div className="relative">
                     <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: '#475569' }} />
@@ -195,7 +195,7 @@ export default function ResetPasswordPage({ onDone }: Props) {
                   </div>
                   {confirm && !matches && (
                     <p className="text-xs mt-1.5" style={{ color: '#f87171' }}>
-                      {isKin ? 'Amagambo ntahuye.' : 'Passwords do not match.'}
+                      {isKin ? 'Amagambo y\'ibanga ntahuye.' : 'Passwords do not match.'}
                     </p>
                   )}
                 </div>
@@ -215,7 +215,7 @@ export default function ResetPasswordPage({ onDone }: Props) {
                   onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = '#00d4aa'; }}>
                   {loading
                     ? <div className="w-5 h-5 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: '#0d0f14', borderTopColor: 'transparent' }} />
-                    : <>{isKin ? 'Hinda ijambo ryibanga' : 'Update password'} <ArrowRight size={16} /></>}
+                    : <>{isKin ? 'Hindura ijambo ry\'ibanga' : 'Update password'} <ArrowRight size={16} /></>}
                 </button>
               </form>
             </>

@@ -23,28 +23,28 @@ export default function PrivacyPolicyPage() {
             <li>
               <strong>{isKinyarwanda ? 'Amakuru y\'ikonti' : 'Account information'}:</strong>{' '}
               {isKinyarwanda
-                ? 'Amazina, email, telefoni (niba wabitanze)'
+                ? 'Amazina, i-meyili, telefoni (niba wayitanze)'
                 : 'Name, email, phone (if provided)'}
             </li>
             <li>
-              <strong>{isKinyarwanda ? 'Code yawe' : 'Code submissions'}:</strong>{' '}
+              <strong>{isKinyarwanda ? 'Imikoro ya code watanze' : 'Code submissions'}:</strong>{' '}
               {isKinyarwanda
-                ? 'Code wohererezaho (kugirango AI ikwigishe)'
+                ? 'Code utanga (zikoreshwa mu kwigisha AI no kuguha ibitekerezo)'
                 : 'Code you submit (for AI training and feedback)'}
             </li>
             <li>
-              <strong>{isKinyarwanda ? 'Amakuru y\'ikoreshwa' : 'Usage data'}:</strong>{' '}
+              <strong>{isKinyarwanda ? 'Amakuru y\'imikoreshereze' : 'Usage data'}:</strong>{' '}
               {isKinyarwanda
-                ? 'Ibikoresho ukoresha, igihe, n\'iterambere'
+                ? 'Ibiranga platform ukoresha, igihe umazeho, n\'iterambere ryawe'
                 : 'Which features you use, time spent, and progress'}
             </li>
           </ul>
           <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-start gap-3">
             <Shield className="w-5 h-5 text-[#22c55e] flex-shrink-0 mt-0.5" />
             <p className="text-sm text-gray-700">
-              <strong>{isKinyarwanda ? 'Ntidugurisha amakuru yawe' : 'We do NOT sell your data'}.</strong>{' '}
+              <strong>{isKinyarwanda ? 'Ntabwo tugurisha amakuru yawe' : 'We do NOT sell your data'}.</strong>{' '}
               {isKinyarwanda
-                ? 'Nta na kamwe. Amakuru yawe ni ayawe.'
+                ? 'Na rimwe. Amakuru yawe ni ayawe.'
                 : 'Never. Your data is yours.'}
             </p>
           </div>
@@ -54,37 +54,37 @@ export default function PrivacyPolicyPage() {
     {
       id: 'usage',
       icon: Eye,
-      title: isKinyarwanda ? 'Uburyo Tukoresha Amakuru Yawe' : 'How We Use Your Data',
+      title: isKinyarwanda ? 'Uburyo dukoresha amakuru yawe' : 'How We Use Your Data',
       content: (
         <div className="space-y-4">
           <p>
             {isKinyarwanda
-              ? 'Tukoresha amakuru yawe kugirango:'
+              ? 'Dukoresha amakuru yawe kugirango:'
               : 'We use your information to:'}
           </p>
           <ul className="list-disc list-inside space-y-2 ml-4">
             <li>
-              <strong>{isKinyarwanda ? 'Gutanga ibisubizo bya AI' : 'Provide AI feedback'}:</strong>{' '}
+              <strong>{isKinyarwanda ? 'Duhe AI uburyo bwo kuguha ibitekerezo' : 'Provide AI feedback'}:</strong>{' '}
               {isKinyarwanda
-                ? 'AI yacu isesengura code yawe no gutanga inama'
+                ? 'AI yacu isuzuma code yawe ikaguha inama n\'ibisobanuro'
                 : 'Our AI analyzes your code and provides guidance'}
             </li>
             <li>
-              <strong>{isKinyarwanda ? 'Kunoza serivisi' : 'Improve the platform'}:</strong>{' '}
+              <strong>{isKinyarwanda ? 'Kunoza iyi platform' : 'Improve the platform'}:</strong>{' '}
               {isKinyarwanda
-                ? 'Gusobanukirwa aho abanyeshuri babananira'
+                ? 'Gusobanukirwa aho abanyeshuri bagira imbogamizi'
                 : 'Understand where students struggle'}
             </li>
             <li>
-              <strong>{isKinyarwanda ? 'Kohereza amakuru' : 'Send important updates'}:</strong>{' '}
+              <strong>{isKinyarwanda ? 'Kohereza amakuru mashya y\'ingenzi' : 'Send important updates'}:</strong>{' '}
               {isKinyarwanda
-                ? 'Amakuru y\'ibikoresho bishya n\'amahugurwa'
+                ? 'Ibiranga platform bishya n\'amahirwe yo kwiga'
                 : 'New features and training opportunities'}
             </li>
           </ul>
           <p className="text-sm text-gray-600">
             {isKinyarwanda
-              ? 'Urashobora gusaba kutagira marketing emails igihe cyose.'
+              ? 'Urashobora guhagarika kwakira i-meyili z\'ubucuruzi igihe cyose.'
               : 'You can opt out of marketing emails anytime.'}
           </p>
         </div>
@@ -93,37 +93,37 @@ export default function PrivacyPolicyPage() {
     {
       id: 'storage',
       icon: Lock,
-      title: isKinyarwanda ? 'Kubika no Kurinda Amakuru' : 'Data Storage & Security',
+      title: isKinyarwanda ? 'Kubika no kurinda amakuru' : 'Data Storage & Security',
       content: (
         <div className="space-y-4">
           <p>
             {isKinyarwanda
-              ? 'Dufata umutekano w\'amakuru yawe nk\'ikibazo cy\'ingenzi:'
+              ? 'Dufata umutekano w\'amakuru yawe nk\'ikintu cy\'ingenzi:'
               : 'We take your data security seriously:'}
           </p>
           <ul className="list-disc list-inside space-y-2 ml-4">
             <li>
-              <strong>{isKinyarwanda ? 'Kubika kurafite umutekano' : 'Encrypted storage'}:</strong>{' '}
+              <strong>{isKinyarwanda ? 'Aho tubika amakuru hararinzwe cyane' : 'Encrypted storage'}:</strong>{' '}
               {isKinyarwanda
-                ? 'Amakuru yose yawe arafite encryption (AES-256)'
+                ? 'Amakuru yawe yose afite uburinzi bukomeye (AES-256)'
                 : 'All your data is encrypted (AES-256)'}
             </li>
             <li>
-              <strong>{isKinyarwanda ? 'Seriveri zifite icyemezo' : 'SOC2-certified infrastructure'}:</strong>{' '}
+              <strong>{isKinyarwanda ? 'Seriveri zacu zifite ibyemezo by\'umutekano (SOC2)' : 'SOC2-certified infrastructure'}:</strong>{' '}
               {isKinyarwanda
-                ? 'Dukoresha Supabase ifite icyemezo cya SOC2 Type 2 cy\'umutekano'
+                ? 'Dukoresha Supabase ifite icyemezo cy\'umutekano cya SOC2 Type 2'
                 : 'We use Supabase infrastructure with SOC2 Type 2 security certification'}
             </li>
             <li>
-              <strong>{isKinyarwanda ? 'Backup zihoraho' : 'Regular backups'}:</strong>{' '}
+              <strong>{isKinyarwanda ? 'Twandukura amakuru kenshi (Backups)' : 'Regular backups'}:</strong>{' '}
               {isKinyarwanda
-                ? 'Dufata backup buri munsi kugirango amakuru yawe atagirwe'
+                ? 'Twandukura amakuru buri munsi kugirango atazazima'
                 : 'Daily backups to prevent data loss'}
             </li>
             <li>
-              <strong>{isKinyarwanda ? 'Kugenzura kugera' : 'Access controls'}:</strong>{' '}
+              <strong>{isKinyarwanda ? 'Kugenzura abagerera ku makuru' : 'Access controls'}:</strong>{' '}
               {isKinyarwanda
-                ? 'Gusa abakozi bafite uruhare barashobora kubona amakuru'
+                ? 'Abakozi babifitiye uruhushya gusa nibo bemerewe kureba amakuru'
                 : 'Only authorized staff can access data'}
             </li>
           </ul>
@@ -133,7 +133,7 @@ export default function PrivacyPolicyPage() {
     {
       id: 'rights',
       icon: Users,
-      title: isKinyarwanda ? 'Uburenganzira Bwawe' : 'Your Rights',
+      title: isKinyarwanda ? 'Uburenganzira bwawe' : 'Your Rights',
       content: (
         <div className="space-y-4">
           <p>
@@ -143,7 +143,7 @@ export default function PrivacyPolicyPage() {
           </p>
           <ul className="list-disc list-inside space-y-2 ml-4">
             <li>
-              <strong>{isKinyarwanda ? 'Kugera kuri amakuru yawe' : 'Access your data'}:</strong>{' '}
+              <strong>{isKinyarwanda ? 'Kureba amakuru yawe' : 'Access your data'}:</strong>{' '}
               {isKinyarwanda
                 ? 'Saba kopi y\'amakuru yawe yose igihe cyose'
                 : 'Request a copy of all your data anytime'}
@@ -151,27 +151,27 @@ export default function PrivacyPolicyPage() {
             <li>
               <strong>{isKinyarwanda ? 'Gusiba konti yawe' : 'Delete your account'}:</strong>{' '}
               {isKinyarwanda
-                ? 'Gusiba konti yawe hamwe n\'amakuru yayo yose'
+                ? 'Gusiba konti yawe hamwe n\'amakuru yose yerekeranye na yo'
                 : 'Delete your account and all associated data'}
             </li>
             <li>
-              <strong>{isKinyarwanda ? 'Kohereza amakuru yawe' : 'Export your data'}:</strong>{' '}
+              <strong>{isKinyarwanda ? 'Kohereza amakuru yawe ahandi' : 'Export your data'}:</strong>{' '}
               {isKinyarwanda
-                ? 'Gufata amakuru yawe mu buryo bworoshye (JSON)'
+                ? 'Kuramo amakuru yawe mu buryo bworoshye (JSON)'
                 : 'Download your data in a portable format (JSON)'}
             </li>
             <li>
-              <strong>{isKinyarwanda ? 'Guhindura amakuru yawe' : 'Correct your data'}:</strong>{' '}
+              <strong>{isKinyarwanda ? 'Gukosora amakuru yawe' : 'Correct your data'}:</strong>{' '}
               {isKinyarwanda
-                ? 'Guhindura amakuru adakora neza'
+                ? 'Hindura amakuru atari yo'
                 : 'Update incorrect information'}
             </li>
           </ul>
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
             <p className="text-sm text-gray-700">
-              <strong>{isKinyarwanda ? 'Gukoresha uburenganzira bwawe:' : 'To exercise your rights:'}</strong>{' '}
+              <strong>{isKinyarwanda ? 'Kugirango ukoreshe uburenganzira bwawe:' : 'To exercise your rights:'}</strong>{' '}
               {isKinyarwanda
-                ? 'Twoherereze email ku privacy@educode.rw'
+                ? 'Twandikire kuri privacy@educode.rw'
                 : 'Email us at privacy@educode.rw'}
             </p>
           </div>
@@ -186,18 +186,18 @@ export default function PrivacyPolicyPage() {
         <div className="space-y-4">
           <p>
             {isKinyarwanda
-              ? 'Dufasha abanyeshuri munsi y\'imyaka 18:'
+              ? 'Dufasha abanyeshuri bari munsi y\'imyaka 18:'
               : 'We serve students under 18:'}
           </p>
           <ul className="list-disc list-inside space-y-2 ml-4">
             <li>
               {isKinyarwanda
-                ? 'Abanyeshuri munsi y\'imyaka 18 bakeneye uruhushya rw\'ababyeyi'
+                ? 'Abanyeshuri munsi y\'imyaka 18 bakeneye uruhushya rw\'ababyeyi cyangwa ababarera'
                 : 'Students under 18 need parent/guardian consent'}
             </li>
             <li>
               {isKinyarwanda
-                ? 'Amashuri akora nk\'abarezi ku banyeshuri bayo'
+                ? 'Amashuri afatwa nk\'abarezi b\'abanyeshuri bayo'
                 : 'Schools act as guardians for their students'}
             </li>
             <li>
@@ -207,7 +207,7 @@ export default function PrivacyPolicyPage() {
             </li>
             <li>
               {isKinyarwanda
-                ? 'Ababyeyi barashobora gusaba kubona cyangwa gusiba amakuru y\'umwana'
+                ? 'Ababyeyi bashobora gusaba kureba cyangwa gusiba amakuru y\'umwana wabo'
                 : 'Parents can request to view or delete child data'}
             </li>
           </ul>
@@ -222,39 +222,39 @@ export default function PrivacyPolicyPage() {
         <div className="space-y-4">
           <p>
             {isKinyarwanda
-              ? 'Tukoresha cookies kugirango:'
+              ? 'Dukoresha cookies kugirango:'
               : 'We use cookies to:'}
           </p>
           <ul className="list-disc list-inside space-y-2 ml-4">
             <li>
-              <strong>{isKinyarwanda ? 'Kukubika winjiye' : 'Keep you logged in'}:</strong>{' '}
+              <strong>{isKinyarwanda ? 'Twibuke ko winjiye' : 'Keep you logged in'}:</strong>{' '}
               {isKinyarwanda
                 ? 'Nta kwiyandikisha buri gihe'
                 : "You don't have to log in every time"}
             </li>
             <li>
-              <strong>{isKinyarwanda ? 'Kubika ururimi rwawe' : 'Remember your language'}:</strong>{' '}
+              <strong>{isKinyarwanda ? 'Twibuke ururimi wahisemo' : 'Remember your language'}:</strong>{' '}
               {isKinyarwanda
-                ? 'English cyangwa Kinyarwanda'
+                ? 'Icyongereza cyangwa Ikinyarwanda uhitamo'
                 : 'English or Kinyarwanda preference'}
             </li>
             <li>
-              <strong>{isKinyarwanda ? 'Kumenya ikoreshwa' : 'Understand usage'}:</strong>{' '}
+              <strong>{isKinyarwanda ? 'Gusobanukirwa uko platform ikoreshwa' : 'Understand usage'}:</strong>{' '}
               {isKinyarwanda
-                ? 'Ibikoresho byiza cyane'
+                ? 'Ibiranga platform bikora neza kurusha ibindi'
                 : 'Which features work best'}
             </li>
           </ul>
           <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
             <p className="text-sm text-gray-700">
               {isKinyarwanda
-                ? 'Ntidukoresha cookies zo gukurikirana ku bindi burundu. Gusa cookies z\'ingenzi.'
+                ? 'Ntabwo dukoresha cookies zigukurikirana ngo tuguhe amatangazo y\'ubucuruzi. Dukoresha gusa cookies z\'ingenzi.'
                 : 'We do NOT use tracking cookies for ads. Only essential cookies.'}
             </p>
           </div>
           <p className="text-sm text-gray-600">
             {isKinyarwanda
-              ? 'Urashobora gukemura cookies mu browser yawe, ariko byashobora kubangamira ikoreshwa.'
+              ? 'Urashobora kugenzura cookies muri browser yawe, ariko bishobora gutuma platform itakora neza.'
               : 'You can manage cookies in your browser settings, but this may affect functionality.'}
           </p>
         </div>
@@ -263,12 +263,12 @@ export default function PrivacyPolicyPage() {
     {
       id: 'changes',
       icon: FileText,
-      title: isKinyarwanda ? 'Guhindura iyi Politiki' : 'Changes to Policy',
+      title: isKinyarwanda ? 'Impinduka kuri iyi politiki' : 'Changes to Policy',
       content: (
         <div className="space-y-4">
           <p>
             {isKinyarwanda
-              ? 'Tushobora guhindura iyi politiki igihe cyose:'
+              ? 'Tushobora kuvugurura iyi politiki rimwe na rimwe:'
               : 'We may update this policy from time to time:'}
           </p>
           <ul className="list-disc list-inside space-y-2 ml-4">
@@ -284,7 +284,7 @@ export default function PrivacyPolicyPage() {
             </li>
             <li>
               {isKinyarwanda
-                ? 'Gukomeza gukoresha serivisi yacu bivuze ko wemera impinduka'
+                ? 'Gukomeza kuyikoresha bivuze ko wemeye izo mpinduka'
                 : 'Continued use means you accept changes'}
             </li>
           </ul>
@@ -312,7 +312,7 @@ export default function PrivacyPolicyPage() {
               <Mail className="w-6 h-6 text-[#0ea5e9]" />
               <div>
                 <div className="font-semibold text-gray-900">
-                  {isKinyarwanda ? 'Ikigo cy\'ibanga' : 'Privacy Team'}
+                  {isKinyarwanda ? 'Itsinda rishinzwe ibanga' : 'Privacy Team'}
                 </div>
                 <a href="mailto:privacy@educode.rw" className="text-[#0ea5e9] hover:underline">
                   privacy@educode.rw
@@ -374,7 +374,7 @@ export default function PrivacyPolicyPage() {
             <a href="#" className="hover:text-[#0ea5e9]">{isKinyarwanda ? 'Ahabanza' : 'Home'}</a>
             <ChevronRight className="w-4 h-4" />
             <span className="text-[#0ea5e9] font-semibold">
-              {isKinyarwanda ? 'Politiki y\'Ibanga' : 'Privacy Policy'}
+              {isKinyarwanda ? 'Politiki y\'ibanga' : 'Privacy Policy'}
             </span>
           </div>
         </div>
@@ -390,7 +390,7 @@ export default function PrivacyPolicyPage() {
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                   <div className="flex items-center justify-between mb-6">
                     <h3 className="font-bold text-gray-900">
-                      {isKinyarwanda ? 'Ibiri Muri Politiki' : 'Table of Contents'}
+                      {isKinyarwanda ? 'Ibirimo muri iyi politiki' : 'Table of Contents'}
                     </h3>
                     <button className="text-[#0ea5e9] hover:underline text-sm font-semibold flex items-center gap-1">
                       <Download className="w-4 h-4" />
@@ -427,14 +427,14 @@ export default function PrivacyPolicyPage() {
               {/* Header */}
               <div className="mb-12">
                 <h1 className="text-4xl font-bold text-[#1e293b] mb-4">
-                  {isKinyarwanda ? 'Politiki y\'Ibanga' : 'Privacy Policy'}
+                  {isKinyarwanda ? 'Politiki y\'ibanga' : 'Privacy Policy'}
                 </h1>
                 <p className="text-gray-600">
-                  {isKinyarwanda ? 'Yahinduwe bwa nyuma:' : 'Last updated:'} <strong>April 6, 2026</strong>
+                  {isKinyarwanda ? 'Yavuguruwe bwa nyuma:' : 'Last updated:'} <strong>April 6, 2026</strong>
                 </p>
                 <p className="text-gray-600 mt-4">
                   {isKinyarwanda
-                    ? 'Iyi politiki isobanura uburyo EduCode Rwanda ikusanya, ikoresha, kandi ikarinda amakuru yawe.'
+                    ? 'Iyi politiki isobanura uburyo EduCode Rwanda ikusanya, ikoresha, kandi irinda amakuru yawe.'
                     : 'This policy explains how EduCode Rwanda collects, uses, and protects your information.'}
                 </p>
               </div>
@@ -466,7 +466,7 @@ export default function PrivacyPolicyPage() {
                   <Shield className="w-8 h-8 flex-shrink-0" />
                   <div>
                     <h3 className="font-bold text-lg mb-2">
-                      {isKinyarwanda ? 'Duhaye agaciro ibanga ryawe' : 'We value your privacy'}
+                      {isKinyarwanda ? 'Dufata ibanga ryawe nka rishingiro' : 'We value your privacy'}
                     </h3>
                     <p className="text-blue-100 mb-4">
                       {isKinyarwanda
@@ -478,7 +478,7 @@ export default function PrivacyPolicyPage() {
                       className="inline-flex items-center gap-2 px-6 py-2 bg-white text-[#0ea5e9] rounded-lg font-bold hover:bg-gray-100 transition-all"
                     >
                       <Mail className="w-5 h-5" />
-                      {isKinyarwanda ? 'Twandikire' : 'Contact Privacy Team'}
+                      {isKinyarwanda ? 'Twandikire itsinda rishinzwe ibanga' : 'Contact Privacy Team'}
                     </a>
                   </div>
                 </div>

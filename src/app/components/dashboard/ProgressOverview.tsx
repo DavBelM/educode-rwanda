@@ -22,7 +22,7 @@ export function ProgressOverview({ language, progress, assignmentsCompleted, ass
       boxShadow: '0 4px 24px rgba(0,0,0,0.3)'
     }}>
       <h2 className="font-semibold mb-6" style={{ fontFamily: 'Inter, sans-serif', color: '#94a3b8', letterSpacing: '0.05em', textTransform: 'uppercase', fontSize: '13px' }}>
-        {isKinyarwanda ? 'Iterambere' : 'Progress Overview'}
+        {isKinyarwanda ? 'Incamake y\'iterambere' : 'Progress Overview'}
       </h2>
 
       {/* Circular Progress */}
@@ -64,9 +64,9 @@ export function ProgressOverview({ language, progress, assignmentsCompleted, ass
       {/* Stats Grid */}
       <div className="grid grid-cols-2 gap-3 mb-6">
         {[
-          { label: isKinyarwanda ? 'Ibyasabwe' : 'Assignments', value: `${assignmentsCompleted}/${assignmentsTotal}` },
-          { label: isKinyarwanda ? 'Iminsi' : 'Streak', value: streak, icon: <Zap size={16} className="text-[#f59e0b]" fill="#f59e0b" /> },
-          { label: isKinyarwanda ? 'Amanota' : 'XP Points', value: xpPoints.toLocaleString() },
+          { label: isKinyarwanda ? 'Imikoro' : 'Assignments', value: `${assignmentsCompleted}/${assignmentsTotal}` },
+          { label: isKinyarwanda ? 'Iminsi ukurikirana' : 'Streak', value: streak, icon: <Zap size={16} className="text-[#f59e0b]" fill="#f59e0b" /> },
+          { label: isKinyarwanda ? 'Amanota (XP)' : 'XP Points', value: xpPoints.toLocaleString() },
           { label: isKinyarwanda ? 'Urwego' : 'Level', value: level, small: true },
         ].map((stat, i) => (
           <div key={i} className="rounded-xl p-4" style={{ background: '#1a1e2a', border: '1px solid rgba(255,255,255,0.04)' }}>

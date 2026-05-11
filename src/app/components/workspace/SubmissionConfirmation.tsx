@@ -35,7 +35,7 @@ export function SubmissionConfirmation({
 
           {/* Title */}
           <h1 className="text-3xl font-bold text-[#1e293b] mb-3" style={{ fontFamily: 'Inter, sans-serif' }}>
-            {isKinyarwanda ? 'Umushinga watanzwe!' : 'Assignment Submitted!'}
+            {isKinyarwanda ? 'Umukoro watanzwe!' : 'Assignment Submitted!'}
           </h1>
 
           {/* Assignment Name */}
@@ -61,7 +61,7 @@ export function SubmissionConfirmation({
             <div className="bg-[#f0fdf4] border border-[#10b981] rounded-lg p-4 mb-8">
               <p className="text-[#10b981] font-semibold" style={{ fontFamily: 'Inter, sans-serif' }}>
                 {isKinyarwanda
-                  ? 'Byose byarangiye neza! Umushinga wawe watsinze ibizamini byose.'
+                  ? 'Birashimishije! Umukoro wawe watsinze amagerageza yose.'
                   : 'Perfect! Your assignment passed all tests.'}
               </p>
             </div>
@@ -69,7 +69,7 @@ export function SubmissionConfirmation({
             <div className="bg-[#fef3c7] border border-[#f59e0b] rounded-lg p-4 mb-8">
               <p className="text-[#d97706] font-semibold" style={{ fontFamily: 'Inter, sans-serif' }}>
                 {isKinyarwanda
-                  ? 'Umushinga watanzwe ariko ibizamini bimwe birimo ibibazo.'
+                  ? 'Umukoro watanzwe, ariko amagerageza amwe ntabwo yatsinzwe. Urashobora kuwuhindura maze ukawuha umwarimu nanone.'
                   : 'Assignment submitted, but some tests failed. You can revise and resubmit.'}
               </p>
             </div>
@@ -79,7 +79,7 @@ export function SubmissionConfirmation({
           <div className="flex items-center justify-center gap-2 text-gray-500 text-sm mb-8">
             <Clock size={16} />
             <span style={{ fontFamily: 'Inter, sans-serif' }}>
-              {isKinyarwanda ? 'Watanzwe ku' : 'Submitted at'} {new Date().toLocaleTimeString()}
+              {isKinyarwanda ? 'Watanzwe saa' : 'Submitted at'} {new Date().toLocaleTimeString()}
             </span>
           </div>
 
@@ -90,7 +90,7 @@ export function SubmissionConfirmation({
               className="flex items-center justify-center gap-2 px-6 py-3 bg-[#0ea5e9] text-white rounded-lg hover:bg-[#0284c7] transition-all shadow-md font-semibold"
               style={{ fontFamily: 'Inter, sans-serif' }}
             >
-              <span>{isKinyarwanda ? 'Reba Ibisubizo' : 'View Detailed Results'}</span>
+              <span>{isKinyarwanda ? 'Reba ibisubizo birambuye' : 'View Detailed Results'}</span>
               <ArrowRight size={18} />
             </button>
             <button
@@ -115,7 +115,7 @@ export function SubmissionConfirmation({
               </div>
               <p className="text-gray-600 text-sm" style={{ fontFamily: 'Inter, sans-serif' }}>
                 {isKinyarwanda
-                  ? 'Umwarimu uzareba kode yawe mu minsi 1-2'
+                  ? 'Umwarimu wawe azasuzuma code yawe mu minsi 1-2'
                   : 'Your teacher will review your code within 1-2 days'}
               </p>
             </li>
@@ -135,7 +135,7 @@ export function SubmissionConfirmation({
               </div>
               <p className="text-gray-600 text-sm" style={{ fontFamily: 'Inter, sans-serif' }}>
                 {isKinyarwanda
-                  ? 'Ushobora gusubiramo mu gihe ibizamini bitarangiye'
+                  ? 'Urashobora guhindura umukoro ukawuha umwarimu nanone niba bikenewe'
                   : 'You can revise and resubmit if needed'}
               </p>
             </li>

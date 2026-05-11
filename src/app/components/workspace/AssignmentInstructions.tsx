@@ -74,7 +74,7 @@ export function AssignmentInstructions({
               <Clock size={20} className="text-[#0ea5e9]" />
               <div>
                 <p className="text-xs text-gray-500" style={{ fontFamily: 'Inter, sans-serif' }}>
-                  {isKinyarwanda ? 'Igihe Giteganijwe' : 'Estimated Time'}
+                  {isKinyarwanda ? 'Igihe giteganijwe' : 'Estimated Time'}
                 </p>
                 <p className="text-sm font-semibold text-[#1e293b]" style={{ fontFamily: 'Inter, sans-serif' }}>
                   {estimatedTime}
@@ -114,7 +114,7 @@ export function AssignmentInstructions({
           <div className="flex items-center gap-3 mb-4">
             <Target size={24} className="text-[#0ea5e9]" />
             <h2 className="text-xl font-bold text-[#1e293b]" style={{ fontFamily: 'Inter, sans-serif' }}>
-              {isKinyarwanda ? 'Intego zo Kwiga' : 'Learning Objectives'}
+              {isKinyarwanda ? 'Intego zo kwiga' : 'Learning Objectives'}
             </h2>
           </div>
           <ul className="space-y-2">
@@ -156,7 +156,7 @@ export function AssignmentInstructions({
           <div className="bg-gradient-to-br from-[#fef3c7] to-[#fef9e7] rounded-xl shadow-lg border-2 border-[#f59e0b] p-6">
             <h3 className="font-bold text-[#d97706] mb-4 flex items-center gap-2" style={{ fontFamily: 'Inter, sans-serif' }}>
               <span className="text-xl">💡</span>
-              {isKinyarwanda ? 'Amakuru Afasha' : 'Helpful Hints'}
+              {isKinyarwanda ? 'Inama zigufasha' : 'Helpful Hints'}
             </h3>
             <ul className="space-y-2">
               {hints.map((hint, index) => (
@@ -171,7 +171,7 @@ export function AssignmentInstructions({
         {/* Starter Code Preview */}
         <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
           <h2 className="text-xl font-bold text-[#1e293b] mb-4" style={{ fontFamily: 'Inter, sans-serif' }}>
-            {isKinyarwanda ? 'Kode yo Gutangira' : 'Starter Code'}
+            {isKinyarwanda ? 'Code yo gutangiriraho' : 'Starter Code'}
           </h2>
           <div className="bg-[#1e1e2e] rounded-lg p-4 overflow-x-auto">
             <pre className="text-sm text-gray-300" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
@@ -185,11 +185,11 @@ export function AssignmentInstructions({
           <div className="flex items-center justify-between gap-4 flex-wrap">
             <div>
               <h3 className="font-bold text-[#1e293b] mb-1" style={{ fontFamily: 'Inter, sans-serif' }}>
-                {isKinyarwanda ? 'Witeguye Gutangira?' : 'Ready to Start?'}
+                {isKinyarwanda ? 'Witeguye gutangira?' : 'Ready to Start?'}
               </h3>
               <p className="text-sm text-gray-600" style={{ fontFamily: 'Inter, sans-serif' }}>
                 {isKinyarwanda
-                  ? 'Kanda hano kugirango utangire gukora kode yawe'
+                  ? 'Kanda hano hepfo kugirango utangire gukora code yawe'
                   : 'Click below to open the coding workspace'}
               </p>
             </div>
@@ -199,7 +199,7 @@ export function AssignmentInstructions({
               style={{ fontFamily: 'Inter, sans-serif' }}
             >
               <Play size={24} fill="white" />
-              <span>{isKinyarwanda ? 'Tangira Gukora' : 'Start Coding'}</span>
+              <span>{isKinyarwanda ? 'Tangira gukora Code' : 'Start Coding'}</span>
             </button>
           </div>
         </div>

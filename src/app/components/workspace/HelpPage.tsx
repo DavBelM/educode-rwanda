@@ -30,7 +30,7 @@ export function HelpPage({
             </div>
             <div>
               <h1 className="text-3xl font-bold mb-2" style={{ fontFamily: 'Inter, sans-serif' }}>
-                {isKinyarwanda ? 'Ubufasha & Amabwiriza' : 'Help & Hints'}
+                {isKinyarwanda ? 'Ubufasha n\'inama' : 'Help & Hints'}
               </h1>
               <p className="text-lg opacity-90" style={{ fontFamily: 'Inter, sans-serif' }}>
                 {assignmentTitle}
@@ -39,7 +39,7 @@ export function HelpPage({
           </div>
           <p className="text-white/90" style={{ fontFamily: 'Inter, sans-serif' }}>
             {isKinyarwanda
-              ? 'Niba wafashe ibibazo, dufite uburyo butandukanye bwo guha ubufasha'
+              ? 'Ese uheranwe n\'umukoro? Dufite uburyo bwinshi bwo kugufasha ngo utsinde'
               : 'Stuck on the assignment? We have several ways to help you succeed'}
           </p>
         </div>
@@ -57,15 +57,15 @@ export function HelpPage({
               <ChevronRight size={24} className="text-gray-400" />
             </div>
             <h3 className="font-bold text-[#1e293b] text-lg mb-2" style={{ fontFamily: 'Inter, sans-serif' }}>
-              {isKinyarwanda ? 'Baza AI' : 'Ask AI Assistant'}
+              {isKinyarwanda ? 'Baza AI Assistant' : 'Ask AI Assistant'}
             </h3>
             <p className="text-gray-600 text-sm mb-4" style={{ fontFamily: 'Inter, sans-serif' }}>
               {isKinyarwanda
-                ? 'Baza ibibazo by\'ihariye ku kode yawe ugahabwa ibisubizo by\'agateganyo'
+                ? 'Bona ubufasha bwihuse ku bibazo byihariye kuri code yawe'
                 : 'Get instant help with specific questions about your code'}
             </p>
             <span className="text-[#8b5cf6] font-semibold text-sm" style={{ fontFamily: 'Inter, sans-serif' }}>
-              {isKinyarwanda ? 'Igihe: By\'agateganyo' : 'Response: Instant'}
+              {isKinyarwanda ? 'Igihe cyo gusubizwa: Ako kanya' : 'Response: Instant'}
             </span>
           </div>
 
@@ -78,15 +78,15 @@ export function HelpPage({
               <ChevronRight size={24} className="text-gray-400" />
             </div>
             <h3 className="font-bold text-[#1e293b] text-lg mb-2" style={{ fontFamily: 'Inter, sans-serif' }}>
-              {isKinyarwanda ? 'Vugana n\'Umwarimu' : 'Contact Teacher'}
+              {isKinyarwanda ? 'Vugana n\'umwarimu' : 'Contact Teacher'}
             </h3>
             <p className="text-gray-600 text-sm mb-4" style={{ fontFamily: 'Inter, sans-serif' }}>
               {isKinyarwanda
-                ? 'Ohereza ubutumwa ku mwarimu wawe kugirango ubone ubufasha bwihariye'
+                ? 'Yoherereza umwarimu wawe ubutumwa kugirango ubonye ubufasha bwihariye'
                 : 'Send a message to your teacher for personalized guidance'}
             </p>
             <span className="text-[#0ea5e9] font-semibold text-sm" style={{ fontFamily: 'Inter, sans-serif' }}>
-              {isKinyarwanda ? 'Igihe: Isaha 1-24' : 'Response: 1-24 hours'}
+              {isKinyarwanda ? 'Igihe cyo gusubizwa: Mu masaha 1-24' : 'Response: 1-24 hours'}
             </span>
           </div>
         </div>
@@ -96,7 +96,7 @@ export function HelpPage({
           <div className="flex items-center gap-3 mb-6">
             <BookOpen size={24} className="text-[#10b981]" />
             <h2 className="text-xl font-bold text-[#1e293b]" style={{ fontFamily: 'Inter, sans-serif' }}>
-              {isKinyarwanda ? 'Ibibazo Bikunze Kubazwa' : 'Common Issues'}
+              {isKinyarwanda ? 'Ibibazo bikunze kubaho' : 'Common Issues'}
             </h2>
           </div>
           <div className="space-y-3">
@@ -131,7 +131,7 @@ export function HelpPage({
           <div className="flex items-center gap-3 mb-6">
             <Video size={24} className="text-[#f59e0b]" />
             <h2 className="text-xl font-bold text-[#1e293b]" style={{ fontFamily: 'Inter, sans-serif' }}>
-              {isKinyarwanda ? 'Ibikoresho byo Kwiga' : 'Learning Resources'}
+              {isKinyarwanda ? 'Ibikoresho byo kwifashisha mu kwiga' : 'Learning Resources'}
             </h2>
           </div>
           <div className="grid md:grid-cols-2 gap-4">
@@ -144,7 +144,7 @@ export function HelpPage({
               </div>
               <div>
                 <p className="font-semibold text-[#1e293b] text-sm" style={{ fontFamily: 'Inter, sans-serif' }}>
-                  {isKinyarwanda ? 'Amashusho' : 'Video Tutorial'}
+                  {isKinyarwanda ? 'Isomo rya videwo (Tutorial)' : 'Video Tutorial'}
                 </p>
                 <p className="text-xs text-gray-500" style={{ fontFamily: 'Inter, sans-serif' }}>
                   15 {isKinyarwanda ? 'iminota' : 'minutes'}
@@ -160,10 +160,10 @@ export function HelpPage({
               </div>
               <div>
                 <p className="font-semibold text-[#1e293b] text-sm" style={{ fontFamily: 'Inter, sans-serif' }}>
-                  {isKinyarwanda ? 'Inyandiko' : 'Written Guide'}
+                  {isKinyarwanda ? 'Igitabo cy\'amabwiriza (Guide)' : 'Written Guide'}
                 </p>
                 <p className="text-xs text-gray-500" style={{ fontFamily: 'Inter, sans-serif' }}>
-                  5 {isKinyarwanda ? 'iminota gusoma' : 'min read'}
+                  5 {isKinyarwanda ? 'iminota yo gusoma' : 'min read'}
                 </p>
               </div>
             </a>
@@ -176,10 +176,10 @@ export function HelpPage({
               </div>
               <div>
                 <p className="font-semibold text-[#1e293b] text-sm" style={{ fontFamily: 'Inter, sans-serif' }}>
-                  {isKinyarwanda ? 'Itsinda ry\'Abanyeshuri' : 'Study Group'}
+                  {isKinyarwanda ? 'Itsinda ryo kwigiramo' : 'Study Group'}
                 </p>
                 <p className="text-xs text-gray-500" style={{ fontFamily: 'Inter, sans-serif' }}>
-                  {isKinyarwanda ? 'Vugana n\'abandi' : 'Connect with peers'}
+                  {isKinyarwanda ? 'Vugana n\'abandi banyeshuri' : 'Connect with peers'}
                 </p>
               </div>
             </a>
@@ -192,7 +192,7 @@ export function HelpPage({
               </div>
               <div>
                 <p className="font-semibold text-[#1e293b] text-sm" style={{ fontFamily: 'Inter, sans-serif' }}>
-                  {isKinyarwanda ? 'Ingero z\'Urugero' : 'Code Examples'}
+                  {isKinyarwanda ? 'Ingero za Code' : 'Code Examples'}
                 </p>
                 <p className="text-xs text-gray-500" style={{ fontFamily: 'Inter, sans-serif' }}>
                   {isKinyarwanda ? 'Reba ingero' : 'View examples'}
@@ -205,13 +205,13 @@ export function HelpPage({
         {/* Tips Card */}
         <div className="bg-gradient-to-br from-[#f0fdf4] to-[#dcfce7] rounded-xl border-2 border-[#10b981] p-6">
           <h3 className="font-bold text-[#10b981] mb-4" style={{ fontFamily: 'Inter, sans-serif' }}>
-            {isKinyarwanda ? 'Inama zo Gukemura Ibibazo' : 'Problem-Solving Tips'}
+            {isKinyarwanda ? 'Inama zo gukemura ibibazo' : 'Problem-Solving Tips'}
           </h3>
           <ul className="space-y-2 text-sm text-[#166534]" style={{ fontFamily: 'Inter, sans-serif' }}>
-            <li>• {isKinyarwanda ? 'Soma neza ibisabwa by\'umushinga' : 'Carefully read the assignment requirements'}</li>
-            <li>• {isKinyarwanda ? 'Tangira n\'ibihugu by\'ibanze hanyuma wongere' : 'Start with basic functionality, then add more'}</li>
-            <li>• {isKinyarwanda ? 'Gerageza kode yawe kenshi' : 'Test your code frequently as you write'}</li>
-            <li>• {isKinyarwanda ? 'Koresha console.log() kugirango urebe ibikora' : 'Use console.log() to debug and check values'}</li>
+            <li>• {isKinyarwanda ? 'Soma witonze ibisabwa by\'umukoro' : 'Carefully read the assignment requirements'}</li>
+            <li>• {isKinyarwanda ? 'Tangira ku bintu by\'ibanze, hanyuma ugende wongeraho ibindi' : 'Start with basic functionality, then add more'}</li>
+            <li>• {isKinyarwanda ? 'Jya ugera code yawe kenshi mu gihe uyandika' : 'Test your code frequently as you write'}</li>
+            <li>• {isKinyarwanda ? 'Koresha console.log() kugirango urebe amakosa n\'agaciro k\'ibyo wanditse' : 'Use console.log() to debug and check values'}</li>
             <li>• {isKinyarwanda ? 'Ntutinye gusaba ubufasha!' : 'Don\'t hesitate to ask for help!'}</li>
           </ul>
         </div>

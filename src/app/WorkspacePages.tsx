@@ -15,28 +15,28 @@ export default function WorkspacePages() {
 
   // Sample data
   const assignmentData = {
-    title: isKinyarwanda ? 'Kubara Igiciro Cyose' : 'Calculate Total Price',
+    title: isKinyarwanda ? 'Kubara igiciro cyose hamwe' : 'Calculate Total Price',
     description: isKinyarwanda
-      ? 'Kora porogaramu ikoresha variables kugirango ubaze igiciro cyose cy\'ibicuruzwa'
+      ? 'Kora porogaramu ikoresha variables mu kubara igiciro cyose cy\'ibicuruzwa'
       : 'Create a program that uses variables to calculate the total price of products',
     difficulty: 'Beginner' as const,
     estimatedTime: isKinyarwanda ? 'Iminota 30' : '30 minutes',
     dueDate: 'April 10, 2026',
     objectives: [
-      isKinyarwanda ? 'Kwiga gukoresha variables neza' : 'Learn to declare and use variables properly',
-      isKinyarwanda ? 'Gukora imikorere ya arithmetic' : 'Perform arithmetic operations',
-      isKinyarwanda ? 'Kwerekana ibisubizo neza' : 'Display results correctly'
+      isKinyarwanda ? 'Wige gushyiraho no gukoresha variables mu buryo bukwiye' : 'Learn to declare and use variables properly',
+      isKinyarwanda ? 'Gukoresha imibare' : 'Perform arithmetic operations',
+      isKinyarwanda ? 'Kwerekana ibisubizo mu buryo bwiza' : 'Display results correctly'
     ],
     requirements: [
       isKinyarwanda ? 'Shyiraho variables zitatu: productName, price, quantity' : 'Define three variables: productName, price, quantity',
-      isKinyarwanda ? 'Baza igiciro cyose (price * quantity)' : 'Calculate total price (price * quantity)',
-      isKinyarwanda ? 'Kwerekana izina ry\'igicuruzwa n\'igiciro cyose' : 'Display product name and total price',
-      isKinyarwanda ? 'Koresha RWF mu ibisubizo' : 'Use RWF in the output'
+      isKinyarwanda ? 'Bara igiciro cyose hamwe (igiciro * umubare)' : 'Calculate total price (price * quantity)',
+      isKinyarwanda ? 'Erekana izina ry\'igicuruzwa n\'igiciro cyose hamwe' : 'Display product name and total price',
+      isKinyarwanda ? 'Koresha RWF mu kwerekana ibisubizo' : 'Use RWF in the output'
     ],
     hints: [
-      isKinyarwanda ? 'Koresha const kugirango ushyireho variables' : 'Use const to declare variables',
-      isKinyarwanda ? 'Koresha console.log() kugirango werekane ibisubizo' : 'Use console.log() to display results',
-      isKinyarwanda ? 'Wibuke gukoresha + kugirango uhuje strings' : 'Remember to use + to concatenate strings'
+      isKinyarwanda ? 'Koresha "const" ushyiraho variables' : 'Use const to declare variables',
+      isKinyarwanda ? 'Koresha console.log() werekane ibisubizo' : 'Use console.log() to display results',
+      isKinyarwanda ? 'Wibuke gukoresha akamenyetso ka + uhuza amagambo' : 'Remember to use + to concatenate strings'
     ],
     starterCode: `// Define your variables here
 const productName = "";
@@ -51,13 +51,13 @@ const quantity = 0;
   const testResults = [
     {
       id: '1',
-      name: isKinyarwanda ? 'Igizamini 1: Variables zashyizweho' : 'Test 1: Variables Declared',
+      name: isKinyarwanda ? 'Igerageza rya 1: Variables zashyizweho' : 'Test 1: Variables Declared',
       passed: true,
       input: 'productName = "Laptop", price = 500000, quantity = 2'
     },
     {
       id: '2',
-      name: isKinyarwanda ? 'Igizamini 2: Kubara neza' : 'Test 2: Correct Calculation',
+      name: isKinyarwanda ? 'Igerageza rya 2: Kubara neza' : 'Test 2: Correct Calculation',
       passed: true,
       input: 'price * quantity',
       expectedOutput: '1000000',
@@ -65,27 +65,27 @@ const quantity = 0;
     },
     {
       id: '3',
-      name: isKinyarwanda ? 'Igizamini 3: Ibisubizo byerekanywe' : 'Test 3: Output Displayed',
+      name: isKinyarwanda ? 'Igerageza rya 3: Ibisubizo byerekanwa' : 'Test 3: Output Displayed',
       passed: true
     },
     {
       id: '4',
-      name: isKinyarwanda ? 'Igizamini 4: RWF yinjijwe' : 'Test 4: RWF Included',
+      name: isKinyarwanda ? 'Igerageza rya 4: RWF yashyizwemo' : 'Test 4: RWF Included',
       passed: false,
       expectedOutput: 'Total Price: 1000000 RWF',
       actualOutput: 'Total Price: 1000000',
-      error: isKinyarwanda ? 'RWF ntiyahuje' : 'RWF currency not included'
+      error: isKinyarwanda ? 'RWF ntabwo yashyizwemo' : 'RWF currency not included'
     },
     {
       id: '5',
-      name: isKinyarwanda ? 'Igizamini 5: Umubare w\'ibisubizo' : 'Test 5: Number Formatting',
+      name: isKinyarwanda ? 'Igerageza rya 5: Imiterere y\'imibare' : 'Test 5: Number Formatting',
       passed: true
     }
   ];
 
   const aiFeedback = [
     isKinyarwanda
-      ? 'Urakora neza cyane! Kode yawe ni nziza kandi ifite imiterere myiza.'
+      ? 'Wakozey neza cyane! Code yawe ifite isuku kandi iteye neza.'
       : 'Great work! Your code is clean and well-structured.',
     isKinyarwanda
       ? 'Wibuke kwongera "RWF" mu bisubizo byose kugirango uzuze ibizamini byose.'
@@ -99,17 +99,17 @@ const quantity = 0;
     {
       question: isKinyarwanda ? 'Kuki kode yanjye itakora?' : 'Why isn\'t my code working?',
       answer: isKinyarwanda
-        ? 'Genzura ko variables zawe zose zashyizweho mbere yo kuzikoresha. Koresha console.log() kugirango urebe ibikora.'
+        ? 'Genzura ko variables zawe zose zashyizweho mbere yo kuzikoresha. Koresha console.log() kugirango urebe amakosa.'
         : 'Check that all your variables are declared before using them. Use console.log() to debug values.'
     },
     {
-      question: isKinyarwanda ? 'Ni gute nahuriza strings?' : 'How do I concatenate strings?',
+      question: isKinyarwanda ? 'Ni gute nahuriza hamwe amagambo (strings)?' : 'How do I concatenate strings?',
       answer: isKinyarwanda
         ? 'Koresha + hagati ya strings. Urugero: "Total: " + totalPrice'
         : 'Use the + operator between strings. Example: "Total: " + totalPrice'
     },
     {
-      question: isKinyarwanda ? 'Ni variables zihe nkwiye gukoresha?' : 'What variables should I use?',
+      question: isKinyarwanda ? 'Ni zihe variables ngomba gukoresha?' : 'What variables should I use?',
       answer: isKinyarwanda
         ? 'Uzakeneye: productName (string), price (number), quantity (number), na totalPrice (number).'
         : 'You\'ll need: productName (string), price (number), quantity (number), and totalPrice (number).'

@@ -22,7 +22,7 @@ export function AIFeedbackPanel({ feedback, language, isLoading = false, aiRespo
           </svg>
         </div>
         <span className="font-semibold" style={{ fontFamily: 'Inter, sans-serif', fontSize: '17px', color: '#f1f5f9' }}>
-          {isKinyarwanda ? 'Ubufasha bwa AI' : 'AI Feedback'}
+          {isKinyarwanda ? 'Ibisobanuro bya AI' : 'AI Feedback'}
         </span>
       </div>
 
@@ -195,13 +195,13 @@ export function AIFeedbackPanel({ feedback, language, isLoading = false, aiRespo
                   className="px-4 py-2 rounded-lg text-sm font-medium transition-all"
                   style={{ fontFamily: 'Inter, sans-serif', border: '1px solid rgba(255,255,255,0.1)', color: '#94a3b8', background: 'rgba(255,255,255,0.04)' }}
                 >
-                  {isKinyarwanda ? 'Kosora Wenyine' : 'Fix Myself'}
+                  {isKinyarwanda ? 'Kwikosora' : 'Fix Myself'}
                 </button>
                 <button
                   className="px-4 py-2 rounded-lg bg-[#0ea5e9] text-white hover:bg-[#0284c7] transition-all text-sm font-medium"
                   style={{ fontFamily: 'Inter, sans-serif' }}
                 >
-                  {isKinyarwanda ? 'Sobanura mu Cyongereza' : 'Explain in Kinyarwanda'}
+                  {isKinyarwanda ? 'Sobanura mu Kinyarwanda' : 'Explain in Kinyarwanda'}
                 </button>
               </div>
             ) : (
@@ -210,7 +210,7 @@ export function AIFeedbackPanel({ feedback, language, isLoading = false, aiRespo
                 className="w-full px-4 py-2 rounded-lg text-sm font-medium transition-all"
                 style={{ fontFamily: 'Inter, sans-serif', border: '1px solid rgba(139,92,246,0.4)', color: '#a78bfa', background: 'rgba(139,92,246,0.08)' }}
               >
-                {isKinyarwanda ? 'Sobanura mu Cyongereza (Explain in English)' : 'Explain in Kinyarwanda'}
+                {isKinyarwanda ? 'Sobanura mu Kinyarwanda' : 'Explain in Kinyarwanda'}
               </button>
             )}
           </div>

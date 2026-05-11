@@ -35,7 +35,7 @@ export default function TheoreticalAssignment({ assignment, language, onBack }: 
       const msg = type === 'tabSwitches'
         ? (isKin ? '⚠️ Guhindura tab byarabonye!' : '⚠️ Tab switch detected!')
         : type === 'pasteCount'
-        ? (isKin ? '⚠️ Gukopya ibisubizo byarabonye!' : '⚠️ Paste detected!')
+        ? (isKin ? '⚠️ Twabonye ko hari ibyo wakopeye ukabishyiramo!' : '⚠️ Paste detected!')
         : (isKin ? '⚠️ Gusohoka ku screen nzima byarabonye!' : '⚠️ Fullscreen exit detected!');
       setViolationWarning(msg);
       setTimeout(() => setViolationWarning(''), 3000);
@@ -139,7 +139,7 @@ export default function TheoreticalAssignment({ assignment, language, onBack }: 
           onMouseLeave={e => (e.currentTarget.style.color = '#94a3b8')}
         >
           <ArrowLeft size={16} />
-          {isKin ? 'Subira Inyuma' : 'Back to Dashboard'}
+          {isKin ? 'Garuka kuri Dashboard' : 'Back to Dashboard'}
         </button>
 
         <div className="flex items-center gap-3">
@@ -190,7 +190,7 @@ export default function TheoreticalAssignment({ assignment, language, onBack }: 
             </h2>
             <p className="text-sm" style={{ color: '#64748b' }}>
               {isKin
-                ? 'Ibisubizo byawe byoherejwe neza. Umwarimu azabona.'
+                ? 'Ibisubizo byawe byoherejwe neza. Umwarimu wawe azabisuzuma.'
                 : 'Your answers have been submitted. Your teacher will review them.'}
             </p>
             <button
@@ -200,7 +200,7 @@ export default function TheoreticalAssignment({ assignment, language, onBack }: 
               onMouseEnter={e => (e.currentTarget.style.background = 'rgba(0,212,170,0.2)')}
               onMouseLeave={e => (e.currentTarget.style.background = 'rgba(0,212,170,0.12)')}
             >
-              {isKin ? 'Garuka ku Dashibodi' : 'Back to Dashboard'}
+              {isKin ? 'Garuka kuri Dashboard' : 'Back to Dashboard'}
             </button>
           </div>
         ) : (
@@ -213,7 +213,7 @@ export default function TheoreticalAssignment({ assignment, language, onBack }: 
                   <div key={q.id} className="rounded-2xl p-6" style={{ background: '#13161e', border: '1px solid rgba(255,255,255,0.06)' }}>
                     <label className="block mb-3">
                       <span className="text-xs font-semibold uppercase tracking-wide" style={{ color: '#475569' }}>
-                        {isKin ? `Ikibazo ${index + 1}` : `Question ${index + 1}`}
+                        {isKin ? `Ikibazo cya ${index + 1}` : `Question ${index + 1}`}
                       </span>
                       <p className="text-base font-medium mt-1" style={{ color: '#f1f5f9' }}>
                         {questionText}
@@ -254,7 +254,7 @@ export default function TheoreticalAssignment({ assignment, language, onBack }: 
             {/* Progress indicator */}
             <div className="flex items-center justify-between mb-6">
               <span className="text-sm" style={{ color: '#475569' }}>
-                {questions.filter(q => (answers[q.id] ?? '').trim().length > 0).length} / {questions.length} {isKin ? 'bisubijwe' : 'answered'}
+                {questions.filter(q => (answers[q.id] ?? '').trim().length > 0).length} / {questions.length} {isKin ? 'byasubijwe' : 'answered'}
               </span>
               <div className="flex gap-1">
                 {questions.map(q => (

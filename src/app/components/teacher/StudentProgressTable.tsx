@@ -42,7 +42,7 @@ export function StudentProgressTable({ students, language }: StudentProgressTabl
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-bold text-[#1e293b]" style={{ fontFamily: 'Inter, sans-serif' }}>
-          {isKinyarwanda ? 'Abanyeshuri / Students' : 'Students'}
+          {isKinyarwanda ? 'Abanyeshuri' : 'Students'}
         </h2>
       </div>
 
@@ -61,15 +61,15 @@ export function StudentProgressTable({ students, language }: StudentProgressTabl
               style={{ fontFamily: 'Inter, sans-serif' }}
             >
               {f === 'all' && (isKinyarwanda ? 'Byose' : 'All')}
-              {f === 'struggling' && (isKinyarwanda ? 'Bakeneye Ubufasha' : 'Struggling')}
-              {f === 'on-track' && (isKinyarwanda ? 'Bagenda Neza' : 'On Track')}
-              {f === 'excelling' && (isKinyarwanda ? 'Bateye Imbere' : 'Excelling')}
+              {f === 'struggling' && (isKinyarwanda ? 'Abakeneye ubufasha' : 'Struggling')}
+              {f === 'on-track' && (isKinyarwanda ? 'Abagendera kuri gahunda' : 'On Track')}
+              {f === 'excelling' && (isKinyarwanda ? 'Abakora neza cyane' : 'Excelling')}
             </button>
           ))}
         </div>
         <div className="ml-auto flex items-center gap-2">
           <span className="text-sm text-gray-600" style={{ fontFamily: 'Inter, sans-serif' }}>
-            {isKinyarwanda ? 'Tondekanya:' : 'Sort by:'}
+            {isKinyarwanda ? 'Tondekanya ukurikije:' : 'Sort by:'}
           </span>
           <select
             value={sortBy}
@@ -78,7 +78,7 @@ export function StudentProgressTable({ students, language }: StudentProgressTabl
             style={{ fontFamily: 'Inter, sans-serif' }}
           >
             <option value="progress">{isKinyarwanda ? 'Iterambere' : 'Progress'}</option>
-            <option value="lastActive">{isKinyarwanda ? 'Igihe' : 'Last Active'}</option>
+            <option value="lastActive">{isKinyarwanda ? 'Uheruka gukoresha platform' : 'Last Active'}</option>
             <option value="name">{isKinyarwanda ? 'Izina' : 'Name'}</option>
           </select>
         </div>
@@ -96,7 +96,7 @@ export function StudentProgressTable({ students, language }: StudentProgressTabl
                 {isKinyarwanda ? 'Iterambere' : 'Progress'}
               </th>
               <th className="text-left py-3 px-2 text-sm font-semibold text-gray-600" style={{ fontFamily: 'Inter, sans-serif' }}>
-                {isKinyarwanda ? 'Igihe' : 'Last Active'}
+                {isKinyarwanda ? 'Uheruka gukoresha platform' : 'Last Active'}
               </th>
               <th className="text-left py-3 px-2 text-sm font-semibold text-gray-600" style={{ fontFamily: 'Inter, sans-serif' }}>
                 {isKinyarwanda ? 'Imishinga' : 'Assignments'}
@@ -174,7 +174,7 @@ export function StudentProgressTable({ students, language }: StudentProgressTabl
           className="px-6 py-2 text-[#0ea5e9] font-semibold hover:underline"
           style={{ fontFamily: 'Inter, sans-serif' }}
         >
-          {isKinyarwanda ? 'Reba Byinshi' : 'Load More'}
+          {isKinyarwanda ? 'Reba ibindi byinshi' : 'Load More'}
         </button>
       </div>
     </div>

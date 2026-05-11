@@ -92,10 +92,10 @@ export default function CodingWorkspace({ onBack, assignment, language: initialL
     enabled: examMode,
     onViolation: (type) => {
       const msg = type === 'tabSwitches'
-        ? (isKin ? '⚠️ Guhindura tab byarabonye!' : '⚠️ Tab switch detected!')
+        ? (isKin ? '⚠️ Twabonye ko wahinduye paji!' : '⚠️ Tab switch detected!')
         : type === 'pasteCount'
-        ? (isKin ? '⚠️ Gukopya code byarabonye!' : '⚠️ Code paste detected!')
-        : (isKin ? '⚠️ Gusohoka ku screen nzima byarabonye!' : '⚠️ Fullscreen exit detected!');
+        ? (isKin ? '⚠️ Twabonye ko hari code ukopye ukayishyiramo!' : '⚠️ Code paste detected!')
+        : (isKin ? '⚠️ Twabonye ko wasohotse muri screen yuzuye!' : '⚠️ Fullscreen exit detected!');
       setViolationWarning(msg);
       setTimeout(() => setViolationWarning(''), 3000);
     },
@@ -234,10 +234,10 @@ export default function CodingWorkspace({ onBack, assignment, language: initialL
       {examMode && !isFullscreen && !submitted && (
         <div className="shrink-0 px-4 py-2 flex items-center justify-between" style={{ background: 'rgba(245,158,11,0.08)', borderBottom: '1px solid rgba(245,158,11,0.2)' }}>
           <p className="text-xs font-semibold" style={{ color: '#f59e0b' }}>
-            {isKin ? '⚠️ Injira mu screen yuzuye kugirango utangire' : '⚠️ Enter fullscreen to continue the exam'}
+            {isKin ? '⚠️ Injira muri screen yuzuye kugirango ukomeze ikizamini' : '⚠️ Enter fullscreen to continue the exam'}
           </p>
           <button onClick={requestFullscreen} className="text-xs font-bold px-3 py-1 rounded-lg" style={{ background: 'rgba(245,158,11,0.15)', color: '#f59e0b', border: '1px solid rgba(245,158,11,0.3)' }}>
-            {isKin ? 'Injira' : 'Go Fullscreen'}
+            {isKin ? 'Koresha Screen Yose' : 'Go Fullscreen'}
           </button>
         </div>
       )}
@@ -247,7 +247,7 @@ export default function CodingWorkspace({ onBack, assignment, language: initialL
         <div className="shrink-0 px-6 py-3 flex items-center justify-between" style={{ background: '#13161e', borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
           <div className="min-w-0">
             <p className="text-xs font-semibold uppercase mb-0.5" style={{ color: '#475569', letterSpacing: '0.05em' }}>
-              {examMode ? (isKin ? '🔒 Ikizamini' : '🔒 Exam') : (isKin ? 'Umushinga' : 'Assignment')}
+              {examMode ? (isKin ? '🔒 Ikizamini' : '🔒 Exam') : (isKin ? 'Umukoro' : 'Assignment')}
             </p>
             <p className="text-sm font-bold truncate" style={{ color: '#f1f5f9' }}>
               {isKin && assignment.title_kin ? assignment.title_kin : assignment.title}

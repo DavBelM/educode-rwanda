@@ -40,8 +40,8 @@ export function CommunicationCenterPage({ language }: CommunicationCenterPagePro
     {
       id: '2',
       from: 'Marie Uwase',
-      subject: isKinyarwanda ? 'Ikibazo ku mushinga' : 'Assignment clarification',
-      preview: isKinyarwanda ? 'Ese umushinga w\'inyuma ugomba gukorwa ute?' : 'How should the final project be structured?',
+      subject: isKinyarwanda ? 'Gusobanuza umukoro' : 'Assignment clarification',
+      preview: isKinyarwanda ? 'Umushinga wa nyuma ugomba kuba uteye ute?' : 'How should the final project be structured?',
       timestamp: isKinyarwanda ? 'Ejo' : 'Yesterday',
       status: 'replied',
       type: 'question',
@@ -51,7 +51,7 @@ export function CommunicationCenterPage({ language }: CommunicationCenterPagePro
       id: '3',
       from: 'David Nkunda',
       subject: isKinyarwanda ? 'Gusaba ubufasha' : 'Help request',
-      preview: isKinyarwanda ? 'Ndakeneye ubufasha kuri Arrays assignment' : 'I need help with the Arrays assignment',
+      preview: isKinyarwanda ? 'Ndakeneye ubufasha ku mukoro wa Arrays' : 'I need help with the Arrays assignment',
       timestamp: isKinyarwanda ? 'Iminsi 2 ishize' : '2 days ago',
       status: 'resolved',
       type: 'help',
@@ -60,8 +60,8 @@ export function CommunicationCenterPage({ language }: CommunicationCenterPagePro
     {
       id: '4',
       from: 'Grace Mutesi',
-      subject: isKinyarwanda ? 'Igitekerezo' : 'Feedback',
-      preview: isKinyarwanda ? 'Ndashimira isomo rya nyuma! Ryari ryiza cyane' : 'Thank you for the last lesson! It was very helpful',
+      subject: isKinyarwanda ? 'Ibitekerezo' : 'Feedback',
+      preview: isKinyarwanda ? 'Murakoze ku rya somo ryaherutse! Ryaramfashije cyane' : 'Thank you for the last lesson! It was very helpful',
       timestamp: isKinyarwanda ? 'Iminsi 3 ishize' : '3 days ago',
       status: 'new',
       type: 'feedback',
@@ -70,8 +70,8 @@ export function CommunicationCenterPage({ language }: CommunicationCenterPagePro
     {
       id: '5',
       from: 'Patrick Habimana',
-      subject: isKinyarwanda ? 'Ikibazo cy\'itariki' : 'Due date question',
-      preview: isKinyarwanda ? 'Ese tushobora kongera itariki y\'umushinga?' : 'Can we get an extension on the assignment?',
+      subject: isKinyarwanda ? 'Ikibazo ku itariki ntarengwa' : 'Due date question',
+      preview: isKinyarwanda ? 'Ese dushobora kongererwa igihe cy\'umukoro?' : 'Can we get an extension on the assignment?',
       timestamp: isKinyarwanda ? 'Iminsi 4 ishize' : '4 days ago',
       status: 'replied',
       type: 'question',
@@ -83,13 +83,13 @@ export function CommunicationCenterPage({ language }: CommunicationCenterPagePro
     {
       id: '1',
       title: isKinyarwanda ? 'Isomo rishya rya JavaScript' : 'New JavaScript lesson',
-      date: isKinyarwanda ? 'Ukwakira 5, 2026' : 'April 5, 2026',
+      date: isKinyarwanda ? '5 Mata 2026' : 'April 5, 2026',
       recipients: isKinyarwanda ? 'Ishuri ryose' : 'Entire class',
       sent: true
     },
     {
       id: '2',
-      title: isKinyarwanda ? 'Itariki y\'ikizamini yaje guhinduka' : 'Exam date changed',
+      title: isKinyarwanda ? 'Itariki y\'ikizamini yahindutse' : 'Exam date changed',
       date: isKinyarwanda ? 'Werurwe 28, 2026' : 'March 28, 2026',
       recipients: isKinyarwanda ? 'Ishuri ryose' : 'Entire class',
       sent: true
@@ -98,9 +98,9 @@ export function CommunicationCenterPage({ language }: CommunicationCenterPagePro
 
   const quickReplies = [
     isKinyarwanda ? 'Murakoze ku kibazo. Nzagusubiza vuba.' : 'Thanks for your question. I\'ll reply soon.',
-    isKinyarwanda ? 'Reba isomo rya video kuri ubu buce.' : 'Please review the video lesson on this topic.',
+    isKinyarwanda ? 'Mwongere murebe isomo rya videwo kuri iyi ngingo.' : 'Please review the video lesson on this topic.',
     isKinyarwanda ? 'Tuza kwiganiraho mu gitondo.' : 'We\'ll discuss this in class tomorrow.',
-    isKinyarwanda ? 'Reba amakosa yawe mu code.' : 'Please check your code for errors.'
+    isKinyarwanda ? 'Genzura niba code yawe itarimo amakosa.' : 'Please check your code for errors.'
   ];
 
   const filteredMessages = messages.filter(m => {
@@ -156,7 +156,7 @@ export function CommunicationCenterPage({ language }: CommunicationCenterPagePro
               {isKinyarwanda ? 'Ikigo cy\'itumanaho' : 'Communication Center'}
             </h1>
             <p className="text-gray-600">
-              {isKinyarwanda ? 'Ohereza ubutumwa n\'ibisubizo by\'abanyeshuri' : 'Send announcements and respond to student messages'}
+              {isKinyarwanda ? 'Ohereza amatangazo kandi usubize ubutumwa bw\'abanyeshuri' : 'Send announcements and respond to student messages'}
             </p>
           </div>
           <button
@@ -180,7 +180,7 @@ export function CommunicationCenterPage({ language }: CommunicationCenterPagePro
           >
             <div className="flex items-center gap-2">
               <MessageSquare className="w-5 h-5" />
-              {isKinyarwanda ? 'Ububiko' : 'Inbox'}
+              {isKinyarwanda ? 'Ububiko bw\'ubutumwa (Inbox)' : 'Inbox'}
               {unreadCount > 0 && (
                 <span className="bg-[#ef4444] text-white text-xs font-bold px-2 py-0.5 rounded-full">
                   {unreadCount}
@@ -223,7 +223,7 @@ export function CommunicationCenterPage({ language }: CommunicationCenterPagePro
                   <div className="flex gap-2">
                     {[
                       { id: 'all', label: isKinyarwanda ? 'Byose' : 'All' },
-                      { id: 'new', label: isKinyarwanda ? 'Nshya' : 'New', count: newCount },
+                      { id: 'new', label: isKinyarwanda ? 'Rishya' : 'New', count: newCount },
                       { id: 'replied', label: isKinyarwanda ? 'Byasubijwe' : 'Replied' },
                       { id: 'resolved', label: isKinyarwanda ? 'Byakemuwe' : 'Resolved' }
                     ].map((filter) => (
@@ -348,7 +348,7 @@ export function CommunicationCenterPage({ language }: CommunicationCenterPagePro
                     />
                     <button className="w-full px-4 py-2 bg-[#10b981] text-white rounded-lg font-semibold hover:bg-[#059669] transition-all flex items-center justify-center gap-2">
                       <Send className="w-4 h-4" />
-                      {isKinyarwanda ? 'Ohereza' : 'Send Reply'}
+                      {isKinyarwanda ? 'Ohereza igisubizo' : 'Send Reply'}
                     </button>
                   </div>
                 </div>
@@ -358,7 +358,7 @@ export function CommunicationCenterPage({ language }: CommunicationCenterPagePro
                     {isKinyarwanda ? 'Hitamo ubutumwa' : 'Select a message'}
                   </h3>
                   <p className="text-gray-600 text-sm">
-                    {isKinyarwanda ? 'Kanda ku butumwa kugirango ubone no gusubiza' : 'Click on a message to view and reply'}
+                    {isKinyarwanda ? 'Kanda ku butumwa kugirango ubusome kandi ubusubize' : 'Click on a message to view and reply'}
                   </p>
                 </div>
               )}
@@ -427,7 +427,7 @@ export function CommunicationCenterPage({ language }: CommunicationCenterPagePro
                   <input
                     type="text"
                     className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-[#10b981]"
-                    placeholder={isKinyarwanda ? 'Andika umutwe...' : 'Enter title...'}
+                    placeholder={isKinyarwanda ? 'Andika umutwe w\'itangazo...' : 'Enter title...'}
                   />
                 </div>
 
@@ -438,13 +438,13 @@ export function CommunicationCenterPage({ language }: CommunicationCenterPagePro
                   <textarea
                     className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-[#10b981]"
                     rows={6}
-                    placeholder={isKinyarwanda ? 'Andika ubutumwa bwawe...' : 'Type your message...'}
+                    placeholder={isKinyarwanda ? 'Andika ubutumwa bwawe hano...' : 'Type your message...'}
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    {isKinyarwanda ? 'Abakiriye' : 'Recipients'}
+                    {isKinyarwanda ? 'Abazakira ubutumwa' : 'Recipients'}
                   </label>
                   <select className="w-full border border-gray-300 rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-[#10b981]">
                     <option>{isKinyarwanda ? 'Ishuri ryose' : 'Entire class'}</option>

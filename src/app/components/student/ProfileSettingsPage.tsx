@@ -17,7 +17,7 @@ export function ProfileSettingsPage({ language }: ProfileSettingsPageProps) {
   const isKinyarwanda = language === 'KIN';
 
   const tabs = [
-    { id: 'profile', label: isKinyarwanda ? 'Profile' : 'Profile', icon: User },
+    { id: 'profile', label: isKinyarwanda ? 'Umwirondoro' : 'Profile', icon: User },
     { id: 'settings', label: isKinyarwanda ? 'Igenamiterere' : 'Settings', icon: Shield }
   ];
 
@@ -27,10 +27,10 @@ export function ProfileSettingsPage({ language }: ProfileSettingsPageProps) {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-[#1e293b] mb-2">
-            {isKinyarwanda ? 'Profile & Igenamiterere' : 'Profile & Settings'}
+            {isKinyarwanda ? 'Umwirondoro & Igenamiterere' : 'Profile & Settings'}
           </h1>
           <p className="text-gray-600">
-            {isKinyarwanda ? 'Kugenzura konti yawe n\'amahitamo' : 'Manage your account and preferences'}
+            {isKinyarwanda ? 'Genzura konti yawe n\'ibyo ukunda' : 'Manage your account and preferences'}
           </p>
         </div>
 
@@ -61,7 +61,7 @@ export function ProfileSettingsPage({ language }: ProfileSettingsPageProps) {
             {/* Profile Card */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
               <h2 className="text-xl font-bold text-[#1e293b] mb-6">
-                {isKinyarwanda ? 'Amakuru yawe' : 'Personal Information'}
+                {isKinyarwanda ? 'Amakuru yawe bwite' : 'Personal Information'}
               </h2>
 
               {/* Profile Photo */}
@@ -87,7 +87,7 @@ export function ProfileSettingsPage({ language }: ProfileSettingsPageProps) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    {isKinyarwanda ? 'Izina' : 'Full Name'}
+                    {isKinyarwanda ? 'Amazina yose' : 'Full Name'}
                   </label>
                   <div className="relative">
                     <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -101,7 +101,7 @@ export function ProfileSettingsPage({ language }: ProfileSettingsPageProps) {
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    {isKinyarwanda ? 'Email' : 'Email Address'}
+                    {isKinyarwanda ? 'I-meyili (Email)' : 'Email Address'}
                   </label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -115,7 +115,7 @@ export function ProfileSettingsPage({ language }: ProfileSettingsPageProps) {
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    {isKinyarwanda ? 'Italiki yo kwiyandikisha' : 'Join Date'}
+                    {isKinyarwanda ? 'Itariki winjiriyeho' : 'Join Date'}
                   </label>
                   <div className="relative">
                     <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -130,11 +130,11 @@ export function ProfileSettingsPage({ language }: ProfileSettingsPageProps) {
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    {isKinyarwanda ? 'Bio' : 'Bio'}
+                    {isKinyarwanda ? 'Umwirondoro mugufi' : 'Bio'}
                   </label>
                   <textarea
                     rows={3}
-                    placeholder={isKinyarwanda ? 'Andika ibikuneraho...' : 'Tell us about yourself...'}
+                    placeholder={isKinyarwanda ? 'Tubwire ibigukeraho...' : 'Tell us about yourself...'}
                     className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0ea5e9] resize-none"
                     defaultValue="Learning to code to build amazing apps!"
                   />
@@ -143,7 +143,7 @@ export function ProfileSettingsPage({ language }: ProfileSettingsPageProps) {
 
               <div className="flex justify-end mt-6">
                 <button className="px-6 py-2.5 bg-[#0ea5e9] text-white rounded-lg font-semibold hover:bg-[#0284c7] transition-colors shadow-md">
-                  {isKinyarwanda ? 'Bika Impinduka' : 'Save Changes'}
+                  {isKinyarwanda ? 'Bika impinduka' : 'Save Changes'}
                 </button>
               </div>
             </div>
@@ -151,7 +151,7 @@ export function ProfileSettingsPage({ language }: ProfileSettingsPageProps) {
             {/* Stats Card */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
               <h2 className="text-xl font-bold text-[#1e293b] mb-6">
-                {isKinyarwanda ? 'Imikorere yawe' : 'Your Statistics'}
+                {isKinyarwanda ? 'Imibare yawe (Statistics)' : 'Your Statistics'}
               </h2>
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
@@ -160,7 +160,7 @@ export function ProfileSettingsPage({ language }: ProfileSettingsPageProps) {
                     <Target className="w-8 h-8 text-white" />
                   </div>
                   <div className="text-2xl font-bold text-[#1e293b] mb-1">1,240</div>
-                  <div className="text-sm text-gray-600">{isKinyarwanda ? 'XP Points' : 'XP Points'}</div>
+                  <div className="text-sm text-gray-600">{isKinyarwanda ? 'Amanota (XP)' : 'XP Points'}</div>
                 </div>
 
                 <div className="text-center">
@@ -168,7 +168,7 @@ export function ProfileSettingsPage({ language }: ProfileSettingsPageProps) {
                     <Trophy className="w-8 h-8 text-white" />
                   </div>
                   <div className="text-2xl font-bold text-[#1e293b] mb-1">#42</div>
-                  <div className="text-sm text-gray-600">{isKinyarwanda ? 'Umwanya' : 'Class Rank'}</div>
+                  <div className="text-sm text-gray-600">{isKinyarwanda ? 'Umwanya mu ishuri' : 'Class Rank'}</div>
                 </div>
 
                 <div className="text-center">
@@ -176,7 +176,7 @@ export function ProfileSettingsPage({ language }: ProfileSettingsPageProps) {
                     <Zap className="w-8 h-8 text-white" />
                   </div>
                   <div className="text-2xl font-bold text-[#1e293b] mb-1">5</div>
-                  <div className="text-sm text-gray-600">{isKinyarwanda ? 'Iminsi' : 'Day Streak'}</div>
+                  <div className="text-sm text-gray-600">{isKinyarwanda ? 'Iminsi ukurikirana' : 'Day Streak'}</div>
                 </div>
 
                 <div className="text-center">
@@ -205,7 +205,7 @@ export function ProfileSettingsPage({ language }: ProfileSettingsPageProps) {
                     {isKinyarwanda ? 'Ururimi' : 'Language'}
                   </h2>
                   <p className="text-sm text-gray-600">
-                    {isKinyarwanda ? 'Hitamo ururimi rw\'ikibanza' : 'Choose your preferred language'}
+                    {isKinyarwanda ? 'Hitamo ururimi ukunda gukoresha' : 'Choose your preferred language'}
                   </p>
                 </div>
               </div>
@@ -241,10 +241,10 @@ export function ProfileSettingsPage({ language }: ProfileSettingsPageProps) {
                 </div>
                 <div>
                   <h2 className="text-xl font-bold text-[#1e293b]">
-                    {isKinyarwanda ? 'Imenyesha' : 'Notifications'}
+                    {isKinyarwanda ? 'Imenyesha (Notifications)' : 'Notifications'}
                   </h2>
                   <p className="text-sm text-gray-600">
-                    {isKinyarwanda ? 'Kugenzura imenyesha yakira' : 'Control what notifications you receive'}
+                    {isKinyarwanda ? 'Hitamo imenyesha ushaka kwakira' : 'Control what notifications you receive'}
                   </p>
                 </div>
               </div>
@@ -253,23 +253,23 @@ export function ProfileSettingsPage({ language }: ProfileSettingsPageProps) {
                 {[
                   {
                     key: 'assignmentReminders',
-                    title: isKinyarwanda ? 'Ibutsa ry\'imishinga' : 'Assignment Reminders',
-                    description: isKinyarwanda ? 'Menyeshwa igihe imishinga igeze hafi yo kurangira' : 'Get notified when assignments are due soon'
+                    title: isKinyarwanda ? 'Ikwibutsa ry’imikoro' : 'Assignment Reminders',
+                    description: isKinyarwanda ? 'Menyeshwa igihe imikoro yenda kurangira' : 'Get notified when assignments are due soon'
                   },
                   {
                     key: 'teacherMessages',
-                    title: isKinyarwanda ? 'Ubutumwa bw\'umwarimu' : 'Teacher Messages',
-                    description: isKinyarwanda ? 'Menyeshwa iyo umwarimu yakohereje ubutumwa' : 'Receive messages from your teacher'
+                    title: isKinyarwanda ? 'Ubutumwa bw’umwarimu' : 'Teacher Messages',
+                    description: isKinyarwanda ? 'Yakira ubutumwa bw\'umwarimu wawe' : 'Receive messages from your teacher'
                   },
                   {
                     key: 'achievements',
                     title: isKinyarwanda ? 'Ibihembo' : 'Achievements',
-                    description: isKinyarwanda ? 'Menyeshwa iyo wabonye igihembo gishya' : 'Get notified when you earn new badges'
+                    description: isKinyarwanda ? 'Menyeshwa iyo watsindiye ibihembo bishya' : 'Get notified when you earn new badges'
                   },
                   {
                     key: 'weeklyReports',
-                    title: isKinyarwanda ? 'Raporo z\'icyumweru' : 'Weekly Reports',
-                    description: isKinyarwanda ? 'Akabonera k\'iterambere ryawe' : 'Weekly summary of your progress'
+                    title: isKinyarwanda ? 'Raporo z’icyumweru' : 'Weekly Reports',
+                    description: isKinyarwanda ? 'Inshamake y\'iterambere ryawe ry’icyumweru' : 'Weekly summary of your progress'
                   }
                 ].map((setting) => (
                   <div key={setting.key} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
@@ -305,7 +305,7 @@ export function ProfileSettingsPage({ language }: ProfileSettingsPageProps) {
                     {isKinyarwanda ? 'Umutekano' : 'Security'}
                   </h2>
                   <p className="text-sm text-gray-600">
-                    {isKinyarwanda ? 'Kugenzura konti yawe' : 'Manage your account security'}
+                    {isKinyarwanda ? 'Genzura umutekano wa konti yawe' : 'Manage your account security'}
                   </p>
                 </div>
               </div>
@@ -317,7 +317,7 @@ export function ProfileSettingsPage({ language }: ProfileSettingsPageProps) {
                       {isKinyarwanda ? 'Hindura ijambo ry\'ibanga' : 'Change Password'}
                     </div>
                     <div className="text-sm text-gray-600">
-                      {isKinyarwanda ? 'Kurinda konti yawe' : 'Keep your account secure'}
+                      {isKinyarwanda ? 'Rinda konti yawe' : 'Keep your account secure'}
                     </div>
                   </div>
                   <div className="text-[#0ea5e9] font-semibold">→</div>
@@ -326,10 +326,10 @@ export function ProfileSettingsPage({ language }: ProfileSettingsPageProps) {
                 <button className="w-full flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:border-[#0ea5e9] transition-colors text-left">
                   <div>
                     <div className="font-semibold text-[#1e293b] mb-1">
-                      {isKinyarwanda ? 'Ibikorwa by\'konti' : 'Account Activity'}
+                      {isKinyarwanda ? 'Ibikorwa kuri konti' : 'Account Activity'}
                     </div>
                     <div className="text-sm text-gray-600">
-                      {isKinyarwanda ? 'Reba aho ukoresheje konti' : 'View recent login activity'}
+                      {isKinyarwanda ? 'Reba inshuro uheruka kwinjiriraho' : 'View recent login activity'}
                     </div>
                   </div>
                   <div className="text-[#0ea5e9] font-semibold">→</div>

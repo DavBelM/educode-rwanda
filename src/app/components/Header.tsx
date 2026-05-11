@@ -15,7 +15,7 @@ interface HeaderProps {
 
 export function Header({ language, onLanguageToggle, subtitle, hideAssignmentInfo = false, showWorkspaceActions = false, onBack, announcementCount, onAnnouncementsClick }: HeaderProps) {
   const isKinyarwanda = language === 'KIN';
-  const defaultSubtitle = subtitle || (isKinyarwanda ? 'Ikibanza cyo gutoza kode' : 'Student Coding Workspace');
+  const defaultSubtitle = subtitle || (isKinyarwanda ? 'Workspace yo kwandikiramo code' : 'Student Coding Workspace');
   const { profile, signOut } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -65,11 +65,11 @@ export function Header({ language, onLanguageToggle, subtitle, hideAssignmentInf
         <div className="hidden md:flex items-center gap-4">
           <div className="flex flex-col items-end">
             <span className="text-sm font-medium" style={{ fontFamily: 'Inter, sans-serif', color: '#f1f5f9' }}>
-              {isKinyarwanda ? 'Umushinga: Kubara Igiciro Cyose' : 'Assignment: Calculate Total Price'}
+              {isKinyarwanda ? 'Umukoro: Kubara igiciro cyose hamwe' : 'Assignment: Calculate Total Price'}
             </span>
             <div className="flex items-center gap-2 mt-1">
               <div className="px-2 py-0.5 rounded text-xs font-medium" style={{ background: 'rgba(0,212,170,0.15)', color: '#00d4aa', border: '1px solid rgba(0,212,170,0.25)' }}>
-                3/5 {isKinyarwanda ? 'Ibizamini byatsinze' : 'Tests Passed'}
+                3/5 {isKinyarwanda ? 'Amagerageza yatsinzwe' : 'Tests Passed'}
               </div>
             </div>
           </div>

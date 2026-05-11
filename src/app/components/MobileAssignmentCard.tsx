@@ -21,7 +21,7 @@ export function MobileAssignmentCard({ language }: MobileAssignmentCardProps) {
           </h3>
           <div className="flex items-center gap-2">
             <span className="px-2 py-0.5 rounded text-xs font-medium bg-[#10b981] text-white flex items-center gap-1">
-              3/5 {isKinyarwanda ? 'Byatsinze' : 'Tests Passed'} ✓
+              3/5 {isKinyarwanda ? 'Amagerageza yatsinzwe' : 'Tests Passed'} ✓
             </span>
           </div>
         </div>
@@ -42,14 +42,14 @@ export function MobileAssignmentCard({ language }: MobileAssignmentCardProps) {
             </p>
             <p className="text-sm text-gray-600" style={{ fontFamily: 'Inter, sans-serif' }}>
               {isKinyarwanda
-                ? 'Koresha variables kugirango ubaze igiciro cyose cy\'ibicuruzwa'
+                ? 'Koresha variables ubare igiciro cyose cy\'ibicuruzwa'
                 : 'Use variables to calculate the total price of products'}
             </p>
           </div>
 
           <div>
             <p className="text-sm font-medium text-gray-700 mb-2" style={{ fontFamily: 'Inter, sans-serif' }}>
-              {isKinyarwanda ? 'Ibizamini:' : 'Tests:'}
+              {isKinyarwanda ? 'Amagerageza:' : 'Tests:'}
             </p>
             <div className="space-y-1.5">
               <div className="flex items-center gap-2 text-xs">
@@ -65,7 +65,7 @@ export function MobileAssignmentCard({ language }: MobileAssignmentCardProps) {
                   <span className="text-white text-[10px]">✓</span>
                 </div>
                 <span className="text-gray-600" style={{ fontFamily: 'Inter, sans-serif' }}>
-                  {isKinyarwanda ? 'Kubara igiciro' : 'Calculate total'}
+                  {isKinyarwanda ? 'Kubara igiciro cyose' : 'Calculate total'}
                 </span>
               </div>
               <div className="flex items-center gap-2 text-xs">
@@ -81,7 +81,7 @@ export function MobileAssignmentCard({ language }: MobileAssignmentCardProps) {
                   <span className="text-gray-500 text-[10px]">○</span>
                 </div>
                 <span className="text-gray-400" style={{ fontFamily: 'Inter, sans-serif' }}>
-                  {isKinyarwanda ? 'Gukoresha input validation' : 'Add input validation'}
+                  {isKinyarwanda ? 'Genzura niba ibyinjijwe ari byo' : 'Add input validation'}
                 </span>
               </div>
               <div className="flex items-center gap-2 text-xs">
@@ -89,7 +89,7 @@ export function MobileAssignmentCard({ language }: MobileAssignmentCardProps) {
                   <span className="text-gray-500 text-[10px]">○</span>
                 </div>
                 <span className="text-gray-400" style={{ fontFamily: 'Inter, sans-serif' }}>
-                  {isKinyarwanda ? 'Kugabanya igiciro' : 'Apply discount'}
+                  {isKinyarwanda ? 'Gukuraho igabanyirizwa' : 'Apply discount'}
                 </span>
               </div>
             </div>
@@ -98,7 +98,7 @@ export function MobileAssignmentCard({ language }: MobileAssignmentCardProps) {
           <div className="pt-2">
             <p className="text-xs text-gray-500" style={{ fontFamily: 'Inter, sans-serif' }}>
               {isKinyarwanda
-                ? '⏱️ Igihe gisigaye: 45 iminota'
+                ? '⏱️ Igihe gisigaye: Iminota 45'
                 : '⏱️ Time remaining: 45 minutes'}
             </p>
           </div>

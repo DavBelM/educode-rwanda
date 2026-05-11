@@ -28,7 +28,7 @@ export function OutputConsole({ output, previewSrc, isRunning, language }: Outpu
           }}
         >
           <Terminal size={14} />
-          {isKinyarwanda ? 'Ibyavuye' : 'Console'}
+          {isKinyarwanda ? 'Konsole (Console)' : 'Console'}
         </button>
         <button
           onClick={() => setTab('preview')}
@@ -47,7 +47,7 @@ export function OutputConsole({ output, previewSrc, isRunning, language }: Outpu
           <div className="w-2 h-2 rounded-full" style={{ backgroundColor: isRunning ? '#10b981' : '#334155' }} />
           {isRunning && (
             <span className="text-xs" style={{ fontFamily: 'Inter, sans-serif', color: '#475569' }}>
-              {isKinyarwanda ? 'Irakora...' : 'Running...'}
+              {isKinyarwanda ? 'Biratangira...' : 'Running...'}
             </span>
           )}
         </div>
@@ -61,7 +61,7 @@ export function OutputConsole({ output, previewSrc, isRunning, language }: Outpu
               <div className="flex items-center gap-2">
                 <span className="animate-spin text-2xl">⏳</span>
                 <p className="font-medium" style={{ fontFamily: 'Inter, sans-serif', color: '#94a3b8' }}>
-                  {isKinyarwanda ? 'Kode yawe irakora...' : 'Running your code...'}
+                  {isKinyarwanda ? 'Code yawe irimo gukora...' : 'Running your code...'}
                 </p>
               </div>
               <div className="flex gap-2">
@@ -81,7 +81,7 @@ export function OutputConsole({ output, previewSrc, isRunning, language }: Outpu
             <div className="flex items-center justify-center h-full">
               <p className="text-center text-sm" style={{ fontFamily: 'Inter, sans-serif', color: '#334155' }}>
                 {isKinyarwanda
-                  ? 'Nta byavuye. Kurura kode yawe hanyuma urebe ibyavuye hano.'
+                  ? 'Nta gisubizo kirahoneka. Tangiza code yawe ubone ibisubizo hano.'
                   : 'No output yet. Run your code to see results here.'}
               </p>
             </div>
@@ -103,7 +103,7 @@ export function OutputConsole({ output, previewSrc, isRunning, language }: Outpu
             <div className="flex items-center justify-center h-full">
               <p className="text-center text-sm" style={{ fontFamily: 'Inter, sans-serif', color: '#334155' }}>
                 {isKinyarwanda
-                  ? 'Kurura kode yawe kugirango urebe preview.'
+                  ? 'Tangiza code yawe ubone uko bimeze hano.'
                   : 'Run your code to see the preview here.'}
               </p>
             </div>

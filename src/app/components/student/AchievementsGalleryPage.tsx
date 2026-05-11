@@ -25,38 +25,38 @@ export function AchievementsGalleryPage({ language }: AchievementsGalleryPagePro
   const badges: Badge[] = [
     {
       id: '1',
-      name: isKinyarwanda ? 'Umushinga wa mbere' : 'First Assignment',
-      description: isKinyarwanda ? 'Rangiza umushinga wawe wa mbere' : 'Complete your first assignment',
+      name: isKinyarwanda ? 'Umukoro wa mbere' : 'First Assignment',
+      description: isKinyarwanda ? 'Rangiza umukoro wawe wa mbere' : 'Complete your first assignment',
       icon: 'award',
       earned: true,
-      earnedDate: isKinyarwanda ? 'Werurwe 25, 2026' : 'March 25, 2026',
+      earnedDate: isKinyarwanda ? '25 Werurwe 2026' : 'March 25, 2026',
       category: 'milestones',
       rarity: 'common'
     },
     {
       id: '2',
-      name: isKinyarwanda ? 'Iminsi 5' : '5-Day Streak',
-      description: isKinyarwanda ? 'Kora kode iminsi 5 ikurikirana' : 'Code for 5 days in a row',
+      name: isKinyarwanda ? 'Iminsi 5 ukurikirana' : '5-Day Streak',
+      description: isKinyarwanda ? 'Wanditse code iminsi 5 ikurikirana' : 'Code for 5 days in a row',
       icon: 'flame',
       earned: true,
-      earnedDate: isKinyarwanda ? 'Werurwe 30, 2026' : 'March 30, 2026',
+      earnedDate: isKinyarwanda ? '30 Werurwe 2026' : 'March 30, 2026',
       category: 'streaks',
       rarity: 'common'
     },
     {
       id: '3',
-      name: isKinyarwanda ? 'Ibizamini 10' : '10 Tests Passed',
-      description: isKinyarwanda ? 'Gutsinda ibizamini 10' : 'Pass 10 tests successfully',
+      name: isKinyarwanda ? 'Amagerageza 10 yatsinzwe' : '10 Tests Passed',
+      description: isKinyarwanda ? 'Tsinda amagerageza 10 neza' : 'Pass 10 tests successfully',
       icon: 'check',
       earned: true,
-      earnedDate: isKinyarwanda ? 'Ukwakira 2, 2026' : 'April 2, 2026',
+      earnedDate: isKinyarwanda ? '2 Mata 2026' : 'April 2, 2026',
       category: 'learning',
       rarity: 'common'
     },
     {
       id: '4',
-      name: isKinyarwanda ? 'Iminsi 10' : '10-Day Streak',
-      description: isKinyarwanda ? 'Kora kode iminsi 10 ikurikirana' : 'Code for 10 days in a row',
+      name: isKinyarwanda ? 'Iminsi 10 ukurikirana' : '10-Day Streak',
+      description: isKinyarwanda ? 'Wanditse code iminsi 10 ikurikirana' : 'Code for 10 days in a row',
       icon: 'flame',
       earned: false,
       category: 'streaks',
@@ -66,8 +66,8 @@ export function AchievementsGalleryPage({ language }: AchievementsGalleryPagePro
     },
     {
       id: '5',
-      name: isKinyarwanda ? 'Umushinga 5' : '5 Assignments',
-      description: isKinyarwanda ? 'Rangiza imishinga 5' : 'Complete 5 assignments',
+      name: isKinyarwanda ? 'Imikoro 5' : '5 Assignments',
+      description: isKinyarwanda ? 'Rangiza imikoro 5' : 'Complete 5 assignments',
       icon: 'target',
       earned: false,
       category: 'milestones',
@@ -77,8 +77,8 @@ export function AchievementsGalleryPage({ language }: AchievementsGalleryPagePro
     },
     {
       id: '6',
-      name: isKinyarwanda ? 'Impande zose 100%' : 'Perfect Score',
-      description: isKinyarwanda ? 'Gutsinda ibizamini byose ku mushinga' : 'Pass all tests on an assignment',
+      name: isKinyarwanda ? 'Amanota yose' : 'Perfect Score',
+      description: isKinyarwanda ? 'Tsinda amagerageza yose ku mukoro' : 'Pass all tests on an assignment',
       icon: 'star',
       earned: false,
       category: 'learning',
@@ -88,8 +88,8 @@ export function AchievementsGalleryPage({ language }: AchievementsGalleryPagePro
     },
     {
       id: '7',
-      name: isKinyarwanda ? 'Vuba Cyane' : 'Speed Demon',
-      description: isKinyarwanda ? 'Rangiza umushinga mu minota 30' : 'Complete an assignment in under 30 minutes',
+      name: isKinyarwanda ? 'Umunyamuvuduko' : 'Speed Demon',
+      description: isKinyarwanda ? 'Rangiza umukoro mu minota itageze kuri 30' : 'Complete an assignment in under 30 minutes',
       icon: 'zap',
       earned: false,
       category: 'special',
@@ -97,7 +97,7 @@ export function AchievementsGalleryPage({ language }: AchievementsGalleryPagePro
     },
     {
       id: '8',
-      name: isKinyarwanda ? 'Umunyeshuri w\'icyuma' : 'Scholar',
+      name: isKinyarwanda ? 'Umunyabwenge' : 'Scholar',
       description: isKinyarwanda ? 'Rangiza amasomo 10' : 'Complete 10 lessons',
       icon: 'book',
       earned: false,
@@ -108,8 +108,8 @@ export function AchievementsGalleryPage({ language }: AchievementsGalleryPagePro
     },
     {
       id: '9',
-      name: isKinyarwanda ? 'Umufasha' : 'Team Player',
-      description: isKinyarwanda ? 'Fasha abandi 5' : 'Help 5 classmates',
+      name: isKinyarwanda ? 'Gukorera hamwe' : 'Team Player',
+      description: isKinyarwanda ? 'Fasha bagenzi bawe 5' : 'Help 5 classmates',
       icon: 'users',
       earned: false,
       category: 'special',
@@ -117,8 +117,8 @@ export function AchievementsGalleryPage({ language }: AchievementsGalleryPagePro
     },
     {
       id: '10',
-      name: isKinyarwanda ? 'Iminsi 30' : '30-Day Streak',
-      description: isKinyarwanda ? 'Kora kode iminsi 30 ikurikirana' : 'Code for 30 days in a row',
+      name: isKinyarwanda ? 'Iminsi 30 ukurikirana' : '30-Day Streak',
+      description: isKinyarwanda ? 'Wanditse code iminsi 30 ikurikirana' : 'Code for 30 days in a row',
       icon: 'flame',
       earned: false,
       category: 'streaks',
@@ -128,8 +128,8 @@ export function AchievementsGalleryPage({ language }: AchievementsGalleryPagePro
     },
     {
       id: '11',
-      name: isKinyarwanda ? 'Igikombe' : 'Champion',
-      description: isKinyarwanda ? 'Rangiza imishinga 15' : 'Complete 15 assignments',
+      name: isKinyarwanda ? 'Intwari' : 'Champion',
+      description: isKinyarwanda ? 'Rangiza imikoro 15' : 'Complete 15 assignments',
       icon: 'trophy',
       earned: false,
       category: 'milestones',
@@ -139,8 +139,8 @@ export function AchievementsGalleryPage({ language }: AchievementsGalleryPagePro
     },
     {
       id: '12',
-      name: isKinyarwanda ? 'Umwami w\'amakode' : 'Code Master',
-      description: isKinyarwanda ? 'Rangiza ibice byose byiza' : 'Complete all modules with excellence',
+      name: isKinyarwanda ? 'Inzobere muri Code' : 'Code Master',
+      description: isKinyarwanda ? 'Rangiza ibice byose neza cyane' : 'Complete all modules with excellence',
       icon: 'crown',
       earned: false,
       category: 'special',
@@ -203,9 +203,9 @@ export function AchievementsGalleryPage({ language }: AchievementsGalleryPagePro
   const categories = [
     { id: 'all', label: isKinyarwanda ? 'Byose' : 'All', count: badges.length },
     { id: 'learning', label: isKinyarwanda ? 'Kwiga' : 'Learning', count: badges.filter(b => b.category === 'learning').length },
-    { id: 'streaks', label: isKinyarwanda ? 'Iminsi' : 'Streaks', count: badges.filter(b => b.category === 'streaks').length },
-    { id: 'milestones', label: isKinyarwanda ? 'Intego' : 'Milestones', count: badges.filter(b => b.category === 'milestones').length },
-    { id: 'special', label: isKinyarwanda ? 'Idasanzwe' : 'Special', count: badges.filter(b => b.category === 'special').length }
+    { id: 'streaks', label: isKinyarwanda ? 'Iminsi ukurikirana' : 'Streaks', count: badges.filter(b => b.category === 'streaks').length },
+    { id: 'milestones', label: isKinyarwanda ? 'Intambwe zagezweho' : 'Milestones', count: badges.filter(b => b.category === 'milestones').length },
+    { id: 'special', label: isKinyarwanda ? 'Ibidasanzwe' : 'Special', count: badges.filter(b => b.category === 'special').length }
   ];
 
   return (
@@ -214,10 +214,10 @@ export function AchievementsGalleryPage({ language }: AchievementsGalleryPagePro
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-[#1e293b] mb-2">
-            {isKinyarwanda ? 'Ibihembo / Achievements' : 'Achievements Gallery'}
+            {isKinyarwanda ? 'Inzu y’Ibihembo' : 'Achievements Gallery'}
           </h1>
           <p className="text-gray-600">
-            {isKinyarwanda ? 'Reba ibihembo byawe n\'ibisigaye' : 'View your earned badges and unlock new ones'}
+            {isKinyarwanda ? 'Reba ibihembo watsindiye unakore ibishya' : 'View your earned badges and unlock new ones'}
           </p>
         </div>
 
@@ -226,15 +226,15 @@ export function AchievementsGalleryPage({ language }: AchievementsGalleryPagePro
           <div className="flex items-center justify-between mb-6">
             <div>
               <h2 className="text-2xl font-bold mb-2">
-                {isKinyarwanda ? 'Aho Ugeze' : 'Your Progress'}
+                {isKinyarwanda ? 'Iterambere ryawe' : 'Your Progress'}
               </h2>
               <p className="text-blue-100">
-                {earnedBadges} {isKinyarwanda ? 'ku' : 'of'} {totalBadges} {isKinyarwanda ? 'ibihembo byabonwe' : 'badges earned'}
+                {earnedBadges} {isKinyarwanda ? 'kuri' : 'of'} {totalBadges} {isKinyarwanda ? 'ibihembo watsindiye' : 'badges earned'}
               </p>
             </div>
             <div className="text-right">
               <div className="text-5xl font-bold mb-1">{completionPercentage}%</div>
-              <p className="text-blue-100">{isKinyarwanda ? 'Byuzuye' : 'Complete'}</p>
+              <p className="text-blue-100">{isKinyarwanda ? 'Byarangiye' : 'Complete'}</p>
             </div>
           </div>
           <div className="w-full bg-white/20 rounded-full h-4">
@@ -333,7 +333,7 @@ export function AchievementsGalleryPage({ language }: AchievementsGalleryPagePro
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
             <Award className="w-16 h-16 text-gray-300 mx-auto mb-4" />
             <h3 className="text-xl font-bold text-gray-700 mb-2">
-              {isKinyarwanda ? 'Nta bihembo byabonwe muri iki gice' : 'No badges in this category'}
+              {isKinyarwanda ? 'Nta bihembo bihari muri iki gice' : 'No badges in this category'}
             </h3>
             <p className="text-gray-500">
               {isKinyarwanda ? 'Gerageza guhitamo ikindi gice' : 'Try selecting a different category'}

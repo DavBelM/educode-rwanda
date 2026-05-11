@@ -28,10 +28,10 @@ export function HeroBanner({ language, studentName }: HeroBannerProps) {
           <div className="inline-flex items-center gap-2 mb-3 px-3 py-1 rounded-full text-xs font-semibold"
             style={{ background: 'rgba(0,212,170,0.12)', color: '#00d4aa', border: '1px solid rgba(0,212,170,0.2)' }}>
             <span className="w-1.5 h-1.5 rounded-full bg-[#00d4aa]" />
-            {isKinyarwanda ? 'Murakaza neza' : 'Welcome back'}
+            {isKinyarwanda ? 'Ikaze nanone' : 'Welcome back'}
           </div>
           <h1 className="text-3xl md:text-4xl font-bold mb-2" style={{ fontFamily: 'Inter, sans-serif', color: '#f1f5f9' }}>
-            {isKinyarwanda ? `Mwaramutse, ${studentName}!` : `Hello, ${studentName}!`}
+            {isKinyarwanda ? `Muraho, ${studentName}!` : `Hello, ${studentName}!`}
           </h1>
           <p className="text-base" style={{ fontFamily: 'Inter, sans-serif', color: '#94a3b8' }}>
             {isKinyarwanda ? 'Komeza kwiga — urakora neza' : 'Keep learning — you\'re doing great'}

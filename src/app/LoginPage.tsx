@@ -22,7 +22,7 @@ export default function LoginPage({ onSuccess, onSignupClick, onForgotPassword }
 
     if (error) {
       setError(isKinyarwanda
-        ? 'Email cyangwa ijambo ryibanga ntibikora'
+        ? 'I-meyili cyangwa ijambo ry\'ibanga ntibibonye'
         : 'Email or password is incorrect'
       );
       setLoading(false);
@@ -119,7 +119,7 @@ export default function LoginPage({ onSuccess, onSignupClick, onForgotPassword }
 
           {/* Heading */}
           <h1 className="text-3xl font-bold mb-2" style={{ color: '#f1f5f9', letterSpacing: '-0.01em' }}>
-            {isKinyarwanda ? 'Mwaramutse! Murakaza Neza' : 'Welcome Back'}
+            {isKinyarwanda ? 'Ikaze nanone' : 'Welcome Back'}
           </h1>
           <p className="mb-8 text-sm" style={{ color: '#64748b' }}>
             {isKinyarwanda ? 'Injira kugirango ukomeze kwiga' : 'Log in to continue learning'}
@@ -131,7 +131,7 @@ export default function LoginPage({ onSuccess, onSignupClick, onForgotPassword }
             {/* Email */}
             <div>
               <label className="block text-sm font-semibold mb-2" style={{ color: '#94a3b8' }}>
-                {isKinyarwanda ? 'Email' : 'Email'}
+                {isKinyarwanda ? 'I-meyili (Email)' : 'Email'}
               </label>
               <div className="relative">
                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: '#475569' }} />
@@ -156,7 +156,7 @@ export default function LoginPage({ onSuccess, onSignupClick, onForgotPassword }
             {/* Password */}
             <div>
               <label className="block text-sm font-semibold mb-2" style={{ color: '#94a3b8' }}>
-                {isKinyarwanda ? 'Ijambo ryibanga' : 'Password'}
+                {isKinyarwanda ? 'Ijambo ry\'ibanga' : 'Password'}
               </label>
               <div className="relative">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: '#475569' }} />
@@ -256,7 +256,7 @@ export default function LoginPage({ onSuccess, onSignupClick, onForgotPassword }
             <Lock className="w-3 h-3" />
             <span>
               {isKinyarwanda
-                ? 'Amakuru yawe arafite umutekano kandi yasobanuwe'
+                ? 'Amakuru yawe ararinzwe kandi afite umutekano'
                 : 'Your data is secure and encrypted'}
             </span>
           </div>

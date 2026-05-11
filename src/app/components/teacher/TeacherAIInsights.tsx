@@ -40,7 +40,7 @@ export function TeacherAIInsights({ language, classStruggle, studentAlerts, posi
         {isKinyarwanda ? 'Ibisobanuro by\'AI' : 'AI Insights'}
       </h2>
       <p className="text-sm opacity-90 mb-6 text-center" style={{ fontFamily: 'Inter, sans-serif' }}>
-        {isKinyarwanda ? 'Ubufasha bwihariye' : 'Powered insights for your class'}
+        {isKinyarwanda ? 'Inama zifashijwe na AI ku bw\'ishuri ryawe' : 'Powered insights for your class'}
       </p>
 
       {/* Class Struggles */}
@@ -49,12 +49,12 @@ export function TeacherAIInsights({ language, classStruggle, studentAlerts, posi
           <div className="flex items-center gap-2 mb-3">
             <AlertTriangle size={18} />
             <h3 className="font-bold text-sm" style={{ fontFamily: 'Inter, sans-serif' }}>
-              {isKinyarwanda ? 'Ibibazo by\'Ishuri' : 'Class Struggles'}
+              {isKinyarwanda ? 'Imbogamizi z\'ishuri' : 'Class Struggles'}
             </h3>
           </div>
           <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 mb-3">
             <p className="font-semibold mb-2" style={{ fontFamily: 'Inter, sans-serif' }}>
-              {classStruggle.percentage}% {isKinyarwanda ? 'of students struggling with' : 'of students struggling with'} {classStruggle.concept}
+              {classStruggle.percentage}% {isKinyarwanda ? 'by\'abanyeshuri bafite ikibazo kuri' : 'of students struggling with'} {classStruggle.concept}
             </p>
             <p className="text-sm opacity-90 mb-3" style={{ fontFamily: 'Inter, sans-serif' }}>
               <Lightbulb size={14} className="inline mr-1" />
@@ -64,7 +64,7 @@ export function TeacherAIInsights({ language, classStruggle, studentAlerts, posi
               className="w-full py-2 px-4 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-lg font-semibold transition-all text-sm"
               style={{ fontFamily: 'Inter, sans-serif' }}
             >
-              {isKinyarwanda ? 'Kora Umushinga' : 'Create Targeted Assignment'}
+              {isKinyarwanda ? 'Tanga umukoro wihariye' : 'Create Targeted Assignment'}
             </button>
           </div>
         </div>
@@ -76,7 +76,7 @@ export function TeacherAIInsights({ language, classStruggle, studentAlerts, posi
           <div className="flex items-center gap-2 mb-3">
             <AlertTriangle size={18} />
             <h3 className="font-bold text-sm" style={{ fontFamily: 'Inter, sans-serif' }}>
-              {isKinyarwanda ? 'Abanyeshuri Bakeneye Ubufasha' : 'Individual Alerts'}
+              {isKinyarwanda ? 'Imenyesha kuri buri munyeshuri' : 'Individual Alerts'}
             </h3>
           </div>
           <div className="space-y-3">
@@ -99,7 +99,7 @@ export function TeacherAIInsights({ language, classStruggle, studentAlerts, posi
             className="w-full mt-3 py-2 px-4 border-2 border-white/30 hover:bg-white/20 backdrop-blur-sm rounded-lg font-semibold transition-all text-sm"
             style={{ fontFamily: 'Inter, sans-serif' }}
           >
-            {isKinyarwanda ? 'Vugana na Abanyeshuri' : 'Contact Students'}
+            {isKinyarwanda ? 'Vugana n\'abanyeshuri' : 'Contact Students'}
           </button>
         </div>
       )}
@@ -110,7 +110,7 @@ export function TeacherAIInsights({ language, classStruggle, studentAlerts, posi
           <div className="flex items-center gap-2 mb-3">
             <Star size={18} />
             <h3 className="font-bold text-sm" style={{ fontFamily: 'Inter, sans-serif' }}>
-              {isKinyarwanda ? 'Amakuru Meza' : 'Positive Insights'}
+              {isKinyarwanda ? 'Ibintu bitanga icyizere' : 'Positive Insights'}
             </h3>
           </div>
           <div className="space-y-2">
@@ -130,7 +130,7 @@ export function TeacherAIInsights({ language, classStruggle, studentAlerts, posi
           className="w-full text-center font-semibold hover:underline text-sm"
           style={{ fontFamily: 'Inter, sans-serif' }}
         >
-          {isKinyarwanda ? 'Reba Ibisobanuro Byose' : 'View Detailed Analytics'}
+          {isKinyarwanda ? 'Reba isesengura rirambuye' : 'View Detailed Analytics'}
         </button>
       </div>
     </div>

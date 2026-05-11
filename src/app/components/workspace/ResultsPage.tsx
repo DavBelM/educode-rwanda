@@ -47,7 +47,7 @@ export function ResultsPage({
                 {assignmentTitle}
               </h1>
               <p className="text-sm text-gray-500" style={{ fontFamily: 'Inter, sans-serif' }}>
-                {isKinyarwanda ? 'Watanzwe ku' : 'Submitted on'} {submissionDate}
+                {isKinyarwanda ? 'Watanzwe ku itariki ya' : 'Submitted on'} {submissionDate}
               </p>
             </div>
             <button
@@ -56,7 +56,7 @@ export function ResultsPage({
               style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600 }}
             >
               <Download size={16} />
-              <span className="hidden sm:inline">{isKinyarwanda ? 'Kuramo Raporo' : 'Download Report'}</span>
+              <span className="hidden sm:inline">{isKinyarwanda ? 'Kuramo raporo' : 'Download Report'}</span>
             </button>
           </div>
         </div>
@@ -83,7 +83,7 @@ export function ResultsPage({
                   {passedTests}/{totalTests}
                 </p>
                 <p className="text-sm opacity-90" style={{ fontFamily: 'Inter, sans-serif' }}>
-                  {isKinyarwanda ? 'Ibizamini' : 'Tests Passed'}
+                  {isKinyarwanda ? 'Amagerageza yatsinzwe' : 'Tests Passed'}
                 </p>
               </div>
               {grade >= 80 && (
@@ -96,7 +96,7 @@ export function ResultsPage({
         {/* Test Results */}
         <div className="bg-white rounded-xl shadow-xl border border-gray-100 p-6">
           <h2 className="text-xl font-bold text-[#1e293b] mb-6" style={{ fontFamily: 'Inter, sans-serif' }}>
-            {isKinyarwanda ? 'Ibisubizo by\'Ibizamini' : 'Test Results'}
+            {isKinyarwanda ? 'Ibisubizo by\'amagerageza' : 'Test Results'}
           </h2>
           <div className="space-y-4">
             {testResults.map((test) => (
@@ -120,7 +120,7 @@ export function ResultsPage({
                     {test.input && (
                       <div className="mb-2">
                         <p className="text-xs text-gray-500 mb-1" style={{ fontFamily: 'Inter, sans-serif' }}>
-                          {isKinyarwanda ? 'Icyinjiye' : 'Input'}:
+                          {isKinyarwanda ? 'Icyinjijwe (Input)' : 'Input'}:
                         </p>
                         <code className="text-sm bg-gray-100 px-2 py-1 rounded" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
                           {test.input}
@@ -133,7 +133,7 @@ export function ResultsPage({
                         {test.expectedOutput && (
                           <div className="mb-2">
                             <p className="text-xs text-gray-500 mb-1" style={{ fontFamily: 'Inter, sans-serif' }}>
-                              {isKinyarwanda ? 'Icyari giteganijwe' : 'Expected Output'}:
+                              {isKinyarwanda ? 'Icyari giteganijwe (Expected Output)' : 'Expected Output'}:
                             </p>
                             <code className="text-sm bg-gray-100 px-2 py-1 rounded" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
                               {test.expectedOutput}
@@ -143,7 +143,7 @@ export function ResultsPage({
                         {test.actualOutput && (
                           <div className="mb-2">
                             <p className="text-xs text-gray-500 mb-1" style={{ fontFamily: 'Inter, sans-serif' }}>
-                              {isKinyarwanda ? 'Icyavuye' : 'Your Output'}:
+                              {isKinyarwanda ? 'Icyavuye muri code yawe (Your Output)' : 'Your Output'}:
                             </p>
                             <code className="text-sm bg-gray-100 px-2 py-1 rounded" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
                               {test.actualOutput}
@@ -171,7 +171,7 @@ export function ResultsPage({
               <Code size={24} />
             </div>
             <h2 className="text-xl font-bold" style={{ fontFamily: 'Inter, sans-serif' }}>
-              {isKinyarwanda ? 'Ibisobanuro by\'AI' : 'AI Feedback'}
+              {isKinyarwanda ? 'Ibisobanuro bya AI' : 'AI Feedback'}
             </h2>
           </div>
           <div className="space-y-3">
@@ -193,13 +193,13 @@ export function ResultsPage({
             style={{ fontFamily: 'Inter, sans-serif' }}
           >
             <Edit size={18} />
-            <span>{isKinyarwanda ? 'Hindura Kode Yawe' : 'Revise Your Code'}</span>
+            <span>{isKinyarwanda ? 'Hindura code yawe' : 'Revise Your Code'}</span>
           </button>
           <button
             className="px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all font-semibold"
             style={{ fontFamily: 'Inter, sans-serif' }}
           >
-            {isKinyarwanda ? 'Subira ku Mishinga' : 'Back to Assignments'}
+            {isKinyarwanda ? 'Garuka ku rutonde rw\'imikoro' : 'Back to Assignments'}
           </button>
         </div>
       </div>

@@ -35,7 +35,7 @@ export default function AboutPage() {
                 </button>
               </div>
               <a href="#" className="text-gray-700 hover:text-[#0ea5e9] font-medium">
-                {isKinyarwanda ? 'Injira' : 'Login'}
+                {isKinyarwanda ? 'Kwinjira' : 'Login'}
               </a>
             </div>
           </div>
@@ -47,12 +47,12 @@ export default function AboutPage() {
         <div className="max-w-4xl mx-auto px-4 text-center text-white">
           <h1 className="text-4xl md:text-5xl font-bold mb-6">
             {isKinyarwanda
-              ? 'Guhindura uburezi bwa programming kugirango bugerweho n\'umuntu wese mu Rwanda'
+              ? 'Kugeza uburezi bwa programming kuri bose mu Rwanda'
               : 'Making Programming Education Accessible to Every Rwandan'}
           </h1>
           <p className="text-xl mb-8 text-blue-100 max-w-3xl mx-auto">
             {isKinyarwanda
-              ? 'Intego yacu ni guteza imbere uburezi bw\'ikode bufashijwe na AI mu Kinyarwanda.'
+              ? 'Intego yacu ni kugeza uburezi bufite ireme bwa coding kuri bose binyuze mu kwiga gufashijwe na AI mu Kinyarwanda.'
               : 'Our mission is to democratize quality coding education through AI-powered learning in Kinyarwanda.'}
           </p>
 
@@ -77,19 +77,19 @@ export default function AboutPage() {
               <div className="prose prose-lg text-gray-700 space-y-4">
                 <p>
                   {isKinyarwanda
-                    ? 'Yashizweho mu 2026 n\'umunyeshuri w\'Informatique muri African Leadership University akaba n\'umwarimu wa JavaScript ku ishuri.'
+                    ? 'Yashinzwe mu 2026 n\'umunyeshuri wiga Computer Science muri African Leadership University akaba n\'umwarimu wa JavaScript mu ishuri ryaho.'
                     : 'Founded in 2026 by a Computer Science student at African Leadership University and JavaScript teacher at a local school.'}
                 </p>
                 <p>
                   {isKinyarwanda
-                    ? 'Ikibazo cyari gisobanutse: Abanyeshuri babananaga kwiga programming kubera:'
+                    ? 'Ikibazo cyari gisobanutse: Abanyeshuri babonaga bigoye kwiga programming kubera:'
                     : 'The problem was clear: Students struggled to learn programming because:'}
                 </p>
                 <ul className="list-disc list-inside space-y-2 ml-4">
                   <li>{isKinyarwanda ? 'Amabwiriza yari mu Cyongereza gusa' : 'Instructions were only in English'}</li>
-                  <li>{isKinyarwanda ? 'Abarimu bari bafite abanyeshuri 50+' : 'Teachers had 50+ students to support'}</li>
-                  <li>{isKinyarwanda ? 'Nta bisubizo byihariye' : 'No personalized feedback'}</li>
-                  <li>{isKinyarwanda ? 'Kugera kuri mudasobwa byari bike' : 'Limited computer lab access'}</li>
+                  <li>{isKinyarwanda ? 'Abarimu babaga bafite abanyeshuri barenga 50 bagomba gufasha' : 'Teachers had 50+ students to support'}</li>
+                  <li>{isKinyarwanda ? 'Nta bisubizo byihariye kuri buri munyeshuri' : 'No personalized feedback'}</li>
+                  <li>{isKinyarwanda ? 'Ubushobozi buke bwo kugera muri lab ya mudasobwa' : 'Limited computer lab access'}</li>
                 </ul>
                 <p className="font-semibold text-[#0ea5e9]">
                   {isKinyarwanda
@@ -111,13 +111,13 @@ export default function AboutPage() {
                 {
                   icon: <Target className="w-8 h-8" />,
                   number: '50+',
-                  label: isKinyarwanda ? 'Amashuri Akoresha' : 'Schools Using',
+                  label: isKinyarwanda ? 'Amashuri Akoresha iyi platform' : 'Schools Using',
                   color: '#10b981'
                 },
                 {
                   icon: <Globe className="w-8 h-8" />,
                   number: '95%',
-                  label: isKinyarwanda ? 'Gutsinda' : 'Pass Rate',
+                  label: isKinyarwanda ? 'Igipimo cy\'abatsinda' : 'Pass Rate',
                   color: '#8b5cf6'
                 },
                 {
@@ -158,23 +158,23 @@ export default function AboutPage() {
                 emoji: '🇷🇼',
                 title: isKinyarwanda ? 'U Rwanda Mbere' : 'Rwanda First',
                 description: isKinyarwanda
-                  ? 'Twubatswe ku banyeshuri b\'u Rwanda, n\'abanyanrwanda'
+                  ? 'Byakozwe n\'Abanyarwanda ku bw\'abanyeshuri b\'u Rwanda'
                   : 'Built for Rwandan students, by Rwandans',
                 color: '#10b981'
               },
               {
                 emoji: '🤖',
-                title: isKinyarwanda ? 'Ikoranabuhanga rya AI' : 'AI-Powered',
+                title: isKinyarwanda ? 'Bifashijwemo na AI' : 'AI-Powered',
                 description: isKinyarwanda
-                  ? 'Tekinoroji yumva imiterere yacu'
+                  ? 'Ikoranabuhanga ryumva imiterere yacu'
                   : 'Technology that understands our context',
                 color: '#8b5cf6'
               },
               {
                 emoji: '🌍',
-                title: isKinyarwanda ? 'Gukwirakwiza' : 'Accessible',
+                title: isKinyarwanda ? 'Biboneka byoroshye' : 'Accessible',
                 description: isKinyarwanda
-                  ? 'Irakora offline, ihendutse, mu rurimi rwawe'
+                  ? 'Irakora niyo nta interineti ihari, irahendutse, kandi iri mu rurimi rwawe'
                   : 'Works offline, affordable, in your language',
                 color: '#0ea5e9'
               }
@@ -198,7 +198,7 @@ export default function AboutPage() {
       <div className="py-20">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-[#1e293b] mb-12 text-center">
-            {isKinyarwanda ? 'Hura n\'Itsinda' : 'Meet the Team'}
+            {isKinyarwanda ? 'Menya Itsinda Ryacu' : 'Meet the Team'}
           </h2>
 
           {/* Founder Card */}
@@ -213,12 +213,12 @@ export default function AboutPage() {
               <div className="flex-1 text-center md:text-left">
                 <h3 className="text-2xl font-bold text-[#1e293b] mb-2">[Your Name]</h3>
                 <p className="text-[#0ea5e9] font-semibold mb-4">
-                  {isKinyarwanda ? 'Umuremyi & CEO' : 'Founder & CEO'}
+                  {isKinyarwanda ? 'Umushinzwi & CEO' : 'Founder & CEO'}
                 </p>
                 <div className="text-gray-600 space-y-2">
                   <p>{isKinyarwanda ? 'Umunyeshuri wa Software Engineering muri ALU' : 'Software Engineering Student at ALU'}</p>
                   <p>{isKinyarwanda ? 'Umwarimu wa JavaScript' : 'JavaScript Teacher'}</p>
-                  <p>{isKinyarwanda ? 'Nkunda uburenganzira bw\'uburezi' : 'Passionate about education equity'}</p>
+                  <p>{isKinyarwanda ? 'Nkunda ubusumbane buke mu burezi' : 'Passionate about education equity'}</p>
                 </div>
                 <div className="mt-4">
                   <a
@@ -236,7 +236,7 @@ export default function AboutPage() {
           {/* Join Team CTA */}
           <div className="bg-gradient-to-r from-[#0ea5e9] to-[#8b5cf6] rounded-2xl p-8 text-center text-white">
             <h3 className="text-2xl font-bold mb-4">
-              {isKinyarwanda ? 'Wifuza kwinjira mu itsinda?' : 'Want to join our team?'}
+              {isKinyarwanda ? 'Wifuza kwinjira mu itsinda ryacu?' : 'Want to join our team?'}
             </h3>
             <p className="mb-6 text-blue-100">
               {isKinyarwanda
@@ -247,7 +247,7 @@ export default function AboutPage() {
               href="#"
               className="inline-flex items-center gap-2 px-8 py-3 bg-white text-[#0ea5e9] rounded-lg font-bold hover:bg-gray-100 transition-all"
             >
-              {isKinyarwanda ? 'Reba Imyanya' : 'View Open Positions'}
+              {isKinyarwanda ? 'Reba imyanya y\'akazi ihari' : 'View Open Positions'}
               <ArrowRight className="w-5 h-5" />
             </a>
           </div>
@@ -262,7 +262,7 @@ export default function AboutPage() {
           </h2>
           <p className="text-gray-400 mb-8">
             {isKinyarwanda
-              ? 'Twandikire twakubwire byinshi kuri EduCode Rwanda'
+              ? 'Twandikire niba wifuza kumenya byinshi kuri EduCode Rwanda'
               : 'Get in touch to learn more about EduCode Rwanda'}
           </p>
           <a
@@ -282,7 +282,7 @@ export default function AboutPage() {
           <p>© 2026 EduCode Rwanda. All rights reserved.</p>
           <p className="mt-2">
             {isKinyarwanda
-              ? 'Twubatswe mu Rwanda n\'urukundo'
+              ? 'Byubatswe mu Rwanda n\'urukundo'
               : 'Built with ❤️ in Rwanda'}
           </p>
         </div>

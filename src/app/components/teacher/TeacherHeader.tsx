@@ -24,7 +24,7 @@ export function TeacherHeader({ language, onLanguageToggle, notificationCount = 
             EduCode Rwanda
           </h1>
           <p className="text-sm text-gray-500" style={{ fontFamily: 'Inter, sans-serif' }}>
-            {isKinyarwanda ? 'Ikibanza cy\'abarimu' : 'Teacher Dashboard'}
+            {isKinyarwanda ? 'Dashboard y\'umwarimu' : 'Teacher Dashboard'}
           </p>
         </div>
       </div>
@@ -43,7 +43,7 @@ export function TeacherHeader({ language, onLanguageToggle, notificationCount = 
         <button className="flex items-center gap-2 px-6 py-2 bg-[#0ea5e9] text-white rounded-lg hover:bg-[#0284c7] transition-all shadow-md">
           <Plus size={18} />
           <span className="font-semibold" style={{ fontFamily: 'Inter, sans-serif' }}>
-            {isKinyarwanda ? 'Kora Umushinga' : 'Create Assignment'}
+            {isKinyarwanda ? 'Tanga umukoro' : 'Create Assignment'}
           </span>
         </button>
       </div>

@@ -32,7 +32,7 @@ export default function TeacherPages() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex gap-1 overflow-x-auto">
             {[
-              { id: 'student-detail', label: isKinyarwanda ? 'Umunyeshuri' : 'Student Detail', color: '#10b981' },
+              { id: 'student-detail', label: isKinyarwanda ? 'Amakuru y\'umunyeshuri' : 'Student Detail', color: '#10b981' },
               { id: 'assignments', label: isKinyarwanda ? 'Imishinga' : 'Assignments', color: '#10b981' },
               { id: 'analytics', label: isKinyarwanda ? 'Isesengura' : 'Analytics', color: '#10b981' },
               { id: 'communication', label: isKinyarwanda ? 'Itumanaho' : 'Communication', color: '#10b981' }

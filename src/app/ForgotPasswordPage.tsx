@@ -22,7 +22,7 @@ export default function ForgotPasswordPage({ onBack }: Props) {
     setError('');
     const { error } = await requestPasswordReset(email.trim());
     if (error) {
-      setError(isKin ? 'Hari ikibazo. Gerageza nanone.' : 'Something went wrong. Please try again.');
+      setError(isKin ? 'Hari ikibazo cyabaye. Gerageza nanone.' : 'Something went wrong. Please try again.');
     } else {
       setSent(true);
     }
@@ -52,10 +52,10 @@ export default function ForgotPasswordPage({ onBack }: Props) {
         </div>
         <div className="relative z-10">
           <p className="text-base font-semibold mb-2" style={{ color: '#f1f5f9' }}>
-            {isKin ? 'Wige programming mu rurimi rwawe' : 'Learn programming in your language'}
+            {isKin ? 'Iga programming mu rurimi rwawe' : 'Learn programming in your language'}
           </p>
           <p className="text-sm" style={{ color: '#475569' }}>
-            {isKin ? 'Ibisobanuro mu Kinyarwanda. Buri kosa risobanurwa.' : 'Error explanations in Kinyarwanda. Built for Rwanda.'}
+            {isKin ? 'Ibisobanuro by\'amakosa mu Kinyarwanda. Byakorewe u Rwanda.' : 'Error explanations in Kinyarwanda. Built for Rwanda.'}
           </p>
         </div>
       </div>
@@ -89,11 +89,11 @@ export default function ForgotPasswordPage({ onBack }: Props) {
                 <CheckCircle size={32} style={{ color: '#00d4aa' }} />
               </div>
               <h1 className="text-2xl font-bold mb-3" style={{ color: '#f1f5f9', letterSpacing: '-0.01em' }}>
-                {isKin ? 'Imeyili yoherejwe!' : 'Email sent!'}
+                {isKin ? 'I-meyili yoherejwe!' : 'Email sent!'}
               </h1>
               <p className="text-sm mb-8 leading-relaxed" style={{ color: '#64748b' }}>
                 {isKin
-                  ? `Twoherereje ijambo ryo guhindura ijambo ryibanga kuri ${email}. Reba imbwiriza mu imeyili yawe.`
+                  ? `Twoherereje link yo guhindura ijambo ry'ibanga kuri ${email}. Reba muri i-meyili yawe hanyuma ukurikire amabwiriza.`
                   : `We sent a password reset link to ${email}. Check your inbox and follow the instructions.`}
               </p>
               <button onClick={onBack}
@@ -101,7 +101,7 @@ export default function ForgotPasswordPage({ onBack }: Props) {
                 style={{ height: '48px', background: '#00d4aa', color: '#0d0f14' }}
                 onMouseEnter={e => (e.currentTarget.style.background = '#00bfa0')}
                 onMouseLeave={e => (e.currentTarget.style.background = '#00d4aa')}>
-                {isKin ? 'Garuka ku kwinjira' : 'Back to Login'}
+                {isKin ? 'Subira inyuma' : 'Back to Login'}
                 <ArrowRight size={16} />
               </button>
             </div>
@@ -118,7 +118,7 @@ export default function ForgotPasswordPage({ onBack }: Props) {
               </button>
 
               <h1 className="text-3xl font-bold mb-2" style={{ color: '#f1f5f9', letterSpacing: '-0.01em' }}>
-                {isKin ? 'Wibagiwe ijambo ryibanga?' : 'Forgot password?'}
+                {isKin ? 'Wibagiwe ijambo ry\'ibanga?' : 'Forgot password?'}
               </h1>
               <p className="text-sm mb-8" style={{ color: '#64748b' }}>
                 {isKin
@@ -162,7 +162,7 @@ export default function ForgotPasswordPage({ onBack }: Props) {
                   onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = '#00d4aa'; }}>
                   {loading
                     ? <div className="w-5 h-5 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: '#0d0f14', borderTopColor: 'transparent' }} />
-                    : <>{isKin ? 'Ohereza ijambo ryo gusubiza' : 'Send reset link'} <ArrowRight size={16} /></>}
+                    : <>{isKin ? 'Ohereza link yo guhindura ijambo ry\'ibanga' : 'Send reset link'} <ArrowRight size={16} /></>}
                 </button>
               </form>
             </>
