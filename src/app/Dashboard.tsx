@@ -169,7 +169,13 @@ export default function Dashboard({ language, onLanguageChange, onStartCoding, o
     setLoadingAssignments(false);
   };
 
-  useEffect(() => { recordDailyLogin(); loadAssignments(); }, []);
+  useEffect(() => {
+    recordDailyLogin();
+    loadAssignments();
+    const onVisible = () => { if (document.visibilityState === 'visible') loadAssignments(); };
+    document.addEventListener('visibilitychange', onVisible);
+    return () => document.removeEventListener('visibilitychange', onVisible);
+  }, []);
 
   const toggleLanguage = () => onLanguageChange(language === 'EN' ? 'KIN' : 'EN');
 
@@ -223,16 +229,22 @@ export default function Dashboard({ language, onLanguageChange, onStartCoding, o
     }
   };
 
-  // Compute level from total XP (marks earned)
+  // Level based on profile XP (real accumulated XP)
+  const profileXp = profile?.xp_points ?? 0;
   const getLevel = (xp: number): string => {
-    if (xp >= 100) return 'Advanced';
-    if (xp >= 50)  return 'Intermediate II';
-    if (xp >= 25)  return 'Intermediate I';
-    if (xp >= 10)  return 'Beginner II';
-    return 'Beginner I';
+    if (xp >= 500) return isKinyarwanda ? 'Inzobere' : 'Master';
+    if (xp >= 200) return isKinyarwanda ? 'Injeniyeri' : 'Engineer';
+    if (xp >= 100) return isKinyarwanda ? 'Inzobere II' : 'Advanced II';
+    if (xp >= 50)  return isKinyarwanda ? 'Hagati II' : 'Intermediate II';
+    if (xp >= 25)  return isKinyarwanda ? 'Hagati I' : 'Intermediate I';
+    if (xp >= 10)  return isKinyarwanda ? 'Intangiriro II' : 'Beginner II';
+    return isKinyarwanda ? 'Intangiriro I' : 'Beginner I';
   };
 
-  const progressPct = totalPossible > 0 ? Math.round((totalEarned / totalPossible) * 100) : 0;
+  // Progress = % of assignments submitted (something the student controls)
+  const progressPct = assignments.length > 0
+    ? Math.round((submittedIds.size / assignments.length) * 100)
+    : 0;
 
   const insights = (() => {
     const result: Array<{ text: string; isPositive: boolean }> = [];
@@ -271,19 +283,20 @@ export default function Dashboard({ language, onLanguageChange, onStartCoding, o
         : `${overdueCount} assignment${overdueCount > 1 ? 's are' : ' is'} overdue — submit if you still can!` });
     }
 
+    const scorePct = totalPossible > 0 ? Math.round((totalEarned / totalPossible) * 100) : 0;
     if (totalPossible > 0) {
-      if (progressPct >= 80) {
+      if (scorePct >= 80) {
         result.push({ isPositive: true, text: isKinyarwanda
-          ? `Amanota meza cyane — ugera kuri ${progressPct}% by'amanota yose! 🌟`
-          : `Excellent scores — you're averaging ${progressPct}% overall! 🌟` });
-      } else if (progressPct >= 50) {
+          ? `Amanota meza cyane — ugera kuri ${scorePct}% by'amanota yose! 🌟`
+          : `Excellent scores — you're averaging ${scorePct}% overall! 🌟` });
+      } else if (scorePct >= 50) {
         result.push({ isPositive: false, text: isKinyarwanda
-          ? `Ufite amanota ${progressPct}% ku mikoro yahawe amanota. Reba ibitekerezo by'umwarimu ngo ubashe kwikosora.`
-          : `Scoring ${progressPct}% on graded work. Review feedback to improve.` });
+          ? `Ufite amanota ${scorePct}% ku mikoro yahawe amanota. Reba ibitekerezo by'umwarimu ngo ubashe kwikosora.`
+          : `Scoring ${scorePct}% on graded work. Review feedback to improve.` });
       } else {
         result.push({ isPositive: false, text: isKinyarwanda
-          ? `Amanota ya ${progressPct}% arakeneye iterambere. Soma ibihano by'umwarimu.`
-          : `${progressPct}% score needs improvement — read your teacher's feedback.` });
+          ? `Amanota ya ${scorePct}% arakeneye iterambere. Soma ibihano by'umwarimu.`
+          : `${scorePct}% score needs improvement — read your teacher's feedback.` });
       }
     }
 
@@ -300,7 +313,7 @@ export default function Dashboard({ language, onLanguageChange, onStartCoding, o
   const badges = [
     { id: '1', name: isKinyarwanda ? 'Umukoro wa mbere' : 'First Submit',  icon: 'award',  earned: submittedIds.size >= 1 },
     { id: '2', name: isKinyarwanda ? `Iminsi ${streak}` : `${streak}d Streak`, icon: 'flame', earned: streak >= 1 },
-    { id: '3', name: isKinyarwanda ? 'Amanota 10+' : '10+ XP',              icon: 'star',   earned: totalEarned >= 10 },
+    { id: '3', name: isKinyarwanda ? 'Amanota 10+' : '10+ XP',              icon: 'star',   earned: profileXp >= 10 },
     { id: '4', name: isKinyarwanda ? 'Amanota yo hejuru' : 'High Score', icon: 'trophy', earned: progressPct >= 80 },
   ];
 
@@ -399,8 +412,8 @@ export default function Dashboard({ language, onLanguageChange, onStartCoding, o
               assignmentsCompleted={submittedIds.size}
               assignmentsTotal={assignments.length}
               streak={streak}
-              xpPoints={totalEarned}
-              level={getLevel(totalEarned)}
+              xpPoints={profileXp}
+              level={getLevel(profileXp)}
               onContinueLearning={onContinueLearning}
             />
           </div>
