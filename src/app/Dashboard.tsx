@@ -7,7 +7,7 @@ import { AIInsights } from './components/dashboard/AIInsights';
 import { AchievementBadges } from './components/dashboard/AchievementBadges';
 import { useAuth } from '../lib/auth';
 import { getStudentAssignments, getStudentClasses, getClassWithInviteCode, joinClass, getSubmittedAssignmentIds, getStudentGrades, recordDailyLogin, getStreak, getStudentAnnouncements, type Assignment, type Announcement } from '../lib/db';
-import { Users, ArrowRight, Loader, X, BookOpen, Megaphone, Pin } from 'lucide-react';
+import { Users, ArrowRight, Loader, X, BookOpen, Megaphone, Pin, Code2 } from 'lucide-react';
 
 interface Props {
   language: 'EN' | 'KIN';
@@ -363,6 +363,36 @@ export default function Dashboard({ language, onLanguageChange, onStartCoding, o
               })}
             </div>
           )}
+        </div>
+
+        {/* Practice banner */}
+        <div
+          className="rounded-2xl px-6 py-4 flex items-center justify-between mb-2"
+          style={{ background: 'linear-gradient(135deg, #0f2027, #1a1040)', border: '1px solid rgba(139,92,246,0.25)' }}
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0" style={{ background: 'rgba(139,92,246,0.15)', border: '1px solid rgba(139,92,246,0.3)' }}>
+              <Code2 size={18} style={{ color: '#a78bfa' }} />
+            </div>
+            <div>
+              <p className="text-sm font-bold" style={{ color: '#f1f5f9' }}>
+                {isKinyarwanda ? 'Ushaka Kwimenyereza?' : 'Want to Practice?'}
+              </p>
+              <p className="text-xs" style={{ color: '#64748b' }}>
+                {isKinyarwanda ? 'Fungura workspace ubure imishinga — AI igufasha' : 'Open the editor freely — AI feedback included'}
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={() => onStartCoding?.()}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all shrink-0"
+            style={{ background: 'rgba(139,92,246,0.15)', color: '#a78bfa', border: '1px solid rgba(139,92,246,0.3)' }}
+            onMouseEnter={e => (e.currentTarget.style.background = 'rgba(139,92,246,0.25)')}
+            onMouseLeave={e => (e.currentTarget.style.background = 'rgba(139,92,246,0.15)')}
+          >
+            <Code2 size={14} />
+            {isKinyarwanda ? 'Fungura Editor' : 'Open Editor'}
+          </button>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
