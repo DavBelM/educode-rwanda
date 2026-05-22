@@ -52,18 +52,18 @@ export function warmUpSpace(): void {
   fetch(`${HF_SPACE_URL}/gradio_api/run/predict`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ data: ['ping', [], SYSTEM_PROMPT] }),
+    body: JSON.stringify({ data: ['ping', null, SYSTEM_PROMPT], fn_index: 0 }),
   }).catch(() => { /* ignore — just waking the Space */ });
 }
 
 // ── Call Gradio Space API ─────────────────────────────────────────────────────
 async function callSpace(message: string, systemPrompt: string): Promise<string> {
-  // Gradio 5.x uses /gradio_api/run/predict
   const response = await fetch(`${HF_SPACE_URL}/gradio_api/run/predict`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      data: [message, [], systemPrompt],
+      data: [message, null, systemPrompt],
+      fn_index: 0,
     }),
   });
 
