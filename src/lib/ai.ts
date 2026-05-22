@@ -49,29 +49,75 @@ function getMockResponse(error: string | null, language: 'EN' | 'KIN'): string {
 
 // ── Warm up the Space (fire-and-forget, called when workspace opens) ──────────
 export function warmUpSpace(): void {
-  fetch(`${HF_SPACE_URL}/gradio_api/run/predict`, {
+  fetch(`${HF_SPACE_URL}/gradio_api/call/predict`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ data: ['ping', null, SYSTEM_PROMPT], fn_index: 0 }),
+    body: JSON.stringify({ data: ['ping', null, SYSTEM_PROMPT] }),
   }).catch(() => { /* ignore — just waking the Space */ });
 }
 
-// ── Call Gradio Space API ─────────────────────────────────────────────────────
+// ── Call Gradio Space API (Gradio 5.x two-step SSE approach) ─────────────────
 async function callSpace(message: string, systemPrompt: string): Promise<string> {
-  const response = await fetch(`${HF_SPACE_URL}/gradio_api/run/predict`, {
+  // Step 1: Submit — returns event_id immediately
+  const submitRes = await fetch(`${HF_SPACE_URL}/gradio_api/call/predict`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      data: [message, null, systemPrompt],
-      fn_index: 0,
-    }),
+    body: JSON.stringify({ data: [message, null, systemPrompt] }),
   });
 
-  if (!response.ok) throw new Error(`Space returned ${response.status}`);
-  const json = await response.json();
-  const result = json?.data?.[0];
-  if (typeof result !== 'string' || !result.trim()) throw new Error('Empty response');
-  return result;
+  if (!submitRes.ok) throw new Error(`Submit failed: ${submitRes.status}`);
+  const { event_id } = await submitRes.json();
+  if (!event_id) throw new Error('No event_id');
+
+  // Step 2: Poll via SSE — wait for the model to actually finish
+  return new Promise((resolve, reject) => {
+    const es = new EventSource(
+      `${HF_SPACE_URL}/gradio_api/call/predict/${event_id}`
+    );
+
+    const timer = setTimeout(() => {
+      es.close();
+      reject(new Error('Timeout'));
+    }, 180_000);
+
+    es.addEventListener('complete', (e: MessageEvent) => {
+      clearTimeout(timer);
+      es.close();
+      try {
+        const payload = JSON.parse(e.data);
+        // Gradio 5.x returns the fn output as payload[0]
+        // ChatInterface wraps it: payload[0] = updated chatbot history
+        const raw = payload?.[0];
+        let text: string | null = null;
+
+        if (typeof raw === 'string' && raw.trim()) {
+          text = raw;
+        } else if (Array.isArray(raw) && raw.length > 0) {
+          const last = raw[raw.length - 1];
+          if (Array.isArray(last)) text = last[1];          // tuple format
+          else if (last?.content) text = last.content;      // messages format
+        }
+
+        if (text) resolve(text);
+        else reject(new Error('Empty payload'));
+      } catch {
+        reject(new Error('Parse error'));
+      }
+    });
+
+    es.addEventListener('error', (e: MessageEvent) => {
+      clearTimeout(timer);
+      es.close();
+      try {
+        const d = JSON.parse(e.data ?? '{}');
+        reject(new Error(d.message ?? 'SSE error'));
+      } catch {
+        reject(new Error('SSE error'));
+      }
+    });
+
+    es.onerror = () => { clearTimeout(timer); es.close(); reject(new Error('Connection error')); };
+  });
 }
 
 // ── Public functions ──────────────────────────────────────────────────────────
