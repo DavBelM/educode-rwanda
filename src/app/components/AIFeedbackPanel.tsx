@@ -87,10 +87,10 @@ export function AIFeedbackPanel({ feedback, language, isLoading = false, aiRespo
             {/* Bilingual Text */}
             <div className="space-y-2 mb-6">
               <p className="font-medium" style={{ fontFamily: 'Inter, sans-serif', fontSize: '17px', color: 'var(--ec-text-4)' }}>
-                Click "Run Code" to get AI-powered feedback
+                {isKinyarwanda ? 'Kanda "Kora Code" kugirango ubone ibisobanuro' : 'Run your code to get AI feedback'}
               </p>
-              <p className="text-sm" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--ec-text-6)' }}>
-                Kanda "Kora Code" kugirango ubone ibisobanuro by'AI
+              <p className="text-sm mt-1" style={{ fontFamily: 'Inter, sans-serif', color: 'var(--ec-text-6)' }}>
+                {isKinyarwanda ? 'EduCode AI izaza mu masegonda ~20 nyuma yo gukora' : 'EduCode AI responds in ~20s after running'}
               </p>
             </div>
 
@@ -172,10 +172,26 @@ export function AIFeedbackPanel({ feedback, language, isLoading = false, aiRespo
               </span>
             </div>
             {aiLoading ? (
-              <div className="space-y-2">
-                <div className="h-3 rounded-full animate-pulse" style={{ background: 'rgba(139,92,246,0.3)', width: '85%' }} />
-                <div className="h-3 rounded-full animate-pulse" style={{ background: 'rgba(139,92,246,0.2)', width: '65%', animationDelay: '150ms' }} />
-                <div className="h-3 rounded-full animate-pulse" style={{ background: 'rgba(139,92,246,0.15)', width: '75%', animationDelay: '300ms' }} />
+              <div>
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="flex gap-1">
+                    {[0, 150, 300].map(d => (
+                      <div key={d} className="w-2 h-2 rounded-full animate-bounce"
+                        style={{ background: '#a78bfa', animationDelay: `${d}ms` }} />
+                    ))}
+                  </div>
+                  <span className="text-sm font-medium" style={{ color: '#a78bfa' }}>
+                    {isKinyarwanda ? 'EduCode AI irimo gusuzuma code yawe...' : 'EduCode AI is analyzing your code...'}
+                  </span>
+                </div>
+                <p className="text-xs" style={{ color: 'rgba(167,139,250,0.6)' }}>
+                  {isKinyarwanda ? '⏳ Bitinze hafi ya detinue 20s — komeza gutegereza' : '⏳ Usually takes ~20s — please wait'}
+                </p>
+                <div className="mt-2 space-y-2">
+                  <div className="h-2.5 rounded-full animate-pulse" style={{ background: 'rgba(139,92,246,0.25)', width: '90%' }} />
+                  <div className="h-2.5 rounded-full animate-pulse" style={{ background: 'rgba(139,92,246,0.18)', width: '70%', animationDelay: '200ms' }} />
+                  <div className="h-2.5 rounded-full animate-pulse" style={{ background: 'rgba(139,92,246,0.12)', width: '80%', animationDelay: '400ms' }} />
+                </div>
               </div>
             ) : (
               <p className="text-sm leading-relaxed whitespace-pre-line" style={{ color: 'var(--ec-text-2)' }}>
