@@ -62,7 +62,7 @@ async function callSpace(message: string, systemPrompt: string): Promise<string>
   const submitRes = await fetch(`${HF_SPACE_URL}/gradio_api/call/chat`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ data: [message, null, systemPrompt] }),
+    body: JSON.stringify({ data: [message, systemPrompt] }),
   });
 
   if (!submitRes.ok) throw new Error(`Submit failed: ${submitRes.status}`);
