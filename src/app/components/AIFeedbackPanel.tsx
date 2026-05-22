@@ -117,8 +117,8 @@ export function AIFeedbackPanel({ feedback, language, isLoading = false, aiRespo
           </div>
         ) : (
           <>
-            {/* Robot Icon with Status Badge — hide once AI has responded */}
-            {feedback.length > 0 && !aiResponse && (
+            {/* Robot Icon with Status Badge — hide once AI is loading or has responded */}
+            {feedback.length > 0 && !aiResponse && !aiLoading && (
               <div className="flex justify-center mb-4">
                 <div className="relative">
                   <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#8b5cf6] to-[#a78bfa] flex items-center justify-center shadow-lg">
@@ -144,8 +144,8 @@ export function AIFeedbackPanel({ feedback, language, isLoading = false, aiRespo
               </div>
             )}
 
-            {/* Feedback Messages — show only while AI is still loading */}
-            {!aiResponse && feedback.map((item, index) => (
+            {/* Feedback Messages — hide when AI is loading or has responded */}
+            {!aiResponse && !aiLoading && feedback.map((item, index) => (
               <div
                 key={index}
                 className="p-4 rounded-lg border-l-4"
@@ -201,8 +201,8 @@ export function AIFeedbackPanel({ feedback, language, isLoading = false, aiRespo
           </div>
         )}
 
-        {/* Action Buttons — only show while waiting for AI */}
-        {feedback.length > 0 && !aiResponse && (
+        {/* Action Buttons — only show when no AI activity */}
+        {feedback.length > 0 && !aiResponse && !aiLoading && (
           <div className="mt-2 space-y-2">
             {/* Error State: Two Buttons */}
             {feedback.some(f => f.type === 'error') ? (
