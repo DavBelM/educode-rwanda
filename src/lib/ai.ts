@@ -1,7 +1,4 @@
-// @ts-ignore — Vite provides import.meta.env at runtime
-const HF_SPACE_URL: string =
-  (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_HF_SPACE_URL)
-  ?? 'https://davbelaa-educode-rwanda-ai.hf.space';
+const HF_SPACE_NAME = 'DavBelaa/educode-rwanda-ai';
 
 const SYSTEM_PROMPT =
   'You are EduCode AI, a bilingual coding tutor for Rwandan TVET students. ' +
@@ -49,75 +46,23 @@ function getMockResponse(error: string | null, language: 'EN' | 'KIN'): string {
 
 // ── Warm up the Space (fire-and-forget, called when workspace opens) ──────────
 export function warmUpSpace(): void {
-  fetch(`${HF_SPACE_URL}/gradio_api/call/chat`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ data: ['ping', null, SYSTEM_PROMPT] }),
-  }).catch(() => { /* ignore — just waking the Space */ });
+  // Fire-and-forget to wake ZeroGPU before the student runs code
+  import('@gradio/client').then(({ Client }) =>
+    Client.connect('DavBelaa/educode-rwanda-ai').catch(() => {})
+  ).catch(() => {});
 }
 
-// ── Call Gradio Space API (Gradio 5.x two-step SSE approach) ─────────────────
+// ── Call Gradio Space API via @gradio/client ──────────────────────────────────
 async function callSpace(message: string, systemPrompt: string): Promise<string> {
-  // Step 1: Submit — returns event_id immediately
-  const submitRes = await fetch(`${HF_SPACE_URL}/gradio_api/call/chat`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ data: [message, systemPrompt] }),
+  const { Client } = await import('@gradio/client');
+  const client = await Client.connect(HF_SPACE_NAME);
+  const result = await client.predict('/chat', {
+    message,
+    param_2: systemPrompt,
   });
-
-  if (!submitRes.ok) throw new Error(`Submit failed: ${submitRes.status}`);
-  const { event_id } = await submitRes.json();
-  if (!event_id) throw new Error('No event_id');
-
-  // Step 2: Poll via SSE — wait for the model to actually finish
-  return new Promise((resolve, reject) => {
-    const es = new EventSource(
-      `${HF_SPACE_URL}/gradio_api/call/chat/${event_id}`
-    );
-
-    const timer = setTimeout(() => {
-      es.close();
-      reject(new Error('Timeout'));
-    }, 180_000);
-
-    es.addEventListener('complete', (e: MessageEvent) => {
-      clearTimeout(timer);
-      es.close();
-      try {
-        const payload = JSON.parse(e.data);
-        // Gradio 5.x returns the fn output as payload[0]
-        // ChatInterface wraps it: payload[0] = updated chatbot history
-        const raw = payload?.[0];
-        let text: string | null = null;
-
-        if (typeof raw === 'string' && raw.trim()) {
-          text = raw;
-        } else if (Array.isArray(raw) && raw.length > 0) {
-          const last = raw[raw.length - 1];
-          if (Array.isArray(last)) text = last[1];          // tuple format
-          else if (last?.content) text = last.content;      // messages format
-        }
-
-        if (text) resolve(text);
-        else reject(new Error('Empty payload'));
-      } catch {
-        reject(new Error('Parse error'));
-      }
-    });
-
-    es.addEventListener('error', (e: MessageEvent) => {
-      clearTimeout(timer);
-      es.close();
-      try {
-        const d = JSON.parse(e.data ?? '{}');
-        reject(new Error(d.message ?? 'SSE error'));
-      } catch {
-        reject(new Error('SSE error'));
-      }
-    });
-
-    es.onerror = () => { clearTimeout(timer); es.close(); reject(new Error('Connection error')); };
-  });
+  const text = (result.data as unknown[])?.[0];
+  if (typeof text === 'string' && text.trim()) return text;
+  throw new Error('Empty response from Space');
 }
 
 // ── Public functions ──────────────────────────────────────────────────────────
