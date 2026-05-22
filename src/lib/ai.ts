@@ -49,7 +49,7 @@ function getMockResponse(error: string | null, language: 'EN' | 'KIN'): string {
 
 // ── Warm up the Space (fire-and-forget, called when workspace opens) ──────────
 export function warmUpSpace(): void {
-  fetch(`${HF_SPACE_URL}/run/predict`, {
+  fetch(`${HF_SPACE_URL}/gradio_api/run/predict`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ data: ['ping', [], SYSTEM_PROMPT] }),
@@ -58,7 +58,8 @@ export function warmUpSpace(): void {
 
 // ── Call Gradio Space API ─────────────────────────────────────────────────────
 async function callSpace(message: string, systemPrompt: string): Promise<string> {
-  const response = await fetch(`${HF_SPACE_URL}/run/predict`, {
+  // Gradio 5.x uses /gradio_api/run/predict
+  const response = await fetch(`${HF_SPACE_URL}/gradio_api/run/predict`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
@@ -68,7 +69,6 @@ async function callSpace(message: string, systemPrompt: string): Promise<string>
 
   if (!response.ok) throw new Error(`Space returned ${response.status}`);
   const json = await response.json();
-  // Gradio returns { data: [response_text, updated_history] }
   const result = json?.data?.[0];
   if (typeof result !== 'string' || !result.trim()) throw new Error('Empty response');
   return result;
