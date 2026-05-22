@@ -1,10 +1,16 @@
 const HF_SPACE_NAME = 'DavBelaa/educode-rwanda-ai';
 
-const SYSTEM_PROMPT =
-  'You are EduCode AI, a bilingual coding tutor for Rwandan TVET students. ' +
-  'When the user writes in Kinyarwanda, respond in Kinyarwanda. ' +
-  'When they write in English, respond in English. ' +
-  'Be concise, encouraging, and explain errors simply.';
+const SYSTEM_PROMPT_EN =
+  'You are EduCode AI, a coding tutor for Rwandan TVET students. ' +
+  'You MUST respond in English only. Do not use Kinyarwanda. ' +
+  'Be concise, encouraging, and explain errors simply. ' +
+  'Keep your response under 3 sentences.';
+
+const SYSTEM_PROMPT_KIN =
+  'Uri EduCode AI, umwarimu wa coding ku banyeshuri ba TVET mu Rwanda. ' +
+  'UGOMBA gusubiza mu Kinyarwanda gusa. Ntukoreshe Icyongereza keretse kuri code. ' +
+  'Subiza mu magambo make, ushishikarize, kandi usobanure amakosa yoroshye. ' +
+  'Subiza mu mirongo itari myinshi ya 3.';
 
 // ── Mock responses (used when Space is unreachable) ───────────────────────────
 const MOCK_EN: Record<string, string> = {
@@ -50,7 +56,7 @@ export function warmUpSpace(): void {
   fetch('/api/ai', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ message: 'ping', systemPrompt: SYSTEM_PROMPT }),
+    body: JSON.stringify({ message: 'ping', systemPrompt: SYSTEM_PROMPT_EN }),
   }).catch(() => {});
 }
 
@@ -85,8 +91,9 @@ export async function getAIFeedback(
           ? `This code has an error. Explain what is wrong and how to fix it:\n\`\`\`javascript\n${code}\n\`\`\`\nError: ${error}`
           : `Review this code and suggest any improvements:\n\`\`\`javascript\n${code}\n\`\`\``);
 
+  const systemPrompt = language === 'KIN' ? SYSTEM_PROMPT_KIN : SYSTEM_PROMPT_EN;
   try {
-    return await callSpace(question, SYSTEM_PROMPT);
+    return await callSpace(question, systemPrompt);
   } catch {
     await new Promise(r => setTimeout(r, 800));
     return getMockResponse(error, language);
@@ -103,8 +110,11 @@ export async function getLessonAIHelp(
     ? `Iri somo rigira aya mabwiriza:\n${instructions}\n\nCode y'umunyeshuri ubu:\n\`\`\`javascript\n${code}\n\`\`\`\n\nUmunyeshuri arabaza: ${question}`
     : `This lesson has these instructions:\n${instructions}\n\nStudent's current code:\n\`\`\`javascript\n${code}\n\`\`\`\n\nStudent asks: ${question}`;
 
-  const tutorPrompt = SYSTEM_PROMPT +
-    ' The student is working on a course lesson. Guide them with hints — do not give the full solution directly.';
+  const base = language === 'KIN' ? SYSTEM_PROMPT_KIN : SYSTEM_PROMPT_EN;
+  const tutorPrompt = base +
+    (language === 'KIN'
+      ? ' Umunyeshuri akora isomo. Musobanurire gusa, ntumuphe igisubizo cyose.'
+      : ' The student is working on a lesson. Guide with hints only — do not give the full solution.');
 
   try {
     return await callSpace(context, tutorPrompt);
