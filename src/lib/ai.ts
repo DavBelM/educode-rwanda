@@ -46,23 +46,27 @@ function getMockResponse(error: string | null, language: 'EN' | 'KIN'): string {
 
 // ── Warm up the Space (fire-and-forget, called when workspace opens) ──────────
 export function warmUpSpace(): void {
-  // Fire-and-forget to wake ZeroGPU before the student runs code
-  import('@gradio/client').then(({ Client }) =>
-    Client.connect('DavBelaa/educode-rwanda-ai').catch(() => {})
-  ).catch(() => {});
+  // Fire-and-forget ping through our proxy to wake ZeroGPU
+  fetch('/api/ai', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ message: 'ping', systemPrompt: SYSTEM_PROMPT }),
+  }).catch(() => {});
 }
 
-// ── Call Gradio Space API via @gradio/client ──────────────────────────────────
+// ── Call our Vercel proxy → HuggingFace Space (no browser restrictions) ───────
 async function callSpace(message: string, systemPrompt: string): Promise<string> {
-  const { Client } = await import('@gradio/client');
-  const client = await Client.connect(HF_SPACE_NAME);
-  const result = await client.predict('/chat', {
-    message,
-    param_2: systemPrompt,
+  const response = await fetch('/api/ai', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ message, systemPrompt }),
+    signal: AbortSignal.timeout(300_000), // 5 minute timeout
   });
-  const text = (result.data as unknown[])?.[0];
-  if (typeof text === 'string' && text.trim()) return text;
-  throw new Error('Empty response from Space');
+
+  if (!response.ok) throw new Error(`API returned ${response.status}`);
+  const json = await response.json();
+  if (typeof json.text === 'string' && json.text.trim()) return json.text;
+  throw new Error('Empty response from model');
 }
 
 // ── Public functions ──────────────────────────────────────────────────────────
