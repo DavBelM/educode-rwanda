@@ -1,20 +1,29 @@
+# Dependencies
 node_modules/
+
+# Build output
 dist/
+
+# Environment variables
 .env
-seed.sql
 .env.local
 .env.*.local
 
-# Project planning docs (not part of the codebase)
-PART_1_PROJECT_OVERVIEW.md
-PART_2_AI_ML_STRATEGY.md
-PART_3_DEVELOPMENT_ROADMAP.md
-TeM_SWDJF301_JavaScript Fundamentals.pdf
-TeM_SWDWD301_Website Development.pdf
-default_shadcn_theme.css
-src/imports/
+# Research data (local only — not for GitHub)
+GoogleFormsData/
+Machine_Learnin_Proposal_mission_Capstone.pdf
+translations_for_review.txt
 
-# ML — large dataset files stay local
-ml/data/fixjs/
+# ML data (large files — keep local)
 ml/data/processed/
 ml/data/kinyarwanda/
+ml/data/fixjs/
+hf-space/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+*.swp
