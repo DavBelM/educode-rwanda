@@ -49,7 +49,7 @@ function getMockResponse(error: string | null, language: 'EN' | 'KIN'): string {
 
 // ── Warm up the Space (fire-and-forget, called when workspace opens) ──────────
 export function warmUpSpace(): void {
-  fetch(`${HF_SPACE_URL}/gradio_api/call/predict`, {
+  fetch(`${HF_SPACE_URL}/gradio_api/call/chat`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ data: ['ping', null, SYSTEM_PROMPT] }),
@@ -59,7 +59,7 @@ export function warmUpSpace(): void {
 // ── Call Gradio Space API (Gradio 5.x two-step SSE approach) ─────────────────
 async function callSpace(message: string, systemPrompt: string): Promise<string> {
   // Step 1: Submit — returns event_id immediately
-  const submitRes = await fetch(`${HF_SPACE_URL}/gradio_api/call/predict`, {
+  const submitRes = await fetch(`${HF_SPACE_URL}/gradio_api/call/chat`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ data: [message, null, systemPrompt] }),
@@ -72,7 +72,7 @@ async function callSpace(message: string, systemPrompt: string): Promise<string>
   // Step 2: Poll via SSE — wait for the model to actually finish
   return new Promise((resolve, reject) => {
     const es = new EventSource(
-      `${HF_SPACE_URL}/gradio_api/call/predict/${event_id}`
+      `${HF_SPACE_URL}/gradio_api/call/chat/${event_id}`
     );
 
     const timer = setTimeout(() => {
