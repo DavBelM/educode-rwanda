@@ -47,6 +47,15 @@ function getMockResponse(error: string | null, language: 'EN' | 'KIN'): string {
   return map.generic;
 }
 
+// ── Warm up the Space (fire-and-forget, called when workspace opens) ──────────
+export function warmUpSpace(): void {
+  fetch(`${HF_SPACE_URL}/run/predict`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ data: ['ping', [], SYSTEM_PROMPT] }),
+  }).catch(() => { /* ignore — just waking the Space */ });
+}
+
 // ── Call Gradio Space API ─────────────────────────────────────────────────────
 async function callSpace(message: string, systemPrompt: string): Promise<string> {
   const response = await fetch(`${HF_SPACE_URL}/run/predict`, {

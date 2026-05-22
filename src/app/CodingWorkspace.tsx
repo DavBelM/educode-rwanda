@@ -7,7 +7,7 @@ import { RunCodeButton } from './components/RunCodeButton';
 import { MobileAssignmentCard } from './components/MobileAssignmentCard';
 import { executeCode } from '../lib/code-executor';
 import { analyzeFeedback, formatFeedbackForUI } from '../lib/feedback-engine';
-import { getAIFeedback } from '../lib/ai';
+import { getAIFeedback, warmUpSpace } from '../lib/ai';
 import { submitCodingAssignment, type Assignment } from '../lib/db';
 import { useExamMode } from '../hooks/useExamMode';
 import { Send, CheckCircle, Loader, AlertTriangle, Clock } from 'lucide-react';
@@ -80,6 +80,9 @@ export default function CodingWorkspace({ onBack, assignment, language: initialL
     window.addEventListener('beforeunload', handler);
     return () => window.removeEventListener('beforeunload', handler);
   }, [assignment, submitted]);
+
+  // Wake up the HuggingFace Space as soon as the workspace opens
+  useEffect(() => { warmUpSpace(); }, []);
 
   // Exam mode
   const examMode = !!(assignment?.exam_mode);
