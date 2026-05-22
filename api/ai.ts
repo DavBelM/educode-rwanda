@@ -29,7 +29,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     return res.status(200).json({ text });
   } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : String(err);
+    const msg = err instanceof Error
+      ? err.message
+      : typeof err === 'object'
+        ? JSON.stringify(err)
+        : String(err);
+    console.error('[EduCode AI] Space error:', msg);
     return res.status(502).json({ error: msg });
   }
 }
