@@ -86,8 +86,11 @@ export async function getAIFeedback(
     : `Review this code and suggest any improvements:\n\`\`\`javascript\n${code}\n\`\`\``;
 
   try {
-    return await callSpace(question, SYSTEM_PROMPT_EN);
-  } catch {
+    const result = await callSpace(question, SYSTEM_PROMPT_EN);
+    console.log('[EduCode AI] Real model response:', result);
+    return result;
+  } catch (err) {
+    console.error('[EduCode AI] Model failed, using mock. Reason:', err);
     await new Promise(r => setTimeout(r, 800));
     return getMockResponse(error, language);
   }
