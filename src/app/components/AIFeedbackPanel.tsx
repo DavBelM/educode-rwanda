@@ -15,17 +15,7 @@ export function AIFeedbackPanel({ feedback, language, isLoading = false, aiRespo
   const [kinText, setKinText] = useState<string | null>(null);
   const [kinLoading, setKinLoading] = useState(false);
 
-  useEffect(() => {
-    setKinText(null);
-    setKinLoading(false);
-    if (aiResponse && isKinyarwanda) {
-      setKinLoading(true);
-      translateToKinyarwanda(aiResponse)
-        .then(setKinText)
-        .catch(() => setKinText(aiResponse))
-        .finally(() => setKinLoading(false));
-    }
-  }, [aiResponse]);
+  useEffect(() => { setKinText(null); setKinLoading(false); }, [aiResponse]);
 
   async function handleTranslate() {
     if (!aiResponse) return;

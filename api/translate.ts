@@ -8,11 +8,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const { text } = req.body ?? {};
+  const { text, targetLanguage = 'KIN' } = req.body ?? {};
   if (!text) return res.status(400).json({ error: 'text is required' });
 
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'GEMINI_API_KEY not configured' });
+
+  const prompt = targetLanguage === 'EN'
+    ? `Translate the following to English. Keep code terms (variable names, function names, keywords like const/let/var/function) in English as-is. If it is already in English, return it unchanged:\n\n${text}`
+    : `Translate the following JavaScript error explanation to Kinyarwanda. Keep code terms (variable names, function names, keywords like const/let/var) in English. Only translate the explanation text:\n\n${text}`;
 
   try {
     const response = await fetch(
@@ -21,9 +25,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          contents: [{ parts: [{ text:
-            `Translate this JavaScript error explanation to Kinyarwanda. Keep code terms (variable names, function names, keywords like const/let/var) in English. Only translate the explanation text:\n\n${text}`
-          }] }],
+          contents: [{ parts: [{ text: prompt }] }],
           generationConfig: { maxOutputTokens: 200, temperature: 0.1 },
         }),
       }

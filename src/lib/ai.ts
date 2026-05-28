@@ -76,21 +76,40 @@ async function callSpace(message: string, systemPrompt: string): Promise<string>
 
 // ── Public functions ──────────────────────────────────────────────────────────
 
+async function normalizeLanguage(text: string, targetLanguage: 'EN' | 'KIN'): Promise<string> {
+  const response = await fetch('/api/translate', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text, targetLanguage }),
+    signal: AbortSignal.timeout(30_000),
+  });
+  if (!response.ok) return text;
+  const json = await response.json();
+  return typeof json.text === 'string' && json.text.trim() ? json.text : text;
+}
+
 export async function getAIFeedback(
   code: string,
   error: string | null,
   language: 'EN' | 'KIN'
 ): Promise<string> {
-  // Always use English for the fine-tuned model — translation to Kinyarwanda is handled by Gemini
   const question = error
     ? `This code has an error. Explain what is wrong and how to fix it:\n\`\`\`javascript\n${code}\n\`\`\`\nError: ${error}`
     : `Review this code and suggest any improvements:\n\`\`\`javascript\n${code}\n\`\`\``;
 
+  let raw: string;
   try {
-    return await callSpace(question, SYSTEM_PROMPT_EN);
+    raw = await callSpace(question, SYSTEM_PROMPT_EN);
   } catch {
     await new Promise(r => setTimeout(r, 800));
     return getMockResponse(error, language);
+  }
+
+  // Model may respond in any language — normalize to what the user selected
+  try {
+    return await normalizeLanguage(raw, language);
+  } catch {
+    return raw;
   }
 }
 
@@ -98,7 +117,7 @@ export async function translateToKinyarwanda(text: string): Promise<string> {
   const response = await fetch('/api/translate', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ text }),
+    body: JSON.stringify({ text, targetLanguage: 'KIN' }),
     signal: AbortSignal.timeout(30_000),
   });
   if (!response.ok) throw new Error(`Translate API returned ${response.status}`);
