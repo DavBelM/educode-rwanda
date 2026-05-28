@@ -1,4 +1,6 @@
+import { useState, useEffect } from 'react';
 import { Bot, Sparkles } from 'lucide-react';
+import { translateToKinyarwanda } from '../../lib/ai';
 
 interface AIFeedbackPanelProps {
   feedback: Array<{ type: 'success' | 'error' | 'info'; message: string }>;
@@ -10,6 +12,23 @@ interface AIFeedbackPanelProps {
 
 export function AIFeedbackPanel({ feedback, language, isLoading = false, aiResponse = null, aiLoading = false }: AIFeedbackPanelProps) {
   const isKinyarwanda = language === 'KIN';
+  const [kinText, setKinText] = useState<string | null>(null);
+  const [kinLoading, setKinLoading] = useState(false);
+
+  useEffect(() => { setKinText(null); setKinLoading(false); }, [aiResponse]);
+
+  async function handleTranslate() {
+    if (!aiResponse) return;
+    setKinLoading(true);
+    try {
+      const translated = await translateToKinyarwanda(aiResponse);
+      setKinText(translated);
+    } catch {
+      setKinText(aiResponse);
+    } finally {
+      setKinLoading(false);
+    }
+  }
 
   return (
     <div className="h-full flex flex-col" style={{ background: 'var(--ec-surface)', borderLeft: '1px solid var(--ec-b1)' }}>
@@ -194,9 +213,31 @@ export function AIFeedbackPanel({ feedback, language, isLoading = false, aiRespo
                 </div>
               </div>
             ) : (
-              <p className="text-sm leading-relaxed whitespace-pre-line" style={{ color: 'var(--ec-text-2)' }}>
-                {aiResponse}
-              </p>
+              <>
+                <p className="text-sm leading-relaxed whitespace-pre-line" style={{ color: 'var(--ec-text-2)' }}>
+                  {kinText ?? aiResponse}
+                </p>
+                {!kinText && !kinLoading && (
+                  <button
+                    onClick={handleTranslate}
+                    className="mt-3 w-full px-3 py-1.5 rounded-lg text-xs font-medium transition-all hover:opacity-80"
+                    style={{ border: '1px solid rgba(139,92,246,0.4)', color: '#a78bfa', background: 'rgba(139,92,246,0.08)', fontFamily: 'Inter, sans-serif' }}
+                  >
+                    Sobanura mu Kinyarwanda
+                  </button>
+                )}
+                {kinLoading && (
+                  <div className="mt-3 flex items-center gap-2">
+                    <div className="flex gap-1">
+                      {[0, 150, 300].map(d => (
+                        <div key={d} className="w-1.5 h-1.5 rounded-full animate-bounce"
+                          style={{ background: '#a78bfa', animationDelay: `${d}ms` }} />
+                      ))}
+                    </div>
+                    <span className="text-xs" style={{ color: '#a78bfa' }}>Translating to Kinyarwanda...</span>
+                  </div>
+                )}
+              </>
             )}
           </div>
         )}

@@ -1,4 +1,3 @@
-const HF_SPACE_NAME = 'DavBelaa/educode-rwanda-ai';
 
 const SYSTEM_PROMPT_EN =
   'You are EduCode AI, a coding tutor for Rwandan TVET students. ' +
@@ -98,6 +97,19 @@ export async function getAIFeedback(
     await new Promise(r => setTimeout(r, 800));
     return getMockResponse(error, language);
   }
+}
+
+export async function translateToKinyarwanda(text: string): Promise<string> {
+  const response = await fetch('/api/translate', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text }),
+    signal: AbortSignal.timeout(30_000),
+  });
+  if (!response.ok) throw new Error(`Translate API returned ${response.status}`);
+  const json = await response.json();
+  if (typeof json.text === 'string' && json.text.trim()) return json.text;
+  throw new Error('Empty translation response');
 }
 
 export async function getLessonAIHelp(

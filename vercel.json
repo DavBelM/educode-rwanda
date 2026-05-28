@@ -2,6 +2,9 @@
   "functions": {
     "api/ai.ts": {
       "maxDuration": 300
+    },
+    "api/translate.ts": {
+      "maxDuration": 30
     }
   }
 }
