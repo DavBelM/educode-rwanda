@@ -85,15 +85,29 @@ export async function getAIFeedback(
     ? `This code has an error. Explain what is wrong and how to fix it:\n\`\`\`javascript\n${code}\n\`\`\`\nError: ${error}`
     : `Review this code and suggest any improvements:\n\`\`\`javascript\n${code}\n\`\`\``;
 
+  let raw: string;
   try {
-    const result = await callSpace(question, SYSTEM_PROMPT_EN);
-    console.log('[EduCode AI] Real model response:', result);
-    return result;
-  } catch (err) {
-    console.error('[EduCode AI] Model failed, using mock. Reason:', err);
+    raw = await callSpace(question, SYSTEM_PROMPT_EN);
+  } catch {
     await new Promise(r => setTimeout(r, 800));
     return getMockResponse(error, language);
   }
+
+  // Model always responds in Kinyarwanda — use Gemini to deliver correct language
+  if (language === 'EN') {
+    try {
+      const response = await fetch('/api/translate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: raw, targetLanguage: 'EN' }),
+        signal: AbortSignal.timeout(30_000),
+      });
+      const json = await response.json();
+      if (typeof json.text === 'string' && json.text.trim()) return json.text;
+    } catch { /* fall through to raw */ }
+  }
+
+  return raw;
 }
 
 export async function translateToKinyarwanda(text: string): Promise<string> {
