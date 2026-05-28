@@ -19,7 +19,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const client = await Client.connect(HF_SPACE);
     const result = await client.predict('/chat', {
       message: String(message),
-      param_2: String(systemPrompt ?? ''),
+      param_1: String(systemPrompt ?? ''),
     });
 
     const text = (result.data as unknown[])?.[0];
