@@ -81,18 +81,13 @@ export async function getAIFeedback(
   error: string | null,
   language: 'EN' | 'KIN'
 ): Promise<string> {
-  const question =
-    language === 'KIN'
-      ? (error
-          ? `Muri iyi code hari ikosa, nsobanurire:\n\`\`\`javascript\n${code}\n\`\`\`\nIkosa: ${error}`
-          : `Reba iyi code unsobanurire niba hari ibintu bishobora kongerwa:\n\`\`\`javascript\n${code}\n\`\`\``)
-      : (error
-          ? `This code has an error. Explain what is wrong and how to fix it:\n\`\`\`javascript\n${code}\n\`\`\`\nError: ${error}`
-          : `Review this code and suggest any improvements:\n\`\`\`javascript\n${code}\n\`\`\``);
+  // Always use English for the fine-tuned model — translation to Kinyarwanda is handled by Gemini
+  const question = error
+    ? `This code has an error. Explain what is wrong and how to fix it:\n\`\`\`javascript\n${code}\n\`\`\`\nError: ${error}`
+    : `Review this code and suggest any improvements:\n\`\`\`javascript\n${code}\n\`\`\``;
 
-  const systemPrompt = language === 'KIN' ? SYSTEM_PROMPT_KIN : SYSTEM_PROMPT_EN;
   try {
-    return await callSpace(question, systemPrompt);
+    return await callSpace(question, SYSTEM_PROMPT_EN);
   } catch {
     await new Promise(r => setTimeout(r, 800));
     return getMockResponse(error, language);
