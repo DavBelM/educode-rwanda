@@ -16,11 +16,15 @@ export function AIFeedbackPanel({ feedback, language, isLoading = false, aiRespo
   const [kinLoading, setKinLoading] = useState(false);
 
   const [elapsed, setElapsed] = useState(0);
+  const [responseTime, setResponseTime] = useState<number | null>(null);
 
-  useEffect(() => { setKinText(null); setKinLoading(false); }, [aiResponse]);
+  useEffect(() => { setKinText(null); setKinLoading(false); setResponseTime(null); }, [aiResponse]);
 
   useEffect(() => {
-    if (!aiLoading) { setElapsed(0); return; }
+    if (!aiLoading) {
+      setElapsed(s => { setResponseTime(s); return 0; });
+      return;
+    }
     setElapsed(0);
     const interval = setInterval(() => setElapsed(s => s + 1), 1000);
     return () => clearInterval(interval);
@@ -231,6 +235,11 @@ export function AIFeedbackPanel({ feedback, language, isLoading = false, aiRespo
                 <p className="text-sm leading-relaxed whitespace-pre-line" style={{ color: 'var(--ec-text-2)' }}>
                   {kinText ?? aiResponse}
                 </p>
+                {responseTime !== null && (
+                  <p className="mt-2 text-xs" style={{ color: 'rgba(167,139,250,0.5)' }}>
+                    Responded in {responseTime}s
+                  </p>
+                )}
                 {!kinText && !kinLoading && (
                   <button
                     onClick={handleTranslate}
