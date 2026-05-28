@@ -15,7 +15,16 @@ export function AIFeedbackPanel({ feedback, language, isLoading = false, aiRespo
   const [kinText, setKinText] = useState<string | null>(null);
   const [kinLoading, setKinLoading] = useState(false);
 
+  const [elapsed, setElapsed] = useState(0);
+
   useEffect(() => { setKinText(null); setKinLoading(false); }, [aiResponse]);
+
+  useEffect(() => {
+    if (!aiLoading) { setElapsed(0); return; }
+    setElapsed(0);
+    const interval = setInterval(() => setElapsed(s => s + 1), 1000);
+    return () => clearInterval(interval);
+  }, [aiLoading]);
 
   async function handleTranslate() {
     if (!aiResponse) return;
@@ -204,7 +213,12 @@ export function AIFeedbackPanel({ feedback, language, isLoading = false, aiRespo
                   </span>
                 </div>
                 <p className="text-xs" style={{ color: 'rgba(167,139,250,0.6)' }}>
-                  {isKinyarwanda ? '⏳ Bitinze hafi ya detinue 20s — komeza gutegereza' : '⏳ Usually takes ~20s — please wait'}
+                  {elapsed < 30
+                    ? (isKinyarwanda ? 'Bisaba hafi ya 20s...' : 'Usually takes ~20s...')
+                    : elapsed < 70
+                    ? (isKinyarwanda ? 'Gukora imirimo iremereye — komeza gutegereza...' : 'Loading AI model, please wait...')
+                    : (isKinyarwanda ? 'Bisaba igihe kinini uyu munsi — komeza gutegereza...' : 'Taking longer than usual — still working...')}
+                  <span className="ml-2 font-mono font-bold" style={{ color: '#a78bfa' }}>{elapsed}s</span>
                 </p>
                 <div className="mt-2 space-y-2">
                   <div className="h-2.5 rounded-full animate-pulse" style={{ background: 'rgba(139,92,246,0.25)', width: '90%' }} />
