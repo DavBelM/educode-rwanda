@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>EduCode — Create your account</title>
+<link rel="stylesheet" href="educode.css"/>
+<script src="educode.js"></script>
+<style>
+  .auth { min-height: 100vh; display: grid; grid-template-columns: 1.05fr 1fr; }
+  .auth-aside { background: var(--surface); padding: 40px; display: flex; flex-direction: column; justify-content: space-between; }
+  .auth-aside .logo { font-size: 17px; }
+  .aside-mid { max-width: 32ch; }
+  .aside-mid h2 { font-size: 30px; letter-spacing: -0.03em; line-height: 1.12; }
+  .aside-list { list-style: none; padding: 0; margin: 26px 0 0; }
+  .aside-list li { display: flex; gap: 11px; padding: 10px 0; color: var(--text-2); font-size: 14.5px; }
+  .aside-list li svg { width: 17px; height: 17px; color: var(--text); flex-shrink: 0; margin-top: 2px; }
+  .aside-foot { color: var(--text-3); font-size: 13px; }
+
+  .auth-main { display: flex; align-items: center; justify-content: center; padding: 40px; position: relative; }
+  .auth-top { position: absolute; top: 22px; right: 24px; display: flex; gap: 8px; align-items: center; }
+  .auth-card { width: 100%; max-width: 392px; }
+  .auth-card h1 { font-size: 27px; letter-spacing: -0.03em; }
+  .auth-card .sub { color: var(--text-2); margin-top: 8px; font-size: 14.5px; }
+  .auth-form { margin-top: 24px; display: flex; flex-direction: column; gap: 16px; }
+  .role-seg { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .role-seg label { border: 1px solid var(--line-strong); border-radius: var(--radius); padding: 12px 10px; cursor: pointer; transition: all .15s var(--ease); display:flex; flex-direction:column; gap:2px; }
+  .role-seg label .rt { font-size: 13.5px; color: var(--text); font-weight: 500; }
+  .role-seg label .rd { font-size: 11.5px; color: var(--text-3); }
+  .role-seg input { display: none; }
+  .role-seg input:checked + label { border-color: var(--text-2); background: var(--surface); }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .auth-alt { text-align: center; margin-top: 22px; color: var(--text-2); font-size: 14px; }
+  .auth-alt a { color: var(--text); font-weight: 500; }
+  @media (max-width: 760px){ .auth{ grid-template-columns: 1fr; } .auth-aside{ display:none; } .two{ grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+<div class="auth">
+  <aside class="auth-aside">
+    <a class="logo" href="index.html"><span class="edu">EduCode</span></a>
+    <div class="aside-mid">
+      <h2>One account, the whole path.</h2>
+      <ul class="aside-list">
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Structured courses from your first line of JavaScript.</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>An AI tutor that explains in English or Kinyarwanda.</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Works on shared lab computers and slow connections.</li>
+      </ul>
+    </div>
+    <div class="aside-foot">Free for students at participating schools.</div>
+  </aside>
+
+  <main class="auth-main">
+    <div class="auth-top">
+      <button class="iconbtn" data-action="theme" aria-label="Toggle theme"></button>
+      <button class="iconbtn" data-action="settings" aria-label="Settings"></button>
+    </div>
+    <div class="auth-card rise">
+      <h1>Create your account</h1>
+      <p class="sub">Takes a minute. No card, ever.</p>
+      <form class="auth-form" onsubmit="location.href='Dashboard.html';return false;">
+        <div class="field">
+          <span class="label">I am a…</span>
+          <div class="role-seg">
+            <input type="radio" name="role" id="r-student" checked/><label for="r-student"><span class="rt">Student</span><span class="rd">In a TVET school</span></label>
+            <input type="radio" name="role" id="r-self"/><label for="r-self"><span class="rt">Self-learner</span><span class="rd">On my own</span></label>
+            <input type="radio" name="role" id="r-teacher"/><label for="r-teacher"><span class="rt">Teacher</span><span class="rd">I run classes</span></label>
+            <input type="radio" name="role" id="r-admin"/><label for="r-admin"><span class="rt">Administrator</span><span class="rd">I manage a school</span></label>
+          </div>
+        </div>
+        <div class="two">
+          <div class="field"><span class="label">First name</span><input class="input" type="text" placeholder="Aline"/></div>
+          <div class="field"><span class="label">Last name</span><input class="input" type="text" placeholder="Uwase"/></div>
+        </div>
+        <div class="field"><span class="label">Email</span><input class="input" type="email" placeholder="aline.u@school.rw"/></div>
+        <div class="field">
+          <span class="label">Password</span>
+          <input class="input" type="password" placeholder="At least 8 characters"/>
+          <span class="hint">Use 8+ characters with a number.</span>
+        </div>
+        <label class="checkbox"><input type="checkbox" checked/> I agree to the terms and privacy policy</label>
+        <button class="btn btn-primary btn-block lg" type="submit">Create account</button>
+      </form>
+      <p class="auth-alt">Already have an account? <a href="Login.html">Log in</a></p>
+    </div>
+  </main>
+</div>
+
+<template id="__bundler_thumbnail">
+  <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="200" fill="#0c0c0b"/><rect x="56" y="84" width="88" height="32" rx="7" fill="#efe9dc"/></svg>
+</template>
+</body>
+</html>

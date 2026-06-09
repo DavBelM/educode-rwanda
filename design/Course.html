@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>EduCode — JavaScript Foundations</title>
+<link rel="stylesheet" href="educode.css"/>
+<script src="educode.js"></script>
+<style>
+  .page { padding: 28px 0 90px; }
+  .crumb { display:flex; align-items:center; gap:8px; color: var(--text-3); font-size: 13px; margin-bottom: 22px; }
+  .crumb a:hover { color: var(--text); }
+  .crumb svg { width: 14px; height: 14px; }
+
+  .chead { display:grid; grid-template-columns: 1fr 320px; gap: 40px; align-items:start; margin-bottom: 40px; }
+  .chead .eyebrow { margin-bottom: 14px; }
+  .chead h1 { font-size: 34px; letter-spacing: -0.035em; line-height: 1.08; }
+  .chead .lede { color: var(--text-2); font-size: 16px; line-height: 1.6; margin-top: 14px; max-width: 54ch; }
+  .chead-actions { display:flex; gap:10px; margin-top: 24px; align-items:center; }
+  .chead-meta { display:flex; gap: 22px; margin-top: 26px; color: var(--text-3); font-size: 13px; }
+  .chead-meta span { display:inline-flex; align-items:center; gap:7px; }
+  .chead-meta svg { width: 15px; height: 15px; }
+
+  .sidecard .scrow { display:flex; justify-content:space-between; padding: 11px 0; border-top: 1px solid var(--line); font-size: 13.5px; }
+  .sidecard .scrow:first-child { border-top: 0; }
+  .sidecard .scrow .k { color: var(--text-3); }
+  .sidecard .scrow .v { color: var(--text); font-weight: 500; }
+
+  /* modules */
+  .modules { display:flex; flex-direction:column; gap: 16px; }
+  .module .mhead { display:flex; align-items:center; justify-content:space-between; gap: 16px; padding: 0 4px 14px; }
+  .module .mhead .mt { display:flex; align-items:baseline; gap: 12px; }
+  .module .mhead .mnum { font-family: var(--mono); font-size: 13px; color: var(--text-3); }
+  .module .mhead h3 { font-size: 17px; letter-spacing:-0.02em; }
+  .module .mhead .mc { color: var(--text-3); font-size: 12.5px; }
+
+  .lessons { overflow: hidden; }
+  .lesson { display:grid; grid-template-columns: auto 1fr auto; gap: 14px; align-items:center; padding: 14px 18px; border-top: 1px solid var(--line); transition: background .14s var(--ease); }
+  .lesson:first-child { border-top: 0; }
+  .lesson.clickable { cursor:pointer; color: inherit; }
+  .lesson.clickable:hover { background: var(--surface-2); }
+  .lstat { width: 22px; height: 22px; display:grid; place-items:center; }
+  .lstat svg { width: 19px; height: 19px; }
+  .lstat.done { color: var(--text); }
+  .lstat.cur { color: var(--text); }
+  .lstat.lock { color: var(--text-3); }
+  .lbody .lt { font-size: 14.5px; font-weight: 500; }
+  .lbody .lt.dim { color: var(--text-3); font-weight: 400; }
+  .lbody .lmeta { font-size: 12px; color: var(--text-3); margin-top: 2px; display:flex; gap:8px; align-items:center; }
+  .ltype { font-family: var(--mono); font-size: 11px; color: var(--text-3); text-transform: uppercase; letter-spacing: 0.06em; }
+  .lright { color: var(--text-3); font-size: 12.5px; }
+  @media (max-width: 880px){ .chead{ grid-template-columns:1fr; gap:28px;} }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a class="logo" href="index.html"><span class="edu">EduCode</span></a>
+    <nav class="nav-links collapse">
+      <a class="nav-link" href="Dashboard.html">Dashboard</a>
+      <a class="nav-link active" href="Courses.html">Courses</a>
+      <a class="nav-link" href="Workspace.html">Workspace</a>
+    </nav>
+    <div class="nav-right">
+      <span class="metric" title="12-day streak"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c1 3-1 5-1 5s4 1 4 5a4 4 0 0 1-8 .5C7 10 9 9 9 9s-1-4 3-6z"/></svg><b>12</b></span>
+      <button class="iconbtn" data-action="theme" aria-label="Toggle theme"></button>
+      <button class="iconbtn" data-action="settings" aria-label="Settings"></button>
+      <div class="avatar" title="Aline Uwase">AU</div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap page">
+  <div class="crumb rise">
+    <a href="Courses.html">Courses</a>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="m9 6 6 6-6 6"/></svg>
+    <span style="color:var(--text-2)">JavaScript Foundations</span>
+  </div>
+
+  <div class="chead rise-2">
+    <div>
+      <p class="eyebrow">Course 01 · Beginner</p>
+      <h1>JavaScript Foundations</h1>
+      <p class="lede">The bedrock of every program: variables, types, conditionals, loops, and functions. Hands-on from the very first lesson, with Mwarimu checking your work as you go.</p>
+      <div class="chead-actions">
+        <a class="btn btn-primary" href="Lesson.html">Resume · Module 3</a>
+        <a class="btn btn-tertiary" href="Workspace.html">Open workspace</a>
+      </div>
+      <div class="chead-meta">
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 5h16M4 12h16M4 19h10"/></svg>32 lessons</span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>~9 hours</span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 11l3 3 8-8M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>21 done</span>
+      </div>
+    </div>
+    <aside class="card pad-lg sidecard">
+      <div class="row between" style="margin-bottom:14px;">
+        <span class="card-title">Your progress</span>
+        <span class="dim mono" style="font-size:13px">65%</span>
+      </div>
+      <div class="bar on-card"><i style="width:65%"></i></div>
+      <div class="sp-sm"></div>
+      <div class="scrow"><span class="k">Lessons completed</span><span class="v">21 / 32</span></div>
+      <div class="scrow"><span class="k">Current module</span><span class="v">Functions</span></div>
+      <div class="scrow"><span class="k">Best quiz score</span><span class="v">95%</span></div>
+      <div class="scrow"><span class="k">Earned XP</span><span class="v">1,640</span></div>
+    </aside>
+  </div>
+
+  <div class="modules rise-3">
+    <!-- MODULE 1 -->
+    <section class="module">
+      <div class="mhead">
+        <div class="mt"><span class="mnum">01</span><h3>Variables &amp; Types</h3></div>
+        <span class="mc">6 lessons · complete</span>
+      </div>
+      <div class="card lessons pad-sm" style="padding:0">
+        <a class="lesson clickable" href="Lesson.html">
+          <span class="lstat done"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="m8.5 12 2.5 2.5 4.5-5"/></svg></span>
+          <div class="lbody"><div class="lt dim">What is a variable?</div><div class="lmeta"><span class="ltype">Reading</span>· 6 min</div></div>
+          <span class="lright">Done</span>
+        </a>
+        <a class="lesson clickable" href="Lesson.html">
+          <span class="lstat done"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="m8.5 12 2.5 2.5 4.5-5"/></svg></span>
+          <div class="lbody"><div class="lt dim">Numbers, strings &amp; booleans</div><div class="lmeta"><span class="ltype">Reading</span>· 8 min</div></div>
+          <span class="lright">Done</span>
+        </a>
+        <a class="lesson clickable" href="Workspace.html">
+          <span class="lstat done"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="m8.5 12 2.5 2.5 4.5-5"/></svg></span>
+          <div class="lbody"><div class="lt dim">Exercise: declare three variables</div><div class="lmeta"><span class="ltype">Exercise</span>· 10 min</div></div>
+          <span class="lright">Done</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- MODULE 2 -->
+    <section class="module">
+      <div class="mhead">
+        <div class="mt"><span class="mnum">02</span><h3>Logic &amp; Loops</h3></div>
+        <span class="mc">9 lessons · complete</span>
+      </div>
+      <div class="card lessons" style="padding:0">
+        <a class="lesson clickable" href="Lesson.html">
+          <span class="lstat done"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="m8.5 12 2.5 2.5 4.5-5"/></svg></span>
+          <div class="lbody"><div class="lt dim">if / else if / else</div><div class="lmeta"><span class="ltype">Reading</span>· 9 min</div></div>
+          <span class="lright">Done</span>
+        </a>
+        <a class="lesson clickable" href="Workspace.html">
+          <span class="lstat done"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="m8.5 12 2.5 2.5 4.5-5"/></svg></span>
+          <div class="lbody"><div class="lt dim">Exercise: FizzBuzz</div><div class="lmeta"><span class="ltype">Exercise</span>· 15 min</div></div>
+          <span class="lright">Done</span>
+        </a>
+        <a class="lesson clickable" href="Course.html">
+          <span class="lstat done"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="m8.5 12 2.5 2.5 4.5-5"/></svg></span>
+          <div class="lbody"><div class="lt dim">Quiz: control flow</div><div class="lmeta"><span class="ltype">Quiz</span>· 95%</div></div>
+          <span class="lright">Done</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- MODULE 3 (current) -->
+    <section class="module">
+      <div class="mhead">
+        <div class="mt"><span class="mnum">03</span><h3>Functions &amp; Parameters</h3></div>
+        <span class="mc">8 lessons · in progress</span>
+      </div>
+      <div class="card lessons" style="padding:0">
+        <a class="lesson clickable" href="Lesson.html">
+          <span class="lstat done"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="m8.5 12 2.5 2.5 4.5-5"/></svg></span>
+          <div class="lbody"><div class="lt dim">Declaring functions</div><div class="lmeta"><span class="ltype">Reading</span>· 7 min</div></div>
+          <span class="lright">Done</span>
+        </a>
+        <a class="lesson clickable" href="Lesson.html">
+          <span class="lstat cur"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M10 8.5v7l5.5-3.5z" fill="currentColor" stroke="none"/></svg></span>
+          <div class="lbody"><div class="lt">Default parameters</div><div class="lmeta"><span class="ltype">Reading</span>· 8 min</div></div>
+          <span class="pill accent">Continue</span>
+        </a>
+        <a class="lesson clickable" href="Workspace.html">
+          <span class="lstat lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span>
+          <div class="lbody"><div class="lt dim">Exercise: build a tip calculator</div><div class="lmeta"><span class="ltype">Exercise</span>· 20 min</div></div>
+          <span class="lright">Locked</span>
+        </a>
+        <div class="lesson">
+          <span class="lstat lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span>
+          <div class="lbody"><div class="lt dim">Quiz: functions</div><div class="lmeta"><span class="ltype">Quiz</span>· 6 questions</div></div>
+          <span class="lright">Locked</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- MODULE 4 (locked) -->
+    <section class="module">
+      <div class="mhead">
+        <div class="mt"><span class="mnum">04</span><h3>Scope &amp; the Call Stack</h3></div>
+        <span class="mc">9 lessons · locked</span>
+      </div>
+      <div class="card lessons" style="padding:0">
+        <div class="lesson">
+          <span class="lstat lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span>
+          <div class="lbody"><div class="lt dim">Block vs function scope</div><div class="lmeta"><span class="ltype">Reading</span>· 10 min</div></div>
+          <span class="lright">Locked</span>
+        </div>
+        <div class="lesson">
+          <span class="lstat lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span>
+          <div class="lbody"><div class="lt dim">Reading the call stack</div><div class="lmeta"><span class="ltype">Reading</span>· 12 min</div></div>
+          <span class="lright">Locked</span>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<template id="__bundler_thumbnail">
+  <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="200" fill="#0c0c0b"/><rect x="40" y="56" width="120" height="14" rx="5" fill="#efe9dc"/><rect x="40" y="86" width="120" height="9" rx="4" fill="#161513"/><rect x="40" y="104" width="120" height="9" rx="4" fill="#161513"/><rect x="40" y="122" width="120" height="9" rx="4" fill="#161513"/></svg>
+</template>
+</body>
+</html>

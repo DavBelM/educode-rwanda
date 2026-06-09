@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>EduCode Rwanda — Learn to code, properly</title>
+<link rel="stylesheet" href="educode.css"/>
+<script src="educode.js"></script>
+<style>
+  /* Landing-specific */
+  .hero { padding: 78px 0 60px; }
+  .hero h1 { font-size: clamp(34px, 5.2vw, 60px); line-height: 1.04; letter-spacing: -0.035em; max-width: 16ch; text-wrap: balance; }
+  .hero p.lede { font-size: 18px; color: var(--text-2); line-height: 1.62; max-width: 56ch; margin-top: 22px; text-wrap: pretty; }
+  .hero-cta { display: flex; gap: 12px; margin-top: 32px; flex-wrap: wrap; }
+  .hero-meta { display: flex; gap: 26px; margin-top: 40px; flex-wrap: wrap; }
+  .hero-meta .m { display: flex; flex-direction: column; gap: 2px; }
+  .hero-meta .m b { font-size: 22px; font-weight: 600; letter-spacing: -0.02em; }
+  .hero-meta .m span { font-size: 13px; color: var(--text-3); }
+
+  /* Product mock */
+  .mock { margin-top: 56px; border-radius: 12px; background: var(--surface); padding: 10px; box-shadow: 0 30px 80px rgba(0,0,0,.45); }
+  [data-theme="light"] .mock { box-shadow: 0 30px 80px rgba(30,28,22,.14); }
+  .mock-top { display: flex; align-items: center; gap: 12px; padding: 6px 8px 12px; }
+  .mock-tabs { display: flex; gap: 4px; margin-left: 6px; }
+  .mock-tab { font-size: 12.5px; font-family: var(--mono); color: var(--text-3); padding: 4px 10px; border-radius: 6px; }
+  .mock-tab.on { color: var(--text); background: var(--bg); }
+  .mock-body { display: grid; grid-template-columns: 1.5fr 1fr; gap: 10px; }
+  .mock-editor { background: var(--code-bg); border-radius: 8px; overflow: hidden; }
+  .mock-editor .gut { padding: 16px 18px; font-family: var(--mono); font-size: 13.5px; line-height: 1.85; }
+  .mock-ai { background: var(--bg); border-radius: 8px; padding: 16px; display: flex; flex-direction: column; }
+  .mock-run { margin-left: auto; }
+  .ai-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .ai-who { display: flex; align-items: center; gap: 9px; font-size: 13px; font-weight: 500; }
+  .ai-mwicon { width: 24px; height: 24px; border-radius: 6px; background: var(--surface-2); display: grid; place-items: center; font-family: var(--mono); font-size: 12px; color: var(--text); }
+  .ai-msg { font-size: 13.5px; line-height: 1.6; color: var(--text-2); }
+  .ai-msg b { color: var(--text); font-weight: 500; }
+  .lang-toggle { display: inline-flex; border: 1px solid var(--line); border-radius: 99px; padding: 2px; }
+  .lang-toggle button { border: 0; background: transparent; color: var(--text-3); font-size: 11px; font-weight: 500; letter-spacing: 0.04em; padding: 3px 9px; border-radius: 99px; }
+  .lang-toggle button.on { background: var(--surface-2); color: var(--text); }
+
+  .section { padding: 64px 0; }
+  .section-head { max-width: 60ch; margin-bottom: 36px; }
+  .section-head h2 { font-size: clamp(26px, 3.4vw, 36px); letter-spacing: -0.03em; }
+  .section-head p { color: var(--text-2); font-size: 16.5px; margin-top: 12px; line-height: 1.6; }
+
+  .feat { padding: 26px; }
+  .feat .fi { width: 30px; height: 30px; color: var(--text-2); margin-bottom: 18px; }
+  .feat h3 { font-size: 17px; margin-bottom: 8px; }
+  .feat p { font-size: 14px; color: var(--text-2); line-height: 1.6; }
+
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; }
+  .split ul { list-style: none; padding: 0; margin: 22px 0 0; }
+  .split li { display: flex; gap: 12px; padding: 11px 0; border-top: 1px solid var(--line); font-size: 14.5px; color: var(--text-2); }
+  .split li:first-child { border-top: 0; }
+  .split li svg { width: 17px; height: 17px; color: var(--text); flex-shrink: 0; margin-top: 2px; }
+  .split li b { color: var(--text); font-weight: 500; }
+
+  .cta-band { background: var(--surface); border-radius: 14px; padding: 56px 48px; text-align: center; }
+  .cta-band h2 { font-size: clamp(26px, 3.4vw, 38px); letter-spacing: -0.03em; max-width: 20ch; margin: 0 auto; text-wrap: balance; }
+  .cta-band p { color: var(--text-2); font-size: 16px; margin: 14px auto 28px; max-width: 50ch; }
+
+  footer { border-top: 1px solid var(--line); margin-top: 40px; padding: 40px 0; }
+  .foot { display: flex; justify-content: space-between; gap: 24px; flex-wrap: wrap; color: var(--text-3); font-size: 13.5px; }
+  .foot-links { display: flex; gap: 22px; flex-wrap: wrap; }
+  .foot-links a:hover { color: var(--text); }
+  @media (max-width: 820px){ .mock-body{ grid-template-columns: 1fr; } .split{ grid-template-columns:1fr; gap:32px; } }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a class="logo" href="index.html"><span class="edu">EduCode</span></a>
+    <nav class="nav-links collapse">
+      <a class="nav-link" href="#platform">Platform</a>
+      <a class="nav-link" href="Courses.html">Courses</a>
+      <a class="nav-link" href="#teachers">For schools</a>
+    </nav>
+    <div class="nav-right">
+      <button class="iconbtn" data-action="theme" aria-label="Toggle theme"></button>
+      <button class="iconbtn" data-action="settings" aria-label="Settings"></button>
+      <a class="btn btn-tertiary" href="Login.html">Log in</a>
+      <a class="btn btn-primary sm" href="Signup.html">Get started</a>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <!-- HERO -->
+  <section class="hero">
+    <p class="eyebrow rise">JavaScript for Rwandan TVET</p>
+    <h1 class="rise-2">Learn to code on the tools real developers use.</h1>
+    <p class="lede rise-3">EduCode is a JavaScript learning platform for technical secondary schools — structured courses, a proper code workspace, and an AI tutor that explains your mistakes in English or Kinyarwanda.</p>
+    <div class="hero-cta rise-3">
+      <a class="btn btn-primary lg" href="Signup.html">Start learning free</a>
+      <a class="btn btn-secondary lg" href="Courses.html">Browse the courses</a>
+    </div>
+    <div class="hero-meta rise-4">
+      <div class="m"><b>40+</b><span>Guided lessons</span></div>
+      <div class="m"><b>EN · RW</b><span>Feedback in two languages</span></div>
+      <div class="m"><b>Low-data</b><span>Built for shared lab computers</span></div>
+    </div>
+
+    <!-- PRODUCT MOCK -->
+    <div class="mock rise-4">
+      <div class="mock-top">
+        <span class="pill"><span class="dot"></span>Exercise 3 · Functions</span>
+        <div class="mock-tabs">
+          <span class="mock-tab on">greet.js</span>
+          <span class="mock-tab">console</span>
+        </div>
+        <button class="btn btn-primary sm mock-run">Run code</button>
+      </div>
+      <div class="mock-body">
+        <div class="mock-editor">
+          <div class="gut">
+<span class="t-com">// Greet a learner by name</span><br/>
+<span class="t-key">function</span> <span class="t-fn">greet</span><span class="t-pun">(</span><span class="t-var">name</span><span class="t-pun">)</span> <span class="t-pun">{</span><br/>
+&nbsp;&nbsp;<span class="t-key">const</span> <span class="t-var">message</span> <span class="t-pun">=</span> <span class="t-str">"Muraho, "</span> <span class="t-pun">+</span> <span class="t-var">name</span><span class="t-pun">;</span><br/>
+&nbsp;&nbsp;<span class="t-key">return</span> <span class="t-var">message</span><span class="t-pun">;</span><br/>
+<span class="t-pun">}</span><br/>
+<br/>
+<span class="t-fn">greet</span><span class="t-pun">(</span><span class="t-str">"Aline"</span><span class="t-pun">)</span><span class="t-pun">;</span>
+          </div>
+        </div>
+        <div class="mock-ai">
+          <div class="ai-head">
+            <div class="ai-who"><span class="ai-mwicon">M</span>Mwarimu</div>
+            <div class="lang-toggle"><button class="on">EN</button><button>RW</button></div>
+          </div>
+          <p class="ai-msg" data-en="true"><b>Nice — your function returns a value.</b> One thing to try: what happens if you call <span class="code-inline">greet()</span> with no name? Add a default so it never breaks.</p>
+          <p class="ai-msg" data-en="false" style="display:none"><b>Byiza — umurimo wawe usubiza agaciro.</b> Gerageza ikintu kimwe: bigenda bite iyo uhamagaye <span class="code-inline">greet()</span> nta zina? Ongeraho agaciro fatizo kugira ngo idapfa.</p>
+          <div class="sp-sm"></div>
+          <div class="row" style="margin-top:auto; gap:8px;">
+            <button class="btn btn-secondary sm">Give me a hint</button>
+            <button class="btn btn-tertiary sm">Explain more</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PLATFORM / FEATURES -->
+  <section class="section" id="platform">
+    <div class="section-head">
+      <p class="eyebrow">The platform</p>
+      <h2>Everything between a first <span class="mono" style="font-size:0.82em">console.log</span> and a working program.</h2>
+      <p>Each part is designed to feel like professional software, not a toy — so the habits you build here transfer to the real world.</p>
+    </div>
+    <div class="grid g-3">
+      <article class="card feat">
+        <svg class="fi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16M4 12h16M4 19h10"/></svg>
+        <h3>Structured courses</h3>
+        <p>Lessons and exercises ordered from fundamentals to real projects, each with a clear goal and a checkpoint before you move on.</p>
+      </article>
+      <article class="card feat">
+        <svg class="fi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a4 4 0 0 1 4 4v1a4 4 0 0 1-8 0V7a4 4 0 0 1 4-4zM5 21a7 7 0 0 1 14 0"/></svg>
+        <h3>An AI tutor, bilingual</h3>
+        <p>Mwarimu reads your code, points out the real mistake, and offers a hint before the fix — switching between English and Kinyarwanda instantly.</p>
+      </article>
+      <article class="card feat">
+        <svg class="fi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/><path d="M9 12h6"/></svg>
+        <h3>A real workspace</h3>
+        <p>Write code in a proper editor with syntax highlighting and a live console — the same shape of tools you will use as a junior developer.</p>
+      </article>
+      <article class="card feat">
+        <svg class="fi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3 8-8M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        <h3>Exam mode</h3>
+        <p>A focused assessment view with the tutor stepped back, so teachers can measure what each student can do on their own.</p>
+      </article>
+      <article class="card feat">
+        <svg class="fi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18M7 14l3-4 4 3 5-7"/></svg>
+        <h3>Teacher dashboard</h3>
+        <p>Classes, assignments, and per-student progress in one place — see who is stuck and where, without collecting a single file.</p>
+      </article>
+      <article class="card feat">
+        <svg class="fi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9 6.8 19.2l1-5.8-4.3-4.1 5.9-.9z"/></svg>
+        <h3>Quiet progress</h3>
+        <p>XP and daily streaks track your momentum without the noise — a thin counter and a clear next step, never confetti.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- BILINGUAL SPLIT -->
+  <section class="section" id="bilingual">
+    <div class="split">
+      <div>
+        <p class="eyebrow">Feedback that meets you halfway</p>
+        <h2 style="font-size:clamp(26px,3.4vw,34px); letter-spacing:-0.03em;">Read the explanation in the language you think in.</h2>
+        <p class="muted" style="margin-top:14px; font-size:16px; line-height:1.6;">Every hint, error explanation, and lesson summary has a one-tap switch between English and Kinyarwanda. Nothing reloads, and you never lose your place.</p>
+        <ul>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span><b>Per-message, not per-account.</b> Switch one explanation to Kinyarwanda and keep the rest in English.</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span><b>Code terms stay in English.</b> You still learn the vocabulary the industry uses.</span></li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg><span><b>Works on slow connections.</b> Translations are lightweight and cache for the lesson.</span></li>
+        </ul>
+      </div>
+      <div class="card pad-lg">
+        <div class="ai-head" style="margin-bottom:16px;">
+          <div class="ai-who" style="font-size:14px;"><span class="ai-mwicon">M</span>Mwarimu · explaining an error</div>
+        </div>
+        <div class="code plain" style="margin-bottom:16px;">
+<span class="t-var">total</span> <span class="t-pun">=</span> <span class="t-var">price</span> <span class="t-pun">*</span> <span class="t-var">qty</span><span class="t-pun">;</span><br/>
+<span class="t-com">// ReferenceError: price is not defined</span>
+        </div>
+        <p class="ai-msg" style="font-size:14.5px;"><b>The name <span class="code-inline">price</span> doesn't exist yet.</b> You used it before declaring it. Declare it with <span class="code-inline">const price = …</span> above this line, then run again.</p>
+        <div class="divider" style="margin:18px 0;"></div>
+        <p class="ai-msg" style="font-size:14.5px;"><b>Izina <span class="code-inline">price</span> ntiriraho.</b> Wararikoresheje mbere yo kuritangaza. Ritangaze ukoresheje <span class="code-inline">const price = …</span> haruguru y'uyu murongo, hanyuma wongere ukore.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOR SCHOOLS -->
+  <section class="section" id="teachers">
+    <div class="cta-band">
+      <p class="eyebrow" style="margin-bottom:14px;">For teachers &amp; school administrators</p>
+      <h2>Run a whole class without collecting a single USB stick.</h2>
+      <p>Create classes, assign exercises, and watch progress arrive in real time. Built to share gracefully across the lab computers your school already has.</p>
+      <div class="row" style="justify-content:center; gap:12px;">
+        <a class="btn btn-primary lg" href="Teacher.html">See the teacher view</a>
+        <a class="btn btn-secondary lg" href="Dashboard.html">See the student view</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <div>
+      <div class="logo" style="margin-bottom:8px;"><span class="edu">EduCode</span></div>
+      <div>Built for Rwandan technical secondary schools.</div>
+    </div>
+    <div class="foot-links">
+      <a href="Courses.html">Courses</a>
+      <a href="#platform">Platform</a>
+      <a href="#teachers">For schools</a>
+      <a href="Login.html">Log in</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Hero AI language toggle (local demo)
+  document.querySelectorAll('.lang-toggle button').forEach(function(btn, i, all){
+    btn.addEventListener('click', function(){
+      var box = btn.closest('.mock-ai');
+      box.querySelectorAll('.lang-toggle button').forEach(function(b){ b.classList.remove('on'); });
+      btn.classList.add('on');
+      var en = btn.textContent.trim() === 'EN';
+      box.querySelector('[data-en="true"]').style.display = en ? '' : 'none';
+      box.querySelector('[data-en="false"]').style.display = en ? 'none' : '';
+    });
+  });
+</script>
+
+<template id="__bundler_thumbnail">
+  <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <rect width="200" height="200" fill="#0c0c0b"/>
+    <rect x="50" y="78" width="100" height="44" rx="8" fill="#efe9dc"/>
+    <text x="100" y="107" text-anchor="middle" fill="#1a1815" font-family="monospace" font-weight="600" font-size="20">{ }</text>
+  </svg>
+</template>
+</body>
+</html>

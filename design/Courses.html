@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>EduCode — Courses</title>
+<link rel="stylesheet" href="educode.css"/>
+<script src="educode.js"></script>
+<style>
+  .page { padding: 36px 0 90px; }
+  .phead { margin-bottom: 28px; }
+  .phead h1 { font-size: 30px; letter-spacing: -0.03em; }
+  .phead p { color: var(--text-2); margin-top: 8px; font-size: 15px; max-width: 60ch; }
+
+  .toolbar { display: flex; align-items: center; gap: 14px; margin-bottom: 26px; flex-wrap: wrap; }
+  .search { position: relative; flex: 1; min-width: 220px; max-width: 360px; }
+  .search svg { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--text-3); }
+  .search input { width: 100%; background: var(--surface); border: 1px solid transparent; border-radius: var(--radius); padding: 10px 13px 10px 38px; font-family: inherit; font-size: 14px; color: var(--text); }
+  .search input::placeholder { color: var(--text-3); }
+  .search input:focus { outline: none; border-color: var(--line-strong); }
+  .filters { display: flex; gap: 6px; }
+  .filters button { background: transparent; border: 1px solid var(--line-strong); color: var(--text-2); border-radius: var(--radius-pill); padding: 7px 14px; font-size: 13px; font-weight: 500; transition: all .15s var(--ease); }
+  .filters button:hover { color: var(--text); border-color: var(--text-3); }
+  .filters button.on { background: var(--surface); color: var(--text); border-color: var(--text-3); }
+
+  .courses { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  .course { display: flex; flex-direction: column; }
+  .course .ctop { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; margin-bottom: 14px; }
+  .course .cnum { font-family: var(--mono); font-size: 12px; color: var(--text-3); }
+  .course h3 { font-size: 18px; letter-spacing: -0.02em; }
+  .course .cdesc { color: var(--text-2); font-size: 13.5px; line-height: 1.55; margin-top: 8px; flex: 1; }
+  .course .cmeta { display: flex; gap: 16px; margin-top: 18px; color: var(--text-3); font-size: 12.5px; }
+  .course .cmeta span { display:inline-flex; align-items:center; gap:6px; }
+  .course .cmeta svg { width: 14px; height: 14px; }
+  .course .cprog { margin-top: 16px; }
+  .course .cprog .pl { display:flex; justify-content:space-between; font-size:12px; color:var(--text-3); margin-bottom:7px; }
+  @media (max-width: 900px){ .courses{ grid-template-columns: repeat(2,1fr);} }
+  @media (max-width: 620px){ .courses{ grid-template-columns: 1fr;} }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a class="logo" href="index.html"><span class="edu">EduCode</span></a>
+    <nav class="nav-links collapse">
+      <a class="nav-link" href="Dashboard.html">Dashboard</a>
+      <a class="nav-link active" href="Courses.html">Courses</a>
+      <a class="nav-link" href="Workspace.html">Workspace</a>
+    </nav>
+    <div class="nav-right">
+      <span class="metric" title="12-day streak"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c1 3-1 5-1 5s4 1 4 5a4 4 0 0 1-8 .5C7 10 9 9 9 9s-1-4 3-6z"/></svg><b>12</b></span>
+      <button class="iconbtn" data-action="theme" aria-label="Toggle theme"></button>
+      <button class="iconbtn" data-action="settings" aria-label="Settings"></button>
+      <div class="avatar" title="Aline Uwase">AU</div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap page">
+  <div class="phead rise">
+    <h1>Courses</h1>
+    <p>A path from your first variable to a working program. Complete a course to unlock the next.</p>
+  </div>
+
+  <div class="toolbar rise-2">
+    <div class="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input type="text" placeholder="Search courses"/>
+    </div>
+    <div class="filters">
+      <button class="on">All</button>
+      <button>In progress</button>
+      <button>Not started</button>
+      <button>Completed</button>
+    </div>
+  </div>
+
+  <div class="courses rise-2">
+    <!-- in progress -->
+    <a class="card course card-link" href="Course.html">
+      <div class="ctop"><span class="cnum">01</span><span class="pill"><span class="dot"></span>In progress</span></div>
+      <h3>JavaScript Foundations</h3>
+      <p class="cdesc">Variables, types, conditionals, loops, and functions — the bedrock every program is built on.</p>
+      <div class="cmeta">
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 5h16M4 12h16M4 19h10"/></svg>32 lessons</span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2v20M2 12h20"/></svg>Beginner</span>
+      </div>
+      <div class="cprog">
+        <div class="pl"><span>Progress</span><span>65%</span></div>
+        <div class="bar on-card"><i style="width:65%"></i></div>
+      </div>
+    </a>
+
+    <!-- in progress -->
+    <a class="card course card-link" href="Course.html">
+      <div class="ctop"><span class="cnum">02</span><span class="pill"><span class="dot"></span>In progress</span></div>
+      <h3>Working with Data</h3>
+      <p class="cdesc">Arrays, objects, and the methods that let you store, search, and reshape information.</p>
+      <div class="cmeta">
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 5h16M4 12h16M4 19h10"/></svg>26 lessons</span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2v20M2 12h20"/></svg>Beginner</span>
+      </div>
+      <div class="cprog">
+        <div class="pl"><span>Progress</span><span>20%</span></div>
+        <div class="bar on-card"><i style="width:20%"></i></div>
+      </div>
+    </a>
+
+    <!-- not started -->
+    <a class="card course card-link" href="Course.html">
+      <div class="ctop"><span class="cnum">03</span><span class="pill">Locked</span></div>
+      <h3>The Browser &amp; the DOM</h3>
+      <p class="cdesc">Make a page react to a click. Select elements, handle events, and change what users see.</p>
+      <div class="cmeta">
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 5h16M4 12h16M4 19h10"/></svg>24 lessons</span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2v20M2 12h20"/></svg>Intermediate</span>
+      </div>
+      <div class="cprog">
+        <div class="pl"><span>Complete "Working with Data" to unlock</span></div>
+        <div class="bar on-card"><i style="width:0%"></i></div>
+      </div>
+    </a>
+
+    <!-- not started -->
+    <a class="card course card-link" href="Course.html">
+      <div class="ctop"><span class="cnum">04</span><span class="pill">Locked</span></div>
+      <h3>Asynchronous JavaScript</h3>
+      <p class="cdesc">Promises, <span class="code-inline">async</span>/<span class="code-inline">await</span>, and fetching data without freezing the page.</p>
+      <div class="cmeta">
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 5h16M4 12h16M4 19h10"/></svg>18 lessons</span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2v20M2 12h20"/></svg>Intermediate</span>
+      </div>
+      <div class="cprog">
+        <div class="pl"><span>Locked</span></div>
+        <div class="bar on-card"><i style="width:0%"></i></div>
+      </div>
+    </a>
+
+    <!-- completed -->
+    <a class="card course card-link" href="Course.html">
+      <div class="ctop"><span class="cnum">00</span><span class="pill solid"><span class="dot"></span>Completed</span></div>
+      <h3>Getting Started</h3>
+      <p class="cdesc">Set up your workspace, run your first script, and read an error message without panicking.</p>
+      <div class="cmeta">
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 5h16M4 12h16M4 19h10"/></svg>8 lessons</span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2v20M2 12h20"/></svg>Beginner</span>
+      </div>
+      <div class="cprog">
+        <div class="pl"><span>Progress</span><span>100%</span></div>
+        <div class="bar on-card"><i style="width:100%"></i></div>
+      </div>
+    </a>
+
+    <!-- capstone -->
+    <a class="card course card-link" href="Course.html">
+      <div class="ctop"><span class="cnum">05</span><span class="pill">Capstone</span></div>
+      <h3>Build a Real Project</h3>
+      <p class="cdesc">Bring it together: plan, build, and present a small JavaScript app of your own from scratch.</p>
+      <div class="cmeta">
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 5h16M4 12h16M4 19h10"/></svg>6 milestones</span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2v20M2 12h20"/></svg>Project</span>
+      </div>
+      <div class="cprog">
+        <div class="pl"><span>Locked</span></div>
+        <div class="bar on-card"><i style="width:0%"></i></div>
+      </div>
+    </a>
+  </div>
+</main>
+
+<template id="__bundler_thumbnail">
+  <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="200" fill="#0c0c0b"/><rect x="36" y="64" width="56" height="72" rx="8" fill="#161513"/><rect x="108" y="64" width="56" height="72" rx="8" fill="#161513"/><rect x="48" y="120" width="32" height="6" rx="3" fill="#efe9dc"/></svg>
+</template>
+</body>
+</html>

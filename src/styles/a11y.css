@@ -1,0 +1,130 @@
+/* ==========================================================================
+   EduCode Rwanda — Accessibility supplements for the design system.
+   Imported after educode.css in index.css.
+   Covers three gaps in educode.css:
+     1. :focus-visible rings on interactive classes
+     2. Disabled-state opacity and cursor
+     3. Profile dropdown keyboard-highlight state
+   ========================================================================== */
+
+/* ---- Focus rings ------------------------------------------------------- */
+/* var(--text-2) passes 3:1 on every surface in both dark and light mode.
+   Minimum measured: 4.7:1 on light --surface-2. */
+
+.btn:focus-visible,
+.iconbtn:focus-visible,
+.nav-link:focus-visible,
+.card-link:focus-visible,
+.avatar:focus-visible,
+.seg button:focus-visible,
+.quick button:focus-visible,
+.send:focus-visible {
+  outline: 2px solid var(--text-2);
+  outline-offset: 2px;
+}
+
+/* Checkbox: appearance:none removes the native ring — replace it. */
+.checkbox input:focus-visible {
+  outline: 2px solid var(--text-2);
+  outline-offset: 2px;
+}
+
+/* Inputs already have an outline:none + box-shadow on :focus.
+   Strengthen the shadow so it reads clearly at all zoom levels. */
+.input:focus-visible,
+.textarea:focus-visible,
+.select:focus-visible {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--text-2) 35%, transparent);
+}
+
+/* ---- Disabled states --------------------------------------------------- */
+/* pointer-events intentionally omitted — the browser blocks interaction
+   natively when the disabled attribute is present on the element. */
+
+.btn:disabled,
+.input:disabled,
+.textarea:disabled,
+.select:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ---- AppNav profile dropdown ------------------------------------------- */
+/* Radix DropdownMenu.Content receives .nav-dropdown.
+   Radix DropdownMenu.Item receives .nav-dropdown-item.
+   [data-highlighted] is the Radix attribute for keyboard-focused items. */
+
+.nav-dropdown {
+  min-width: 200px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 6px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+  outline: none;
+  z-index: 60;
+  animation: popin 0.14s var(--ease, cubic-bezier(0.22, 0.61, 0.36, 1)) both;
+}
+
+[data-theme="light"] .nav-dropdown {
+  box-shadow: 0 12px 40px rgba(30, 28, 22, 0.16);
+}
+
+.nav-dropdown-header {
+  padding: 8px 10px 10px;
+  border-bottom: 1px solid var(--line-soft);
+  margin-bottom: 4px;
+}
+
+.nav-dropdown-header p {
+  margin: 0;
+}
+
+.nav-dropdown-header p:first-child {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.nav-dropdown-header p:last-child {
+  font-size: 12px;
+  color: var(--text-3);
+  margin-top: 2px;
+  text-transform: capitalize;
+}
+
+.nav-dropdown-sep {
+  height: 1px;
+  background: var(--line-soft);
+  margin: 4px 0;
+}
+
+.nav-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 10px;
+  border-radius: 6px;
+  font-size: 13.5px;
+  color: var(--text-2);
+  cursor: pointer;
+  outline: none;
+  transition: background 0.12s, color 0.12s;
+  user-select: none;
+}
+
+.nav-dropdown-item:hover,
+.nav-dropdown-item[data-highlighted] {
+  background: var(--hover);
+  color: var(--text);
+}
+
+.nav-dropdown-item.signout {
+  color: var(--error);
+}
+
+.nav-dropdown-item.signout:hover,
+.nav-dropdown-item.signout[data-highlighted] {
+  background: var(--error-dim);
+  color: var(--error);
+}

@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>EduCode — Teacher</title>
+<link rel="stylesheet" href="educode.css"/>
+<script src="educode.js"></script>
+<style>
+  .page { padding: 32px 0 90px; }
+  .thead { display:flex; align-items:flex-end; justify-content:space-between; gap:20px; flex-wrap:wrap; margin-bottom: 28px; }
+  .thead h1 { font-size: 28px; letter-spacing:-0.03em; }
+  .thead .sub { color: var(--text-2); margin-top: 6px; font-size: 14.5px; }
+  .classsel { display:inline-flex; align-items:center; gap:10px; }
+  .classsel select { background: var(--surface); border:1px solid transparent; border-radius: var(--radius); padding: 9px 13px; color: var(--text); font-family:inherit; font-size: 14px; }
+  .classsel select:focus { outline:none; border-color: var(--line-strong); }
+
+  .stats { display:grid; grid-template-columns: repeat(4,1fr); gap: 1px; background: var(--line); border-radius: var(--radius); overflow:hidden; margin-bottom: 26px; }
+  .stat { background: var(--surface); padding: 20px 22px; }
+  .stat .sl { color: var(--text-3); font-size: 12.5px; }
+  .stat .sv { font-size: 28px; font-weight: 600; letter-spacing:-0.02em; margin-top: 6px; }
+  .stat .sd { font-size: 12px; color: var(--text-2); margin-top: 4px; }
+  .stat .sd.warn { color: var(--error); }
+
+  .tgrid { display:grid; grid-template-columns: 1fr 332px; gap: 22px; align-items:start; }
+  @media (max-width: 920px){ .tgrid{ grid-template-columns:1fr; } .stats{ grid-template-columns: repeat(2,1fr);} }
+
+  /* roster table */
+  .roster { padding: 0; overflow: hidden; }
+  .rhead { display:flex; align-items:center; justify-content:space-between; padding: 18px 22px; }
+  table.tbl { width:100%; border-collapse: collapse; }
+  table.tbl th { text-align:left; font-size: 11.5px; letter-spacing:0.06em; text-transform:uppercase; color: var(--text-3); font-weight:500; padding: 10px 22px; border-top:1px solid var(--line); border-bottom:1px solid var(--line); }
+  table.tbl td { padding: 14px 22px; border-bottom: 1px solid var(--line); font-size: 14px; vertical-align: middle; }
+  table.tbl tr:last-child td { border-bottom: 0; }
+  table.tbl tbody tr { transition: background .14s var(--ease); cursor:pointer; }
+  table.tbl tbody tr:hover { background: var(--surface-2); }
+  .stu { display:flex; align-items:center; gap: 11px; }
+  .stu .av { width: 30px; height:30px; border-radius:50%; background: var(--surface-2); border:1px solid var(--line); display:grid; place-items:center; font-size:11px; color: var(--text); flex-shrink:0; }
+  .stu .nm { font-weight: 500; }
+  .stu .un { font-size: 12px; color: var(--text-3); }
+  .pcell { display:flex; align-items:center; gap: 11px; min-width: 130px; }
+  .pcell .bar { flex:1; }
+  .pcell .pv { font-family: var(--mono); font-size: 12.5px; color: var(--text-2); width: 34px; }
+  td .when { color: var(--text-3); font-size: 13px; }
+
+  /* side cards */
+  .att-item { display:flex; gap: 12px; padding: 14px 0; border-top: 1px solid var(--line); }
+  .att-item:first-child { border-top:0; padding-top: 2px; }
+  .att-item .av { width: 28px; height:28px; border-radius:50%; background: var(--surface-2); border:1px solid var(--line); display:grid; place-items:center; font-size:11px; flex-shrink:0; }
+  .att-item .ab .t { font-size: 13.5px; font-weight:500; }
+  .att-item .ab .d { font-size: 12.5px; color: var(--text-2); margin-top:2px; line-height:1.45; }
+  .asg { display:flex; align-items:center; justify-content:space-between; gap:12px; padding: 13px 0; border-top:1px solid var(--line); }
+  .asg:first-child{ border-top:0; padding-top:2px;}
+  .asg .at { font-size: 13.5px; font-weight: 500; }
+  .asg .ad { font-size: 12px; color: var(--text-3); margin-top:2px; }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a class="logo" href="index.html"><span class="edu">EduCode</span></a>
+    <nav class="nav-links collapse">
+      <a class="nav-link active" href="Teacher.html">Overview</a>
+      <a class="nav-link" href="Teacher.html">Classes</a>
+      <a class="nav-link" href="Teacher.html">Assignments</a>
+    </nav>
+    <div class="nav-right">
+      <button class="iconbtn" data-action="theme" aria-label="Toggle theme"></button>
+      <button class="iconbtn" data-action="settings" aria-label="Settings"></button>
+      <div class="avatar" title="Mr. Habimana">MH</div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap page">
+  <div class="thead rise">
+    <div>
+      <h1>Good morning, Mr. Habimana.</h1>
+      <p class="sub">3 students need a look before today's class.</p>
+    </div>
+    <div class="row" style="gap:12px;">
+      <div class="classsel">
+        <select>
+          <option>S5 SOD · JavaScript Foundations</option>
+          <option>S4 SOD · Getting Started</option>
+          <option>S6 NIT · Working with Data</option>
+        </select>
+      </div>
+      <button class="btn btn-primary">New assignment</button>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats rise-2">
+    <div class="stat"><div class="sl">Students</div><div class="sv">28</div><div class="sd">26 active this week</div></div>
+    <div class="stat"><div class="sl">Class progress</div><div class="sv">58%</div><div class="sd">+6% since last week</div></div>
+    <div class="stat"><div class="sl">To review</div><div class="sv">12</div><div class="sd">submissions waiting</div></div>
+    <div class="stat"><div class="sl">Falling behind</div><div class="sv">3</div><div class="sd warn">no activity in 5+ days</div></div>
+  </div>
+
+  <div class="tgrid">
+    <!-- ROSTER -->
+    <section class="card roster rise-2">
+      <div class="rhead">
+        <h3 class="card-title">Class roster</h3>
+        <div class="row" style="gap:8px;">
+          <span class="pill"><span class="dot"></span>28 students</span>
+          <a class="btn btn-tertiary sm" href="#">Export</a>
+        </div>
+      </div>
+      <table class="tbl">
+        <thead>
+          <tr><th>Student</th><th>Course progress</th><th>Current module</th><th>Last active</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><div class="stu"><span class="av">AU</span><div><div class="nm">Aline Uwase</div><div class="un">aline.u</div></div></div></td>
+            <td><div class="pcell"><div class="bar"><i style="width:65%"></i></div><span class="pv">65%</span></div></td>
+            <td>Functions</td>
+            <td><span class="when">2 hours ago</span></td>
+            <td><span class="pill solid"><span class="dot"></span>On track</span></td>
+          </tr>
+          <tr>
+            <td><div class="stu"><span class="av">JN</span><div><div class="nm">Jean Niyonzima</div><div class="un">jean.n</div></div></div></td>
+            <td><div class="pcell"><div class="bar"><i style="width:82%"></i></div><span class="pv">82%</span></div></td>
+            <td>Scope</td>
+            <td><span class="when">Yesterday</span></td>
+            <td><span class="pill solid"><span class="dot"></span>On track</span></td>
+          </tr>
+          <tr>
+            <td><div class="stu"><span class="av">CI</span><div><div class="nm">Chantal Ingabire</div><div class="un">chantal.i</div></div></div></td>
+            <td><div class="pcell"><div class="bar"><i style="width:34%"></i></div><span class="pv">34%</span></div></td>
+            <td>Logic &amp; Loops</td>
+            <td><span class="when">6 days ago</span></td>
+            <td><span class="pill error">Behind</span></td>
+          </tr>
+          <tr>
+            <td><div class="stu"><span class="av">EM</span><div><div class="nm">Eric Mugisha</div><div class="un">eric.m</div></div></div></td>
+            <td><div class="pcell"><div class="bar"><i style="width:71%"></i></div><span class="pv">71%</span></div></td>
+            <td>Functions</td>
+            <td><span class="when">3 hours ago</span></td>
+            <td><span class="pill solid"><span class="dot"></span>On track</span></td>
+          </tr>
+          <tr>
+            <td><div class="stu"><span class="av">DI</span><div><div class="nm">Diane Iradukunda</div><div class="un">diane.i</div></div></div></td>
+            <td><div class="pcell"><div class="bar"><i style="width:48%"></i></div><span class="pv">48%</span></div></td>
+            <td>Logic &amp; Loops</td>
+            <td><span class="when">Today</span></td>
+            <td><span class="pill"><span class="dot"></span>Needs help</span></td>
+          </tr>
+          <tr>
+            <td><div class="stu"><span class="av">PK</span><div><div class="nm">Patrick Kagabo</div><div class="un">patrick.k</div></div></div></td>
+            <td><div class="pcell"><div class="bar"><i style="width:22%"></i></div><span class="pv">22%</span></div></td>
+            <td>Variables &amp; Types</td>
+            <td><span class="when">8 days ago</span></td>
+            <td><span class="pill error">Behind</span></td>
+          </tr>
+          <tr>
+            <td><div class="stu"><span class="av">SU</span><div><div class="nm">Sandrine Umutoni</div><div class="un">sandrine.u</div></div></div></td>
+            <td><div class="pcell"><div class="bar"><i style="width:90%"></i></div><span class="pv">90%</span></div></td>
+            <td>Scope</td>
+            <td><span class="when">1 hour ago</span></td>
+            <td><span class="pill solid"><span class="dot"></span>On track</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- SIDE -->
+    <aside class="stack" style="--gap:22px">
+      <section class="card pad-lg rise-3">
+        <div class="card-head"><h3 class="card-title">Needs attention</h3><span class="pill error">3</span></div>
+        <div class="att-item">
+          <span class="av">PK</span>
+          <div class="ab"><div class="t">Patrick Kagabo</div><div class="d">No activity in 8 days. Stuck on "Variables &amp; Types" since the 1st.</div></div>
+        </div>
+        <div class="att-item">
+          <span class="av">CI</span>
+          <div class="ab"><div class="t">Chantal Ingabire</div><div class="d">Repeated <span class="code-inline">===</span> mistakes flagged by Mwarimu across 3 exercises.</div></div>
+        </div>
+        <div class="att-item">
+          <span class="av">DI</span>
+          <div class="ab"><div class="t">Diane Iradukunda</div><div class="d">Asked Mwarimu for the same hint 5 times on loops — may need a check-in.</div></div>
+        </div>
+      </section>
+
+      <section class="card pad-lg rise-3">
+        <div class="card-head"><h3 class="card-title">Assignments</h3><a class="btn btn-tertiary sm" href="#">Manage</a></div>
+        <div class="asg">
+          <div><div class="at">Build a tip calculator</div><div class="ad">Due tomorrow</div></div>
+          <span class="pill">16 / 28 in</span>
+        </div>
+        <div class="asg">
+          <div><div class="at">Loops practice set</div><div class="ad">Due Friday</div></div>
+          <span class="pill">9 / 28 in</span>
+        </div>
+        <div class="asg">
+          <div><div class="at">Arrays quiz</div><div class="ad">Closed Monday</div></div>
+          <span class="pill solid"><span class="dot"></span>Graded</span>
+        </div>
+      </section>
+    </aside>
+  </div>
+</main>
+
+<template id="__bundler_thumbnail">
+  <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="200" fill="#0c0c0b"/><rect x="30" y="48" width="140" height="20" rx="6" fill="#161513"/><rect x="30" y="76" width="140" height="20" rx="6" fill="#161513"/><rect x="30" y="104" width="140" height="20" rx="6" fill="#161513"/><rect x="40" y="132" width="80" height="10" rx="5" fill="#efe9dc"/></svg>
+</template>
+</body>
+</html>

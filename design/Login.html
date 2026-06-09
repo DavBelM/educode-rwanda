@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>EduCode — Log in</title>
+<link rel="stylesheet" href="educode.css"/>
+<script src="educode.js"></script>
+<style>
+  .auth { min-height: 100vh; display: grid; grid-template-columns: 1.05fr 1fr; }
+  .auth-aside { background: var(--surface); padding: 40px; display: flex; flex-direction: column; justify-content: space-between; }
+  .auth-aside .logo { font-size: 17px; }
+  .aside-mid { max-width: 30ch; }
+  .aside-mid h2 { font-size: 30px; letter-spacing: -0.03em; line-height: 1.12; }
+  .aside-mid p { color: var(--text-2); margin-top: 14px; font-size: 15px; line-height: 1.6; }
+  .aside-code { margin-top: 26px; }
+  .aside-foot { color: var(--text-3); font-size: 13px; }
+
+  .auth-main { display: flex; align-items: center; justify-content: center; padding: 40px; position: relative; }
+  .auth-top { position: absolute; top: 22px; right: 24px; display: flex; gap: 8px; align-items: center; }
+  .auth-card { width: 100%; max-width: 380px; }
+  .auth-card h1 { font-size: 27px; letter-spacing: -0.03em; }
+  .auth-card .sub { color: var(--text-2); margin-top: 8px; font-size: 14.5px; }
+  .auth-form { margin-top: 28px; display: flex; flex-direction: column; gap: 16px; }
+  .label-row { display: flex; align-items: center; justify-content: space-between; }
+  .role-seg { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+  .role-seg label { border: 1px solid var(--line-strong); border-radius: var(--radius); padding: 10px 8px; text-align: center; font-size: 12.5px; color: var(--text-2); cursor: pointer; transition: all .15s var(--ease); }
+  .role-seg input { display: none; }
+  .role-seg input:checked + label { border-color: var(--text-2); color: var(--text); background: var(--surface); }
+  .auth-alt { text-align: center; margin-top: 22px; color: var(--text-2); font-size: 14px; }
+  .auth-alt a { color: var(--text); font-weight: 500; }
+  @media (max-width: 760px){ .auth{ grid-template-columns: 1fr; } .auth-aside{ display:none; } }
+</style>
+</head>
+<body>
+<div class="auth">
+  <!-- LEFT PANEL -->
+  <aside class="auth-aside">
+    <a class="logo" href="index.html"><span class="edu">EduCode</span></a>
+    <div class="aside-mid">
+      <h2>Pick up where you left off.</h2>
+      <p>Your streak, your progress, and Mwarimu's notes are waiting exactly where you stopped.</p>
+      <div class="code aside-code">
+        <div class="code-bar"><span class="code-dots"><i></i><i></i><i></i></span><span class="fname">streak.js</span></div>
+        <pre><span class="t-key">const</span> <span class="t-var">days</span> <span class="t-pun">=</span> <span class="t-num">12</span><span class="t-pun">;</span>
+<span class="t-com">// keep it going today</span></pre>
+      </div>
+    </div>
+    <div class="aside-foot">Built for Rwandan technical secondary schools.</div>
+  </aside>
+
+  <!-- RIGHT : FORM -->
+  <main class="auth-main">
+    <div class="auth-top">
+      <button class="iconbtn" data-action="theme" aria-label="Toggle theme"></button>
+      <button class="iconbtn" data-action="settings" aria-label="Settings"></button>
+    </div>
+    <div class="auth-card rise">
+      <h1>Welcome back</h1>
+      <p class="sub">Log in to continue learning.</p>
+      <form class="auth-form" onsubmit="location.href='Dashboard.html';return false;">
+        <div class="field">
+          <span class="label">Email or username</span>
+          <input class="input" type="text" placeholder="aline.u@school.rw" autocomplete="username"/>
+        </div>
+        <div class="field">
+          <div class="label-row">
+            <span class="label">Password</span>
+            <a class="hint" href="#" style="color:var(--text-2)">Forgot?</a>
+          </div>
+          <div class="input-group">
+            <input class="input" type="password" placeholder="••••••••" autocomplete="current-password"/>
+            <span class="input-affix"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg></span>
+          </div>
+        </div>
+        <label class="checkbox"><input type="checkbox" checked/> Keep me signed in on this computer</label>
+        <button class="btn btn-primary btn-block lg" type="submit">Log in</button>
+      </form>
+      <div class="or" style="margin:22px 0">on a shared computer?</div>
+      <a class="btn btn-secondary btn-block" href="Dashboard.html">Use a class code instead</a>
+      <p class="auth-alt">New to EduCode? <a href="Signup.html">Create an account</a></p>
+    </div>
+  </main>
+</div>
+
+<template id="__bundler_thumbnail">
+  <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><rect width="200" height="200" fill="#0c0c0b"/><rect x="56" y="84" width="88" height="32" rx="7" fill="#efe9dc"/></svg>
+</template>
+</body>
+</html>
