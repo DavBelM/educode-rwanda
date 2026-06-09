@@ -1,13 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Header } from './components/Header';
-import { HeroBanner } from './components/dashboard/HeroBanner';
-import { ProgressOverview } from './components/dashboard/ProgressOverview';
-import { AssignmentCard } from './components/dashboard/AssignmentCard';
-import { AIInsights } from './components/dashboard/AIInsights';
-import { AchievementBadges } from './components/dashboard/AchievementBadges';
+import { AppNav } from './components/AppNav';
 import { useAuth } from '../lib/auth';
 import { getStudentAssignments, getStudentClasses, getClassWithInviteCode, joinClass, getSubmittedAssignmentIds, getStudentGrades, recordDailyLogin, getStreak, getStudentAnnouncements, getNewGradeCount, getLessonProgress, type Assignment, type Announcement } from '../lib/db';
-import { Users, ArrowRight, Loader, X, BookOpen, Megaphone, Pin, Code2 } from 'lucide-react';
+import { Users, ArrowRight, Loader, X, Megaphone, Pin, Code2 } from 'lucide-react';
 
 interface Props {
   language: 'EN' | 'KIN';
@@ -114,7 +109,7 @@ function JoinClassModal({ language, onClose, onJoined }: {
 
 // ─── Main Dashboard ────────────────────────────────────────────────────────────
 
-export default function Dashboard({ language, onLanguageChange, onStartCoding, onOpenAssignment, onOpenCourses, onOpenResults, onContinueLearning }: Props) {
+export default function Dashboard({ language, onStartCoding, onOpenAssignment, onOpenCourses, onOpenResults, onContinueLearning }: Props) {
   const { profile } = useAuth();
   const studentName = profile?.full_name ?? 'Student';
   const isKinyarwanda = language === 'KIN';
@@ -180,7 +175,6 @@ export default function Dashboard({ language, onLanguageChange, onStartCoding, o
     return () => document.removeEventListener('visibilitychange', onVisible);
   }, []);
 
-  const toggleLanguage = () => onLanguageChange(language === 'EN' ? 'KIN' : 'EN');
 
   // Map a DB assignment to the AssignmentCard shape
   const toCardAssignment = (a: Assignment) => {
@@ -318,260 +312,311 @@ export default function Dashboard({ language, onLanguageChange, onStartCoding, o
     { id: '4', name: isKinyarwanda ? 'Amanota yo hejuru' : 'High Score', icon: 'trophy', earned: progressPct >= 80 },
   ];
 
+  const firstName = studentName.split(' ')[0];
+
   return (
-    <div className="min-h-screen" style={{ fontFamily: 'Inter, sans-serif', background: 'var(--ec-bg)' }}>
-      <Header
-        language={language}
-        onLanguageToggle={toggleLanguage}
-        subtitle={isKinyarwanda ? 'Dashboard y\'umunyeshuri' : 'Student Dashboard'}
-        hideAssignmentInfo={true}
-        announcementCount={announcements.length}
-        onAnnouncementsClick={() => setShowAnnouncements(true)}
-      />
+    <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
+      <AppNav streak={streak} />
 
-      <div className="max-w-7xl mx-auto px-6 py-8 space-y-8">
-        <HeroBanner language={language} studentName={studentName} />
+      <main className="wrap page">
+        {/* Welcome header */}
+        <div className="welcome rise">
+          <div>
+            <h1>
+              {isKinyarwanda ? `Murakaza neza, ${firstName}.` : `Welcome back, ${firstName}.`}
+            </h1>
+            <p className="sub">
+              {streak > 0
+                ? (isKinyarwanda
+                    ? `Iminsi ${streak} ukurikirana. Isomo rimwe ririnda igihe cyawe uyu munsi.`
+                    : `You're on a ${streak}-day streak. One lesson keeps it alive today.`)
+                : (isKinyarwanda ? 'Tangira kwiga uyu munsi.' : 'Start learning today.')}
+            </p>
+          </div>
+          <button className="btn btn-primary" onClick={onContinueLearning}>
+            {isKinyarwanda ? 'Komeza isomo' : 'Continue lesson'}
+          </button>
+        </div>
 
-        {/* Announcements modal */}
-        {showAnnouncements && (
-          <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4"
-            style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)' }}
-            onClick={() => setShowAnnouncements(false)}>
-            <div className="w-full max-w-lg rounded-2xl flex flex-col"
-              style={{ background: 'var(--ec-surface)', border: '1px solid var(--ec-b2)', maxHeight: '80vh' }}
-              onClick={e => e.stopPropagation()}>
-              {/* Header */}
-              <div className="flex items-center justify-between px-5 py-4"
-                style={{ borderBottom: '1px solid var(--ec-b1)' }}>
-                <div className="flex items-center gap-2">
-                  <Megaphone size={16} style={{ color: '#f59e0b' }} />
-                  <h2 className="font-bold" style={{ color: 'var(--ec-text-1)', fontSize: '16px' }}>
-                    {isKinyarwanda ? 'Amatangazo' : 'Announcements'}
-                  </h2>
-                  {announcements.length > 0 && (
-                    <span className="px-2 py-0.5 rounded-full text-xs font-semibold"
-                      style={{ background: 'rgba(245,158,11,0.12)', color: '#f59e0b', border: '1px solid rgba(245,158,11,0.25)' }}>
-                      {announcements.length}
-                    </span>
-                  )}
+        <div className="dash">
+          {/* LEFT column */}
+          <div className="stack" style={{ ['--gap' as string]: '22px' }}>
+
+            {/* Continue card */}
+            <section className="card pad-lg continue rise-2">
+              <div>
+                <div className="meta">
+                  {isKinyarwanda ? 'Amahugurwa ya JavaScript · Igice 3' : 'JavaScript Foundations · Module 3'}
                 </div>
-                <button onClick={() => setShowAnnouncements(false)}
-                  style={{ color: 'var(--ec-text-6)' }}
-                  onMouseEnter={e => (e.currentTarget.style.color = 'var(--ec-text-4)')}
-                  onMouseLeave={e => (e.currentTarget.style.color = 'var(--ec-text-6)')}>
-                  <X size={20} />
-                </button>
+                <h2>{isKinyarwanda ? 'Imirimo n\'Impano' : 'Functions & Parameters'}</h2>
+                <p className="desc">
+                  {isKinyarwanda
+                    ? 'Wahagaritse hagati ya "Default parameters". Komeza aho Mwarimu yakusigiye note.'
+                    : 'You stopped halfway through "Default parameters". Pick up where Mwarimu left a note.'}
+                </p>
+                <div className="row" style={{ marginTop: 18, gap: 10 }}>
+                  <button className="btn btn-primary sm" onClick={onContinueLearning}>
+                    {isKinyarwanda ? 'Subira isomo' : 'Resume lesson'}
+                  </button>
+                  <button className="btn btn-tertiary sm" onClick={onOpenCourses}>
+                    {isKinyarwanda ? 'Reba igice' : 'View module'}
+                  </button>
+                </div>
               </div>
-
-              {/* Body */}
-              <div className="overflow-y-auto p-5 space-y-3">
-                {announcements.length === 0 ? (
-                  <div className="py-10 text-center">
-                    <Megaphone size={28} className="mx-auto mb-3" style={{ color: 'var(--ec-text-7)' }} />
-                    <p className="font-medium" style={{ color: 'var(--ec-text-6)', fontSize: '15px' }}>
-                      {isKinyarwanda ? 'Nta matangazo arahari' : 'No announcements yet'}
-                    </p>
-                    <p className="text-sm mt-1" style={{ color: 'var(--ec-text-7)' }}>
-                      {isKinyarwanda ? 'Umwarimu wawe azashyira amakuru mashya hano' : 'Your teacher will post updates here'}
-                    </p>
-                  </div>
-                ) : (
-                  announcements.map(a => {
-                    const cls = (a.classes as { name: string } | undefined)?.name;
-                    return (
-                      <div key={a.id} className="rounded-xl p-4"
-                        style={{ background: a.pinned ? 'rgba(245,158,11,0.06)' : 'var(--ec-surface-2)', border: a.pinned ? '1px solid rgba(245,158,11,0.2)' : '1px solid var(--ec-b5)' }}>
-                        <div className="flex items-start gap-2 mb-2">
-                          {a.pinned && <Pin size={12} className="shrink-0 mt-0.5" style={{ color: '#f59e0b' }} />}
-                          <p className="font-semibold flex-1" style={{ color: 'var(--ec-text-1)', fontSize: '15px' }}>{a.title}</p>
-                          {cls && (
-                            <span className="px-2 py-0.5 rounded-full text-xs font-semibold shrink-0"
-                              style={{ background: 'rgba(0,212,170,0.08)', color: '#00d4aa', border: '1px solid rgba(0,212,170,0.15)' }}>
-                              {cls}
-                            </span>
-                          )}
-                        </div>
-                        <p className="leading-relaxed mb-2" style={{ color: 'var(--ec-text-4)', fontSize: '14px', whiteSpace: 'pre-wrap' }}>{a.body}</p>
-                        <p className="text-xs" style={{ color: 'var(--ec-text-7)' }}>
-                          {new Date(a.created_at).toLocaleString()}
-                        </p>
-                      </div>
-                    );
-                  })
-                )}
+              <div className="progress-ring">
+                <svg width="92" height="92" viewBox="0 0 92 92" aria-label={`${progressPct}% complete`}>
+                  <circle cx="46" cy="46" r="40" fill="none" stroke="var(--surface-2)" strokeWidth="6"/>
+                  <circle cx="46" cy="46" r="40" fill="none" stroke="var(--text-2)" strokeWidth="6"
+                    strokeLinecap="round" strokeDasharray="251"
+                    strokeDashoffset={251 - (251 * progressPct) / 100}
+                    transform="rotate(-90 46 46)"/>
+                  <text x="46" y="51" textAnchor="middle" fill="var(--text)" fontSize="20" fontWeight="600" fontFamily="var(--font)">{progressPct}%</text>
+                </svg>
               </div>
-            </div>
-          </div>
-        )}
+            </section>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Progress */}
-          <div className="lg:col-span-3">
-            <ProgressOverview
-              language={language}
-              progress={progressPct}
-              assignmentsCompleted={lessonProgress.completed}
-              assignmentsTotal={lessonProgress.total}
-              streak={streak}
-              xpPoints={profileXp}
-              level={getLevel(profileXp)}
-              onContinueLearning={onContinueLearning}
-            />
-          </div>
-
-          {/* Assignments */}
-          <div className="lg:col-span-6">
-            <div className="rounded-2xl p-6" style={{ background: 'var(--ec-surface)', border: '1px solid var(--ec-b1)' }}>
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-lg font-bold" style={{ color: 'var(--ec-text-1)' }}>
-                  {isKinyarwanda ? 'Imikoro ihari ubu' : 'Active Assignments'}
-                </h2>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => onOpenResults?.()}
-                    className="relative flex items-center gap-1.5 text-sm font-semibold px-3 py-1.5 rounded-lg transition-all"
-                    style={{ color: '#f59e0b', background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.2)' }}
-                    onMouseEnter={e => (e.currentTarget.style.background = 'rgba(245,158,11,0.15)')}
-                    onMouseLeave={e => (e.currentTarget.style.background = 'rgba(245,158,11,0.08)')}
-                  >
-                    <ArrowRight size={12} />
-                    {isKinyarwanda ? 'Amanota Yanjye' : 'My Results'}
-                    {newGradeCount > 0 && (
-                      <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full flex items-center justify-center text-xs font-bold"
-                        style={{ background: '#ef4444', color: '#fff', fontSize: '10px' }}>
+            {/* Active assignments */}
+            <section className="card pad-lg rise-2">
+              <div className="card-head">
+                <h3 className="card-title">{isKinyarwanda ? 'Imikoro ihari' : 'Active assignments'}</h3>
+                <div className="row" style={{ gap: 8 }}>
+                  {newGradeCount > 0 && (
+                    <button className="btn btn-tertiary sm" onClick={onOpenResults} style={{ position: 'relative' }}>
+                      {isKinyarwanda ? 'Amanota' : 'Results'}
+                      <span style={{ position: 'absolute', top: -6, right: -6, width: 16, height: 16, borderRadius: '50%', background: 'var(--error)', color: '#fff', fontSize: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700 }}>
                         {newGradeCount}
                       </span>
-                    )}
-                  </button>
-                  <button
-                    onClick={() => onOpenCourses?.()}
-                    className="flex items-center gap-1.5 text-sm font-semibold px-3 py-1.5 rounded-lg transition-all"
-                    style={{ color: '#8b5cf6', background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.2)' }}
-                    onMouseEnter={e => (e.currentTarget.style.background = 'rgba(139,92,246,0.15)')}
-                    onMouseLeave={e => (e.currentTarget.style.background = 'rgba(139,92,246,0.08)')}
-                  >
-                    <BookOpen size={13} />
-                    {isKinyarwanda ? 'Amasomo' : 'Courses'}
-                  </button>
-                  <button
-                    onClick={() => setShowJoinModal(true)}
-                    className="flex items-center gap-1.5 text-sm font-semibold px-3 py-1.5 rounded-lg transition-all"
-                    style={{ color: '#00d4aa', background: 'rgba(0,212,170,0.08)', border: '1px solid rgba(0,212,170,0.2)' }}
-                    onMouseEnter={e => (e.currentTarget.style.background = 'rgba(0,212,170,0.15)')}
-                    onMouseLeave={e => (e.currentTarget.style.background = 'rgba(0,212,170,0.08)')}
-                  >
-                    <Users size={13} />
-                    {isKinyarwanda ? 'Injira mu Ishuri' : 'Join Class'}
+                    </button>
+                  )}
+                  <button className="btn btn-tertiary sm" onClick={() => setShowJoinModal(true)}>
+                    {isKinyarwanda ? 'Injira mu ishuri' : 'Join class'}
                   </button>
                 </div>
               </div>
 
               {loadingAssignments ? (
-                <div className="flex items-center justify-center py-12">
-                  <Loader size={20} className="animate-spin" style={{ color: '#00d4aa' }} />
+                <div style={{ padding: '32px 0', display: 'flex', justifyContent: 'center' }}>
+                  <Loader size={20} style={{ animation: 'spin 1s linear infinite', color: 'var(--text-2)' }} />
                 </div>
               ) : hasClass === false ? (
-                /* No class enrolled */
-                <div className="py-10 text-center">
-                  <div className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ background: 'var(--ec-b3)', border: '1px solid var(--ec-b2)' }}>
-                    <Users size={24} style={{ color: 'var(--ec-text-7)' }} />
-                  </div>
-                  <p className="text-sm font-medium mb-1" style={{ color: 'var(--ec-text-5)' }}>
-                    {isKinyarwanda ? 'Ntabwo uri mu ishuri' : 'You\'re not in a class yet'}
+                <div style={{ padding: '32px 0', textAlign: 'center' }}>
+                  <Users size={28} style={{ color: 'var(--text-3)', margin: '0 auto 12px' }} />
+                  <p style={{ fontSize: 14, color: 'var(--text-2)', marginBottom: 6 }}>
+                    {isKinyarwanda ? 'Ntabwo uri mu ishuri' : "You're not in a class yet"}
                   </p>
-                  <p className="text-xs mb-5" style={{ color: 'var(--ec-text-7)' }}>
-                    {isKinyarwanda
-                      ? 'Shyiramo kode wahawe n\'umwarimu wawe kugirango ubone imikoro yawe.'
-                      : 'Enter the invite code from your teacher to see your assignments.'}
+                  <p style={{ fontSize: 13, color: 'var(--text-3)', marginBottom: 16 }}>
+                    {isKinyarwanda ? 'Shyiramo kode wahawe n\'umwarimu.' : 'Enter your teacher\'s invite code.'}
                   </p>
-                  <button
-                    onClick={() => setShowJoinModal(true)}
-                    className="px-5 py-2.5 rounded-xl text-sm font-semibold transition-all"
-                    style={{ background: '#00d4aa', color: 'var(--ec-bg)' }}
-                    onMouseEnter={e => (e.currentTarget.style.background = '#00bfa0')}
-                    onMouseLeave={e => (e.currentTarget.style.background = '#00d4aa')}
-                  >
+                  <button className="btn btn-primary sm" onClick={() => setShowJoinModal(true)}>
                     {isKinyarwanda ? 'Injira mu Ishuri' : 'Join a Class'}
                   </button>
                 </div>
               ) : assignments.length === 0 ? (
-                /* Enrolled but no assignments yet */
-                <div className="py-10 text-center">
-                  <p className="text-sm" style={{ color: 'var(--ec-text-6)' }}>
-                    {isKinyarwanda ? 'Nta mikoro urahabwa n\'umwarimu wawe.' : 'No assignments from your teacher yet.'}
+                <div style={{ padding: '32px 0', textAlign: 'center' }}>
+                  <p style={{ fontSize: 14, color: 'var(--text-3)' }}>
+                    {isKinyarwanda ? 'Nta mikoro urahabwa.' : 'No assignments yet.'}
                   </p>
                 </div>
               ) : (
-                <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2">
-                  {assignments.map((assignment) => (
-                    <AssignmentCard
-                      key={assignment.id}
-                      assignment={toCardAssignment(assignment)}
-                      language={language}
-                      onClick={() => handleAssignmentClick(assignment)}
-                    />
-                  ))}
+                <div className="alist">
+                  {assignments.map(a => {
+                    const card = toCardAssignment(a);
+                    return (
+                      <div key={a.id} className="arow" style={{ cursor: 'pointer' }} onClick={() => handleAssignmentClick(a)}>
+                        <div>
+                          <div className="at">{card.title}</div>
+                          <div className="ad">{card.description}</div>
+                        </div>
+                        <div className="right">
+                          <span className={`pill${card.dueStatus === 'overdue' ? ' error' : card.dueStatus === 'submitted' ? ' solid' : ''}`}>
+                            {card.dueStatus === 'submitted' && <span className="dot"></span>}
+                            {card.dueText}
+                          </span>
+                          <button className="btn btn-secondary sm" onClick={e => { e.stopPropagation(); handleAssignmentClick(a); }}>
+                            {card.dueStatus === 'submitted' ? (isKinyarwanda ? 'Reba' : 'Review') : (isKinyarwanda ? 'Fungura' : 'Open')}
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
+              )}
+            </section>
+
+            {/* Mwarimu insights */}
+            <section className="card pad-lg rise-3">
+              <div className="card-head">
+                <h3 className="card-title">{isKinyarwanda ? 'Ubutumwa bwa Mwarimu' : 'From Mwarimu'}</h3>
+                <span className="pill"><span className="dot"></span>{isKinyarwanda ? 'Iki cyumweru' : 'This week'}</span>
+              </div>
+              <div className="stack" style={{ ['--gap' as string]: '16px' }}>
+                {insights.length === 0 ? (
+                  <p style={{ fontSize: 14, color: 'var(--text-3)' }}>
+                    {isKinyarwanda ? 'Nta makuru arahari ubu.' : 'No insights yet — keep coding!'}
+                  </p>
+                ) : (
+                  insights.map((ins, i) => (
+                    <div key={i}>
+                      {i > 0 && <div className="divider"></div>}
+                      <div className="insight" style={{ marginTop: i > 0 ? 16 : 0 }}>
+                        <span className="ic">
+                          {ins.isPositive ? (
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M12 16v-4M12 8h.01"/><circle cx="12" cy="12" r="9"/>
+                            </svg>
+                          ) : (
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/>
+                            </svg>
+                          )}
+                        </span>
+                        <p dangerouslySetInnerHTML={{ __html: ins.text.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>') }} />
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </section>
+          </div>
+
+          {/* RIGHT sidebar */}
+          <aside className="stack" style={{ ['--gap' as string]: '22px' }}>
+            {/* XP + stats */}
+            <section className="card pad-lg rise-3">
+              <div className="level-row">
+                <span className="lv">{getLevel(profileXp)}</span>
+                <span className="xp">{profileXp} XP</span>
+              </div>
+              <div className="bar on-card">
+                <i style={{ width: `${Math.min(100, (profileXp % 100))}%` }}></i>
+              </div>
+              <p className="dim" style={{ fontSize: 12.5, marginTop: 10 }}>
+                {100 - (profileXp % 100)} XP {isKinyarwanda ? 'kugeza iry\'ubuninahazwa' : 'to next level'}
+              </p>
+              <div className="stat-grid">
+                <div className="stat"><b>{streak}</b><span>{isKinyarwanda ? 'Iminsi ikurikirana' : 'Day streak'}</span></div>
+                <div className="stat"><b>{lessonProgress.completed}</b><span>{isKinyarwanda ? 'Amasomo yarangiye' : 'Lessons done'}</span></div>
+                <div className="stat"><b>{totalPossible > 0 ? Math.round((totalEarned / totalPossible) * 100) : 0}%</b><span>{isKinyarwanda ? 'Amanota y\'averaze' : 'Avg. score'}</span></div>
+                <div className="stat"><b>{profileXp}</b><span>XP {isKinyarwanda ? 'yose' : 'total'}</span></div>
+              </div>
+            </section>
+
+            {/* Achievements */}
+            <section className="card pad-lg rise-4">
+              <div className="card-head">
+                <h3 className="card-title">{isKinyarwanda ? 'Ibyagezweho' : 'Achievements'}</h3>
+                <span className="dim" style={{ fontSize: 12.5 }}>
+                  {badges.filter(b => b.earned).length} / {badges.length}
+                </span>
+              </div>
+              <div className="ach-grid">
+                {badges.map(badge => (
+                  <div key={badge.id} className={`ach ${badge.earned ? 'un' : 'lock'}`} title={badge.name}>
+                    {badge.icon === 'flame' && (
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M12 3c1 3-1 5-1 5s4 1 4 5a4 4 0 0 1-8 .5C7 10 9 9 9 9s-1-4 3-6z"/>
+                      </svg>
+                    )}
+                    {badge.icon === 'star' && (
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M12 3l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.9 6.8 19.2l1-5.8-4.3-4.1 5.9-.9z"/>
+                      </svg>
+                    )}
+                    {badge.icon === 'award' && (
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M9 11l3 3 8-8M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+                      </svg>
+                    )}
+                    {badge.icon === 'trophy' && (
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M6 9H4a2 2 0 0 1-2-2V5h4M18 9h2a2 2 0 0 0 2-2V5h-4M12 17v4M8 21h8M12 17a6 6 0 0 1-6-6V3h12v8a6 6 0 0 1-6 6z"/>
+                      </svg>
+                    )}
+                    {!badge.earned && (
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>
+                      </svg>
+                    )}
+                    <span>{badge.name}</span>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* Practice card */}
+            <section className="card pad-lg rise-4">
+              <div className="card-head">
+                <h3 className="card-title">{isKinyarwanda ? 'Imenyereze' : 'Free practice'}</h3>
+              </div>
+              <p style={{ fontSize: 13.5, color: 'var(--text-2)', lineHeight: 1.55, marginBottom: 14 }}>
+                {isKinyarwanda
+                  ? 'Fungura editor uko ushaka — AI izagufasha.'
+                  : 'Open the editor freely — AI feedback included.'}
+              </p>
+              <button className="btn btn-secondary btn-block" onClick={() => onStartCoding?.()}>
+                <Code2 size={14} />
+                {isKinyarwanda ? 'Fungura Editor' : 'Open Editor'}
+              </button>
+            </section>
+          </aside>
+        </div>
+      </main>
+
+      {/* Announcements modal */}
+      {showAnnouncements && (
+        <div
+          style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }}
+          onClick={() => setShowAnnouncements(false)}
+        >
+          <div
+            style={{ width: '100%', maxWidth: 520, background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 14, display: 'flex', flexDirection: 'column', maxHeight: '80vh' }}
+            onClick={e => e.stopPropagation()}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderBottom: '1px solid var(--line)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <Megaphone size={16} style={{ color: 'var(--text-2)' }} />
+                <h2 style={{ fontSize: 16, fontWeight: 600, color: 'var(--text)' }}>
+                  {isKinyarwanda ? 'Amatangazo' : 'Announcements'}
+                </h2>
+                {announcements.length > 0 && <span className="pill">{announcements.length}</span>}
+              </div>
+              <button className="iconbtn" onClick={() => setShowAnnouncements(false)} aria-label="Close">
+                <X size={16} />
+              </button>
+            </div>
+            <div style={{ overflowY: 'auto', padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {announcements.length === 0 ? (
+                <div style={{ padding: '32px 0', textAlign: 'center' }}>
+                  <p style={{ color: 'var(--text-3)', fontSize: 14 }}>
+                    {isKinyarwanda ? 'Nta matangazo arahari' : 'No announcements yet'}
+                  </p>
+                </div>
+              ) : (
+                announcements.map(a => {
+                  const cls = (a.classes as { name: string } | undefined)?.name;
+                  return (
+                    <div key={a.id} className="card pad-sm" style={{ borderColor: a.pinned ? 'var(--line-strong)' : undefined }}>
+                      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 8 }}>
+                        {a.pinned && <Pin size={12} style={{ color: 'var(--text-2)', flexShrink: 0, marginTop: 2 }} />}
+                        <p style={{ fontWeight: 500, color: 'var(--text)', fontSize: 15, flex: 1 }}>{a.title}</p>
+                        {cls && <span className="pill" style={{ flexShrink: 0 }}>{cls}</span>}
+                      </div>
+                      <p style={{ color: 'var(--text-2)', fontSize: 14, lineHeight: 1.55, whiteSpace: 'pre-wrap', marginBottom: 8 }}>{a.body}</p>
+                      <p style={{ color: 'var(--text-3)', fontSize: 12 }}>{new Date(a.created_at).toLocaleString()}</p>
+                    </div>
+                  );
+                })
               )}
             </div>
           </div>
-
-          {/* Insights & Badges */}
-          <div className="lg:col-span-3 space-y-6">
-            {/* Practice card */}
-            <div className="rounded-2xl p-4" style={{ background: 'var(--ec-gradient-practice)', border: '1px solid rgba(139,92,246,0.25)' }}>
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'rgba(139,92,246,0.15)', border: '1px solid rgba(139,92,246,0.3)' }}>
-                  <Code2 size={16} style={{ color: '#a78bfa' }} />
-                </div>
-                <p className="text-sm font-bold" style={{ color: 'var(--ec-text-1)' }}>
-                  {isKinyarwanda ? 'Ushaka kwimenyereza?' : 'Want to Practice?'}
-                </p>
-              </div>
-              <p className="text-xs mb-3" style={{ color: 'var(--ec-text-5)' }}>
-                {isKinyarwanda ? 'Fungura editor uko ushaka — AI izagufasha' : 'Open the editor freely — AI feedback included'}
-              </p>
-              <button
-                onClick={() => onStartCoding?.()}
-                className="w-full flex items-center justify-center gap-2 py-2 rounded-xl text-sm font-bold transition-all"
-                style={{ background: 'rgba(139,92,246,0.15)', color: '#a78bfa', border: '1px solid rgba(139,92,246,0.3)' }}
-                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(139,92,246,0.25)')}
-                onMouseLeave={e => (e.currentTarget.style.background = 'rgba(139,92,246,0.15)')}
-              >
-                <Code2 size={13} />
-                {isKinyarwanda ? 'Fungura Editor' : 'Open Editor'}
-              </button>
-            </div>
-            <AIInsights language={language} insights={insights} />
-            <AchievementBadges language={language} badges={badges} />
-          </div>
         </div>
-      </div>
-
-      {/* Mobile nav */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 border-t px-4 py-3 z-40" style={{ background: 'var(--ec-surface)', borderColor: 'var(--ec-b1)' }}>
-        <div className="flex items-center justify-around">
-          {[
-            { icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M3 9L12 2L21 9V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9Z" stroke="#00d4aa" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>, label: isKinyarwanda ? 'Ahabanza' : 'Home', active: true },
-            { icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M14 2H6C5.46957 2 4.96086 2.21071 4.58579 2.58579C4.21071 2.96086 4 3.46957 4 4V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V8L14 2Z" stroke="var(--ec-text-6)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>, label: isKinyarwanda ? 'Imikoro' : 'Assignments', active: false },
-            { icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 15C15.866 15 19 11.866 19 8C19 4.13401 15.866 1 12 1C8.13401 1 5 4.13401 5 8C5 11.866 8.13401 15 12 15Z" stroke="var(--ec-text-6)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><path d="M8.21 13.89L7 23L12 20L17 23L15.79 13.88" stroke="var(--ec-text-6)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>, label: isKinyarwanda ? 'Ibihembo' : 'Badges', active: false },
-          ].map((item, i) => (
-            <button key={i} className="flex flex-col items-center gap-1">
-              {item.icon}
-              <span className="text-xs font-medium" style={{ color: item.active ? '#00d4aa' : 'var(--ec-text-6)' }}>{item.label}</span>
-            </button>
-          ))}
-        </div>
-      </div>
+      )}
 
       {showJoinModal && (
         <JoinClassModal
           language={language}
           onClose={() => setShowJoinModal(false)}
-          onJoined={() => {
-            setShowJoinModal(false);
-            loadAssignments();
-          }}
+          onJoined={() => { setShowJoinModal(false); loadAssignments(); }}
         />
       )}
     </div>

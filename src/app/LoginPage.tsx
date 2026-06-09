@@ -1,267 +1,175 @@
 import React, { useState } from 'react';
-import { Eye, EyeOff, Lock, Mail, ArrowRight } from 'lucide-react';
 import { useAuth } from '../lib/auth';
+import { useTheme } from '../lib/theme';
 
-export default function LoginPage({ onSuccess, onSignupClick, onForgotPassword }: { onSuccess?: () => void; onSignupClick?: () => void; onForgotPassword?: () => void }) {
+export default function LoginPage({ onSuccess, onSignupClick, onForgotPassword }: {
+  onSuccess?: () => void;
+  onSignupClick?: () => void;
+  onForgotPassword?: () => void;
+}) {
   const { signIn } = useAuth();
-  const [language, setLanguage] = useState<'EN' | 'KIN'>('EN');
+  const { theme, toggleTheme } = useTheme();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const isKinyarwanda = language === 'KIN';
-
   const handleLogin = async (e: React.BaseSyntheticEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
-
     const { error } = await signIn(email, password);
-
     if (error) {
-      setError(isKinyarwanda
-        ? 'I-meyili cyangwa ijambo ry\'ibanga ntibibonye'
-        : 'Email or password is incorrect'
-      );
+      setError('Email or password is incorrect');
       setLoading(false);
       return;
     }
-
-    // Keep spinner running — App.tsx will navigate once auth state changes
     onSuccess?.();
   };
 
   return (
-    <div className="min-h-screen flex" style={{ fontFamily: 'Inter, sans-serif', background: 'var(--ec-bg)' }}>
-
-      {/* Left Side - Brand panel */}
-      <div
-        className="hidden lg:flex lg:w-2/5 flex-col justify-between p-12 relative overflow-hidden"
-        style={{ background: 'var(--ec-surface)', borderRight: '1px solid var(--ec-b1)' }}
-      >
-        {/* Ambient glows */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-80 h-80 rounded-full pointer-events-none" style={{ background: 'radial-gradient(ellipse, rgba(0,212,170,0.08) 0%, transparent 70%)', filter: 'blur(40px)' }} />
-        <div className="absolute bottom-1/4 left-0 w-64 h-64 rounded-full pointer-events-none" style={{ background: 'radial-gradient(ellipse, rgba(139,92,246,0.07) 0%, transparent 70%)', filter: 'blur(40px)' }} />
-
-        {/* Logo */}
-        <div className="flex items-center gap-3 relative z-10">
-          <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: '#0ea5e9' }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path d="M8 6H16M8 12H16M8 18H13" stroke="white" strokeWidth="2" strokeLinecap="round"/>
-            </svg>
-          </div>
-          <span className="text-xl font-bold" style={{ color: 'var(--ec-text-1)' }}>EduCode Rwanda</span>
-        </div>
-
-        {/* Center visual */}
-        <div className="flex-1 flex items-center justify-center relative z-10">
-          <div className="text-center">
-            <div className="text-8xl font-mono mb-6" style={{ color: '#8b5cf6', textShadow: '0 0 40px rgba(139,92,246,0.3)' }}>&lt;/&gt;</div>
-            <div className="flex items-center justify-center gap-5 text-3xl font-mono">
-              <span style={{ color: '#00d4aa' }}>{'{ }'}</span>
-              <span style={{ color: '#0ea5e9' }}>{'[ ]'}</span>
-              <span style={{ color: '#f59e0b' }}>{'( )'}</span>
+    <div className="auth">
+      {/* LEFT PANEL */}
+      <aside className="auth-aside">
+        <a className="logo" href="/"><span className="edu">EduCode</span></a>
+        <div className="aside-mid">
+          <h2>Pick up where you left off.</h2>
+          <p>Your streak, your progress, and Mwarimu&apos;s notes are waiting exactly where you stopped.</p>
+          <div className="code aside-code">
+            <div className="code-bar">
+              <span className="code-dots"><i></i><i></i><i></i></span>
+              <span className="fname">streak.js</span>
             </div>
+            <pre>
+              <span style={{ color: 'var(--cream)' }}>const</span>
+              {' '}<span style={{ color: 'var(--text)' }}>days</span>
+              <span style={{ color: 'var(--text-2)' }}> = </span>
+              <span style={{ color: 'var(--text)' }}>12</span>
+              <span style={{ color: 'var(--text-2)' }}>;</span>{'\n'}
+              <span style={{ color: 'var(--text-3)' }}>{'// keep it going today'}</span>
+            </pre>
           </div>
         </div>
+        <div className="aside-foot">Built for Rwandan technical secondary schools.</div>
+      </aside>
 
-        {/* Tagline */}
-        <div className="relative z-10">
-          <p className="text-base font-semibold mb-2" style={{ color: 'var(--ec-text-1)' }}>
-            {isKinyarwanda ? 'Wige programming mu rurimi rwawe' : 'Learn programming in your language'}
-          </p>
-          <p className="text-sm" style={{ color: 'var(--ec-text-6)' }}>
-            {isKinyarwanda
-              ? 'Ibisobanuro mu Kinyarwanda. Buri kosa risobanurwa.'
-              : 'Error explanations in Kinyarwanda. Built for Rwanda.'}
-          </p>
-        </div>
-      </div>
-
-      {/* Right Side - Form */}
-      <div className="flex-1 flex items-center justify-center p-8" style={{ background: 'var(--ec-bg)' }}>
-        <div className="w-full max-w-md">
-
-          {/* Mobile Logo */}
-          <div className="lg:hidden flex items-center justify-center gap-3 mb-8">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: '#0ea5e9' }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                <path d="M8 6H16M8 12H16M8 18H13" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+      {/* RIGHT : FORM */}
+      <main className="auth-main">
+        <div className="auth-top">
+          <button
+            className="iconbtn"
+            onClick={toggleTheme}
+            aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+            aria-pressed={theme === 'light'}
+          >
+            {theme === 'dark' ? (
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="4"/>
+                <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
               </svg>
+            ) : (
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+              </svg>
+            )}
+          </button>
+        </div>
+
+        <div className="auth-card rise">
+          <h1>Welcome back</h1>
+          <p className="sub">Log in to continue learning.</p>
+
+          <form className="auth-form" onSubmit={handleLogin}>
+            <div className="field">
+              <span className="label">Email</span>
+              <input
+                className="input"
+                type="text"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                placeholder="aline.u@school.rw"
+                autoComplete="username"
+              />
             </div>
-            <span className="text-xl font-bold" style={{ color: 'var(--ec-text-1)' }}>EduCode Rwanda</span>
-          </div>
 
-          {/* Language Toggle */}
-          <div className="flex justify-end mb-8">
-            <div className="flex items-center rounded-lg overflow-hidden" style={{ border: '1px solid var(--ec-b2)' }}>
-              <button
-                onClick={() => setLanguage('EN')}
-                className="px-3 py-1.5 text-xs font-bold transition-all"
-                style={{
-                  background: language === 'EN' ? 'rgba(0,212,170,0.15)' : 'transparent',
-                  color: language === 'EN' ? '#00d4aa' : 'var(--ec-text-6)',
-                  borderRight: '1px solid var(--ec-b2)',
-                }}
-              >EN</button>
-              <button
-                onClick={() => setLanguage('KIN')}
-                className="px-3 py-1.5 text-xs font-bold transition-all"
-                style={{
-                  background: language === 'KIN' ? 'rgba(0,212,170,0.15)' : 'transparent',
-                  color: language === 'KIN' ? '#00d4aa' : 'var(--ec-text-6)',
-                }}
-              >KIN</button>
-            </div>
-          </div>
-
-          {/* Heading */}
-          <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--ec-text-1)', letterSpacing: '-0.01em' }}>
-            {isKinyarwanda ? 'Ikaze nanone' : 'Welcome Back'}
-          </h1>
-          <p className="mb-8 text-sm" style={{ color: 'var(--ec-text-5)' }}>
-            {isKinyarwanda ? 'Injira kugirango ukomeze kwiga' : 'Log in to continue learning'}
-          </p>
-
-          {/* Form */}
-          <form onSubmit={handleLogin} className="space-y-5">
-
-            {/* Email */}
-            <div>
-              <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--ec-text-4)' }}>
-                {isKinyarwanda ? 'I-meyili (Email)' : 'Email'}
-              </label>
-              <div className="relative">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--ec-text-6)' }} />
-                <input
-                  type="text"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="jean@example.com"
-                  className="w-full pl-11 pr-4 py-3 rounded-xl text-sm transition-all focus:outline-none"
-                  style={{
-                    height: '48px',
-                    background: 'var(--ec-surface)',
-                    border: error ? '1px solid rgba(239,68,68,0.5)' : '1px solid var(--ec-b2)',
-                    color: 'var(--ec-text-1)',
-                  }}
-                  onFocus={e => { if (!error) e.target.style.border = '1px solid rgba(0,212,170,0.4)'; }}
-                  onBlur={e => { if (!error) e.target.style.border = '1px solid var(--ec-b2)'; }}
-                />
+            <div className="field">
+              <div className="label-row">
+                <span className="label">Password</span>
+                <button
+                  type="button"
+                  onClick={onForgotPassword}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-2)', fontSize: 13, padding: 0 }}
+                >
+                  Forgot?
+                </button>
               </div>
-            </div>
-
-            {/* Password */}
-            <div>
-              <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--ec-text-4)' }}>
-                {isKinyarwanda ? 'Ijambo ry\'ibanga' : 'Password'}
-              </label>
-              <div className="relative">
-                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--ec-text-6)' }} />
+              <div className="input-group">
                 <input
+                  className="input"
                   type={showPassword ? 'text' : 'password'}
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={e => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full pl-11 pr-12 py-3 rounded-xl text-sm transition-all focus:outline-none"
-                  style={{
-                    height: '48px',
-                    background: 'var(--ec-surface)',
-                    border: error ? '1px solid rgba(239,68,68,0.5)' : '1px solid var(--ec-b2)',
-                    color: 'var(--ec-text-1)',
-                  }}
-                  onFocus={e => { if (!error) e.target.style.border = '1px solid rgba(0,212,170,0.4)'; }}
-                  onBlur={e => { if (!error) e.target.style.border = '1px solid var(--ec-b2)'; }}
+                  autoComplete="current-password"
                 />
                 <button
                   type="button"
+                  className="input-affix"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 transition-colors"
-                  style={{ color: 'var(--ec-text-6)' }}
-                  onMouseEnter={e => (e.currentTarget.style.color = 'var(--ec-text-4)')}
-                  onMouseLeave={e => (e.currentTarget.style.color = 'var(--ec-text-6)')}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-3)', display: 'flex', alignItems: 'center' }}
                 >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  {showPassword ? (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
+                      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24M1 1l22 22"/>
+                    </svg>
+                  ) : (
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
+                      <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/>
+                      <circle cx="12" cy="12" r="3"/>
+                    </svg>
+                  )}
                 </button>
               </div>
             </div>
 
-            {/* Error */}
+            <label className="checkbox">
+              <input type="checkbox" defaultChecked/> Keep me signed in on this computer
+            </label>
+
             {error && (
-              <div className="p-3 rounded-xl text-sm" style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#f87171' }}>
+              <div style={{ padding: '10px 14px', borderRadius: 'var(--radius)', background: 'var(--error-dim)', color: 'var(--error)', fontSize: 14 }}>
                 {error}
               </div>
             )}
 
-            {/* Forgot password */}
-            <div className="flex justify-end">
-              <button type="button" onClick={onForgotPassword} className="text-xs font-semibold transition-colors" style={{ color: 'var(--ec-text-6)' }}
-                onMouseEnter={e => (e.currentTarget.style.color = '#00d4aa')}
-                onMouseLeave={e => (e.currentTarget.style.color = 'var(--ec-text-6)')}
-              >
-                {isKinyarwanda ? 'Wibagiwe ijambo ryibanga?' : 'Forgot Password?'}
-              </button>
-            </div>
-
-            {/* Login Button */}
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all disabled:opacity-50"
-              style={{ height: '48px', background: '#00d4aa', color: 'var(--ec-bg)', boxShadow: '0 0 20px rgba(0,212,170,0.25)' }}
-              onMouseEnter={e => { if (!loading) (e.currentTarget as HTMLButtonElement).style.background = '#00bfa0'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = '#00d4aa'; }}
-            >
+            <button className="btn btn-primary btn-block lg" type="submit" disabled={loading}>
               {loading ? (
-                <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" style={{ borderColor: 'var(--ec-bg)', borderTopColor: 'transparent' }} />
-              ) : (
-                <>
-                  {isKinyarwanda ? 'Injira' : 'Log In'}
-                  <ArrowRight className="w-4 h-4" />
-                </>
-              )}
+                <svg style={{ animation: 'spin 1s linear infinite' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16">
+                  <circle cx="12" cy="12" r="10" strokeOpacity=".25"/>
+                  <path d="M12 2a10 10 0 0 1 10 10" strokeOpacity=".85"/>
+                </svg>
+              ) : 'Log in'}
             </button>
-
-            {/* Divider */}
-            <div className="relative flex items-center">
-              <div className="flex-1" style={{ borderTop: '1px solid var(--ec-b1)' }} />
-              <span className="px-3 text-xs" style={{ color: 'var(--ec-text-7)' }}>
-                {isKinyarwanda ? 'CYANGWA' : 'OR'}
-              </span>
-              <div className="flex-1" style={{ borderTop: '1px solid var(--ec-b1)' }} />
-            </div>
-
-            {/* Sign Up Link */}
-            <div className="text-center text-sm">
-              <span style={{ color: 'var(--ec-text-6)' }}>
-                {isKinyarwanda ? 'Ntabwo ufite konti?' : "Don't have an account?"}{' '}
-              </span>
-              <button
-                type="button"
-                onClick={onSignupClick}
-                className="font-semibold transition-colors"
-                style={{ color: '#00d4aa' }}
-                onMouseEnter={e => (e.currentTarget.style.color = '#00bfa0')}
-                onMouseLeave={e => (e.currentTarget.style.color = '#00d4aa')}
-              >
-                {isKinyarwanda ? 'Iyandikishe' : 'Sign Up'}
-              </button>
-            </div>
           </form>
 
-          {/* Security badge */}
-          <div className="mt-8 flex items-center justify-center gap-2 text-xs" style={{ color: 'var(--ec-text-7)' }}>
-            <Lock className="w-3 h-3" />
-            <span>
-              {isKinyarwanda
-                ? 'Amakuru yawe ararinzwe kandi afite umutekano'
-                : 'Your data is secure and encrypted'}
-            </span>
-          </div>
+          <div className="or" style={{ margin: '22px 0' }}>on a shared computer?</div>
+          <button
+            type="button"
+            className="btn btn-secondary btn-block"
+            onClick={onSignupClick}
+            style={{ width: '100%' }}
+          >
+            Use a class code instead
+          </button>
+
+          <p className="auth-alt">
+            New to EduCode?{' '}
+            <button type="button" onClick={onSignupClick}>Create an account</button>
+          </p>
         </div>
-      </div>
+      </main>
     </div>
   );
 }

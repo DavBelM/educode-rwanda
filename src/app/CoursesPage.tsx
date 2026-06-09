@@ -1,28 +1,17 @@
-import { ThemeToggle } from './components/ThemeToggle';
 import { useState, useEffect } from 'react';
-import { ArrowLeft, BookOpen, Code2, HelpCircle, CheckCircle, Clock, ChevronRight, Zap } from 'lucide-react';
+import { AppNav } from './components/AppNav';
 import {
   getCourses, getCourseDetail, getCompletedLessonIds,
   type Course, type CourseModule, type CourseLesson,
 } from '../lib/db';
+import { CheckCircle, Clock, BookOpen, Code2, HelpCircle, Zap } from 'lucide-react';
 
 interface Props {
   language: 'EN' | 'KIN';
+  onLanguageChange?: (l: 'EN' | 'KIN') => void;
   onBack: () => void;
   onOpenLesson: (lesson: CourseLesson, courseTitle: string, allLessons: CourseLesson[]) => void;
 }
-
-const LESSON_TYPE = {
-  reading: { icon: <BookOpen size={13} />, label: 'Reading',  bg: 'rgba(14,165,233,0.1)',  text: '#0ea5e9', border: 'rgba(14,165,233,0.2)' },
-  coding:  { icon: <Code2 size={13} />,    label: 'Coding',   bg: 'rgba(0,212,170,0.1)',   text: '#00d4aa', border: 'rgba(0,212,170,0.2)' },
-  quiz:    { icon: <HelpCircle size={13} />,label: 'Quiz',    bg: 'rgba(139,92,246,0.1)',  text: '#8b5cf6', border: 'rgba(139,92,246,0.2)' },
-};
-
-const DIFF_STYLE: Record<string, { bg: string; text: string; border: string }> = {
-  beginner:     { bg: 'rgba(0,212,170,0.1)',  text: '#00d4aa', border: 'rgba(0,212,170,0.2)' },
-  intermediate: { bg: 'rgba(245,158,11,0.1)', text: '#f59e0b', border: 'rgba(245,158,11,0.2)' },
-  advanced:     { bg: 'rgba(139,92,246,0.1)', text: '#8b5cf6', border: 'rgba(139,92,246,0.2)' },
-};
 
 // ─── Course Catalog ───────────────────────────────────────────────────────────
 
@@ -32,67 +21,92 @@ function CourseCatalog({ courses, language, onSelect }: {
   onSelect: (c: Course) => void;
 }) {
   const isKin = language === 'KIN';
+  const [filter, setFilter] = useState<'all' | 'in-progress' | 'not-started' | 'completed'>('all');
+  const [search, setSearch] = useState('');
+
+  const filtered = courses.filter(c => {
+    const title = isKin && c.title_kin ? c.title_kin : c.title;
+    if (search && !title.toLowerCase().includes(search.toLowerCase())) return false;
+    return true;
+  });
 
   return (
-    <div>
-      <h2 className="text-xl font-bold mb-1" style={{ color: 'var(--ec-text-1)', fontFamily: 'Inter, sans-serif' }}>
-        {isKin ? 'Amasomo' : 'Courses'}
-      </h2>
-      <p className="text-sm mb-8" style={{ color: 'var(--ec-text-6)', fontFamily: 'Inter, sans-serif' }}>
-        {isKin
-          ? 'Amasomo wigenga — iga ku muvuduko wawe, nta shuri ukeneye.'
-          : 'Self-paced courses — learn at your own speed, no class needed.'}
-      </p>
+    <>
+      <div className="phead rise">
+        <h1>{isKin ? 'Amasomo' : 'Courses'}</h1>
+        <p>
+          {isKin
+            ? 'Inzira kuva kuri variable yawe ya mbere kugeza kuri porogaramu ikora.'
+            : 'A path from your first variable to a working program. Complete a course to unlock the next.'}
+        </p>
+      </div>
 
-      {courses.length === 0 ? (
-        <div className="py-16 text-center">
-          <p className="text-sm" style={{ color: 'var(--ec-text-6)' }}>No courses available yet.</p>
+      <div className="toolbar rise-2">
+        <div className="search">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true">
+            <circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>
+          </svg>
+          <input
+            type="text"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder={isKin ? 'Shakisha amasomo' : 'Search courses'}
+          />
+        </div>
+        <div className="filters">
+          {(['all', 'in-progress', 'not-started', 'completed'] as const).map(f => (
+            <button key={f} className={filter === f ? 'on' : ''} onClick={() => setFilter(f)}>
+              {f === 'all' ? (isKin ? 'Yose' : 'All')
+                : f === 'in-progress' ? (isKin ? 'Biragenda' : 'In progress')
+                : f === 'not-started' ? (isKin ? 'Bitangiye' : 'Not started')
+                : (isKin ? 'Byarangiye' : 'Completed')}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {filtered.length === 0 ? (
+        <div style={{ padding: '64px 0', textAlign: 'center' }}>
+          <p style={{ color: 'var(--text-3)', fontSize: 15 }}>
+            {isKin ? 'Nta masomo arabonetse.' : 'No courses found.'}
+          </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {courses.map(c => {
-            const diff = DIFF_STYLE[c.difficulty] ?? DIFF_STYLE.beginner;
+        <div className="courses rise-2">
+          {filtered.map((c, i) => {
             const title = isKin && c.title_kin ? c.title_kin : c.title;
             const desc  = isKin && c.description_kin ? c.description_kin : c.description;
             return (
-              <div
+              <a
                 key={c.id}
+                className="card course card-link"
                 onClick={() => onSelect(c)}
-                className="rounded-2xl p-6 cursor-pointer transition-all"
-                style={{ background: 'var(--ec-surface)', border: '1px solid var(--ec-b1)' }}
-                onMouseEnter={e => {
-                  (e.currentTarget as HTMLDivElement).style.border = '1px solid rgba(0,212,170,0.2)';
-                  (e.currentTarget as HTMLDivElement).style.boxShadow = '0 0 24px rgba(0,212,170,0.06)';
-                }}
-                onMouseLeave={e => {
-                  (e.currentTarget as HTMLDivElement).style.border = '1px solid var(--ec-b1)';
-                  (e.currentTarget as HTMLDivElement).style.boxShadow = 'none';
-                }}
+                role="button"
+                tabIndex={0}
+                onKeyDown={e => e.key === 'Enter' && onSelect(c)}
               >
-                <div className="w-14 h-14 rounded-xl flex items-center justify-center mb-4"
-                  style={{ background: 'rgba(0,212,170,0.1)', border: '1px solid rgba(0,212,170,0.15)' }}>
-                  <Code2 size={26} style={{ color: '#00d4aa' }} />
+                <div className="ctop">
+                  <span className="cnum">{String(i + 1).padStart(2, '0')}</span>
+                  <span className="pill"><span className="dot"></span>{isKin ? 'Biragenda' : 'In progress'}</span>
                 </div>
-                <h3 className="text-lg font-bold mb-2" style={{ color: 'var(--ec-text-1)', fontFamily: 'Inter, sans-serif' }}>{title}</h3>
-                <p className="text-base mb-4" style={{ color: 'var(--ec-text-6)', fontFamily: 'Inter, sans-serif',
-                  display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                  {desc}
-                </p>
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="px-2.5 py-1 rounded-full text-sm font-semibold"
-                    style={{ background: diff.bg, color: diff.text, border: `1px solid ${diff.border}` }}>
+                <h3>{title}</h3>
+                <p className="cdesc">{desc}</p>
+                <div className="cmeta">
+                  <span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M4 5h16M4 12h16M4 19h10"/></svg>
+                    {c.estimated_hours ? `~${c.estimated_hours}h` : '—'}
+                  </span>
+                  <span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M12 2v20M2 12h20"/></svg>
                     {c.difficulty.charAt(0).toUpperCase() + c.difficulty.slice(1)}
                   </span>
-                  <span className="flex items-center gap-1 text-sm" style={{ color: 'var(--ec-text-6)', fontFamily: 'Inter, sans-serif' }}>
-                    <Clock size={13} /> {c.estimated_hours}h
-                  </span>
                 </div>
-              </div>
+              </a>
             );
           })}
         </div>
       )}
-    </div>
+    </>
   );
 }
 
@@ -120,111 +134,142 @@ function CourseDetail({ course, language, onBack, onOpenLesson }: {
   const completedCount = allLessons.filter(l => completedIds.has(l.id)).length;
   const pct = totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0;
   const courseTitle = isKin && course.title_kin ? course.title_kin : course.title;
+  const courseDesc  = isKin && course.description_kin ? course.description_kin : course.description;
+
+  const LESSON_ICON: Record<string, JSX.Element> = {
+    reading: <BookOpen size={13} />,
+    coding:  <Code2 size={13} />,
+    quiz:    <HelpCircle size={13} />,
+  };
 
   return (
-    <div>
-      <button onClick={onBack} className="flex items-center gap-2 text-base mb-6 transition-all"
-        style={{ color: 'var(--ec-text-6)', fontFamily: 'Inter, sans-serif' }}
-        onMouseEnter={e => (e.currentTarget.style.color = 'var(--ec-text-4)')}
-        onMouseLeave={e => (e.currentTarget.style.color = 'var(--ec-text-6)')}>
-        <ArrowLeft size={18} /> {isKin ? 'Garuka ku Masomo' : 'Back to Courses'}
-      </button>
+    <>
+      <div className="crumb rise">
+        <a onClick={onBack} style={{ cursor: 'pointer' }}>{isKin ? 'Amasomo' : 'Courses'}</a>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><path d="m9 6 6 6-6 6"/></svg>
+        <span style={{ color: 'var(--text-2)' }}>{courseTitle}</span>
+      </div>
 
-      {/* Course header */}
-      <div className="rounded-2xl p-6 mb-6" style={{ background: 'var(--ec-surface)', border: '1px solid var(--ec-b1)' }}>
-        <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--ec-text-1)', fontFamily: 'Inter, sans-serif' }}>{courseTitle}</h2>
-        <p className="text-base mb-4" style={{ color: 'var(--ec-text-6)', fontFamily: 'Inter, sans-serif' }}>
-          {isKin && course.description_kin ? course.description_kin : course.description}
-        </p>
-        <div className="flex items-center gap-4 mb-3">
-          <span className="text-base font-semibold" style={{ color: '#00d4aa', fontFamily: 'Inter, sans-serif' }}>
-            {completedCount}/{totalLessons} {isKin ? 'amasomo' : 'lessons'}
-          </span>
-          <span className="text-base" style={{ color: 'var(--ec-text-6)' }}>{pct}%</span>
+      <div className="chead rise-2">
+        <div>
+          <p className="eyebrow">
+            {course.difficulty.charAt(0).toUpperCase() + course.difficulty.slice(1)}
+          </p>
+          <h1>{courseTitle}</h1>
+          <p className="lede">{courseDesc}</p>
+          <div className="chead-actions">
+            <button className="btn btn-primary" onClick={() => {
+              const next = allLessons.find(l => !completedIds.has(l.id));
+              if (next) onOpenLesson(next, allLessons);
+            }}>
+              {isKin ? 'Subira aho wahagaritse' : 'Resume · Continue'}
+            </button>
+          </div>
+          <div className="chead-meta">
+            <span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M4 5h16M4 12h16M4 19h10"/></svg>
+              {totalLessons} {isKin ? 'amasomo' : 'lessons'}
+            </span>
+            {course.estimated_hours && (
+              <span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+                ~{course.estimated_hours}h
+              </span>
+            )}
+            <span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M9 11l3 3 8-8M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+              {completedCount} {isKin ? 'byarangiye' : 'done'}
+            </span>
+          </div>
         </div>
-        <div className="w-full h-2 rounded-full overflow-hidden" style={{ background: 'var(--ec-b1)' }}>
-          <div className="h-full rounded-full transition-all duration-500"
-            style={{ width: `${pct}%`, background: 'linear-gradient(90deg, #00d4aa, #8b5cf6)' }} />
-        </div>
+
+        <aside className="card pad-lg sidecard">
+          <div className="row between" style={{ marginBottom: 14 }}>
+            <span className="card-title">{isKin ? 'Aho ugeze' : 'Your progress'}</span>
+            <span className="dim mono" style={{ fontSize: 13 }}>{pct}%</span>
+          </div>
+          <div className="bar on-card"><i style={{ width: `${pct}%` }}></i></div>
+          <div style={{ marginTop: 8 }}></div>
+          <div className="scrow"><span className="k">{isKin ? 'Amasomo yarangiye' : 'Lessons completed'}</span><span className="v">{completedCount} / {totalLessons}</span></div>
+          <div className="scrow"><span className="k">{isKin ? 'Ingorane' : 'Difficulty'}</span><span className="v">{course.difficulty.charAt(0).toUpperCase() + course.difficulty.slice(1)}</span></div>
+        </aside>
       </div>
 
       {loading ? (
-        <div className="flex justify-center py-12">
-          <div className="w-6 h-6 border-2 border-t-transparent rounded-full animate-spin"
-            style={{ borderColor: '#00d4aa', borderTopColor: 'transparent' }} />
+        <div style={{ padding: '48px 0', display: 'flex', justifyContent: 'center' }}>
+          <svg style={{ animation: 'spin 1s linear infinite' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="24" height="24">
+            <circle cx="12" cy="12" r="10" strokeOpacity=".25"/>
+            <path d="M12 2a10 10 0 0 1 10 10" strokeOpacity=".85"/>
+          </svg>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="modules rise-3">
           {modules.map((mod, mi) => {
             const modTitle = isKin && mod.title_kin ? mod.title_kin : mod.title;
             const modDone = mod.lessons.length > 0 && mod.lessons.every(l => completedIds.has(l.id));
             return (
-              <div key={mod.id} className="rounded-2xl overflow-hidden"
-                style={{ background: 'var(--ec-surface)', border: '1px solid var(--ec-b1)' }}>
-                {/* Module header */}
-                <div className="px-5 py-4 flex items-center gap-3"
-                  style={{ borderBottom: '1px solid var(--ec-b3)' }}>
-                  <div className="w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold"
-                    style={{ background: modDone ? 'rgba(0,212,170,0.15)' : 'var(--ec-b5)',
-                      color: modDone ? '#00d4aa' : 'var(--ec-text-6)', fontFamily: 'Inter, sans-serif' }}>
-                    {mi + 1}
+              <section key={mod.id} className="module">
+                <div className="mhead">
+                  <div className="mt">
+                    <span className="mnum">{String(mi + 1).padStart(2, '0')}</span>
+                    <h3>{modTitle}</h3>
                   </div>
-                  <h3 className="flex-1 text-base font-semibold" style={{ color: 'var(--ec-text-1)', fontFamily: 'Inter, sans-serif' }}>
-                    {modTitle}
-                  </h3>
-                  {modDone && <CheckCircle size={16} style={{ color: '#00d4aa' }} />}
+                  <span className="mc">
+                    {mod.lessons.length} {isKin ? 'amasomo' : 'lessons'}
+                    {modDone && ` · ${isKin ? 'byarangiye' : 'complete'}`}
+                  </span>
                 </div>
-                {/* Lessons */}
-                <div>
-                  {mod.lessons.map((lesson, li) => {
+                <div className="card lessons pad-sm" style={{ padding: 0 }}>
+                  {mod.lessons.map(lesson => {
                     const lessonTitle = isKin && lesson.title_kin ? lesson.title_kin : lesson.title;
                     const done = completedIds.has(lesson.id);
-                    const lt = LESSON_TYPE[lesson.lesson_type];
                     return (
                       <div
                         key={lesson.id}
+                        className="lesson clickable"
                         onClick={() => onOpenLesson(lesson, allLessons)}
-                        className="flex items-center gap-3 px-5 py-4 cursor-pointer transition-all"
-                        style={{ borderTop: li > 0 ? '1px solid var(--ec-b3)' : 'none' }}
-                        onMouseEnter={e => (e.currentTarget as HTMLDivElement).style.background = 'rgba(255,255,255,0.02)'}
-                        onMouseLeave={e => (e.currentTarget as HTMLDivElement).style.background = 'transparent'}
                       >
-                        <div className="w-5 flex-shrink-0">
-                          {done
-                            ? <CheckCircle size={16} style={{ color: '#00d4aa' }} />
-                            : <div className="w-4 h-4 rounded-full border" style={{ borderColor: 'var(--ec-b7)' }} />
-                          }
-                        </div>
-                        <span className="flex-1 text-base" style={{ color: done ? 'var(--ec-text-5)' : 'var(--ec-text-3)', fontFamily: 'Inter, sans-serif' }}>
-                          {lessonTitle}
+                        <span className={`lstat ${done ? 'done' : 'cur'}`}>
+                          {done ? (
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+                              <circle cx="12" cy="12" r="9"/><path d="m8.5 12 2.5 2.5 4.5-5"/>
+                            </svg>
+                          ) : (
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
+                              <circle cx="12" cy="12" r="9"/>
+                            </svg>
+                          )}
                         </span>
-                        <div className="flex items-center gap-2">
-                          <span className="flex items-center gap-1 px-2.5 py-1 rounded-full text-sm"
-                            style={{ background: lt.bg, color: lt.text, border: `1px solid ${lt.border}` }}>
-                            {lt.icon} {lt.label}
-                          </span>
-                          <span className="flex items-center gap-1 text-sm" style={{ color: 'var(--ec-text-6)' }}>
-                            <Zap size={12} style={{ color: '#f59e0b' }} />{lesson.xp_reward}
-                          </span>
-                          <ChevronRight size={16} style={{ color: 'var(--ec-text-7)' }} />
+                        <div className="lbody">
+                          <div className={`lt${done ? ' dim' : ''}`}>{lessonTitle}</div>
+                          <div className="lmeta">
+                            <span className="ltype">{lesson.lesson_type}</span>
+                            {lesson.xp_reward > 0 && (
+                              <><span>·</span><span style={{ display: 'inline-flex', alignItems: 'center', gap: 3 }}><Zap size={11} />{lesson.xp_reward} XP</span></>
+                            )}
+                          </div>
                         </div>
+                        <span className="lright">
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" width="16" height="16">
+                            <path d="m9 6 6 6-6 6"/>
+                          </svg>
+                        </span>
                       </div>
                     );
                   })}
                 </div>
-              </div>
+              </section>
             );
           })}
         </div>
       )}
-    </div>
+    </>
   );
 }
 
 // ─── Page Root ────────────────────────────────────────────────────────────────
 
 export default function CoursesPage({ language, onBack, onOpenLesson }: Props) {
-  const isKin = language === 'KIN';
   const [courses, setCourses] = useState<Course[]>([]);
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const [loading, setLoading] = useState(true);
@@ -234,29 +279,16 @@ export default function CoursesPage({ language, onBack, onOpenLesson }: Props) {
   }, []);
 
   return (
-    <div className="min-h-screen" style={{ background: 'var(--ec-bg)', fontFamily: 'Inter, sans-serif' }}>
-      {/* Top bar */}
-      <div className="border-b px-6 py-4 flex items-center gap-3"
-        style={{ background: 'var(--ec-surface)', borderColor: 'var(--ec-b1)' }}>
-        <button onClick={onBack} className="flex items-center gap-2 text-base transition-all"
-          style={{ color: 'var(--ec-text-6)' }}
-          onMouseEnter={e => (e.currentTarget.style.color = 'var(--ec-text-4)')}
-          onMouseLeave={e => (e.currentTarget.style.color = 'var(--ec-text-6)')}>
-          <ArrowLeft size={18} /> {isKin ? 'Dashboard' : 'Dashboard'}
-        </button>
-        <span style={{ color: 'var(--ec-b2)' }}>|</span>
-        <ThemeToggle />
-        <span className="flex items-center gap-2 text-base font-semibold" style={{ color: 'var(--ec-text-1)' }}>
-          <BookOpen size={16} style={{ color: '#00d4aa' }} />
-          {isKin ? 'Amasomo' : 'Courses'}
-        </span>
-      </div>
+    <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
+      <AppNav />
 
-      <div className="max-w-5xl mx-auto px-6 py-8">
+      <main className="wrap page">
         {loading ? (
-          <div className="flex justify-center py-24">
-            <div className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin"
-              style={{ borderColor: '#00d4aa', borderTopColor: 'transparent' }} />
+          <div style={{ padding: '96px 0', display: 'flex', justifyContent: 'center' }}>
+            <svg style={{ animation: 'spin 1s linear infinite' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="28" height="28">
+              <circle cx="12" cy="12" r="10" strokeOpacity=".25"/>
+              <path d="M12 2a10 10 0 0 1 10 10" strokeOpacity=".85"/>
+            </svg>
           </div>
         ) : selectedCourse ? (
           <CourseDetail
@@ -266,9 +298,13 @@ export default function CoursesPage({ language, onBack, onOpenLesson }: Props) {
             onOpenLesson={(lesson, allLessons) => onOpenLesson(lesson, selectedCourse.title, allLessons)}
           />
         ) : (
-          <CourseCatalog courses={courses} language={language} onSelect={setSelectedCourse} />
+          <CourseCatalog
+            courses={courses}
+            language={language}
+            onSelect={setSelectedCourse}
+          />
         )}
-      </div>
+      </main>
     </div>
   );
 }

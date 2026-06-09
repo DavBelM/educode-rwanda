@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Header } from './components/Header';
+import { AppNav } from './components/AppNav';
 import { CodeEditor } from './components/CodeEditor';
 import { AIFeedbackPanel } from './components/AIFeedbackPanel';
 import { OutputConsole } from './components/OutputConsole';
@@ -38,8 +38,8 @@ interface Props {
   language?: 'EN' | 'KIN';
 }
 
-export default function CodingWorkspace({ onBack, assignment, language: initialLanguage }: Props) {
-  const [language, setLanguage] = useState<'EN' | 'KIN'>( initialLanguage ?? 'EN');
+export default function CodingWorkspace({ assignment, language: initialLanguage }: Props) {
+  const [language] = useState<'EN' | 'KIN'>(initialLanguage ?? 'EN');
   const isKin = language === 'KIN';
 
   // Auto-save key — per assignment or free practice
@@ -160,8 +160,6 @@ export default function CodingWorkspace({ onBack, assignment, language: initialL
     setSubmitting(false);
   };
 
-  const toggleLanguage = () => setLanguage(prev => prev === 'EN' ? 'KIN' : 'EN');
-
   const runCode = useCallback(async () => {
     setIsRunning(true);
     setOutput('');
@@ -222,8 +220,8 @@ export default function CodingWorkspace({ onBack, assignment, language: initialL
   }, [isRunning, runCode]);
 
   return (
-    <div className="h-screen flex flex-col bg-[#f8fafc]" style={{ fontFamily: 'Inter, sans-serif' }}>
-      <Header language={language} onLanguageToggle={toggleLanguage} onBack={onBack} hideAssignmentInfo />
+    <div className="h-screen flex flex-col" style={{ background: 'var(--bg)' }}>
+      <AppNav />
 
       {/* Violation warning toast */}
       {violationWarning && (
@@ -309,7 +307,7 @@ export default function CodingWorkspace({ onBack, assignment, language: initialL
               errorLine={errorLine}
             />
           </div>
-          <div className="shrink-0 px-4 py-3 bg-[#181825] border-t border-gray-700 flex items-center gap-3">
+          <div className="shrink-0 px-4 py-3 flex items-center gap-3" style={{ background: 'var(--code-bg)', borderTop: '1px solid var(--line)' }}>
             <RunCodeButton onClick={runCode} isRunning={isRunning} language={language} />
           </div>
         </div>
@@ -358,7 +356,7 @@ export default function CodingWorkspace({ onBack, assignment, language: initialL
           <AIFeedbackPanel feedback={feedback} language={language} isLoading={isRunning} />
         </div>
 
-        <div className="sticky bottom-0 p-4 bg-white border-t border-gray-200 shadow-lg flex gap-3">
+        <div className="sticky bottom-0 p-4 flex gap-3" style={{ background: 'var(--surface)', borderTop: '1px solid var(--line)' }}>
           <RunCodeButton onClick={runCode} isRunning={isRunning} language={language} isMobile />
           {assignment && !submitted && (
             <button

@@ -2,4 +2,5 @@
 @import './tailwind.css';
 @import './theme.css';
 @import '../../design/educode.css';
+@import './pages.css';
 @import './a11y.css';

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Users, FileText, Plus, Copy, Check, X, ChevronDown, BookOpen, Code2, Loader, Trophy, Medal, Megaphone, Pin, Trash2, BarChart2, AlertCircle, Download } from 'lucide-react';
-import { Header } from './components/Header';
+import { AppNav } from './components/AppNav';
 import {
   createClass, getTeacherClasses, getClassAssignments, createAssignment, getClassStudentCount,
   getAssignmentSubmissions, getAssignmentSubmissionCounts, gradeSubmission, releaseGrades, getClassLeaderboard,
@@ -1360,7 +1360,7 @@ function Leaderboard({ classId, language }: { classId: string; language: 'EN' | 
 // ─── Main Dashboard ────────────────────────────────────────────────────────────
 
 export default function TeacherDashboard() {
-  const [language, setLanguage] = useState<'EN' | 'KIN'>('EN');
+  const [language] = useState<'EN' | 'KIN'>('EN');
   const isKin = language === 'KIN';
 
   const [classes, setClasses] = useState<Array<Class & { studentCount?: number; assignmentCount?: number }>>([]);
@@ -1416,15 +1416,10 @@ export default function TeacherDashboard() {
   const totalSubmissions = Object.values(submissionCounts).reduce((s, n) => s + n, 0);
 
   return (
-    <div className="min-h-screen" style={{ fontFamily: 'Inter, sans-serif', background: 'var(--ec-bg)' }}>
-      <Header
-        language={language}
-        onLanguageToggle={() => setLanguage(prev => prev === 'EN' ? 'KIN' : 'EN')}
-        subtitle={isKin ? 'Dashboard y\'umwarimu' : 'Teacher Dashboard'}
-        hideAssignmentInfo={true}
-      />
+    <div className="min-h-screen" style={{ background: 'var(--bg)' }}>
+      <AppNav />
 
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="wrap page">
         {loadingData ? (
           <div className="flex items-center justify-center py-24">
             <Loader size={24} className="animate-spin" style={{ color: '#00d4aa' }} />
@@ -1433,16 +1428,17 @@ export default function TeacherDashboard() {
           <div className="space-y-8">
 
             {/* Stats row */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="stats rise-2">
               {[
-                { label: isKin ? 'Amashuri' : 'Classes', value: classes.length, color: '#00d4aa' },
-                { label: isKin ? 'Abanyeshuri' : 'Students', value: totalStudents, color: '#8b5cf6' },
-                { label: isKin ? 'Imikoro yose' : 'Assignments', value: classes.reduce((s, c) => s + (c.assignmentCount ?? 0), 0), color: '#f59e0b' },
-                { label: isKin ? 'Imikoro yatanzwe' : 'Submissions', value: totalSubmissions, color: '#0ea5e9' },
+                { label: isKin ? 'Amashuri' : 'Classes',              value: classes.length,                                          detail: '' },
+                { label: isKin ? 'Abanyeshuri' : 'Students',          value: totalStudents,                                           detail: isKin ? 'muri amashuri yose' : 'across all classes' },
+                { label: isKin ? 'Imikoro yose' : 'Assignments',      value: classes.reduce((s, c) => s + (c.assignmentCount ?? 0), 0), detail: '' },
+                { label: isKin ? 'Imikoro yatanzwe' : 'Submissions',  value: totalSubmissions,                                        detail: isKin ? 'zitegereje gukosorwa' : 'awaiting review' },
               ].map((stat, i) => (
-                <div key={i} className="rounded-2xl p-5" style={{ background: 'var(--ec-surface)', border: '1px solid var(--ec-b1)' }}>
-                  <p className="text-2xl font-bold mb-1" style={{ color: stat.color, fontFamily: 'Inter, sans-serif' }}>{stat.value}</p>
-                  <p className="text-xs" style={{ color: 'var(--ec-text-6)', fontFamily: 'Inter, sans-serif' }}>{stat.label}</p>
+                <div key={i} className="stat">
+                  <div className="sl">{stat.label}</div>
+                  <div className="sv">{stat.value}</div>
+                  {stat.detail && <div className="sd">{stat.detail}</div>}
                 </div>
               ))}
             </div>
