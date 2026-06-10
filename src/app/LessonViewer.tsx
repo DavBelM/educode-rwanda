@@ -191,8 +191,8 @@ function CodingLesson({ lesson, language, onComplete, completing }: {
           return (
             <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
               {hints.slice(0, hintsRevealed).map((h, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, padding: '8px 12px', borderRadius: 'var(--radius)', background: 'rgba(245,158,11,0.07)', border: '1px solid rgba(245,158,11,0.2)' }}>
-                  <span style={{ fontSize: 12, fontWeight: 600, marginTop: 2, color: '#f59e0b', flexShrink: 0 }}>
+                <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, padding: '8px 12px', borderRadius: 'var(--radius)', background: 'var(--surface-2)', border: '1px solid var(--line)' }}>
+                  <span style={{ fontSize: 12, fontWeight: 600, marginTop: 2, color: 'var(--text)', flexShrink: 0 }}>
                     {isKin ? `Icyifuzo ${i + 1}` : `Hint ${i + 1}`}
                   </span>
                   <p style={{ fontSize: 12.5, lineHeight: 1.55, color: 'var(--text-2)', margin: 0 }}>{h}</p>
@@ -201,7 +201,7 @@ function CodingLesson({ lesson, language, onComplete, completing }: {
               {hintsRevealed < hints.length && (
                 <button
                   onClick={() => setHintsRevealed(n => n + 1)}
-                  style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12.5, fontWeight: 600, color: '#f59e0b', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                  style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12.5, fontWeight: 600, color: 'var(--text)', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
                 >
                   💡 {isKin
                     ? `Bona icyifuzo ${hintsRevealed + 1} (${hints.length - hintsRevealed} bisigaye)`
@@ -570,8 +570,8 @@ function QuizLesson({ lesson, language, onComplete, completing }: {
         </button>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-          <div className="card pad-lg" style={{ display: 'flex', alignItems: 'center', gap: 16, background: perfect ? 'rgba(158,170,132,0.06)' : 'rgba(245,158,11,0.06)', border: `1px solid ${perfect ? 'rgba(158,170,132,0.2)' : 'rgba(245,158,11,0.2)'}` }}>
-            <div style={{ fontSize: 28, fontWeight: 700, color: perfect ? '#9eaa84' : '#f59e0b' }}>
+          <div className="card pad-lg" style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+            <div style={{ fontSize: 28, fontWeight: 700, color: 'var(--text)' }}>
               {score}/{questions.length}
             </div>
             <p style={{ fontSize: 14, color: 'var(--text-2)', lineHeight: 1.5 }}>
