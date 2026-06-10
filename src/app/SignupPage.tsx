@@ -25,9 +25,9 @@ export default function SignupPage({ onSuccess, onLoginClick }: {
 
   const getPasswordStrength = (pw: string) => {
     if (pw.length === 0) return { strength: 0, label: '', color: '' };
-    if (pw.length < 6) return { strength: 1, label: 'Weak', color: '#ef4444' };
-    if (pw.length < 10) return { strength: 2, label: 'Medium', color: '#f59e0b' };
-    return { strength: 3, label: 'Strong', color: '#22c55e' };
+    if (pw.length < 6) return { strength: 1, label: 'Weak', color: 'var(--error)' };
+    if (pw.length < 10) return { strength: 2, label: 'Medium', color: 'var(--accent)' };
+    return { strength: 3, label: 'Strong', color: 'var(--text)' };
   };
   const pwStrength = getPasswordStrength(formData.password);
 

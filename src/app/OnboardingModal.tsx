@@ -20,6 +20,12 @@ export default function OnboardingModal({ userType, userName, language, onDone }
   const [step, setStep] = useState(0);
   const firstName = userName.split(' ')[0];
 
+  const iconBox = (icon: React.ReactNode) => (
+    <div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: 'var(--surface-2)', border: '1px solid var(--line)', color: 'var(--text)' }}>
+      {icon}
+    </div>
+  );
+
   const teacherSteps: Step[] = [
     {
       icon: <div className="text-5xl">👋</div>,
@@ -30,7 +36,7 @@ export default function OnboardingModal({ userType, userName, language, onDone }
       tip: isKin ? 'Ibi bizakugenda neza.' : "Here's a quick tour of what you can do.",
     },
     {
-      icon: <div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(0,212,170,0.12)', border: '1px solid rgba(0,212,170,0.2)' }}><Users size={28} style={{ color: '#00d4aa' }} /></div>,
+      icon: iconBox(<Users size={28} />),
       title: isKin ? 'Kora Ishuri Ryawe' : 'Create Your Class',
       description: isKin
         ? 'Tangira ukora ishuri. Buri shuri rihabwa kode yaryo — usangire n\'abanyeshuri bawe bayikoreshe binjira.'
@@ -38,7 +44,7 @@ export default function OnboardingModal({ userType, userName, language, onDone }
       tip: isKin ? 'Urashobora gukora amashuri menshi.' : 'You can create multiple classes.',
     },
     {
-      icon: <div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(139,92,246,0.12)', border: '1px solid rgba(139,92,246,0.2)' }}><ClipboardList size={28} style={{ color: '#8b5cf6' }} /></div>,
+      icon: iconBox(<ClipboardList size={28} />),
       title: isKin ? 'Tanga imikoro' : 'Create Assignments',
       description: isKin
         ? 'Tanga imikoro yo kwandika cyangwa iya code. Shyiraho igihe ntarengwa, amanota, n\'uburyo bw\'ikizamini (Exam Mode) kugirango birinde gukopera.'
@@ -46,7 +52,7 @@ export default function OnboardingModal({ userType, userName, language, onDone }
       tip: isKin ? 'Uburyo bw\'ikizamini (Exam Mode) bufunga screen kandi bukurikirana niba umunyeshuri ahinduye paji.' : 'Exam Mode locks the screen and tracks tab switches.',
     },
     {
-      icon: <div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(245,158,11,0.12)', border: '1px solid rgba(245,158,11,0.2)' }}><BarChart2 size={28} style={{ color: '#f59e0b' }} /></div>,
+      icon: iconBox(<BarChart2 size={28} />),
       title: isKin ? 'Suzuma kandi uhe amanota' : 'Review & Grade',
       description: isKin
         ? 'Reba ibisubizo bya buri munyeshuri, tanga amanota, wongere igitekerezo cyawe. Reba Analytics kugirango ubonee ikigereranyo cy\'ishuri ryawe.'
@@ -54,7 +60,7 @@ export default function OnboardingModal({ userType, userName, language, onDone }
       tip: isKin ? 'Abanyeshuri babona ibitekerezo byawe kuri dashboard yabo.' : 'Students see your feedback on their dashboard.',
     },
     {
-      icon: <div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(0,212,170,0.12)', border: '1px solid rgba(0,212,170,0.2)' }}><Megaphone size={28} style={{ color: '#00d4aa' }} /></div>,
+      icon: iconBox(<Megaphone size={28} />),
       title: isKin ? 'Shyiraho amatangazo' : 'Post Announcements',
       description: isKin
         ? 'Yoherereza abanyeshuri bawe amakuru y\'ingenzi — nk\'amatariki y\'ibizamini n\'ibindi. Abanyeshuri bayabona ako kanya kuri dashboard yabo.'
@@ -73,7 +79,7 @@ export default function OnboardingModal({ userType, userName, language, onDone }
       tip: isKin ? 'Ibi bizafata iminota ibiri.' : "This will only take two minutes.",
     },
     {
-      icon: <div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(0,212,170,0.12)', border: '1px solid rgba(0,212,170,0.2)' }}><Users size={28} style={{ color: '#00d4aa' }} /></div>,
+      icon: iconBox(<Users size={28} />),
       title: isKin ? 'Injira mu ishuri ryawe' : 'Join Your Class',
       description: isKin
         ? 'Baza umwarimu wawe kode yo kwinjira mu ishuri. Kanda "Join Class" kuri dashboard kuzuzamo iyo kode.'
@@ -81,7 +87,7 @@ export default function OnboardingModal({ userType, userName, language, onDone }
       tip: isKin ? 'Urashobora kwinjira mu mashuri menshi.' : 'You can join multiple classes.',
     },
     {
-      icon: <div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(139,92,246,0.12)', border: '1px solid rgba(139,92,246,0.2)' }}><BookOpen size={28} style={{ color: '#8b5cf6' }} /></div>,
+      icon: iconBox(<BookOpen size={28} />),
       title: isKin ? 'Kora imikoro' : 'Complete Assignments',
       description: isKin
         ? 'Imikoro yawe igaragara kuri dashboard. Fungura umwe, usubize ibibazo cyangwa wandike code — hanyuma uwohereze mbere y\'igihe ntarengwa.'
@@ -89,7 +95,7 @@ export default function OnboardingModal({ userType, userName, language, onDone }
       tip: isKin ? 'Imikoro y\'ibizamini ifunga screen kandi ikoherezwa mu buryo bwikora iyo igihe kirangiye.' : 'Exam assignments lock the screen and auto-submit when time runs out.',
     },
     {
-      icon: <div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(0,212,170,0.12)', border: '1px solid rgba(0,212,170,0.2)' }}><Code2 size={28} style={{ color: '#00d4aa' }} /></div>,
+      icon: iconBox(<Code2 size={28} />),
       title: isKin ? 'Imenyereze gukora code' : 'Practice Coding',
       description: isKin
         ? 'Fungura "Courses" kugirango ubone amasomo. Jya muri Coding Workspace igihe icyo aricyo cyose kugirango ugerageze JavaScript yawe.'
@@ -97,7 +103,7 @@ export default function OnboardingModal({ userType, userName, language, onDone }
       tip: isKin ? 'AI izajya igusobanurira amakosa mu gihe wandika code.' : 'The AI will explain errors in your code as you learn.',
     },
     {
-      icon: <div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: 'rgba(245,158,11,0.12)', border: '1px solid rgba(245,158,11,0.2)' }}><CheckCircle size={28} style={{ color: '#f59e0b' }} /></div>,
+      icon: iconBox(<CheckCircle size={28} />),
       title: isKin ? 'Kurikirana iterambere ryawe' : 'Track Your Progress',
       description: isKin
         ? 'Kanda "My Results" kugirango ubone amanota yawe yose, igitekerezo cy\'umwarimu, n\'iterambere ryawe. Buri munsi wakoze wongera streak yawe.'
@@ -113,24 +119,21 @@ export default function OnboardingModal({ userType, userName, language, onDone }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(6px)', fontFamily: 'Inter, sans-serif' }}>
-      <div className="w-full max-w-lg rounded-3xl overflow-hidden"
-        style={{ background: 'var(--ec-surface)', border: '1px solid var(--ec-b2)', boxShadow: '0 40px 80px rgba(0,0,0,0.5)' }}>
+      style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }}>
+      <div className="card w-full max-w-lg overflow-hidden" style={{ padding: 0 }}>
 
         {/* Progress bar */}
-        <div className="h-1" style={{ background: 'var(--ec-b1)' }}>
+        <div className="h-1" style={{ background: 'var(--surface-2)' }}>
           <div className="h-full transition-all duration-500"
-            style={{ width: `${progress}%`, background: 'linear-gradient(90deg, #00d4aa, #8b5cf6)' }} />
+            style={{ width: `${progress}%`, background: 'var(--text)' }} />
         </div>
 
         {/* Header */}
         <div className="flex items-center justify-between px-6 pt-5 pb-0">
-          <span className="text-xs font-semibold" style={{ color: 'var(--ec-text-7)' }}>
+          <span className="text-xs font-semibold dim">
             {step + 1} / {steps.length}
           </span>
-          <button onClick={onDone} style={{ color: 'var(--ec-text-7)' }}
-            onMouseEnter={e => (e.currentTarget.style.color = 'var(--ec-text-4)')}
-            onMouseLeave={e => (e.currentTarget.style.color = 'var(--ec-text-7)')}>
+          <button onClick={onDone} className="iconbtn" aria-label="Close">
             <X size={18} />
           </button>
         </div>
@@ -139,16 +142,16 @@ export default function OnboardingModal({ userType, userName, language, onDone }
         <div className="px-8 py-8 text-center">
           <div className="flex justify-center mb-6">{current.icon}</div>
 
-          <h2 className="text-2xl font-bold mb-3" style={{ color: 'var(--ec-text-1)', letterSpacing: '-0.01em' }}>
+          <h2 className="text-2xl font-bold mb-3" style={{ color: 'var(--text)', letterSpacing: '-0.01em' }}>
             {current.title}
           </h2>
-          <p className="text-sm leading-relaxed mb-4" style={{ color: 'var(--ec-text-5)', maxWidth: '360px', margin: '0 auto 16px' }}>
+          <p className="text-sm leading-relaxed mb-4" style={{ color: 'var(--text-2)', maxWidth: '360px', margin: '0 auto 16px' }}>
             {current.description}
           </p>
 
           {current.tip && (
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-medium"
-              style={{ background: 'rgba(0,212,170,0.07)', border: '1px solid rgba(0,212,170,0.15)', color: '#00d4aa' }}>
+            <div className="inline-flex items-center gap-2 px-4 py-2 text-xs font-medium"
+              style={{ background: 'var(--surface-2)', border: '1px solid var(--line)', borderRadius: 'var(--radius)', color: 'var(--text-2)' }}>
               💡 {current.tip}
             </div>
           )}
@@ -163,7 +166,7 @@ export default function OnboardingModal({ userType, userName, language, onDone }
                 width: i === step ? '20px' : '8px',
                 height: '8px',
                 borderRadius: '4px',
-                background: i === step ? '#00d4aa' : i < step ? 'rgba(0,212,170,0.3)' : 'var(--ec-b4)',
+                background: i === step ? 'var(--text)' : i < step ? 'var(--text-3)' : 'var(--line-strong)',
               }} />
           ))}
         </div>
@@ -171,20 +174,13 @@ export default function OnboardingModal({ userType, userName, language, onDone }
         {/* Actions */}
         <div className="px-6 pb-6 flex gap-3">
           {step > 0 && (
-            <button onClick={() => setStep(s => s - 1)}
-              className="flex-1 py-3 rounded-xl text-sm font-semibold transition-all"
-              style={{ background: 'var(--ec-b3)', color: 'var(--ec-text-4)', border: '1px solid var(--ec-b2)' }}
-              onMouseEnter={e => (e.currentTarget.style.background = 'var(--ec-b2)')}
-              onMouseLeave={e => (e.currentTarget.style.background = 'var(--ec-b3)')}>
+            <button onClick={() => setStep(s => s - 1)} className="btn btn-secondary flex-1">
               {isKin ? 'Subira inyuma' : 'Back'}
             </button>
           )}
           <button
             onClick={() => isLast ? onDone() : setStep(s => s + 1)}
-            className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold transition-all"
-            style={{ background: isLast ? '#00d4aa' : 'rgba(0,212,170,0.12)', color: isLast ? 'var(--ec-bg)' : '#00d4aa', border: isLast ? 'none' : '1px solid rgba(0,212,170,0.25)', boxShadow: isLast ? '0 0 24px rgba(0,212,170,0.25)' : 'none' }}
-            onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = isLast ? '#00bfa0' : 'rgba(0,212,170,0.2)'; }}
-            onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = isLast ? '#00d4aa' : 'rgba(0,212,170,0.12)'; }}>
+            className="btn btn-primary flex-1">
             {isLast
               ? <>{isKin ? 'Tangira!' : "Let's go!"} <CheckCircle size={16} /></>
               : <>{isKin ? 'Komeza' : 'Next'} <ArrowRight size={16} /></>}

@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { Eye, EyeOff, Lock, ArrowRight, CheckCircle } from 'lucide-react';
+import { ArrowRight, CheckCircle } from 'lucide-react';
 import { useAuth } from '../lib/auth';
+import { useTheme } from '../lib/theme';
 import { usePageTitle } from '../hooks/usePageTitle';
 
 interface Props {
@@ -10,6 +11,7 @@ interface Props {
 export default function ResetPasswordPage({ onDone }: Props) {
   usePageTitle('Reset Password · EduCode');
   const { updatePassword } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const [language, setLanguage] = useState<'EN' | 'KIN'>('EN');
   const isKin = language === 'KIN';
   const [password, setPassword] = useState('');
@@ -22,6 +24,13 @@ export default function ResetPasswordPage({ onDone }: Props) {
 
   const isStrong = password.length >= 8;
   const matches = password === confirm;
+
+  const pwStrength = (() => {
+    if (password.length === 0) return { strength: 0, label: '', color: '' };
+    if (password.length < 8) return { strength: 1, label: isKin ? 'Ni ryoroshye cyane' : 'Weak', color: 'var(--error)' };
+    if (password.length < 10) return { strength: 2, label: isKin ? 'Ririringaniye' : 'Fair', color: 'var(--accent)' };
+    return { strength: 3, label: isKin ? 'Rikomeye' : 'Strong', color: 'var(--text)' };
+  })();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,185 +54,170 @@ export default function ResetPasswordPage({ onDone }: Props) {
   };
 
   return (
-    <div className="min-h-screen flex" style={{ fontFamily: 'Inter, sans-serif', background: 'var(--ec-bg)' }}>
+    <div className="auth">
+      {/* LEFT PANEL */}
+      <aside className="auth-aside">
+        <a className="logo" href="/"><span className="edu">EduCode</span></a>
+        <div className="aside-mid">
+          <h2>{isKin ? 'Wige programming mu rurimi rwawe' : 'Learn programming in your language'}</h2>
+          <p>{isKin ? 'Ibisobanuro mu Kinyarwanda. Buri kosa risobanurwa.' : 'Error explanations in Kinyarwanda. Built for Rwanda.'}</p>
+        </div>
+        <div className="aside-foot">Built for Rwandan technical secondary schools.</div>
+      </aside>
 
-      {/* Left brand panel */}
-      <div className="hidden lg:flex lg:w-2/5 flex-col justify-between p-12 relative overflow-hidden"
-        style={{ background: 'var(--ec-surface)', borderRight: '1px solid var(--ec-b1)' }}>
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-80 h-80 rounded-full pointer-events-none"
-          style={{ background: 'radial-gradient(ellipse, rgba(0,212,170,0.08) 0%, transparent 70%)', filter: 'blur(40px)' }} />
-        <div className="flex items-center gap-3 relative z-10">
-          <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: '#0ea5e9' }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-              <path d="M8 6H16M8 12H16M8 18H13" stroke="white" strokeWidth="2" strokeLinecap="round" />
-            </svg>
+      {/* RIGHT : FORM */}
+      <main className="auth-main">
+        <div className="auth-top">
+          <div className="lang-toggle">
+            {(['EN', 'KIN'] as const).map(lang => (
+              <button key={lang} className={language === lang ? 'on' : ''} onClick={() => setLanguage(lang)}>
+                {lang}
+              </button>
+            ))}
           </div>
-          <span className="text-xl font-bold" style={{ color: 'var(--ec-text-1)' }}>EduCode Rwanda</span>
+          <button
+            className="iconbtn"
+            onClick={toggleTheme}
+            aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+            aria-pressed={theme === 'light'}
+          >
+            {theme === 'dark' ? (
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="4"/>
+                <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+              </svg>
+            ) : (
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+              </svg>
+            )}
+          </button>
         </div>
-        <div className="flex-1 flex items-center justify-center relative z-10">
-          <div className="text-8xl font-mono" style={{ color: '#8b5cf6', textShadow: '0 0 40px rgba(139,92,246,0.3)' }}>&lt;/&gt;</div>
-        </div>
-        <div className="relative z-10">
-          <p className="text-base font-semibold mb-2" style={{ color: 'var(--ec-text-1)' }}>
-            {isKin ? 'Wige programming mu rurimi rwawe' : 'Learn programming in your language'}
-          </p>
-          <p className="text-sm" style={{ color: 'var(--ec-text-6)' }}>
-            {isKin ? 'Ibisobanuro mu Kinyarwanda. Buri kosa risobanurwa.' : 'Error explanations in Kinyarwanda. Built for Rwanda.'}
-          </p>
-        </div>
-      </div>
 
-      {/* Right form panel */}
-      <div className="flex-1 flex items-center justify-center p-8">
-        <div className="w-full max-w-md">
-
-          {/* Language toggle */}
-          <div className="flex justify-end mb-8">
-            <div className="flex items-center rounded-lg overflow-hidden" style={{ border: '1px solid var(--ec-b2)' }}>
-              {(['EN', 'KIN'] as const).map((lang, i) => (
-                <button key={lang} onClick={() => setLanguage(lang)}
-                  className="px-3 py-1.5 text-xs font-bold transition-all"
-                  style={{
-                    background: language === lang ? 'rgba(0,212,170,0.15)' : 'transparent',
-                    color: language === lang ? '#00d4aa' : 'var(--ec-text-6)',
-                    borderRight: i === 0 ? '1px solid var(--ec-b2)' : undefined,
-                  }}>
-                  {lang}
-                </button>
-              ))}
-            </div>
-          </div>
-
+        <div className="auth-card rise">
           {done ? (
             <div className="text-center">
-              <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6"
-                style={{ background: 'rgba(0,212,170,0.12)', border: '1px solid rgba(0,212,170,0.25)' }}>
-                <CheckCircle size={32} style={{ color: '#00d4aa' }} />
+              <div className="iconbtn" style={{ width: 56, height: 56, margin: '0 auto 20px', pointerEvents: 'none' }}>
+                <CheckCircle size={26} />
               </div>
-              <h1 className="text-2xl font-bold mb-3" style={{ color: 'var(--ec-text-1)', letterSpacing: '-0.01em' }}>
-                {isKin ? 'Ijambo ry\'ibanga ryahinduwe neza!' : 'Password updated!'}
-              </h1>
-              <p className="text-sm mb-8" style={{ color: 'var(--ec-text-5)' }}>
+              <h1>{isKin ? 'Ijambo ry\'ibanga ryahinduwe neza!' : 'Password updated!'}</h1>
+              <p className="sub">
                 {isKin ? 'Urashobora kwinjira ukoresheje ijambo ry\'ibanga rishya.' : 'You can now log in with your new password.'}
               </p>
-              <button onClick={onDone}
-                className="w-full rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all"
-                style={{ height: '48px', background: '#00d4aa', color: 'var(--ec-bg)' }}
-                onMouseEnter={e => (e.currentTarget.style.background = '#00bfa0')}
-                onMouseLeave={e => (e.currentTarget.style.background = '#00d4aa')}>
+              <button onClick={onDone} className="btn btn-primary btn-block lg" style={{ marginTop: 24 }}>
                 {isKin ? 'Jya kwinjira' : 'Go to Login'} <ArrowRight size={16} />
               </button>
             </div>
           ) : (
             <>
-              <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--ec-text-1)', letterSpacing: '-0.01em' }}>
-                {isKin ? 'Shyiraho ijambo ry\'ibanga rishya' : 'Set new password'}
-              </h1>
-              <p className="text-sm mb-8" style={{ color: 'var(--ec-text-5)' }}>
+              <h1>{isKin ? 'Shyiraho ijambo ry\'ibanga rishya' : 'Set new password'}</h1>
+              <p className="sub">
                 {isKin ? 'Hitamo ijambo ry\'ibanga rishya kandi rikomeye.' : 'Choose a strong new password for your account.'}
               </p>
 
-              <form onSubmit={handleSubmit} className="space-y-5">
+              <form onSubmit={handleSubmit} className="auth-form">
                 {/* New password */}
-                <div>
-                  <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--ec-text-4)' }}>
-                    {isKin ? 'Ijambo ry\'ibanga rishya' : 'New password'}
-                  </label>
-                  <div className="relative">
-                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--ec-text-6)' }} />
+                <div className="field">
+                  <span className="label">{isKin ? 'Ijambo ry\'ibanga rishya' : 'New password'}</span>
+                  <div className="input-group">
                     <input
+                      className="input"
                       type={showPassword ? 'text' : 'password'}
                       value={password}
                       onChange={e => setPassword(e.target.value)}
                       placeholder="••••••••"
                       required
-                      className="w-full pl-11 pr-12 py-3 rounded-xl text-sm focus:outline-none"
-                      style={{ height: '48px', background: 'var(--ec-surface)', border: '1px solid var(--ec-b2)', color: 'var(--ec-text-1)' }}
-                      onFocus={e => (e.target.style.border = '1px solid rgba(0,212,170,0.4)')}
-                      onBlur={e => (e.target.style.border = '1px solid var(--ec-b2)')}
                     />
-                    <button type="button" onClick={() => setShowPassword(p => !p)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 transition-colors"
-                      style={{ color: 'var(--ec-text-6)' }}
-                      onMouseEnter={e => (e.currentTarget.style.color = 'var(--ec-text-4)')}
-                      onMouseLeave={e => (e.currentTarget.style.color = 'var(--ec-text-6)')}>
-                      {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                    <button
+                      type="button"
+                      className="input-affix"
+                      onClick={() => setShowPassword(p => !p)}
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer' }}
+                    >
+                      {showPassword ? (
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
+                          <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24M1 1l22 22"/>
+                        </svg>
+                      ) : (
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
+                          <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/>
+                          <circle cx="12" cy="12" r="3"/>
+                        </svg>
+                      )}
                     </button>
                   </div>
                   {/* Strength indicator */}
                   {password && (
-                    <div className="flex items-center gap-2 mt-2">
-                      <div className="flex gap-1">
-                        {[1, 2, 3].map(i => (
-                          <div key={i} className="h-1 w-8 rounded-full transition-all"
-                            style={{ background: password.length >= i * 4 ? (password.length >= 10 ? '#00d4aa' : '#f59e0b') : 'var(--ec-b2)' }} />
+                    <div className="pw-strength">
+                      <div className="pw-bars">
+                        {[1, 2, 3].map(lvl => (
+                          <div key={lvl} className="pw-bar" style={{ background: lvl <= pwStrength.strength ? pwStrength.color : undefined }} />
                         ))}
                       </div>
-                      <span className="text-xs" style={{ color: password.length >= 10 ? '#00d4aa' : password.length >= 8 ? '#f59e0b' : '#f87171' }}>
-                        {password.length >= 10 ? (isKin ? 'Rikomeye' : 'Strong') : password.length >= 8 ? (isKin ? 'Ririringaniye' : 'Fair') : (isKin ? 'Ni ryoroshye cyane' : 'Weak')}
-                      </span>
+                      <span style={{ fontSize: 12, color: 'var(--text-3)' }}>{pwStrength.label}</span>
                     </div>
                   )}
                 </div>
 
                 {/* Confirm password */}
-                <div>
-                  <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--ec-text-4)' }}>
-                    {isKin ? 'Subiramo ijambo ry\'ibanga' : 'Confirm password'}
-                  </label>
-                  <div className="relative">
-                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4" style={{ color: 'var(--ec-text-6)' }} />
+                <div className="field">
+                  <span className="label">{isKin ? 'Subiramo ijambo ry\'ibanga' : 'Confirm password'}</span>
+                  <div className="input-group">
                     <input
+                      className="input"
                       type={showConfirm ? 'text' : 'password'}
                       value={confirm}
                       onChange={e => setConfirm(e.target.value)}
                       placeholder="••••••••"
                       required
-                      className="w-full pl-11 pr-12 py-3 rounded-xl text-sm focus:outline-none"
-                      style={{
-                        height: '48px', background: 'var(--ec-surface)', color: 'var(--ec-text-1)',
-                        border: confirm && !matches ? '1px solid rgba(239,68,68,0.5)' : confirm && matches ? '1px solid rgba(0,212,170,0.4)' : '1px solid var(--ec-b2)',
-                      }}
-                      onFocus={e => { if (!confirm) e.target.style.border = '1px solid rgba(0,212,170,0.4)'; }}
-                      onBlur={e => { if (!confirm) e.target.style.border = '1px solid var(--ec-b2)'; }}
+                      style={confirm && !matches ? { borderColor: 'var(--error)' } : undefined}
                     />
-                    <button type="button" onClick={() => setShowConfirm(p => !p)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 transition-colors"
-                      style={{ color: 'var(--ec-text-6)' }}
-                      onMouseEnter={e => (e.currentTarget.style.color = 'var(--ec-text-4)')}
-                      onMouseLeave={e => (e.currentTarget.style.color = 'var(--ec-text-6)')}>
-                      {showConfirm ? <EyeOff size={16} /> : <Eye size={16} />}
+                    <button
+                      type="button"
+                      className="input-affix"
+                      onClick={() => setShowConfirm(p => !p)}
+                      aria-label={showConfirm ? 'Hide password' : 'Show password'}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer' }}
+                    >
+                      {showConfirm ? (
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
+                          <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24M1 1l22 22"/>
+                        </svg>
+                      ) : (
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
+                          <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/>
+                          <circle cx="12" cy="12" r="3"/>
+                        </svg>
+                      )}
                     </button>
                   </div>
                   {confirm && !matches && (
-                    <p className="text-xs mt-1.5" style={{ color: '#f87171' }}>
+                    <p className="text-xs mt-1.5" style={{ color: 'var(--error)' }}>
                       {isKin ? 'Amagambo y\'ibanga ntahuye.' : 'Passwords do not match.'}
                     </p>
                   )}
                 </div>
 
                 {error && (
-                  <div className="p-3 rounded-xl text-sm" style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#f87171' }}>
+                  <div style={{ padding: '10px 14px', borderRadius: 'var(--radius)', background: 'var(--error-dim)', color: 'var(--error)', fontSize: 14 }}>
                     {error}
                   </div>
                 )}
 
-                <button
-                  type="submit"
-                  disabled={loading || !isStrong || !matches}
-                  className="w-full rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all disabled:opacity-50"
-                  style={{ height: '48px', background: '#00d4aa', color: 'var(--ec-bg)', boxShadow: '0 0 20px rgba(0,212,170,0.2)' }}
-                  onMouseEnter={e => { if (!loading) (e.currentTarget as HTMLButtonElement).style.background = '#00bfa0'; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = '#00d4aa'; }}>
-                  {loading
-                    ? <div className="w-5 h-5 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: 'var(--ec-bg)', borderTopColor: 'transparent' }} />
-                    : <>{isKin ? 'Hindura ijambo ry\'ibanga' : 'Update password'} <ArrowRight size={16} /></>}
+                <button type="submit" disabled={loading || !isStrong || !matches} className="btn btn-primary btn-block lg">
+                  {loading ? (
+                    <svg style={{ animation: 'spin 1s linear infinite' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16">
+                      <circle cx="12" cy="12" r="10" strokeOpacity=".25"/>
+                      <path d="M12 2a10 10 0 0 1 10 10" strokeOpacity=".85"/>
+                    </svg>
+                  ) : <>{isKin ? 'Hindura ijambo ry\'ibanga' : 'Update password'} <ArrowRight size={16} /></>}
                 </button>
               </form>
             </>
           )}
         </div>
-      </div>
+      </main>
     </div>
   );
 }
