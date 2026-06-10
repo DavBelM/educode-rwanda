@@ -415,3 +415,19 @@ td .when { color: var(--text-3); font-size: 13px; }
   .tgrid { grid-template-columns: 1fr; }
   .stats { grid-template-columns: repeat(2,1fr); }
 }
+
+/* Privacy / legal pages */
+.privacy-layout { display: grid; grid-template-columns: 240px 1fr; gap: 32px; align-items: start; }
+.toc-link { display: flex; align-items: center; gap: 10px; padding: 7px 10px; border-radius: var(--radius); font-size: 13px; color: var(--text-2); text-decoration: none; transition: background 0.15s, color 0.15s; }
+.toc-link:hover { background: var(--surface-2); color: var(--text); }
+.toc-link.on { background: var(--surface-2); color: var(--text); font-weight: 600; }
+.plain-list { display: flex; flex-direction: column; gap: 8px; padding-left: 22px; list-style: disc; }
+.callout { display: flex; align-items: flex-start; gap: 10px; padding: 14px 16px; border-radius: var(--radius); border: 1px solid var(--line); background: var(--surface-2); font-size: 14px; color: var(--text-2); }
+.callout.success { border-color: color-mix(in srgb, #9eaa84 40%, transparent); background: color-mix(in srgb, #9eaa84 12%, transparent); color: var(--text); }
+.callout.warning { border-color: color-mix(in srgb, #cda86a 40%, transparent); background: color-mix(in srgb, #cda86a 12%, transparent); color: var(--text); }
+.callout svg { flex-shrink: 0; margin-top: 1px; }
+
+@media (max-width: 920px) {
+  .privacy-layout { grid-template-columns: 1fr; }
+  .privacy-toc .card { position: static !important; }
+}
