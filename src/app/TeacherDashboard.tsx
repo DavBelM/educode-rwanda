@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
-import { Users, FileText, Plus, Copy, Check, X, ChevronDown, BookOpen, Code2, Loader, Trophy, Medal, Megaphone, Pin, Trash2, BarChart2, AlertCircle, Download } from 'lucide-react';
+import { Users, Plus, Copy, Check, X, ChevronDown, BookOpen, Code2, Loader, Trophy, Medal, Megaphone, Pin, Trash2, BarChart2, AlertCircle, Download } from 'lucide-react';
 import { AppNav } from './components/AppNav';
 import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../lib/auth';
 import {
   createClass, getTeacherClasses, getClassAssignments, createAssignment, getClassStudentCount,
   getAssignmentSubmissions, getAssignmentSubmissionCounts, gradeSubmission, releaseGrades, getClassLeaderboard,
-  getClassAnalytics, getClassGradesExport,
+  getClassAnalytics, getClassGradesExport, getClassRoster, getClassPendingReviewCount,
   createAnnouncement, getClassAnnouncements, deleteAnnouncement,
-  type Class, type Assignment, type Question, type Submission, type LeaderboardEntry, type Announcement, type ClassAnalytics
+  type Class, type Assignment, type Question, type Submission, type LeaderboardEntry, type Announcement, type ClassAnalytics, type RosterStudent
 } from '../lib/db';
 
 // ─── Create Class Modal ────────────────────────────────────────────────────────
@@ -1360,6 +1361,63 @@ function Leaderboard({ classId, language }: { classId: string; language: 'EN' | 
 
 // ─── Main Dashboard ────────────────────────────────────────────────────────────
 
+// ─── Overview helpers ──────────────────────────────────────────────────────────
+
+function initials(name: string): string {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return '?';
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+
+function greeting(isKin: boolean): string {
+  const hour = new Date().getHours();
+  if (hour < 12) return isKin ? 'Mwaramutse' : 'Good morning';
+  if (hour < 17) return isKin ? 'Mwiriwe' : 'Good afternoon';
+  return isKin ? 'Mwiriwe' : 'Good evening';
+}
+
+function formatRelativeTime(iso: string | null, isKin: boolean): string {
+  if (!iso) return isKin ? 'Nta na rimwe' : 'Never';
+  const diffMs = Date.now() - new Date(iso).getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMs / 3600000);
+  const diffDays = Math.floor(diffMs / 86400000);
+  if (diffMins < 1) return isKin ? 'Nonaha' : 'Just now';
+  if (diffHours < 1) return isKin ? `Iminota ${diffMins} ishize` : `${diffMins} min${diffMins > 1 ? 's' : ''} ago`;
+  if (diffDays < 1) return isKin ? `Amasaha ${diffHours} ashize` : `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+  if (diffDays === 1) return isKin ? 'Ejo' : 'Yesterday';
+  return isKin ? `Iminsi ${diffDays} ishize` : `${diffDays} days ago`;
+}
+
+function StatusPill({ status, isKin }: { status: RosterStudent['status']; isKin: boolean }) {
+  if (status === 'on-track') return <span className="pill solid"><span className="dot" />{isKin ? 'Biri neza' : 'On track'}</span>;
+  if (status === 'behind') return <span className="pill error">{isKin ? 'Birasubira inyuma' : 'Behind'}</span>;
+  return <span className="pill"><span className="dot" />{isKin ? 'Akeneye ubufasha' : 'Needs help'}</span>;
+}
+
+function attentionNote(s: RosterStudent, isKin: boolean): string {
+  if (s.status === 'behind') {
+    const days = s.last_active ? Math.floor((Date.now() - new Date(s.last_active).getTime()) / 86400000) : null;
+    return isKin
+      ? `${days !== null ? `Nta gikorwa mu minsi ${days}.` : 'Ntiyatangiye.'} Ubu ari kuri "${s.current_module}".`
+      : `${days !== null ? `No activity in ${days} day${days === 1 ? '' : 's'}.` : 'Hasn\'t started yet.'} Currently on "${s.current_module}".`;
+  }
+  return isKin
+    ? `Ageze kuri ${s.progress_pct}% muri "${s.current_module}" — yakwifuza kuganirwaho.`
+    : `At ${s.progress_pct}% in "${s.current_module}" — may need a check-in.`;
+}
+
+function dueText(assignment: Assignment, isKin: boolean): string {
+  if (!assignment.due_date) return isKin ? 'Nta gihe ntarengwa' : 'No due date';
+  const diffDays = Math.ceil((new Date(assignment.due_date).getTime() - Date.now()) / 86400000);
+  const dateStr = new Date(assignment.due_date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+  if (diffDays < 0) return isKin ? `Byafunzwe ${dateStr}` : `Closed ${dateStr}`;
+  if (diffDays === 0) return isKin ? 'Bigomba kuba uyu munsi' : 'Due today';
+  if (diffDays === 1) return isKin ? 'Bigomba kuba ejo' : 'Due tomorrow';
+  return isKin ? `Bigomba kuba ${dateStr}` : `Due ${dateStr}`;
+}
+
 export default function TeacherDashboard() {
   usePageTitle('Teacher Dashboard · EduCode');
   const [language] = useState<'EN' | 'KIN'>('EN');
@@ -1375,6 +1433,9 @@ export default function TeacherDashboard() {
   const [viewingAssignment, setViewingAssignment] = useState<Assignment | null>(null);
   const [announcementsClass, setAnnouncementsClass] = useState<Class | null>(null);
   const [analyticsClass, setAnalyticsClass] = useState<Class | null>(null);
+  const [roster, setRoster] = useState<RosterStudent[]>([]);
+  const [pendingReview, setPendingReview] = useState(0);
+  const { profile } = useAuth();
 
   const loadData = async () => {
     setLoadingData(true);
@@ -1396,8 +1457,14 @@ export default function TeacherDashboard() {
       setSelectedClassId(targetId);
       const { data: aData } = await getClassAssignments(targetId);
       setAssignments(aData);
-      const counts = await getAssignmentSubmissionCounts(aData.map(a => a.id));
+      const [counts, rosterData, pending] = await Promise.all([
+        getAssignmentSubmissionCounts(aData.map(a => a.id)),
+        getClassRoster(targetId),
+        getClassPendingReviewCount(targetId),
+      ]);
       setSubmissionCounts(counts);
+      setRoster(rosterData);
+      setPendingReview(pending);
     }
 
     setLoadingData(false);
@@ -1409,13 +1476,45 @@ export default function TeacherDashboard() {
     if (!selectedClassId) return;
     getClassAssignments(selectedClassId).then(async ({ data }) => {
       setAssignments(data);
-      const counts = await getAssignmentSubmissionCounts(data.map(a => a.id));
+      const [counts, rosterData, pending] = await Promise.all([
+        getAssignmentSubmissionCounts(data.map(a => a.id)),
+        getClassRoster(selectedClassId),
+        getClassPendingReviewCount(selectedClassId),
+      ]);
       setSubmissionCounts(counts);
+      setRoster(rosterData);
+      setPendingReview(pending);
     });
   }, [selectedClassId]);
 
-  const totalStudents = classes.reduce((sum, c) => sum + (c.studentCount ?? 0), 0);
-  const totalSubmissions = Object.values(submissionCounts).reduce((s, n) => s + n, 0);
+  const selectedClass = classes.find(c => c.id === selectedClassId) ?? null;
+  const activeThisWeek = roster.filter(s => s.last_active && (Date.now() - new Date(s.last_active).getTime()) < 7 * 86400000).length;
+  const classProgress = roster.length > 0 ? Math.round(roster.reduce((sum, s) => sum + s.progress_pct, 0) / roster.length) : 0;
+  const fallingBehind = roster.filter(s => s.status === 'behind').length;
+  const needsAttention = [...roster]
+    .filter(s => s.status !== 'on-track')
+    .sort((a, b) => (a.status !== b.status ? (a.status === 'behind' ? -1 : 1) : a.progress_pct - b.progress_pct))
+    .slice(0, 3);
+
+  const handleExportRoster = () => {
+    const header = ['Name', 'Username', 'Progress %', 'Current Module', 'Last Active', 'Status'];
+    const rows = roster.map(s => [
+      `"${s.full_name}"`,
+      s.username,
+      s.progress_pct,
+      `"${s.current_module}"`,
+      s.last_active ? new Date(s.last_active).toLocaleString() : 'Never',
+      s.status,
+    ]);
+    const csv = [header.join(','), ...rows.map(r => r.join(','))].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${(selectedClass?.name ?? 'class').replace(/\s+/g, '_')}_roster.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--bg)' }}>
@@ -1426,138 +1525,192 @@ export default function TeacherDashboard() {
           <div className="flex items-center justify-center py-24">
             <Loader size={24} className="animate-spin" style={{ color: '#00d4aa' }} />
           </div>
+        ) : classes.length === 0 ? (
+          <div className="rounded-2xl p-8 text-center rise" style={{ background: 'var(--surface)', border: '1px dashed var(--line)' }}>
+            <Users size={32} className="mx-auto mb-3" style={{ color: 'var(--text-3)' }} />
+            <p className="text-sm font-medium mb-1" style={{ color: 'var(--text-2)' }}>
+              {isKin ? 'Nta mashuri uragira' : 'No classes yet'}
+            </p>
+            <p className="text-xs mb-4" style={{ color: 'var(--text-3)' }}>
+              {isKin ? 'Kora ishuri kugirango utangire' : 'Create a class to get started'}
+            </p>
+            <button onClick={() => setShowCreateClass(true)} className="btn btn-primary sm">
+              {isKin ? 'Kora ishuri' : 'Create Class'}
+            </button>
+          </div>
         ) : (
-          <div className="space-y-8">
-
-            {/* Stats row */}
-            <div className="stats rise-2">
-              {[
-                { label: isKin ? 'Amashuri' : 'Classes',              value: classes.length,                                          detail: '' },
-                { label: isKin ? 'Abanyeshuri' : 'Students',          value: totalStudents,                                           detail: isKin ? 'muri amashuri yose' : 'across all classes' },
-                { label: isKin ? 'Imikoro yose' : 'Assignments',      value: classes.reduce((s, c) => s + (c.assignmentCount ?? 0), 0), detail: '' },
-                { label: isKin ? 'Imikoro yatanzwe' : 'Submissions',  value: totalSubmissions,                                        detail: isKin ? 'zitegereje gukosorwa' : 'awaiting review' },
-              ].map((stat, i) => (
-                <div key={i} className="stat">
-                  <div className="sl">{stat.label}</div>
-                  <div className="sv">{stat.value}</div>
-                  {stat.detail && <div className="sd">{stat.detail}</div>}
+          <>
+            {/* Header */}
+            <div className="thead rise">
+              <div>
+                <h1>{greeting(isKin)}, {(profile?.full_name ?? '').split(' ')[0] || (isKin ? 'Mwarimu' : 'Teacher')}.</h1>
+                <p className="sub">
+                  {needsAttention.length > 0
+                    ? (isKin
+                        ? `Abanyeshuri ${needsAttention.length} bakeneye kurebwa mbere y'isomo ryawe ryo uyu munsi.`
+                        : `${needsAttention.length} student${needsAttention.length === 1 ? '' : 's'} need a look before today's class.`)
+                    : (isKin ? 'Byose biri neza muri iri shuri.' : 'Everything looks on track in this class.')}
+                </p>
+              </div>
+              <div className="row" style={{ gap: '12px' }}>
+                <div className="classsel">
+                  <select value={selectedClassId ?? ''} onChange={e => setSelectedClassId(e.target.value)}>
+                    {classes.map(cls => (
+                      <option key={cls.id} value={cls.id}>{cls.name} · {cls.subject}</option>
+                    ))}
+                  </select>
                 </div>
-              ))}
+                <button className="btn btn-secondary sm" onClick={() => setShowCreateClass(true)} title={isKin ? 'Ishuri rishya' : 'New class'}>
+                  <Plus size={14} />
+                </button>
+                <button className="btn btn-secondary sm" onClick={() => selectedClass && setAnnouncementsClass(selectedClass)} title={isKin ? 'Amatangazo' : 'Announcements'}>
+                  <Megaphone size={14} />
+                </button>
+                <button className="btn btn-secondary sm" onClick={() => selectedClass && setAnalyticsClass(selectedClass)} title={isKin ? 'Isesengura' : 'Analytics'}>
+                  <BarChart2 size={14} />
+                </button>
+                <button className="btn btn-primary" onClick={() => setShowCreateAssignment(true)}>
+                  {isKin ? 'Umukoro mushya' : 'New assignment'}
+                </button>
+              </div>
             </div>
 
-            {/* Main grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            {/* STATS */}
+            <div className="stats rise-2">
+              <div className="stat">
+                <div className="sl">{isKin ? 'Abanyeshuri' : 'Students'}</div>
+                <div className="sv">{roster.length}</div>
+                <div className="sd">{isKin ? `${activeThisWeek} bakora iki cyumweru` : `${activeThisWeek} active this week`}</div>
+              </div>
+              <div className="stat">
+                <div className="sl">{isKin ? 'Aho ishuri rigeze' : 'Class progress'}</div>
+                <div className="sv">{classProgress}%</div>
+                <div className="sd">{isKin ? "impuzandengo y'ishuri" : 'class average'}</div>
+              </div>
+              <div className="stat">
+                <div className="sl">{isKin ? 'Bitegereje gusuzumwa' : 'To review'}</div>
+                <div className="sv">{pendingReview}</div>
+                <div className="sd">{isKin ? 'imikoro itegereje' : 'submissions waiting'}</div>
+              </div>
+              <div className="stat">
+                <div className="sl">{isKin ? 'Basubira inyuma' : 'Falling behind'}</div>
+                <div className="sv">{fallingBehind}</div>
+                <div className="sd warn">{isKin ? 'nta gikorwa mu minsi 5+' : 'no activity in 5+ days'}</div>
+              </div>
+            </div>
 
-              {/* Classes column */}
-              <div className="lg:col-span-5 space-y-4">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-base font-bold" style={{ color: 'var(--ec-text-1)', fontFamily: 'Inter, sans-serif' }}>
-                    {isKin ? 'Amashuri yanjye' : 'My Classes'}
-                  </h2>
-                  <button
-                    onClick={() => setShowCreateClass(true)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
-                    style={{ background: 'rgba(0,212,170,0.1)', color: '#00d4aa', border: '1px solid rgba(0,212,170,0.2)', fontFamily: 'Inter, sans-serif' }}
-                    onMouseEnter={e => (e.currentTarget.style.background = 'rgba(0,212,170,0.18)')}
-                    onMouseLeave={e => (e.currentTarget.style.background = 'rgba(0,212,170,0.1)')}
-                  >
-                    <Plus size={14} />
-                    {isKin ? 'Ishuri rishya' : 'New Class'}
-                  </button>
-                </div>
-
-                {classes.length === 0 ? (
-                  <div className="rounded-2xl p-8 text-center" style={{ background: 'var(--ec-surface)', border: '1px dashed rgba(255,255,255,0.08)' }}>
-                    <Users size={32} className="mx-auto mb-3" style={{ color: 'var(--ec-text-7)' }} />
-                    <p className="text-sm font-medium mb-1" style={{ color: 'var(--ec-text-6)', fontFamily: 'Inter, sans-serif' }}>
-                      {isKin ? 'Nta mashuri uragira' : 'No classes yet'}
-                    </p>
-                    <p className="text-xs mb-4" style={{ color: 'var(--ec-text-7)', fontFamily: 'Inter, sans-serif' }}>
-                      {isKin ? 'Kora ishuri kugirango utangire' : 'Create a class to get started'}
-                    </p>
-                    <button
-                      onClick={() => setShowCreateClass(true)}
-                      className="px-4 py-2 rounded-lg text-xs font-semibold transition-all"
-                      style={{ background: 'rgba(0,212,170,0.1)', color: '#00d4aa', border: '1px solid rgba(0,212,170,0.2)', fontFamily: 'Inter, sans-serif' }}
-                    >
-                      {isKin ? 'Kora ishuri' : 'Create Class'}
+            <div className="tgrid">
+              {/* ROSTER */}
+              <section className="card roster rise-2">
+                <div className="rhead">
+                  <h3 className="card-title">{isKin ? "Abanyeshuri b'ishuri" : 'Class roster'}</h3>
+                  <div className="row" style={{ gap: '8px' }}>
+                    <span className="pill"><span className="dot" />{roster.length} {isKin ? 'abanyeshuri' : 'students'}</span>
+                    <button className="btn btn-tertiary sm" onClick={handleExportRoster} disabled={roster.length === 0}>
+                      {isKin ? 'Pakurura' : 'Export'}
                     </button>
+                  </div>
+                </div>
+                {roster.length === 0 ? (
+                  <div className="py-10 text-center">
+                    <Users size={28} className="mx-auto mb-3" style={{ color: 'var(--text-3)' }} />
+                    <p className="text-sm" style={{ color: 'var(--text-2)' }}>
+                      {isKin ? 'Nta munyeshuri urahari muri iri shuri' : 'No students enrolled in this class yet'}
+                    </p>
                   </div>
                 ) : (
-                  classes.map(cls => (
-                    <div key={cls.id} onClick={() => setSelectedClassId(cls.id)} className="cursor-pointer" style={{ outline: selectedClassId === cls.id ? '2px solid rgba(0,212,170,0.3)' : 'none', borderRadius: '16px' }}>
-                      <ClassCard cls={cls} language={language} onAnnouncements={() => setAnnouncementsClass(cls)} onAnalytics={() => setAnalyticsClass(cls)} />
-                    </div>
-                  ))
+                  <table className="tbl">
+                    <thead>
+                      <tr>
+                        <th>{isKin ? 'Umunyeshuri' : 'Student'}</th>
+                        <th>{isKin ? 'Aho agejeje' : 'Course progress'}</th>
+                        <th>{isKin ? 'Igice agezeho' : 'Current module'}</th>
+                        <th>{isKin ? 'Igihe yagaragaye' : 'Last active'}</th>
+                        <th>{isKin ? 'Imiterere' : 'Status'}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {roster.map(s => (
+                        <tr key={s.student_id}>
+                          <td>
+                            <div className="stu">
+                              <span className="av">{initials(s.full_name)}</span>
+                              <div>
+                                <div className="nm">{s.full_name}</div>
+                                <div className="un">{s.username}</div>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <div className="pcell">
+                              <div className="bar"><i style={{ width: `${s.progress_pct}%` }} /></div>
+                              <span className="pv">{s.progress_pct}%</span>
+                            </div>
+                          </td>
+                          <td>{s.current_module}</td>
+                          <td><span className="when">{formatRelativeTime(s.last_active, isKin)}</span></td>
+                          <td><StatusPill status={s.status} isKin={isKin} /></td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 )}
-              </div>
+              </section>
 
-              {/* Assignments column */}
-              <div className="lg:col-span-4">
-                <div className="rounded-2xl p-6" style={{ background: 'var(--ec-surface)', border: '1px solid var(--ec-b1)' }}>
-                  <div className="flex items-center justify-between mb-5">
-                    <h2 className="text-base font-bold" style={{ color: 'var(--ec-text-1)', fontFamily: 'Inter, sans-serif' }}>
-                      {isKin ? 'Imikoro yose' : 'Assignments'}
-                      {selectedClassId && classes.find(c => c.id === selectedClassId) && (
-                        <span className="ml-2 text-xs font-normal" style={{ color: 'var(--ec-text-6)' }}>
-                          — {classes.find(c => c.id === selectedClassId)?.name}
-                        </span>
-                      )}
-                    </h2>
-                    <button
-                      onClick={() => setShowCreateAssignment(true)}
-                      disabled={classes.length === 0}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all disabled:opacity-40"
-                      style={{ background: '#00d4aa', color: 'var(--ec-bg)', fontFamily: 'Inter, sans-serif' }}
-                      onMouseEnter={e => { if (classes.length > 0) (e.currentTarget as HTMLButtonElement).style.background = '#00bfa0'; }}
-                      onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = '#00d4aa'; }}
-                    >
-                      <Plus size={14} />
-                      {isKin ? 'Umukoro mushya' : 'New Assignment'}
+              {/* SIDE */}
+              <aside className="stack" style={{ ['--gap' as string]: '22px' }}>
+                <section className="card pad-lg rise-3">
+                  <div className="card-head">
+                    <h3 className="card-title">{isKin ? 'Abakeneye kurebwa' : 'Needs attention'}</h3>
+                    {needsAttention.length > 0 && <span className="pill error">{needsAttention.length}</span>}
+                  </div>
+                  {needsAttention.length === 0 ? (
+                    <p className="text-sm" style={{ color: 'var(--text-2)' }}>
+                      {isKin ? 'Nta munyeshuri ukeneye kurebwa ubu.' : 'No students need attention right now.'}
+                    </p>
+                  ) : (
+                    needsAttention.map(s => (
+                      <div className="att-item" key={s.student_id}>
+                        <span className="av">{initials(s.full_name)}</span>
+                        <div className="ab">
+                          <div className="t">{s.full_name}</div>
+                          <div className="d">{attentionNote(s, isKin)}</div>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </section>
+
+                <section className="card pad-lg rise-3">
+                  <div className="card-head">
+                    <h3 className="card-title">{isKin ? 'Imikoro' : 'Assignments'}</h3>
+                    <button className="btn btn-tertiary sm" onClick={() => setShowCreateAssignment(true)}>
+                      {isKin ? 'Ongeraho' : 'New'}
                     </button>
                   </div>
-
                   {assignments.length === 0 ? (
-                    <div className="py-10 text-center">
-                      <FileText size={28} className="mx-auto mb-3" style={{ color: 'var(--ec-text-7)' }} />
-                      <p className="text-sm" style={{ color: 'var(--ec-text-6)', fontFamily: 'Inter, sans-serif' }}>
-                        {classes.length === 0
-                          ? (isKin ? 'Kora ishuri mbere' : 'Create a class first')
-                          : (isKin ? 'Nta mukoro urashyirwa muri iri shuri' : 'No assignments in this class yet')}
-                      </p>
-                    </div>
+                    <p className="text-sm" style={{ color: 'var(--text-2)' }}>
+                      {isKin ? 'Nta mukoro urahari muri iri shuri' : 'No assignments in this class yet'}
+                    </p>
                   ) : (
-                    <div className="space-y-1">
-                      {assignments.map(a => (
-                        <AssignmentRow
-                          key={a.id}
-                          assignment={a}
-                          submissionCount={submissionCounts[a.id] ?? 0}
-                          language={language}
-                          onClick={() => setViewingAssignment(a)}
-                        />
-                      ))}
-                    </div>
+                    assignments.slice(0, 4).map(a => (
+                      <div className="asg" key={a.id} onClick={() => setViewingAssignment(a)} style={{ cursor: 'pointer' }}>
+                        <div>
+                          <div className="at">{isKin && a.title_kin ? a.title_kin : a.title}</div>
+                          <div className="ad">{dueText(a, isKin)}</div>
+                        </div>
+                        {a.grades_released ? (
+                          <span className="pill solid"><span className="dot" />{isKin ? 'Byasuzumwe' : 'Graded'}</span>
+                        ) : (
+                          <span className="pill">{submissionCounts[a.id] ?? 0} / {roster.length} {isKin ? 'batanze' : 'in'}</span>
+                        )}
+                      </div>
+                    ))
                   )}
-                </div>
-              </div>
-
-              {/* Leaderboard column */}
-              <div className="lg:col-span-3">
-                {selectedClassId
-                  ? <Leaderboard classId={selectedClassId} language={language} />
-                  : (
-                    <div className="rounded-2xl p-6 text-center" style={{ background: 'var(--ec-surface)', border: '1px solid var(--ec-b1)' }}>
-                      <Trophy size={24} className="mx-auto mb-2" style={{ color: 'var(--ec-text-7)' }} />
-                      <p className="text-sm" style={{ color: 'var(--ec-text-6)', fontFamily: 'Inter, sans-serif' }}>
-                        {isKin ? 'Hitamo ishuri' : 'Select a class'}
-                      </p>
-                    </div>
-                  )
-                }
-              </div>
+                </section>
+              </aside>
             </div>
-          </div>
+          </>
         )}
       </div>
 

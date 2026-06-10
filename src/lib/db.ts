@@ -1059,6 +1059,93 @@ export async function getClassAnalytics(classId: string): Promise<ClassAnalytics
   return { total_students: totalStudents, assignments: analyticsRows, class_avg_pct: classAvgPct, overall_submission_rate: overallSubmissionRate };
 }
 
+// ─── Class Roster ─────────────────────────────────────────────────────────────
+
+export interface RosterStudent {
+  student_id: string;
+  full_name: string;
+  username: string;
+  progress_pct: number;
+  current_module: string;
+  last_active: string | null;
+  status: 'on-track' | 'behind' | 'needs-help';
+}
+
+function usernameFromName(name: string): string {
+  const parts = name.trim().toLowerCase().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return 'student';
+  if (parts.length === 1) return parts[0];
+  return `${parts[0]}.${parts[parts.length - 1][0]}`;
+}
+
+export async function getClassRoster(classId: string): Promise<RosterStudent[]> {
+  const { data: enrollments } = await supabase
+    .from('class_enrollments')
+    .select('student_id, profiles(full_name)')
+    .eq('class_id', classId);
+
+  if (!enrollments?.length) return [];
+
+  const courses = await getCourses();
+  const courseDetails = await Promise.all(courses.map(c => getCourseDetail(c.id)));
+  const orderedLessons = courseDetails.flatMap(({ modules }) =>
+    modules.flatMap(m => m.lessons.map(l => ({ lessonId: l.id, moduleTitle: m.title })))
+  );
+  const allLessonIds = orderedLessons.map(l => l.lessonId);
+  const studentIds = enrollments.map((e: { student_id: string }) => e.student_id);
+
+  const { data: progressRows } = allLessonIds.length > 0
+    ? await supabase.from('student_lesson_progress')
+        .select('student_id, lesson_id, completed_at')
+        .in('student_id', studentIds)
+        .in('lesson_id', allLessonIds)
+    : { data: [] };
+
+  return enrollments.map((e: { student_id: string; profiles: unknown }) => {
+    const p = (Array.isArray(e.profiles) ? e.profiles[0] : e.profiles) as { full_name: string } | null;
+    const fullName = p?.full_name ?? 'Student';
+
+    const myProgress = (progressRows ?? []).filter((r: { student_id: string }) => r.student_id === e.student_id);
+    const completedSet = new Set(myProgress.map((r: { lesson_id: string }) => r.lesson_id));
+    const pct = orderedLessons.length > 0 ? Math.round((completedSet.size / orderedLessons.length) * 100) : 0;
+
+    const nextLesson = orderedLessons.find(l => !completedSet.has(l.lessonId));
+    const currentModule = nextLesson?.moduleTitle ?? orderedLessons[orderedLessons.length - 1]?.moduleTitle ?? '—';
+
+    const lastActive = myProgress.reduce<string | null>((latest: string | null, r: { completed_at: string | null }) => {
+      if (!r.completed_at) return latest;
+      return !latest || r.completed_at > latest ? r.completed_at : latest;
+    }, null);
+
+    const daysSinceActive = lastActive ? (Date.now() - new Date(lastActive).getTime()) / (1000 * 60 * 60 * 24) : Infinity;
+    const status: RosterStudent['status'] = daysSinceActive > 5 ? 'behind' : pct < 50 ? 'needs-help' : 'on-track';
+
+    return {
+      student_id: e.student_id,
+      full_name: fullName,
+      username: usernameFromName(fullName),
+      progress_pct: pct,
+      current_module: currentModule,
+      last_active: lastActive,
+      status,
+    };
+  }).sort((a, b) => b.progress_pct - a.progress_pct);
+}
+
+export async function getClassPendingReviewCount(classId: string): Promise<number> {
+  const { data: assignments } = await supabase.from('assignments').select('id').eq('class_id', classId);
+  const ids = (assignments ?? []).map((a: { id: string }) => a.id);
+  if (!ids.length) return 0;
+
+  const { count } = await supabase
+    .from('student_submissions')
+    .select('*', { count: 'exact', head: true })
+    .in('assignment_id', ids)
+    .is('marks_earned', null);
+
+  return count ?? 0;
+}
+
 // ─── School Admin ─────────────────────────────────────────────────────────────
 
 export interface School {
