@@ -1,11 +1,14 @@
 import { useState } from 'react';
-import { School, Users, Target, CheckCircle2, ArrowRight, Mail, Phone, ChevronDown, ChevronRight, Lock, Eye, EyeOff } from 'lucide-react';
+import { Link } from 'react-router';
+import { School, Users, Target, CheckCircle2, ArrowRight, Mail, Phone, ChevronDown, Lock } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { createSchool, linkProfileToSchool } from '../lib/db';
+import { useTheme } from '../lib/theme';
 import { usePageTitle } from '../hooks/usePageTitle';
 
 export default function SchoolSignupPage() {
   usePageTitle('School Sign Up · EduCode');
+  const { theme, toggleTheme } = useTheme();
   const [language, setLanguage] = useState<'EN' | 'KIN'>('EN');
   const [formData, setFormData] = useState({
     schoolName: '',
@@ -25,37 +28,37 @@ export default function SchoolSignupPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
 
-  const isKinyarwanda = language === 'KIN';
+  const isKin = language === 'KIN';
 
   const faqs = [
     {
-      question: isKinyarwanda ? 'Bigutwara amafaranga angahe?' : 'How much does it cost?',
-      answer: isKinyarwanda
+      question: isKin ? 'Bigutwara amafaranga angahe?' : 'How much does it cost?',
+      answer: isKin
         ? 'Tuha trial y\'amezi 3 kubusa. Nyuma y\'ibyo, ni RWF 100,000 ku mwaka ku banyeshuri badahagarika.'
         : "We offer a free 3-month trial. After that, it's RWF 100,000/year for unlimited students."
     },
     {
-      question: isKinyarwanda ? 'Igihe cy’igerageza (trial) kimara igihe kingana iki?' : 'How long is the trial?',
-      answer: isKinyarwanda
+      question: isKin ? 'Igihe cy\'igerageza (trial) kimara igihe kingana iki?' : 'How long is the trial?',
+      answer: isKin
         ? 'Amezi 3 yose ni ubuntu, nta karita ya banki ukeneye.'
         : '3 months completely free, no credit card required.'
     },
     {
-      question: isKinyarwanda ? 'Dukeneye mudasobwa zidasanzwe?' : 'Do we need special computers?',
-      answer: isKinyarwanda
+      question: isKin ? 'Dukeneye mudasobwa zidasanzwe?' : 'Do we need special computers?',
+      answer: isKin
         ? 'Oya. Irakora kuri mudasobwa zose n\'amatefoni. Ikora na offline.'
         : 'No. Works on any computer or phone. Even works offline.'
     },
     {
-      question: isKinyarwanda ? 'Abanyeshuri barashobora kuyikoresha bari mu rugo?' : 'Can students use it at home?',
-      answer: isKinyarwanda
+      question: isKin ? 'Abanyeshuri barashobora kuyikoresha bari mu rugo?' : 'Can students use it at home?',
+      answer: isKin
         ? 'Yego! Abanyeshuri barashobora kwandika code bari mu rugo cyangwa ku ishuri. Amakuru yikora sync iyo bahuye na interineti.'
         : 'Yes! Students can code at home or at school. Syncs whenever they connect.'
     },
     {
-      question: isKinyarwanda ? 'Ni ubuhe bufasha duhabwa?' : 'What support do we get?',
-      answer: isKinyarwanda
-        ? 'Ubufasha bwihuse kuri i-meyili na telefoni, amahugurwa y’abarimu, na demo ku ishuri.'
+      question: isKin ? 'Ni ubuhe bufasha duhabwa?' : 'What support do we get?',
+      answer: isKin
+        ? 'Ubufasha bwihuse kuri i-meyili na telefoni, amahugurwa y\'abarimu, na demo ku ishuri.'
         : 'Priority email and phone support, teacher training, and in-school demos.'
     }
   ];
@@ -64,7 +67,6 @@ export default function SchoolSignupPage() {
     e.preventDefault();
     setLoading(true); setError('');
 
-    // 1. Create school record
     const { data: school, error: schoolErr } = await createSchool({
       name: formData.schoolName,
       location: formData.location,
@@ -72,7 +74,6 @@ export default function SchoolSignupPage() {
     });
     if (schoolErr || !school) { setError(schoolErr ?? 'Failed to create school'); setLoading(false); return; }
 
-    // 2. Sign up the admin user
     const { data: authData, error: authErr } = await supabase.auth.signUp({
       email: formData.email,
       password: formData.password,
@@ -80,7 +81,6 @@ export default function SchoolSignupPage() {
     });
     if (authErr || !authData.user) { setError(authErr?.message ?? 'Signup failed'); setLoading(false); return; }
 
-    // 3. Link admin profile to school
     await linkProfileToSchool(authData.user.id, school.id);
 
     setLoading(false);
@@ -88,436 +88,413 @@ export default function SchoolSignupPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white" style={{ fontFamily: 'Inter, sans-serif' }}>
-      {/* Navigation */}
-      <nav className="border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center gap-2">
-              <span className="text-2xl">🇷🇼</span>
-              <span className="text-xl font-bold text-[#1e293b]">EduCode Rwanda</span>
+    <>
+      {/* NAV */}
+      <header className="nav">
+        <div className="nav-inner">
+          <Link className="logo" to="/"><span className="edu">EduCode</span></Link>
+          <nav className="nav-links nav-collapse" aria-label="Main">
+            <Link className="nav-link" to="/about">{isKin ? 'Abo turibo' : 'About'}</Link>
+            <Link className="nav-link" to="/contact">{isKin ? 'Twandikire' : 'Contact'}</Link>
+          </nav>
+          <div className="nav-right">
+            <div className="lang-toggle">
+              {(['EN', 'KIN'] as const).map(l => (
+                <button key={l} className={language === l ? 'on' : ''} onClick={() => setLanguage(l)}>{l}</button>
+              ))}
             </div>
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-1 border border-gray-300 rounded-lg p-1">
-                <button
-                  onClick={() => setLanguage('EN')}
-                  className={`px-3 py-1 rounded text-sm font-semibold transition-all ${
-                    language === 'EN' ? 'bg-[#0ea5e9] text-white' : 'text-gray-600'
-                  }`}
-                >
-                  EN
-                </button>
-                <button
-                  onClick={() => setLanguage('KIN')}
-                  className={`px-3 py-1 rounded text-sm font-semibold transition-all ${
-                    language === 'KIN' ? 'bg-[#0ea5e9] text-white' : 'text-gray-600'
-                  }`}
-                >
-                  KIN
-                </button>
-              </div>
-              <a href="#" className="text-gray-700 hover:text-[#0ea5e9] font-medium">
-                {isKinyarwanda ? 'Injira' : 'Login'}
-              </a>
-            </div>
+            <button
+              className="iconbtn"
+              onClick={toggleTheme}
+              aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+              aria-pressed={theme === 'light'}
+            >
+              {theme === 'dark' ? (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+                </svg>
+              ) : (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                </svg>
+              )}
+            </button>
+            <Link className="btn btn-tertiary" to="/login">{isKin ? 'Kwinjira' : 'Log in'}</Link>
+            <Link className="btn btn-primary sm" to="/signup">{isKin ? 'Tangira' : 'Get started'}</Link>
           </div>
         </div>
-      </nav>
+      </header>
 
-      {/* Breadcrumb */}
-      <div className="bg-[#f8fafc] py-4">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-2 text-sm text-gray-600">
-            <a href="#" className="hover:text-[#0ea5e9]">{isKinyarwanda ? 'Ahabanza' : 'Home'}</a>
-            <ChevronRight className="w-4 h-4" />
-            <a href="#" className="hover:text-[#0ea5e9]">{isKinyarwanda ? 'Ku Mashuri' : 'For Schools'}</a>
-            <ChevronRight className="w-4 h-4" />
-            <span className="text-[#0ea5e9] font-semibold">{isKinyarwanda ? 'Kwiyandikisha' : 'Sign Up'}</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Page Header */}
-      <div className="bg-gradient-to-br from-[#0ea5e9] to-[#8b5cf6] py-16">
-        <div className="max-w-4xl mx-auto px-4 text-center text-white">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            {isKinyarwanda ? 'Zana EduCode mu Ishuri Ryanyu' : 'Bring EduCode to Your School'}
+      <main className="wrap">
+        {/* HERO */}
+        <section className="hero">
+          <p className="eyebrow rise">{isKin ? 'Ku Mashuri' : 'For schools'}</p>
+          <h1 className="rise-2">
+            {isKin ? 'Zana EduCode mu Ishuri Ryanyu' : 'Bring EduCode to your school.'}
           </h1>
-          <p className="text-xl mb-8 text-blue-100">
-            {isKinyarwanda
-              ? 'Injira mu mashuri arenga 50 akoresha uburezi bwa coding bufashijwe na AI'
-              : 'Join 50+ schools using AI-powered coding education'}
+          <p className="lede rise-3">
+            {isKin
+              ? 'Injira mu mashuri arenga 50 akoresha uburezi bwa coding bufashijwe na AI.'
+              : 'Join 50+ schools using AI-powered coding education.'}
           </p>
-
-          {/* Trust Badges */}
-          <div className="flex flex-wrap items-center justify-center gap-6">
-            <div className="flex items-center gap-2 bg-white/20 px-4 py-2 rounded-lg backdrop-blur">
-              <School className="w-5 h-5" />
-              <span className="font-semibold">{isKinyarwanda ? 'Amashuri 50+' : '50+ Schools'}</span>
-            </div>
-            <div className="flex items-center gap-2 bg-white/20 px-4 py-2 rounded-lg backdrop-blur">
-              <Users className="w-5 h-5" />
-              <span className="font-semibold">{isKinyarwanda ? 'Abanyeshuri 5,000+' : '5,000+ Students'}</span>
-            </div>
-            <div className="flex items-center gap-2 bg-white/20 px-4 py-2 rounded-lg backdrop-blur">
-              <Target className="w-5 h-5" />
-              <span className="font-semibold">95% {isKinyarwanda ? 'Igipimo cy’ubutsinda' : 'Success Rate'}</span>
-            </div>
+          <div className="hero-meta rise-4">
+            <div className="m"><b><School size={16} style={{ marginBottom: -2 }} /> 50+</b><span>{isKin ? 'Amashuri' : 'Schools'}</span></div>
+            <div className="m"><b><Users size={16} style={{ marginBottom: -2 }} /> 5,000+</b><span>{isKin ? 'Abanyeshuri' : 'Students'}</span></div>
+            <div className="m"><b><Target size={16} style={{ marginBottom: -2 }} /> 95%</b><span>{isKin ? 'Igipimo cy\'ubutsinda' : 'Success rate'}</span></div>
           </div>
-        </div>
-      </div>
+        </section>
 
-      {/* Form Section */}
-      <div className="py-16">
-        <div className="max-w-2xl mx-auto px-4">
-          <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-8 md:p-12">
+        {/* FORM */}
+        <section className="section" style={{ maxWidth: 640, margin: '0 auto' }}>
+          <div className="card pad-lg">
             {success ? (
-              <div className="text-center py-8">
-                <div className="text-6xl mb-4">🎉</div>
-                <h2 className="text-2xl font-bold text-[#1e293b] mb-3">
-                  {isKinyarwanda ? 'Konti yafunguwe neza!' : 'Account created!'}
+              <div className="text-center" style={{ padding: '24px 0' }}>
+                <div style={{ fontSize: 48, marginBottom: 12 }}>🎉</div>
+                <h2 className="text-xl font-bold mb-2" style={{ color: 'var(--text)' }}>
+                  {isKin ? 'Konti yafunguwe neza!' : 'Account created!'}
                 </h2>
-                <p className="text-gray-600 mb-2">
-                  {isKinyarwanda
-                    ? 'Injira ukoresheje i-meyili n’ijambo ry’ibanga umaze gushyiraho.'
+                <p className="dim mb-2">
+                  {isKin
+                    ? 'Injira ukoresheje i-meyili n\'ijambo ry\'ibanga umaze gushyiraho.'
                     : 'Log in with the email and password you just set.'}
                 </p>
-                <p className="text-sm text-gray-500 mb-6">
-                  {isKinyarwanda ? 'Uzabona dashboard ya konti y\'ishuri ryawe.' : "You'll see your school admin dashboard after logging in."}
+                <p className="dim" style={{ fontSize: 13, marginBottom: 24 }}>
+                  {isKin ? 'Uzabona dashboard ya konti y\'ishuri ryawe.' : "You'll see your school admin dashboard after logging in."}
                 </p>
-                <a
-                  href="/"
-                  className="inline-block px-8 py-3 bg-[#10b981] text-white rounded-lg font-bold hover:bg-[#059669] transition-all">
-                  {isKinyarwanda ? 'Injira' : 'Go to Login'}
-                </a>
+                <Link to="/login" className="btn btn-primary lg">
+                  {isKin ? 'Injira' : 'Go to login'}
+                </Link>
               </div>
             ) : (
-            <>
-            <h2 className="text-3xl font-bold text-[#1e293b] mb-2 text-center">
-              {isKinyarwanda ? 'Saba amezi 3 y’igerageza ku buntu' : 'Request Your Free 3-Month Trial'}
-            </h2>
-            <p className="text-gray-600 mb-8 text-center">
-              {isKinyarwanda ? 'Uzuzanya uyu form tuzakuhamagara mu gihe cy\'amasaha 24' : "Fill out this form and we'll contact you within 24 hours"}
-            </p>
+              <>
+                <h2 style={{ fontSize: 24, fontWeight: 700, color: 'var(--text)', marginBottom: 6, textAlign: 'center' }}>
+                  {isKin ? 'Saba amezi 3 y\'igerageza ku buntu' : 'Request your free 3-month trial'}
+                </h2>
+                <p className="dim text-center mb-6">
+                  {isKin ? 'Uzuzanya uyu form tuzakuhamagara mu gihe cy\'amasaha 24' : "Fill out this form and we'll contact you within 24 hours"}
+                </p>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {/* School Information Section */}
-              <div className="pb-6 border-b border-gray-200">
-                <h3 className="text-lg font-bold text-[#1e293b] mb-4">
-                  {isKinyarwanda ? 'Amakuru y’Ishuri' : 'School Information'}
-                </h3>
+                <form onSubmit={handleSubmit} className="stack" style={{ ['--gap' as string]: '20px' }}>
+                  {/* School information */}
+                  <div className="stack" style={{ ['--gap' as string]: '14px' }}>
+                    <h3 className="font-bold" style={{ color: 'var(--text)', fontSize: 14, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                      {isKin ? 'Amakuru y\'Ishuri' : 'School information'}
+                    </h3>
 
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      {isKinyarwanda ? 'Izina ry’Ishuri' : 'School Name'} *
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.schoolName}
-                      onChange={(e) => setFormData({ ...formData, schoolName: e.target.value })}
-                      placeholder="IPRC Kigali"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      {isKinyarwanda ? 'Ubwoko bw’Ishuri' : 'School Type'} *
-                    </label>
-                    <div className="relative">
-                      <select
-                        value={formData.schoolType}
-                        onChange={(e) => setFormData({ ...formData, schoolType: e.target.value })}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0ea5e9] appearance-none"
-                        required
-                      >
-                        <option value="">{isKinyarwanda ? 'Hitamo ubwoko' : 'Select type'}</option>
-                        <option value="tvet">TVET</option>
-                        <option value="secondary">{isKinyarwanda ? 'Ishuri ryisumbuye' : 'Secondary School'}</option>
-                        <option value="university">{isKinyarwanda ? 'Kaminuza' : 'University'}</option>
-                        <option value="training">{isKinyarwanda ? 'Ikigo cy’amahugurwa' : 'Training Center'}</option>
-                      </select>
-                      <ChevronDown className="absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      {isKinyarwanda ? 'Akarere' : 'Location (District)'} *
-                    </label>
-                    <div className="relative">
-                      <select
-                        value={formData.location}
-                        onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0ea5e9] appearance-none"
-                        required
-                      >
-                        <option value="">{isKinyarwanda ? 'Hitamo akarere' : 'Select district'}</option>
-                        <option value="kigali">Kigali</option>
-                        <option value="huye">Huye</option>
-                        <option value="musanze">Musanze</option>
-                        <option value="rubavu">Rubavu</option>
-                        <option value="other">{isKinyarwanda ? 'Ikindi' : 'Other'}</option>
-                      </select>
-                      <ChevronDown className="absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      {isKinyarwanda ? 'Umubare w’Abanyeshuri' : 'Number of Students'} *
-                    </label>
-                    <div className="relative">
-                      <select
-                        value={formData.studentCount}
-                        onChange={(e) => setFormData({ ...formData, studentCount: e.target.value })}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0ea5e9] appearance-none"
-                        required
-                      >
-                        <option value="">{isKinyarwanda ? 'Hitamo umubare' : 'Select count'}</option>
-                        <option value="1-50">1-50</option>
-                        <option value="50-100">50-100</option>
-                        <option value="100-200">100-200</option>
-                        <option value="200-500">200-500</option>
-                        <option value="500+">500+</option>
-                      </select>
-                      <ChevronDown className="absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Contact Person Section */}
-              <div className="pb-6 border-b border-gray-200">
-                <h3 className="text-lg font-bold text-[#1e293b] mb-4">
-                  {isKinyarwanda ? 'Umuntu wo guhamagara' : 'Contact Person'}
-                </h3>
-
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      {isKinyarwanda ? 'Amazina Yose' : 'Full Name'} *
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.fullName}
-                      onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                      placeholder="John Doe"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      {isKinyarwanda ? 'Umwanya' : 'Position'} *
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.position}
-                      onChange={(e) => setFormData({ ...formData, position: e.target.value })}
-                      placeholder={isKinyarwanda ? 'Umuyobozi w’Amasomo' : 'Dean of Studies'}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Email Address *
-                    </label>
-                    <div className="relative">
-                      <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <div className="field">
+                      <span className="label">{isKin ? 'Izina ry\'Ishuri' : 'School name'} *</span>
                       <input
-                        type="email"
-                        value={formData.email}
-                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        placeholder="john@school.ac.rw"
-                        className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]"
+                        type="text"
+                        value={formData.schoolName}
+                        onChange={(e) => setFormData({ ...formData, schoolName: e.target.value })}
+                        placeholder="IPRC Kigali"
+                        className="input"
                         required
                       />
                     </div>
-                  </div>
 
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      {isKinyarwanda ? 'Ijambo ry’ibanga' : 'Password'} *
-                    </label>
-                    <div className="relative">
-                      <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                      <input
-                        type={showPassword ? 'text' : 'password'}
-                        value={formData.password}
-                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                        placeholder="Min. 8 characters"
-                        minLength={8}
-                        className="w-full pl-12 pr-12 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]"
-                        required
-                      />
-                      <button type="button" onClick={() => setShowPassword(p => !p)}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                      </button>
+                    <div className="field">
+                      <span className="label">{isKin ? 'Ubwoko bw\'Ishuri' : 'School type'} *</span>
+                      <select
+                          value={formData.schoolType}
+                          onChange={(e) => setFormData({ ...formData, schoolType: e.target.value })}
+                          className="select"
+                          required
+                        >
+                          <option value="">{isKin ? 'Hitamo ubwoko' : 'Select type'}</option>
+                          <option value="tvet">TVET</option>
+                          <option value="secondary">{isKin ? 'Ishuri ryisumbuye' : 'Secondary school'}</option>
+                          <option value="university">{isKin ? 'Kaminuza' : 'University'}</option>
+                          <option value="training">{isKin ? 'Ikigo cy\'amahugurwa' : 'Training center'}</option>
+                        </select>
+                    </div>
+
+                    <div className="field">
+                      <span className="label">{isKin ? 'Akarere' : 'Location (district)'} *</span>
+                      <select
+                          value={formData.location}
+                          onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                          className="select"
+                          required
+                        >
+                          <option value="">{isKin ? 'Hitamo akarere' : 'Select district'}</option>
+                          <option value="kigali">Kigali</option>
+                          <option value="huye">Huye</option>
+                          <option value="musanze">Musanze</option>
+                          <option value="rubavu">Rubavu</option>
+                          <option value="other">{isKin ? 'Ikindi' : 'Other'}</option>
+                        </select>
+                    </div>
+
+                    <div className="field">
+                      <span className="label">{isKin ? 'Umubare w\'Abanyeshuri' : 'Number of students'} *</span>
+                      <select
+                          value={formData.studentCount}
+                          onChange={(e) => setFormData({ ...formData, studentCount: e.target.value })}
+                          className="select"
+                          required
+                        >
+                          <option value="">{isKin ? 'Hitamo umubare' : 'Select count'}</option>
+                          <option value="1-50">1-50</option>
+                          <option value="50-100">50-100</option>
+                          <option value="100-200">100-200</option>
+                          <option value="200-500">200-500</option>
+                          <option value="500+">500+</option>
+                        </select>
                     </div>
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      {isKinyarwanda ? 'Nimero ya Telefoni' : 'Phone Number'} *
-                    </label>
-                    <div className="relative">
-                      <Phone className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <div className="divider"></div>
+
+                  {/* Contact person */}
+                  <div className="stack" style={{ ['--gap' as string]: '14px' }}>
+                    <h3 className="font-bold" style={{ color: 'var(--text)', fontSize: 14, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                      {isKin ? 'Umuntu wo guhamagara' : 'Contact person'}
+                    </h3>
+
+                    <div className="field">
+                      <span className="label">{isKin ? 'Amazina Yose' : 'Full name'} *</span>
                       <input
-                        type="tel"
-                        value={formData.phone}
-                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                        placeholder="+250 XXX XXX XXX"
-                        className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]"
+                        type="text"
+                        value={formData.fullName}
+                        onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                        placeholder="John Doe"
+                        className="input"
                         required
                       />
                     </div>
+
+                    <div className="field">
+                      <span className="label">{isKin ? 'Umwanya' : 'Position'} *</span>
+                      <input
+                        type="text"
+                        value={formData.position}
+                        onChange={(e) => setFormData({ ...formData, position: e.target.value })}
+                        placeholder={isKin ? 'Umuyobozi w\'Amasomo' : 'Dean of Studies'}
+                        className="input"
+                        required
+                      />
+                    </div>
+
+                    <div className="field">
+                      <span className="label">Email *</span>
+                      <div className="input-group">
+                        <Mail size={16} className="input-affix" style={{ left: 12, right: 'auto', pointerEvents: 'none' }} />
+                        <input
+                          type="email"
+                          value={formData.email}
+                          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                          placeholder="john@school.ac.rw"
+                          className="input"
+                          style={{ paddingLeft: 38 }}
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div className="field">
+                      <span className="label">{isKin ? 'Ijambo ry\'ibanga' : 'Password'} *</span>
+                      <div className="input-group">
+                        <Lock size={16} className="input-affix" style={{ left: 12, right: 'auto', pointerEvents: 'none' }} />
+                        <input
+                          type={showPassword ? 'text' : 'password'}
+                          value={formData.password}
+                          onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                          placeholder={isKin ? 'Byibuze inyuguti 8' : 'Min. 8 characters'}
+                          minLength={8}
+                          className="input"
+                          style={{ paddingLeft: 38, paddingRight: 38 }}
+                          required
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(p => !p)}
+                          className="input-affix"
+                          aria-label={showPassword ? 'Hide password' : 'Show password'}
+                          style={{ left: 'auto', right: 12, background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-3)', display: 'flex', alignItems: 'center' }}
+                        >
+                          {showPassword ? (
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
+                              <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24M1 1l22 22"/>
+                            </svg>
+                          ) : (
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" width="16" height="16">
+                              <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/>
+                              <circle cx="12" cy="12" r="3"/>
+                            </svg>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="field">
+                      <span className="label">{isKin ? 'Nimero ya Telefoni' : 'Phone number'} *</span>
+                      <div className="input-group">
+                        <Phone size={16} className="input-affix" style={{ left: 12, right: 'auto', pointerEvents: 'none' }} />
+                        <input
+                          type="tel"
+                          value={formData.phone}
+                          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                          placeholder="+250 XXX XXX XXX"
+                          className="input"
+                          style={{ paddingLeft: 38 }}
+                          required
+                        />
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
 
-              {/* Challenges */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  {isKinyarwanda ? 'Ni izihe mbogamizi muhura nazo?' : 'What challenges do you face?'} ({isKinyarwanda ? 'Si itegeko' : 'Optional'})
-                </label>
-                <textarea
-                  value={formData.challenges}
-                  onChange={(e) => setFormData({ ...formData, challenges: e.target.value })}
-                  placeholder={isKinyarwanda
-                    ? 'Tubwire imbogamizi muhura nazo mu kwigisha programming...'
-                    : 'Tell us about your current challenges with programming education...'}
-                  rows={4}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]"
-                />
-              </div>
-
-              {error && (
-                <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-sm text-red-700">{error}</div>
-              )}
-
-              {/* Submit Button */}
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full py-4 bg-[#10b981] text-white rounded-lg font-bold text-lg hover:bg-[#059669] transition-all shadow-lg flex items-center justify-center gap-2 disabled:opacity-50"
-              >
-                {loading ? (
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                ) : (
-                  <>
-                    {isKinyarwanda ? 'Saba igerageza ry’ubuntu' : 'Request Free Trial'}
-                    <ArrowRight className="w-5 h-5" />
-                  </>
-                )}
-              </button>
-
-              {/* Benefits */}
-              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                <div className="space-y-2 text-sm text-gray-700">
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-[#22c55e] flex-shrink-0" />
-                    <span>{isKinyarwanda ? 'Ntabwo ari itegeko gukomeza nyuma' : 'No commitment required'}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-[#22c55e] flex-shrink-0" />
-                    <span>{isKinyarwanda ? 'Tuzakuhamagara mu masaha 24' : "We'll contact you within 24 hours"}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-[#22c55e] flex-shrink-0" />
-                    <span>{isKinyarwanda ? 'Ni ubuntu mu mezi 3 ya mbere, hanyuma akaba 100,000 RWF ku mwaka.' : 'Free for 3 months, then RWF 100,000/year'}</span>
-                  </div>
-                </div>
-              </div>
-            </form>
-            </>
-            )}
-          </div>
-
-          {/* What Happens Next */}
-          <div className="mt-16">
-            <h2 className="text-3xl font-bold text-[#1e293b] mb-8 text-center">
-              {isKinyarwanda ? 'Iki nicyo kizakurikira' : 'What Happens Next'}
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {[
-                {
-                  step: '1',
-                  title: isKinyarwanda ? 'Tuzakuhamagara' : "We'll Call You",
-                  description: isKinyarwanda ? 'Mu masaha 24 tuzakuhamagara tuganire' : "Within 24 hours we'll give you a call"
-                },
-                {
-                  step: '2',
-                  title: isKinyarwanda ? 'Shiraho igihe cya Demo' : 'Schedule Demo',
-                  description: isKinyarwanda ? 'Tuza ku ishuri ryanyu kumurika uko platform ikora ku barimu' : 'We come to your school for a teacher demo'
-                },
-                {
-                  step: '3',
-                  title: isKinyarwanda ? 'Tangira igerageza' : 'Start Trial',
-                  description: isKinyarwanda ? 'Tangira amezi yawe 3 y’igerageza ku buntu' : 'Begin your free 3-month trial'
-                }
-              ].map((item, index) => (
-                <div key={index} className="text-center">
-                  <div className="w-16 h-16 bg-[#10b981] rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4">
-                    {item.step}
-                  </div>
-                  <h3 className="text-xl font-bold text-[#1e293b] mb-2">{item.title}</h3>
-                  <p className="text-gray-600">{item.description}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* FAQ Section */}
-          <div className="mt-16">
-            <h2 className="text-3xl font-bold text-[#1e293b] mb-8 text-center">
-              {isKinyarwanda ? 'Ibibazo Bikunze Kubazwa' : 'Frequently Asked Questions'}
-            </h2>
-            <div className="space-y-4">
-              {faqs.map((faq, index) => (
-                <div key={index} className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-                  <button
-                    onClick={() => setExpandedFAQ(expandedFAQ === index ? null : index)}
-                    className="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-gray-50 transition-all"
-                  >
-                    <span className="font-semibold text-gray-900">{faq.question}</span>
-                    <ChevronDown
-                      className={`w-5 h-5 text-gray-500 transition-transform ${
-                        expandedFAQ === index ? 'transform rotate-180' : ''
-                      }`}
+                  <div className="field">
+                    <span className="label">
+                      {isKin ? 'Ni izihe mbogamizi muhura nazo?' : 'What challenges do you face?'}{' '}
+                      <span className="dim">({isKin ? 'Si itegeko' : 'Optional'})</span>
+                    </span>
+                    <textarea
+                      value={formData.challenges}
+                      onChange={(e) => setFormData({ ...formData, challenges: e.target.value })}
+                      placeholder={isKin
+                        ? 'Tubwire imbogamizi muhura nazo mu kwigisha programming...'
+                        : 'Tell us about your current challenges with programming education...'}
+                      rows={4}
+                      className="textarea"
                     />
-                  </button>
-                  {expandedFAQ === index && (
-                    <div className="px-6 pb-4 text-gray-600">
-                      {faq.answer}
+                  </div>
+
+                  {error && (
+                    <div style={{ padding: '10px 14px', borderRadius: 'var(--radius)', background: 'var(--error-dim)', color: 'var(--error)', fontSize: 14 }}>
+                      {error}
                     </div>
                   )}
+
+                  <button type="submit" disabled={loading} className="btn btn-primary btn-block lg">
+                    {loading ? (
+                      <svg style={{ animation: 'spin 1s linear infinite' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16">
+                        <circle cx="12" cy="12" r="10" strokeOpacity=".25"/>
+                        <path d="M12 2a10 10 0 0 1 10 10" strokeOpacity=".85"/>
+                      </svg>
+                    ) : (
+                      <>
+                        {isKin ? 'Saba igerageza ry\'ubuntu' : 'Request free trial'}
+                        <ArrowRight size={16} />
+                      </>
+                    )}
+                  </button>
+
+                  <div className="callout success">
+                    <div className="stack" style={{ ['--gap' as string]: '6px', fontSize: 14 }}>
+                      <div className="flex items-center gap-2">
+                        <CheckCircle2 size={14} style={{ flexShrink: 0 }} />
+                        <span>{isKin ? 'Ntabwo ari itegeko gukomeza nyuma' : 'No commitment required'}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <CheckCircle2 size={14} style={{ flexShrink: 0 }} />
+                        <span>{isKin ? 'Tuzakuhamagara mu masaha 24' : "We'll contact you within 24 hours"}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <CheckCircle2 size={14} style={{ flexShrink: 0 }} />
+                        <span>{isKin ? 'Ni ubuntu mu mezi 3 ya mbere, hanyuma akaba 100,000 RWF ku mwaka.' : 'Free for 3 months, then RWF 100,000/year'}</span>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </>
+            )}
+          </div>
+        </section>
+
+        {/* WHAT HAPPENS NEXT */}
+        <section className="section">
+          <div className="section-head">
+            <p className="eyebrow">{isKin ? 'Inzira' : 'Process'}</p>
+            <h2>{isKin ? 'Iki nicyo kizakurikira' : 'What happens next'}</h2>
+          </div>
+          <div className="grid g-3">
+            {[
+              {
+                step: '1',
+                title: isKin ? 'Tuzakuhamagara' : "We'll call you",
+                description: isKin ? 'Mu masaha 24 tuzakuhamagara tuganire' : "Within 24 hours we'll give you a call"
+              },
+              {
+                step: '2',
+                title: isKin ? 'Shiraho igihe cya Demo' : 'Schedule a demo',
+                description: isKin ? 'Tuza ku ishuri ryanyu kumurika uko platform ikora ku barimu' : 'We come to your school for a teacher demo'
+              },
+              {
+                step: '3',
+                title: isKin ? 'Tangira igerageza' : 'Start your trial',
+                description: isKin ? 'Tangira amezi yawe 3 y\'igerageza ku buntu' : 'Begin your free 3-month trial'
+              }
+            ].map((item) => (
+              <article key={item.step} className="card feat text-center">
+                <div className="iconbtn" style={{ margin: '0 auto 18px', pointerEvents: 'none', fontWeight: 700 }}>
+                  {item.step}
                 </div>
-              ))}
+                <h3>{item.title}</h3>
+                <p>{item.description}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        {/* FAQ */}
+        <section className="section">
+          <div className="section-head">
+            <p className="eyebrow">FAQ</p>
+            <h2>{isKin ? 'Ibibazo Bikunze Kubazwa' : 'Frequently asked questions'}</h2>
+          </div>
+          <div className="stack" style={{ ['--gap' as string]: '8px', maxWidth: 720, margin: '0 auto' }}>
+            {faqs.map((faq, index) => (
+              <div key={index} className="card" style={{ padding: 0 }}>
+                <button
+                  onClick={() => setExpandedFAQ(expandedFAQ === index ? null : index)}
+                  className="flex items-center justify-between"
+                  style={{ width: '100%', padding: '16px 20px', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', color: 'var(--text)', fontWeight: 600, fontSize: 15 }}
+                >
+                  <span>{faq.question}</span>
+                  <ChevronDown
+                    size={18}
+                    style={{ flexShrink: 0, transition: 'transform 0.2s', transform: expandedFAQ === index ? 'rotate(180deg)' : 'none', color: 'var(--text-3)' }}
+                  />
+                </button>
+                {expandedFAQ === index && (
+                  <div className="dim" style={{ padding: '0 20px 16px', fontSize: 14 }}>
+                    {faq.answer}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* FINAL CTA */}
+        <section className="section">
+          <div className="cta-band">
+            <h2>{isKin ? 'Ufite ibibazo?' : 'Have questions?'}</h2>
+            <div className="row" style={{ justifyContent: 'center' }}>
+              <Link to="/contact" className="btn btn-secondary lg">
+                {isKin ? 'Vugana n\'abashinzwe kugurisha' : 'Contact sales'}
+                <ArrowRight size={16} />
+              </Link>
             </div>
           </div>
+        </section>
+      </main>
 
-          {/* Final CTA */}
-          <div className="mt-16 text-center">
-            <p className="text-gray-600 mb-4">
-              {isKinyarwanda ? 'Ufite ibibazo?' : 'Have questions?'}
-            </p>
-            <a
-              href="#"
-              className="inline-flex items-center gap-2 px-8 py-3 border-2 border-[#10b981] text-[#10b981] rounded-lg font-bold hover:bg-green-50 transition-all"
-            >
-              {isKinyarwanda ? 'Vugana n’abashinzwe kugurisha' : 'Contact Sales'}
-              <ArrowRight className="w-5 h-5" />
-            </a>
+      <footer className="site-footer">
+        <div className="wrap foot">
+          <div>
+            <div className="logo" style={{ marginBottom: 8 }}><span className="edu">EduCode</span></div>
+            <div>{isKin ? '© 2026 EduCode Rwanda. Byubatswe mu Rwanda n\'urukundo.' : '© 2026 EduCode Rwanda. Built with ❤️ in Rwanda.'}</div>
+          </div>
+          <div className="foot-links">
+            <Link to="/login">{isKin ? 'Kwinjira' : 'Log in'}</Link>
+            <Link to="/signup">{isKin ? 'Iyandikishe' : 'Sign up'}</Link>
+            <Link to="/about">{isKin ? 'Abo turibo' : 'About'}</Link>
+            <Link to="/contact">{isKin ? 'Twandikire' : 'Contact'}</Link>
           </div>
         </div>
-      </div>
-    </div>
+      </footer>
+    </>
   );
 }
