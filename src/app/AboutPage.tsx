@@ -1,294 +1,243 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import { Link } from 'react-router';
 import { Users, Target, Globe, ArrowRight, Mail, Linkedin } from 'lucide-react';
+import { useTheme } from '../lib/theme';
 import { usePageTitle } from '../hooks/usePageTitle';
 
 export default function AboutPage() {
   usePageTitle('About · EduCode');
+  const { theme, toggleTheme } = useTheme();
   const [language, setLanguage] = useState<'EN' | 'KIN'>('EN');
-  const isKinyarwanda = language === 'KIN';
+  const isKin = language === 'KIN';
 
   return (
-    <div className="min-h-screen bg-white" style={{ fontFamily: 'Inter, sans-serif' }}>
-      {/* Navigation */}
-      <nav className="border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center gap-2">
-              <span className="text-2xl">🇷🇼</span>
-              <span className="text-xl font-bold text-[#1e293b]">EduCode Rwanda</span>
+    <>
+      {/* NAV */}
+      <header className="nav">
+        <div className="nav-inner">
+          <Link className="logo" to="/"><span className="edu">EduCode</span></Link>
+          <nav className="nav-links nav-collapse" aria-label="Main">
+            <Link className="nav-link active" to="/about">{isKin ? 'Abo turibo' : 'About'}</Link>
+            <Link className="nav-link" to="/contact">{isKin ? 'Twandikire' : 'Contact'}</Link>
+          </nav>
+          <div className="nav-right">
+            <div className="lang-toggle">
+              {(['EN', 'KIN'] as const).map(l => (
+                <button key={l} className={language === l ? 'on' : ''} onClick={() => setLanguage(l)}>{l}</button>
+              ))}
             </div>
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-1 border border-gray-300 rounded-lg p-1">
-                <button
-                  onClick={() => setLanguage('EN')}
-                  className={`px-3 py-1 rounded text-sm font-semibold transition-all ${
-                    language === 'EN' ? 'bg-[#0ea5e9] text-white' : 'text-gray-600'
-                  }`}
-                >
-                  EN
-                </button>
-                <button
-                  onClick={() => setLanguage('KIN')}
-                  className={`px-3 py-1 rounded text-sm font-semibold transition-all ${
-                    language === 'KIN' ? 'bg-[#0ea5e9] text-white' : 'text-gray-600'
-                  }`}
-                >
-                  KIN
-                </button>
-              </div>
-              <a href="#" className="text-gray-700 hover:text-[#0ea5e9] font-medium">
-                {isKinyarwanda ? 'Kwinjira' : 'Login'}
-              </a>
-            </div>
+            <button
+              className="iconbtn"
+              onClick={toggleTheme}
+              aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+              aria-pressed={theme === 'light'}
+            >
+              {theme === 'dark' ? (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+                </svg>
+              ) : (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                </svg>
+              )}
+            </button>
+            <Link className="btn btn-tertiary" to="/login">{isKin ? 'Kwinjira' : 'Log in'}</Link>
+            <Link className="btn btn-primary sm" to="/signup">{isKin ? 'Tangira' : 'Get started'}</Link>
           </div>
         </div>
-      </nav>
+      </header>
 
-      {/* Hero Section */}
-      <div className="bg-gradient-to-br from-[#0ea5e9] to-[#8b5cf6] py-20">
-        <div className="max-w-4xl mx-auto px-4 text-center text-white">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">
-            {isKinyarwanda
+      <main className="wrap">
+        {/* HERO */}
+        <section className="hero">
+          <p className="eyebrow rise">{isKin ? 'Abo turibo' : 'About us'}</p>
+          <h1 className="rise-2">
+            {isKin
               ? 'Kugeza uburezi bwa programming kuri bose mu Rwanda'
-              : 'Making Programming Education Accessible to Every Rwandan'}
+              : 'Making programming education accessible to every Rwandan.'}
           </h1>
-          <p className="text-xl mb-8 text-blue-100 max-w-3xl mx-auto">
-            {isKinyarwanda
+          <p className="lede rise-3">
+            {isKin
               ? 'Intego yacu ni kugeza uburezi bufite ireme bwa coding kuri bose binyuze mu kwiga gufashijwe na AI mu Kinyarwanda.'
               : 'Our mission is to democratize quality coding education through AI-powered learning in Kinyarwanda.'}
           </p>
+        </section>
 
-          {/* Team Photo Placeholder */}
-          <div className="mt-12 bg-white/20 backdrop-blur rounded-2xl p-8">
-            <div className="aspect-video bg-gradient-to-br from-[#1e293b] to-[#0f172a] rounded-xl flex items-center justify-center">
-              <Users className="w-24 h-24 text-white/40" />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Our Story Section */}
-      <div className="py-20">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            {/* Left: Story Text */}
+        {/* OUR STORY */}
+        <section className="section">
+          <div className="split">
             <div>
-              <h2 className="text-3xl font-bold text-[#1e293b] mb-6">
-                {isKinyarwanda ? 'Inkuru Yacu' : 'Our Story'}
+              <p className="eyebrow">{isKin ? 'Inkuru yacu' : 'Our story'}</p>
+              <h2 style={{ fontSize: 'clamp(26px,3.4vw,34px)', letterSpacing: '-0.03em' }}>
+                {isKin ? 'Yavutse mu ishuri.' : 'Born from the classroom.'}
               </h2>
-              <div className="prose prose-lg text-gray-700 space-y-4">
-                <p>
-                  {isKinyarwanda
-                    ? 'Yashinzwe mu 2026 n\'umunyeshuri wiga Computer Science muri African Leadership University akaba n\'umwarimu wa JavaScript mu ishuri ryaho.'
-                    : 'Founded in 2026 by a Computer Science student at African Leadership University and JavaScript teacher at a local school.'}
-                </p>
-                <p>
-                  {isKinyarwanda
-                    ? 'Ikibazo cyari gisobanutse: Abanyeshuri babonaga bigoye kwiga programming kubera:'
-                    : 'The problem was clear: Students struggled to learn programming because:'}
-                </p>
-                <ul className="list-disc list-inside space-y-2 ml-4">
-                  <li>{isKinyarwanda ? 'Amabwiriza yari mu Cyongereza gusa' : 'Instructions were only in English'}</li>
-                  <li>{isKinyarwanda ? 'Abarimu babaga bafite abanyeshuri barenga 50 bagomba gufasha' : 'Teachers had 50+ students to support'}</li>
-                  <li>{isKinyarwanda ? 'Nta bisubizo byihariye kuri buri munyeshuri' : 'No personalized feedback'}</li>
-                  <li>{isKinyarwanda ? 'Ubushobozi buke bwo kugera muri lab ya mudasobwa' : 'Limited computer lab access'}</li>
-                </ul>
-                <p className="font-semibold text-[#0ea5e9]">
-                  {isKinyarwanda
-                    ? 'EduCode Rwanda yavuye mu ishuri, yubatswe n\'umwarimu wabonye abanyeshuri bareka kode - si kuko badashoboye kwiga, ahubwo kubera ko ibikoresho bitari byubatswe kubera bo.'
-                    : "EduCode Rwanda was born from the classroom, built by a teacher who saw students give up on coding—not because they couldn't learn, but because the tools weren't designed for them."}
-                </p>
-              </div>
+              <p className="muted" style={{ marginTop: 14, fontSize: 16, lineHeight: 1.6 }}>
+                {isKin
+                  ? 'Yashinzwe mu 2026 n\'umunyeshuri wiga Computer Science muri African Leadership University akaba n\'umwarimu wa JavaScript mu ishuri ryaho. Ikibazo cyari gisobanutse: abanyeshuri babonaga bigoye kwiga programming.'
+                  : 'Founded in 2026 by a Computer Science student at African Leadership University and JavaScript teacher at a local school. The problem was clear: students struggled to learn programming.'}
+              </p>
+              <ul>
+                <li>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M20 6 9 17l-5-5"/>
+                  </svg>
+                  <span>{isKin ? 'Amabwiriza yari mu Cyongereza gusa' : 'Instructions were only in English'}</span>
+                </li>
+                <li>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M20 6 9 17l-5-5"/>
+                  </svg>
+                  <span>{isKin ? 'Abarimu babaga bafite abanyeshuri barenga 50 bagomba gufasha' : 'Teachers had 50+ students to support'}</span>
+                </li>
+                <li>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M20 6 9 17l-5-5"/>
+                  </svg>
+                  <span>{isKin ? 'Nta bisubizo byihariye kuri buri munyeshuri' : 'No personalized feedback'}</span>
+                </li>
+                <li>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M20 6 9 17l-5-5"/>
+                  </svg>
+                  <span>{isKin ? 'Ubushobozi buke bwo kugera muri lab ya mudasobwa' : 'Limited computer lab access'}</span>
+                </li>
+              </ul>
             </div>
-
-            {/* Right: Stats */}
-            <div className="grid grid-cols-2 gap-6">
+            <div className="grid g-2">
               {[
-                {
-                  icon: <Users className="w-8 h-8" />,
-                  number: '5,000+',
-                  label: isKinyarwanda ? 'Abanyeshuri Biga' : 'Students Learning',
-                  color: '#0ea5e9'
-                },
-                {
-                  icon: <Target className="w-8 h-8" />,
-                  number: '50+',
-                  label: isKinyarwanda ? 'Amashuri Akoresha iyi platform' : 'Schools Using',
-                  color: '#10b981'
-                },
-                {
-                  icon: <Globe className="w-8 h-8" />,
-                  number: '95%',
-                  label: isKinyarwanda ? 'Igipimo cy\'abatsinda' : 'Pass Rate',
-                  color: '#8b5cf6'
-                },
-                {
-                  icon: <span className="text-4xl">🇷🇼</span>,
-                  number: '#1',
-                  label: isKinyarwanda ? 'Mu Rwanda' : 'in Rwanda',
-                  color: '#fbbf24'
-                }
-              ].map((stat, index) => (
-                <div
-                  key={index}
-                  className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 text-center hover:shadow-xl transition-all"
-                >
-                  <div
-                    className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
-                    style={{ backgroundColor: `${stat.color}20`, color: stat.color }}
-                  >
+                { icon: <Users size={22} />, number: '5,000+', label: isKin ? 'Abanyeshuri Biga' : 'Students learning' },
+                { icon: <Target size={22} />, number: '50+', label: isKin ? 'Amashuri akoresha' : 'Schools using it' },
+                { icon: <Globe size={22} />, number: '95%', label: isKin ? 'Igipimo cy\'abatsinda' : 'Pass rate' },
+                { icon: <span style={{ fontSize: 22 }}>🇷🇼</span>, number: '#1', label: isKin ? 'Mu Rwanda' : 'In Rwanda' },
+              ].map((stat) => (
+                <div key={stat.label} className="card pad-sm text-center">
+                  <div className="iconbtn" style={{ margin: '0 auto 12px', pointerEvents: 'none' }}>
                     {stat.icon}
                   </div>
-                  <div className="text-3xl font-bold text-[#1e293b] mb-2">{stat.number}</div>
-                  <div className="text-sm text-gray-600">{stat.label}</div>
+                  <div className="text-3xl font-bold" style={{ color: 'var(--text)' }}>{stat.number}</div>
+                  <div className="text-sm dim">{stat.label}</div>
                 </div>
               ))}
             </div>
           </div>
-        </div>
-      </div>
+        </section>
 
-      {/* Our Values Section */}
-      <div className="py-20 bg-[#f8fafc]">
-        <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-[#1e293b] mb-12 text-center">
-            {isKinyarwanda ? 'Indangagaciro Zacu' : 'Our Values'}
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              {
-                emoji: '🇷🇼',
-                title: isKinyarwanda ? 'U Rwanda Mbere' : 'Rwanda First',
-                description: isKinyarwanda
-                  ? 'Byakozwe n\'Abanyarwanda ku bw\'abanyeshuri b\'u Rwanda'
-                  : 'Built for Rwandan students, by Rwandans',
-                color: '#10b981'
-              },
-              {
-                emoji: '🤖',
-                title: isKinyarwanda ? 'Bifashijwemo na AI' : 'AI-Powered',
-                description: isKinyarwanda
-                  ? 'Ikoranabuhanga ryumva imiterere yacu'
-                  : 'Technology that understands our context',
-                color: '#8b5cf6'
-              },
-              {
-                emoji: '🌍',
-                title: isKinyarwanda ? 'Biboneka byoroshye' : 'Accessible',
-                description: isKinyarwanda
-                  ? 'Irakora niyo nta interineti ihari, irahendutse, kandi iri mu rurimi rwawe'
-                  : 'Works offline, affordable, in your language',
-                color: '#0ea5e9'
-              }
-            ].map((value, index) => (
-              <div
-                key={index}
-                className="bg-white rounded-xl shadow-lg border border-gray-200 p-8 text-center hover:shadow-xl transition-all"
-              >
-                <div className="text-6xl mb-4">{value.emoji}</div>
-                <h3 className="text-xl font-bold mb-3" style={{ color: value.color }}>
-                  {value.title}
-                </h3>
-                <p className="text-gray-600">{value.description}</p>
-              </div>
-            ))}
+        {/* OUR VALUES */}
+        <section className="section">
+          <div className="section-head">
+            <p className="eyebrow">{isKin ? 'Indangagaciro zacu' : 'Our values'}</p>
+            <h2>{isKin ? 'Ibitwiganisha' : 'What guides us'}</h2>
           </div>
-        </div>
-      </div>
+          <div className="grid g-3">
+            <article className="card feat">
+              <div style={{ fontSize: 30, marginBottom: 18 }}>🇷🇼</div>
+              <h3>{isKin ? 'U Rwanda Mbere' : 'Rwanda first'}</h3>
+              <p>
+                {isKin
+                  ? 'Byakozwe n\'Abanyarwanda ku bw\'abanyeshuri b\'u Rwanda.'
+                  : 'Built for Rwandan students, by Rwandans.'}
+              </p>
+            </article>
+            <article className="card feat">
+              <div style={{ fontSize: 30, marginBottom: 18 }}>🤖</div>
+              <h3>{isKin ? 'Bifashijwemo na AI' : 'AI-powered'}</h3>
+              <p>
+                {isKin
+                  ? 'Ikoranabuhanga ryumva imiterere yacu.'
+                  : 'Technology that understands our context.'}
+              </p>
+            </article>
+            <article className="card feat">
+              <div style={{ fontSize: 30, marginBottom: 18 }}>🌍</div>
+              <h3>{isKin ? 'Biboneka byoroshye' : 'Accessible'}</h3>
+              <p>
+                {isKin
+                  ? 'Irakora niyo nta interineti ihari, irahendutse, kandi iri mu rurimi rwawe.'
+                  : 'Works offline, affordable, and in your language.'}
+              </p>
+            </article>
+          </div>
+        </section>
 
-      {/* Team Section */}
-      <div className="py-20">
-        <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-[#1e293b] mb-12 text-center">
-            {isKinyarwanda ? 'Menya Itsinda Ryacu' : 'Meet the Team'}
-          </h2>
-
-          {/* Founder Card */}
-          <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-8 mb-8">
+        {/* TEAM */}
+        <section className="section">
+          <div className="section-head">
+            <p className="eyebrow">{isKin ? 'Itsinda' : 'Team'}</p>
+            <h2>{isKin ? 'Menya itsinda ryacu' : 'Meet the team'}</h2>
+          </div>
+          <div className="card pad-lg">
             <div className="flex flex-col md:flex-row items-center gap-8">
-              {/* Photo */}
-              <div className="w-32 h-32 rounded-full bg-gradient-to-br from-[#0ea5e9] to-[#8b5cf6] flex items-center justify-center text-white text-4xl font-bold flex-shrink-0">
+              <div className="iconbtn" style={{ width: 88, height: 88, fontSize: 28, fontWeight: 700, flexShrink: 0, pointerEvents: 'none' }}>
                 JD
               </div>
-
-              {/* Info */}
               <div className="flex-1 text-center md:text-left">
-                <h3 className="text-2xl font-bold text-[#1e293b] mb-2">[Your Name]</h3>
-                <p className="text-[#0ea5e9] font-semibold mb-4">
-                  {isKinyarwanda ? 'Umushinzwi & CEO' : 'Founder & CEO'}
+                <h3 style={{ fontSize: 22, fontWeight: 700, color: 'var(--text)', marginBottom: 4 }}>[Your Name]</h3>
+                <p style={{ color: 'var(--text-2)', fontWeight: 600, marginBottom: 12 }}>
+                  {isKin ? 'Umushinzwi & CEO' : 'Founder & CEO'}
                 </p>
-                <div className="text-gray-600 space-y-2">
-                  <p>{isKinyarwanda ? 'Umunyeshuri wa Software Engineering muri ALU' : 'Software Engineering Student at ALU'}</p>
-                  <p>{isKinyarwanda ? 'Umwarimu wa JavaScript' : 'JavaScript Teacher'}</p>
-                  <p>{isKinyarwanda ? 'Nkunda ubusumbane buke mu burezi' : 'Passionate about education equity'}</p>
+                <div className="dim" style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                  <p>{isKin ? 'Umunyeshuri wa Software Engineering muri ALU' : 'Software Engineering student at ALU'}</p>
+                  <p>{isKin ? 'Umwarimu wa JavaScript' : 'JavaScript teacher'}</p>
+                  <p>{isKin ? 'Nkunda ubusumbane buke mu burezi' : 'Passionate about education equity'}</p>
                 </div>
-                <div className="mt-4">
-                  <a
-                    href="#"
-                    className="inline-flex items-center gap-2 text-[#0ea5e9] hover:underline font-semibold"
-                  >
-                    <Linkedin className="w-5 h-5" />
-                    LinkedIn
-                  </a>
-                </div>
+                <a href="#" className="btn btn-tertiary" style={{ marginTop: 12, padding: 0 }}>
+                  <Linkedin size={16} /> LinkedIn
+                </a>
               </div>
             </div>
           </div>
 
-          {/* Join Team CTA */}
-          <div className="bg-gradient-to-r from-[#0ea5e9] to-[#8b5cf6] rounded-2xl p-8 text-center text-white">
-            <h3 className="text-2xl font-bold mb-4">
-              {isKinyarwanda ? 'Wifuza kwinjira mu itsinda ryacu?' : 'Want to join our team?'}
-            </h3>
-            <p className="mb-6 text-blue-100">
-              {isKinyarwanda
-                ? 'Turashaka abantu bafite ubushake bwo guhinduza uburezi mu Rwanda'
-                : "We're looking for passionate people to transform education in Rwanda"}
+          <div className="cta-band" style={{ marginTop: 18 }}>
+            <h2>{isKin ? 'Wifuza kwinjira mu itsinda ryacu?' : 'Want to join our team?'}</h2>
+            <p>
+              {isKin
+                ? 'Turashaka abantu bafite ubushake bwo guhinduza uburezi mu Rwanda.'
+                : "We're looking for passionate people to transform education in Rwanda."}
             </p>
-            <a
-              href="#"
-              className="inline-flex items-center gap-2 px-8 py-3 bg-white text-[#0ea5e9] rounded-lg font-bold hover:bg-gray-100 transition-all"
-            >
-              {isKinyarwanda ? 'Reba imyanya y\'akazi ihari' : 'View Open Positions'}
-              <ArrowRight className="w-5 h-5" />
-            </a>
+            <div className="row" style={{ justifyContent: 'center' }}>
+              <a href="#" className="btn btn-primary lg">
+                {isKin ? 'Reba imyanya y\'akazi ihari' : 'View open positions'}
+                <ArrowRight size={16} />
+              </a>
+            </div>
+          </div>
+        </section>
+
+        {/* CONTACT CTA */}
+        <section className="section">
+          <div className="cta-band">
+            <h2>{isKin ? 'Wifuza kumenya byinshi?' : 'Want to learn more?'}</h2>
+            <p>
+              {isKin
+                ? 'Twandikire niba wifuza kumenya byinshi kuri EduCode Rwanda.'
+                : 'Get in touch to learn more about EduCode Rwanda.'}
+            </p>
+            <div className="row" style={{ justifyContent: 'center' }}>
+              <Link to="/contact" className="btn btn-primary lg">
+                <Mail size={16} />
+                {isKin ? 'Twandikire' : 'Contact us'}
+                <ArrowRight size={16} />
+              </Link>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer className="site-footer">
+        <div className="wrap foot">
+          <div>
+            <div className="logo" style={{ marginBottom: 8 }}><span className="edu">EduCode</span></div>
+            <div>{isKin ? '© 2026 EduCode Rwanda. Byubatswe mu Rwanda n\'urukundo.' : '© 2026 EduCode Rwanda. Built with ❤️ in Rwanda.'}</div>
+          </div>
+          <div className="foot-links">
+            <Link to="/login">{isKin ? 'Kwinjira' : 'Log in'}</Link>
+            <Link to="/signup">{isKin ? 'Iyandikishe' : 'Sign up'}</Link>
+            <Link to="/contact">{isKin ? 'Twandikire' : 'Contact'}</Link>
+            <Link to="/privacy">{isKin ? 'Ibanga' : 'Privacy'}</Link>
           </div>
         </div>
-      </div>
-
-      {/* Contact CTA */}
-      <div className="bg-[#1e293b] py-16">
-        <div className="max-w-4xl mx-auto px-4 text-center text-white">
-          <h2 className="text-3xl font-bold mb-4">
-            {isKinyarwanda ? 'Wifuza kumenya byinshi?' : 'Want to learn more?'}
-          </h2>
-          <p className="text-gray-400 mb-8">
-            {isKinyarwanda
-              ? 'Twandikire niba wifuza kumenya byinshi kuri EduCode Rwanda'
-              : 'Get in touch to learn more about EduCode Rwanda'}
-          </p>
-          <a
-            href="#"
-            className="inline-flex items-center gap-2 px-8 py-3 bg-[#0ea5e9] text-white rounded-lg font-bold hover:bg-[#0284c7] transition-all"
-          >
-            <Mail className="w-5 h-5" />
-            {isKinyarwanda ? 'Twandikire' : 'Contact Us'}
-            <ArrowRight className="w-5 h-5" />
-          </a>
-        </div>
-      </div>
-
-      {/* Footer */}
-      <footer className="text-white py-8" style={{ background: 'var(--ec-footer-bg)' }}>
-        <div className="max-w-7xl mx-auto px-4 text-center text-sm text-gray-400">
-          <p>© 2026 EduCode Rwanda. All rights reserved.</p>
-          <p className="mt-2">
-            {isKinyarwanda
-              ? 'Byubatswe mu Rwanda n\'urukundo'
-              : 'Built with ❤️ in Rwanda'}
-          </p>
-        </div>
       </footer>
-    </div>
+    </>
   );
 }
