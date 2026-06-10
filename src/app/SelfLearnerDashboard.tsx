@@ -1,6 +1,6 @@
-import { ThemeToggle } from './components/ThemeToggle';
 import { useState, useEffect } from 'react';
-import { Code2, BookOpen, Zap, Flame, ChevronRight, Loader, Bot, Star, ArrowRight } from 'lucide-react';
+import { Code2, BookOpen, Zap, ChevronRight, Loader, Bot, ArrowRight } from 'lucide-react';
+import { AppNav } from './components/AppNav';
 import { useAuth } from '../lib/auth';
 import { getSelfLearnerStats, getResumeLesson, type CourseProgress, type CourseLesson } from '../lib/db';
 import { usePageTitle } from '../hooks/usePageTitle';
@@ -29,21 +29,7 @@ function getLevel(xp: number) {
   return { level: level + 1, name: LEVEL_NAMES[level], xpToNext: next - xp, pct };
 }
 
-function DifficultyBadge({ difficulty, isKin }: { difficulty: string; isKin: boolean }) {
-  const map: Record<string, { label: string; labelKin: string; color: string; bg: string }> = {
-    beginner:     { label: 'Beginner',     labelKin: 'Intangiriro', color: '#00d4aa', bg: 'rgba(0,212,170,0.1)' },
-    intermediate: { label: 'Intermediate', labelKin: 'Hagati',      color: '#f59e0b', bg: 'rgba(245,158,11,0.1)' },
-    advanced:     { label: 'Advanced',     labelKin: 'Inzobere',    color: '#8b5cf6', bg: 'rgba(139,92,246,0.1)' },
-  };
-  const d = map[difficulty] ?? map.beginner;
-  return (
-    <span className="px-2 py-0.5 rounded-full text-xs font-semibold" style={{ background: d.bg, color: d.color }}>
-      {isKin ? d.labelKin : d.label}
-    </span>
-  );
-}
-
-export default function SelfLearnerDashboard({ language, onLanguageChange, onStartCoding, onOpenCourses, onContinueLearning, onOpenLesson }: Props) {
+export default function SelfLearnerDashboard({ language, onStartCoding, onOpenCourses, onContinueLearning, onOpenLesson }: Props) {
   usePageTitle('Dashboard · EduCode');
   const { profile } = useAuth();
   const isKin = language === 'KIN';
@@ -82,266 +68,212 @@ export default function SelfLearnerDashboard({ language, onLanguageChange, onSta
   const notStarted  = courseProgress.filter(c => c.pct === 0);
   const completed   = courseProgress.filter(c => c.pct === 100 && c.total_lessons > 0);
 
-  return (
-    <div className="min-h-screen" style={{ background: 'var(--ec-bg)', fontFamily: 'Inter, sans-serif' }}>
+  const quickActions = [
+    {
+      icon: <Zap size={18} />,
+      title: isKin ? 'Komeza Kwiga' : 'Continue Learning',
+      sub: isKin ? 'Komeza aho wari ugeze' : 'Pick up where you left off',
+      onClick: handleContinue,
+      loading: resumeLoading,
+      primary: true,
+    },
+    {
+      icon: <Code2 size={18} />,
+      title: isKin ? 'Kwandika Code Wishyuye' : 'Free Coding',
+      sub: isKin ? 'Fungura editor, nta mukoro ukenewe.' : 'Open the editor, no assignment needed',
+      onClick: onStartCoding,
+      loading: false,
+      primary: false,
+    },
+    {
+      icon: <BookOpen size={18} />,
+      title: isKin ? 'Reba Amasomo' : 'Browse Courses',
+      sub: isKin ? 'Reba amasomo yose ahari' : 'See all available courses',
+      onClick: onOpenCourses,
+      loading: false,
+      primary: false,
+    },
+  ];
 
-      {/* Header */}
-      <header style={{ background: 'var(--ec-surface)', borderBottom: '1px solid var(--ec-b1)' }}>
-        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-xl">🇷🇼</span>
-            <span className="text-base font-bold" style={{ color: 'var(--ec-text-1)' }}>EduCode Rwanda</span>
+  return (
+    <div style={{ minHeight: '100vh', background: 'var(--bg)' }}>
+      <AppNav streak={streak} />
+
+      <main className="wrap page">
+        {/* Welcome header */}
+        <div className="welcome rise">
+          <div>
+            <h1>
+              {isKin ? `Ikaze nanone, ${firstName}! 👋` : `Welcome back, ${firstName}! 👋`}
+            </h1>
+            <p className="sub">
+              {isKin ? 'Komeza wigire. Buri somo rishya ryongera ubumenyi bwawe.' : 'Keep learning. Every lesson adds to your skills.'}
+            </p>
           </div>
-          <div className="flex items-center gap-3">
-            {/* XP + Level */}
-            <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl"
-              style={{ background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.15)' }}>
-              <Star size={13} style={{ color: '#8b5cf6' }} />
-              <span className="text-xs font-bold" style={{ color: '#8b5cf6' }}>
-                {isKin ? `Urwego ${lvl.level}` : `Level ${lvl.level}`} · {xp} XP
-              </span>
-            </div>
-            {/* Streak */}
-            {streak > 0 && (
-              <div className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl"
-                style={{ background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.15)' }}>
-                <Flame size={13} style={{ color: '#f59e0b' }} />
-                <span className="text-xs font-bold" style={{ color: '#f59e0b' }}>{streak}</span>
-              </div>
-            )}
-            <ThemeToggle />
-            {/* Language toggle */}
-            <div className="flex items-center gap-1 rounded-lg p-1" style={{ background: 'var(--ec-b3)', border: '1px solid var(--ec-b1)' }}>
-              {(['EN', 'KIN'] as const).map(l => (
-                <button key={l} onClick={() => onLanguageChange(l)}
-                  className="px-2.5 py-1 rounded-md text-xs font-semibold transition-all"
-                  style={{ background: language === l ? 'rgba(0,212,170,0.15)' : 'transparent', color: language === l ? '#00d4aa' : 'var(--ec-text-6)' }}>
-                  {l}
+          <button className="btn btn-primary" onClick={onContinueLearning}>
+            {isKin ? 'Komeza isomo' : 'Continue lesson'}
+          </button>
+        </div>
+
+        <div className="dash">
+          {/* LEFT column */}
+          <div className="stack" style={{ ['--gap' as string]: '22px' }}>
+
+            {/* Quick actions */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 rise-2">
+              {quickActions.map(a => (
+                <button
+                  key={a.title}
+                  onClick={a.onClick}
+                  disabled={a.loading}
+                  className="card pad-lg card-link text-left"
+                  style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}
+                >
+                  <div className="flex items-center justify-between" style={{ color: 'var(--text)' }}>
+                    {a.loading ? <Loader size={18} className="animate-spin" /> : a.icon}
+                    {a.primary && <ArrowRight size={14} style={{ color: 'var(--text-3)' }} />}
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold" style={{ color: 'var(--text)' }}>{a.title}</p>
+                    <p className="text-xs mt-0.5 dim">{a.sub}</p>
+                  </div>
                 </button>
               ))}
             </div>
+
+            {/* Course progress */}
+            {loading ? (
+              <div className="card pad-lg flex justify-center py-12 rise-2">
+                <Loader size={22} className="animate-spin" style={{ color: 'var(--text-2)' }} />
+              </div>
+            ) : courseProgress.length === 0 ? (
+              <div className="card pad-lg text-center py-12 rise-2">
+                <BookOpen size={32} style={{ color: 'var(--text-3)', margin: '0 auto 12px' }} />
+                <p className="text-sm dim">
+                  {isKin ? 'Nta masomo arahari ubu.' : 'No courses available yet.'}
+                </p>
+              </div>
+            ) : (
+              <div className="stack" style={{ ['--gap' as string]: '22px' }}>
+                {/* In progress */}
+                {inProgress.length > 0 && (
+                  <section className="card pad-lg lessons rise-2">
+                    <div className="card-head">
+                      <h3 className="card-title">{isKin ? 'Biracyakorwa' : 'In Progress'}</h3>
+                    </div>
+                    {inProgress.map(c => <CourseRow key={c.course_id} course={c} isKin={isKin} onOpen={onOpenCourses} />)}
+                  </section>
+                )}
+
+                {/* Not started */}
+                {notStarted.length > 0 && (
+                  <section className="card pad-lg lessons rise-3">
+                    <div className="card-head">
+                      <h3 className="card-title">{isKin ? 'Ntibiratangira' : 'Not Started'}</h3>
+                    </div>
+                    {notStarted.map(c => <CourseRow key={c.course_id} course={c} isKin={isKin} onOpen={onOpenCourses} />)}
+                  </section>
+                )}
+
+                {/* Completed */}
+                {completed.length > 0 && (
+                  <section className="card pad-lg lessons rise-4">
+                    <div className="card-head">
+                      <h3 className="card-title">{isKin ? 'Byarangiye' : 'Completed'}</h3>
+                    </div>
+                    {completed.map(c => <CourseRow key={c.course_id} course={c} isKin={isKin} onOpen={onOpenCourses} />)}
+                  </section>
+                )}
+              </div>
+            )}
           </div>
-        </div>
-      </header>
 
-      <main className="max-w-4xl mx-auto px-4 py-8 space-y-6">
-
-        {/* Welcome + Level bar */}
-        <div className="rounded-2xl p-6" style={{ background: 'linear-gradient(135deg, rgba(0,212,170,0.08), rgba(139,92,246,0.08))', border: '1px solid var(--ec-b1)' }}>
-          <div className="flex items-start justify-between gap-4 flex-wrap">
-            <div>
-              <h1 className="text-2xl font-bold mb-1" style={{ color: 'var(--ec-text-1)' }}>
-                {isKin ? `Ikaze nanone, ${firstName}! 👋` : `Welcome back, ${firstName}! 👋`}
-              </h1>
-              <p className="text-sm" style={{ color: 'var(--ec-text-5)' }}>
-                {isKin ? 'Komeza wigire. Buri somo rishya ryongera ubumenyi bwawe.' : 'Keep learning. Every lesson adds to your skills.'}
-              </p>
-            </div>
-            <div className="text-right shrink-0">
-              <p className="text-xs font-semibold mb-1" style={{ color: 'var(--ec-text-6)' }}>
-                {isKin ? `Urwego ${lvl.level} — ${lvl.name}` : `Level ${lvl.level} — ${lvl.name}`}
-              </p>
-              <p className="text-xs" style={{ color: 'var(--ec-text-7)' }}>
+          {/* RIGHT sidebar */}
+          <aside className="stack" style={{ ['--gap' as string]: '22px' }}>
+            {/* XP + Level */}
+            <section className="card pad-lg rise-3">
+              <div className="level-row">
+                <span className="lv">{isKin ? `Urwego ${lvl.level} — ${lvl.name}` : `Level ${lvl.level} — ${lvl.name}`}</span>
+                <span className="xp">{xp} XP</span>
+              </div>
+              <div className="bar on-card">
+                <i style={{ width: `${lvl.pct}%` }} />
+              </div>
+              <p className="dim" style={{ fontSize: 12.5, marginTop: 10 }}>
                 {lvl.xpToNext > 0
                   ? (isKin ? `Hasigaye ${lvl.xpToNext} XP ngo ugere ku rwego rukurikira` : `${lvl.xpToNext} XP to next level`)
                   : (isKin ? 'Wageze ku rwego rwa nyuma!' : 'Max level!')}
               </p>
-              <div className="w-40 h-1.5 rounded-full mt-2" style={{ background: 'var(--ec-b1)' }}>
-                <div className="h-full rounded-full transition-all" style={{ width: `${lvl.pct}%`, background: 'linear-gradient(90deg,#00d4aa,#8b5cf6)' }} />
-              </div>
-            </div>
-          </div>
 
-          {/* Overall progress */}
-          {!loading && totalLessons > 0 && (
-            <div className="mt-5 pt-4" style={{ borderTop: '1px solid var(--ec-b5)' }}>
-              <div className="flex justify-between text-xs mb-2" style={{ color: 'var(--ec-text-6)' }}>
-                <span>{isKin ? 'Iterambere ryawe muri rusange' : 'Overall progress'}</span>
-                <span style={{ color: 'var(--ec-text-1)', fontWeight: 600 }}>{totalCompleted} / {totalLessons} {isKin ? 'amasomo' : 'lessons'} ({overallPct}%)</span>
-              </div>
-              <div className="h-2 rounded-full overflow-hidden" style={{ background: 'var(--ec-b1)' }}>
-                <div className="h-full rounded-full transition-all duration-700" style={{ width: `${overallPct}%`, background: 'linear-gradient(90deg,#00d4aa,#8b5cf6)' }} />
-              </div>
-            </div>
-          )}
-        </div>
+              {!loading && totalLessons > 0 && (
+                <>
+                  <div className="flex justify-between text-xs mt-4 mb-1.5 dim">
+                    <span>{isKin ? 'Iterambere muri rusange' : 'Overall progress'}</span>
+                    <span style={{ color: 'var(--text)', fontWeight: 600 }}>{overallPct}%</span>
+                  </div>
+                  <div className="bar on-card">
+                    <i style={{ width: `${overallPct}%` }} />
+                  </div>
+                  <p className="dim" style={{ fontSize: 12.5, marginTop: 6 }}>
+                    {totalCompleted} / {totalLessons} {isKin ? 'amasomo yarangiye' : 'lessons completed'}
+                  </p>
+                </>
+              )}
+            </section>
 
-        {/* Quick actions */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          {[
-            {
-              icon: <Zap size={20} style={{ color: '#00d4aa' }} />,
-              bg: 'rgba(0,212,170,0.08)',
-              border: 'rgba(0,212,170,0.2)',
-              title: isKin ? 'Komeza Kwiga' : 'Continue Learning',
-              sub: isKin ? 'Komeza aho wari ugeze' : 'Pick up where you left off',
-              onClick: handleContinue,
-              loading: resumeLoading,
-              primary: true,
-            },
-            {
-              icon: <Code2 size={20} style={{ color: '#8b5cf6' }} />,
-              bg: 'rgba(139,92,246,0.08)',
-              border: 'rgba(139,92,246,0.2)',
-              title: isKin ? 'Kwandika Code Wishyuye' : 'Free Coding',
-              sub: isKin ? 'Fungura editor, nta mukoro ukenewe.' : 'Open the editor, no assignment needed',
-              onClick: onStartCoding,
-              loading: false,
-              primary: false,
-            },
-            {
-              icon: <BookOpen size={20} style={{ color: '#f59e0b' }} />,
-              bg: 'rgba(245,158,11,0.08)',
-              border: 'rgba(245,158,11,0.2)',
-              title: isKin ? 'Reba Amasomo' : 'Browse Courses',
-              sub: isKin ? 'Reba amasomo yose ahari' : 'See all available courses',
-              onClick: onOpenCourses,
-              loading: false,
-              primary: false,
-            },
-          ].map(a => (
-            <button
-              key={a.title}
-              onClick={a.onClick}
-              disabled={a.loading}
-              className="rounded-2xl p-4 text-left transition-all flex flex-col gap-3"
-              style={{ background: a.bg, border: `1px solid ${a.border}` }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.opacity = '0.85'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.opacity = '1'; }}>
-              <div className="flex items-center justify-between">
-                {a.loading ? <Loader size={20} className="animate-spin" style={{ color: '#00d4aa' }} /> : a.icon}
-                {a.primary && <ArrowRight size={14} style={{ color: '#00d4aa' }} />}
-              </div>
-              <div>
-                <p className="text-sm font-bold" style={{ color: 'var(--ec-text-1)' }}>{a.title}</p>
-                <p className="text-xs mt-0.5" style={{ color: 'var(--ec-text-6)' }}>{a.sub}</p>
-              </div>
-            </button>
-          ))}
-        </div>
-
-        {/* AI Tutor banner */}
-        <div className="rounded-2xl p-5 flex items-center justify-between gap-4"
-          style={{ background: 'rgba(139,92,246,0.06)', border: '1px solid rgba(139,92,246,0.18)' }}>
-          <div className="flex items-start gap-3">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
-              style={{ background: 'rgba(139,92,246,0.15)' }}>
-              <Bot size={20} style={{ color: '#8b5cf6' }} />
-            </div>
-            <div>
-              <p className="text-sm font-bold" style={{ color: 'var(--ec-text-1)' }}>
-                {isKin ? 'Mwarimu wawe wa AI' : 'Your AI Tutor'}
-              </p>
-              <p className="text-xs mt-0.5" style={{ color: 'var(--ec-text-5)' }}>
-                {isKin
-                  ? 'Iyo wanditse code, AI isobanura amakosa yawe ikakuyobora. Fungura workspace uyigerageze.'
-                  : 'When you write code, the AI explains your errors and guides you. Open the workspace to try it.'}
-              </p>
-            </div>
-          </div>
-          <button
-            onClick={onStartCoding}
-            className="shrink-0 px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap"
-            style={{ background: 'rgba(139,92,246,0.15)', color: '#8b5cf6', border: '1px solid rgba(139,92,246,0.25)' }}
-            onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.25)'; }}
-            onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = 'rgba(139,92,246,0.15)'; }}>
-            {isKin ? 'Igerageze →' : 'Try it →'}
-          </button>
-        </div>
-
-        {/* Course progress */}
-        {loading ? (
-          <div className="flex justify-center py-12">
-            <Loader size={22} className="animate-spin" style={{ color: '#00d4aa' }} />
-          </div>
-        ) : courseProgress.length === 0 ? (
-          <div className="text-center py-12 rounded-2xl" style={{ background: 'var(--ec-surface)', border: '1px solid var(--ec-b1)' }}>
-            <BookOpen size={32} style={{ color: '#1e293b', margin: '0 auto 12px' }} />
-            <p className="text-sm" style={{ color: 'var(--ec-text-6)' }}>
-              {isKin ? 'Nta masomo arahari ubu.' : 'No courses available yet.'}
-            </p>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {/* In progress */}
-            {inProgress.length > 0 && (
-              <section>
-                <h2 className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: 'var(--ec-text-6)' }}>
-                  {isKin ? 'Biracyakorwa' : 'In Progress'}
-                </h2>
-                <div className="space-y-2">
-                  {inProgress.map(c => <CourseCard key={c.course_id} course={c} isKin={isKin} onOpen={onOpenCourses} />)}
+            {/* AI Tutor banner */}
+            <section className="card pad-lg rise-4">
+              <div className="flex items-start gap-3 mb-3">
+                <div className="iconbtn" style={{ pointerEvents: 'none' }}>
+                  <Bot size={16} />
                 </div>
-              </section>
-            )}
-
-            {/* Not started */}
-            {notStarted.length > 0 && (
-              <section>
-                <h2 className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: 'var(--ec-text-6)' }}>
-                  {isKin ? 'Ntibiratangira' : 'Not Started'}
-                </h2>
-                <div className="space-y-2">
-                  {notStarted.map(c => <CourseCard key={c.course_id} course={c} isKin={isKin} onOpen={onOpenCourses} />)}
+                <div>
+                  <p className="text-sm font-bold" style={{ color: 'var(--text)' }}>
+                    {isKin ? 'Mwarimu wawe wa AI' : 'Your AI Tutor'}
+                  </p>
+                  <p className="text-xs mt-0.5 dim">
+                    {isKin
+                      ? 'Iyo wanditse code, AI isobanura amakosa yawe ikakuyobora.'
+                      : 'When you write code, the AI explains your errors and guides you.'}
+                  </p>
                 </div>
-              </section>
-            )}
-
-            {/* Completed */}
-            {completed.length > 0 && (
-              <section>
-                <h2 className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: 'var(--ec-text-6)' }}>
-                  {isKin ? 'Byarangiye' : 'Completed'}
-                </h2>
-                <div className="space-y-2">
-                  {completed.map(c => <CourseCard key={c.course_id} course={c} isKin={isKin} onOpen={onOpenCourses} />)}
-                </div>
-              </section>
-            )}
-          </div>
-        )}
+              </div>
+              <button onClick={onStartCoding} className="btn btn-secondary btn-block">
+                {isKin ? 'Igerageze →' : 'Try it →'}
+              </button>
+            </section>
+          </aside>
+        </div>
       </main>
     </div>
   );
 }
 
-function CourseCard({ course, isKin, onOpen }: { course: CourseProgress; isKin: boolean; onOpen: () => void }) {
-  const barColor = course.pct === 100 ? '#00d4aa' : course.pct > 0 ? '#8b5cf6' : 'var(--ec-b4)';
+function CourseRow({ course, isKin, onOpen }: { course: CourseProgress; isKin: boolean; onOpen: () => void }) {
   return (
-    <button
-      onClick={onOpen}
-      className="w-full rounded-2xl p-4 text-left transition-all flex items-center gap-4"
-      style={{ background: 'var(--ec-surface)', border: '1px solid var(--ec-b1)' }}
-      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--ec-b7)'; }}
-      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--ec-b1)'; }}>
-      {/* Completion ring */}
-      <div className="relative w-11 h-11 shrink-0">
-        <svg className="w-full h-full -rotate-90" viewBox="0 0 36 36">
-          <circle cx="18" cy="18" r="15" fill="none" stroke="var(--ec-b1)" strokeWidth="3" />
-          <circle cx="18" cy="18" r="15" fill="none" stroke={course.pct === 100 ? '#00d4aa' : '#8b5cf6'}
-            strokeWidth="3" strokeDasharray={`${(course.pct / 100) * 94.2} 94.2`} strokeLinecap="round" />
-        </svg>
-        <span className="absolute inset-0 flex items-center justify-center text-xs font-bold" style={{ color: course.pct === 100 ? '#00d4aa' : '#8b5cf6' }}>
-          {course.pct === 100 ? '✓' : `${course.pct}%`}
-        </span>
+    <div className="lesson clickable" onClick={onOpen}>
+      <div className={`lstat ${course.pct === 100 ? 'done' : course.pct > 0 ? 'cur' : 'lock'}`}>
+        {course.pct === 100 ? (
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M20 6 9 17l-5-5" />
+          </svg>
+        ) : (
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" /><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+          </svg>
+        )}
       </div>
-
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 mb-1">
-          <p className="text-sm font-semibold truncate" style={{ color: 'var(--ec-text-1)' }}>
-            {isKin && course.title_kin ? course.title_kin : course.title}
-          </p>
-          <DifficultyBadge difficulty={course.difficulty} isKin={isKin} />
+      <div className="lbody">
+        <div className="lt">{isKin && course.title_kin ? course.title_kin : course.title}</div>
+        <div className="lmeta">
+          <span className="ltype">{course.difficulty}</span>
+          <span>{course.completed_lessons} / {course.total_lessons} {isKin ? 'amasomo' : 'lessons'}</span>
         </div>
-        <div className="h-1.5 rounded-full overflow-hidden" style={{ background: 'var(--ec-b5)' }}>
-          <div className="h-full rounded-full transition-all duration-500" style={{ width: `${course.pct}%`, background: barColor }} />
-        </div>
-        <p className="text-xs mt-1" style={{ color: 'var(--ec-text-6)' }}>
-          {course.completed_lessons} / {course.total_lessons} {isKin ? 'amasomo' : 'lessons'}
-        </p>
       </div>
-
-      <ChevronRight size={16} style={{ color: 'var(--ec-text-7)', flexShrink: 0 }} />
-    </button>
+      <div className="lright" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        {course.pct === 100 ? '✓' : `${course.pct}%`}
+        <ChevronRight size={14} />
+      </div>
+    </div>
   );
 }

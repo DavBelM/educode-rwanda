@@ -1,8 +1,8 @@
-import { ThemeToggle } from './components/ThemeToggle';
 import { useState, useEffect } from 'react';
-import { ArrowLeft, BookOpen, Code2, CheckCircle, Clock, MessageSquare, TrendingUp, Bell } from 'lucide-react';
+import { BookOpen, Code2, CheckCircle, Clock, MessageSquare, TrendingUp, Bell } from 'lucide-react';
 import { getStudentResults, type StudentResult } from '../lib/db';
 import { usePageTitle } from '../hooks/usePageTitle';
+import { AppNav } from './components/AppNav';
 
 interface Props {
   language: 'EN' | 'KIN';
@@ -11,13 +11,7 @@ interface Props {
 
 type Filter = 'all' | 'graded' | 'pending' | 'not-submitted';
 
-const difficultyStyle: Record<string, { bg: string; text: string; border: string }> = {
-  beginner:     { bg: 'rgba(0,212,170,0.1)',  text: '#00d4aa', border: 'rgba(0,212,170,0.2)' },
-  intermediate: { bg: 'rgba(245,158,11,0.1)', text: '#f59e0b', border: 'rgba(245,158,11,0.2)' },
-  advanced:     { bg: 'rgba(139,92,246,0.1)', text: '#8b5cf6', border: 'rgba(139,92,246,0.2)' },
-};
-
-export default function MyResultsPage({ language, onBack }: Props) {
+export default function MyResultsPage({ language }: Props) {
   usePageTitle('My Results · EduCode');
   const isKin = language === 'KIN';
   const [results, setResults] = useState<StudentResult[]>([]);
@@ -75,64 +69,49 @@ export default function MyResultsPage({ language, onBack }: Props) {
   ];
 
   return (
-    <div className="min-h-screen" style={{ fontFamily: 'Inter, sans-serif', background: 'var(--ec-bg)' }}>
+    <div className="min-h-screen" style={{ background: 'var(--bg)' }}>
+      <AppNav />
 
-      {/* Top bar */}
-      <div className="sticky top-0 z-10 px-6 py-5 flex items-center justify-between"
-        style={{ background: 'var(--ec-bg-a95)', backdropFilter: 'blur(12px)', borderBottom: '1px solid var(--ec-b1)' }}>
-        <button onClick={onBack}
-          className="flex items-center gap-2 font-medium transition-colors"
-          style={{ color: 'var(--ec-text-4)', fontSize: '15px' }}
-          onMouseEnter={e => (e.currentTarget.style.color = 'var(--ec-text-1)')}
-          onMouseLeave={e => (e.currentTarget.style.color = 'var(--ec-text-4)')}>
-          <ArrowLeft size={18} />
-          {isKin ? 'Subira inyuma' : 'Back'}
-        </button>
-        <ThemeToggle />
-        <h1 className="font-bold" style={{ color: 'var(--ec-text-1)', fontSize: '18px' }}>
+      <div className="wrap page stack" style={{ ['--gap' as string]: '24px', maxWidth: '760px' }}>
+
+        <h1 className="text-xl font-bold" style={{ color: 'var(--text)' }}>
           {isKin ? 'Amanota Yanjye' : 'My Results'}
         </h1>
-        <div className="w-16" />
-      </div>
-
-      <div className="max-w-3xl mx-auto px-4 py-8 space-y-6">
 
         {/* Summary card */}
-        <div className="rounded-2xl p-8" style={{ background: 'var(--ec-surface)', border: '1px solid var(--ec-b1)' }}>
+        <div className="card pad-lg">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
             <div className="text-center">
-              <p className="text-4xl font-bold mb-1" style={{ color: 'var(--ec-text-1)' }}>{results.length}</p>
-              <p className="text-sm" style={{ color: 'var(--ec-text-6)' }}>{isKin ? 'Imikoro yose hamwe' : 'Total assignments'}</p>
+              <p className="text-3xl font-bold mb-1" style={{ color: 'var(--text)' }}>{results.length}</p>
+              <p className="text-sm dim">{isKin ? 'Imikoro yose hamwe' : 'Total assignments'}</p>
             </div>
             <div className="text-center">
-              <p className="text-4xl font-bold mb-1" style={{ color: '#00d4aa' }}>{submitted.length}</p>
-              <p className="text-sm" style={{ color: 'var(--ec-text-6)' }}>{isKin ? 'Byatanzwe' : 'Submitted'}</p>
+              <p className="text-3xl font-bold mb-1" style={{ color: 'var(--text)' }}>{submitted.length}</p>
+              <p className="text-sm dim">{isKin ? 'Byatanzwe' : 'Submitted'}</p>
             </div>
             <div className="text-center">
-              <p className="text-4xl font-bold mb-1" style={{ color: '#f59e0b' }}>
+              <p className="text-3xl font-bold mb-1" style={{ color: 'var(--text)' }}>
                 {pct !== null ? `${pct}%` : '—'}
               </p>
-              <p className="text-sm" style={{ color: 'var(--ec-text-6)' }}>{isKin ? 'Ikigereranyo cy\'amanota' : 'Average score'}</p>
+              <p className="text-sm dim">{isKin ? 'Ikigereranyo cy\'amanota' : 'Average score'}</p>
             </div>
             <div className="text-center">
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full font-bold mb-1"
-                style={{ background: 'rgba(139,92,246,0.12)', color: '#8b5cf6', border: '1px solid rgba(139,92,246,0.2)', fontSize: '14px' }}>
-                <TrendingUp size={14} />
+              <div className="inline-flex items-center gap-1.5 pill solid mb-1">
+                <TrendingUp size={13} />
                 {level}
               </div>
-              <p className="text-sm" style={{ color: 'var(--ec-text-6)' }}>{isKin ? 'Urwego' : 'Level'}</p>
+              <p className="text-sm dim">{isKin ? 'Urwego' : 'Level'}</p>
             </div>
           </div>
 
           {totalPossible > 0 && (
             <div className="mt-6">
-              <div className="flex justify-between text-sm mb-2" style={{ color: 'var(--ec-text-6)' }}>
+              <div className="flex justify-between text-sm mb-2 dim">
                 <span>{isKin ? 'Amanota yose hamwe' : 'Overall score'}</span>
-                <span style={{ color: 'var(--ec-text-1)', fontWeight: 600 }}>{totalEarned} / {totalPossible}</span>
+                <span style={{ color: 'var(--text)', fontWeight: 600 }}>{totalEarned} / {totalPossible}</span>
               </div>
-              <div className="h-3 rounded-full overflow-hidden" style={{ background: 'var(--ec-b1)' }}>
-                <div className="h-full rounded-full transition-all duration-700"
-                  style={{ width: `${pct}%`, background: pct! >= 70 ? '#00d4aa' : pct! >= 50 ? '#f59e0b' : '#ef4444' }} />
+              <div className="bar">
+                <i style={{ width: `${pct}%` }} />
               </div>
             </div>
           )}
@@ -142,18 +121,11 @@ export default function MyResultsPage({ language, onBack }: Props) {
         <div className="flex gap-2 overflow-x-auto pb-1">
           {filters.map(f => (
             <button key={f.key} onClick={() => setFilter(f.key)}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl font-semibold whitespace-nowrap transition-all shrink-0"
-              style={{
-                fontSize: '14px',
-                background: filter === f.key ? 'rgba(0,212,170,0.12)' : 'var(--ec-b3)',
-                color: filter === f.key ? '#00d4aa' : 'var(--ec-text-6)',
-                border: filter === f.key ? '1px solid rgba(0,212,170,0.25)' : '1px solid var(--ec-b1)',
-              }}>
+              className={`pill${filter === f.key ? ' solid' : ''}`}
+              style={{ cursor: 'pointer', whiteSpace: 'nowrap', flexShrink: 0, gap: '8px' }}>
               {f.label}
-              <span className="px-2 py-0.5 rounded-full text-xs"
-                style={{ background: 'var(--ec-b2)', color: 'var(--ec-text-4)' }}>
-                {f.count}
-              </span>
+              <span className="dot" />
+              {f.count}
             </button>
           ))}
         </div>
@@ -161,38 +133,28 @@ export default function MyResultsPage({ language, onBack }: Props) {
         {/* Results list */}
         {loading ? (
           <div className="flex items-center justify-center py-20">
-            <div className="w-8 h-8 border-2 border-t-transparent rounded-full animate-spin"
-              style={{ borderColor: '#00d4aa', borderTopColor: 'transparent' }} />
+            <div className="w-8 h-8 border-2 rounded-full animate-spin" style={{ borderColor: 'var(--line-strong)', borderTopColor: 'var(--text-2)' }} />
           </div>
         ) : filtered.length === 0 ? (
-          <div className="rounded-2xl py-16 text-center" style={{ background: 'var(--ec-surface)', border: '1px solid var(--ec-b1)' }}>
-            <p style={{ color: 'var(--ec-text-6)', fontSize: '15px' }}>
+          <div className="card pad-lg text-center">
+            <p className="text-sm dim">
               {isKin ? 'Nta bisubizo birahagaragara.' : 'Nothing here yet.'}
             </p>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="stack" style={{ ['--gap' as string]: '16px' }}>
             {filtered.map(r => {
-              const diff = difficultyStyle[r.difficulty] ?? difficultyStyle.beginner;
-              const scoreColor = r.marks_earned === null ? 'var(--ec-text-6)'
-                : (r.marks_earned / r.total_marks) >= 0.7 ? '#00d4aa'
-                : (r.marks_earned / r.total_marks) >= 0.5 ? '#f59e0b'
-                : '#ef4444';
+              const scorePct = r.marks_earned !== null ? Math.round((r.marks_earned / r.total_marks) * 100) : null;
               const isNew = r.marks_earned !== null && !seenGrades.has(r.assignment_id);
 
               return (
-                <div key={r.assignment_id} className="rounded-2xl p-6"
-                  style={{
-                    background: 'var(--ec-surface)',
-                    border: isNew ? '1px solid rgba(0,212,170,0.3)' : '1px solid var(--ec-b1)',
-                  }}>
+                <div key={r.assignment_id} className="card" style={isNew ? { border: '1px solid var(--accent)' } : undefined}>
 
                   {/* New grade banner */}
                   {isNew && (
-                    <div className="flex items-center gap-2 mb-3 px-3 py-1.5 rounded-lg"
-                      style={{ background: 'rgba(0,212,170,0.08)', border: '1px solid rgba(0,212,170,0.2)' }}>
-                      <Bell size={13} style={{ color: '#00d4aa' }} />
-                      <span style={{ color: '#00d4aa', fontSize: '13px', fontWeight: 600 }}>
+                    <div className="flex items-center gap-2 mb-3 px-3 py-1.5" style={{ borderRadius: 'var(--radius-sm)', background: 'var(--accent-soft)', border: '1px solid var(--accent)' }}>
+                      <Bell size={13} style={{ color: 'var(--text)' }} />
+                      <span style={{ color: 'var(--text)', fontSize: '13px', fontWeight: 600 }}>
                         {isKin ? 'Amanota mashya yasohotse!' : 'New grade released!'}
                       </span>
                     </div>
@@ -203,19 +165,18 @@ export default function MyResultsPage({ language, onBack }: Props) {
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 mb-2">
                         {r.assignment_type === 'coding'
-                          ? <Code2 size={16} style={{ color: '#00d4aa', flexShrink: 0 }} />
-                          : <BookOpen size={16} style={{ color: '#8b5cf6', flexShrink: 0 }} />}
-                        <p className="font-semibold truncate" style={{ color: 'var(--ec-text-1)', fontSize: '16px' }}>
+                          ? <Code2 size={16} style={{ color: 'var(--text-2)', flexShrink: 0 }} />
+                          : <BookOpen size={16} style={{ color: 'var(--text-2)', flexShrink: 0 }} />}
+                        <p className="font-semibold truncate" style={{ color: 'var(--text)', fontSize: '16px' }}>
                           {isKin && r.title_kin ? r.title_kin : r.title}
                         </p>
                       </div>
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="px-2.5 py-1 rounded-full font-semibold"
-                          style={{ background: diff.bg, color: diff.text, border: `1px solid ${diff.border}`, fontSize: '13px' }}>
+                        <span className="pill">
                           {r.difficulty.charAt(0).toUpperCase() + r.difficulty.slice(1)}
                         </span>
                         {r.submitted_at && (
-                          <span className="flex items-center gap-1" style={{ color: 'var(--ec-text-7)', fontSize: '13px' }}>
+                          <span className="flex items-center gap-1 dim" style={{ fontSize: '13px' }}>
                             <Clock size={12} />
                             {new Date(r.submitted_at).toLocaleDateString()}
                           </span>
@@ -226,22 +187,20 @@ export default function MyResultsPage({ language, onBack }: Props) {
                     {/* Score badge */}
                     <div className="shrink-0 text-right">
                       {!r.submitted ? (
-                        <span className="px-3 py-1.5 rounded-full font-semibold"
-                          style={{ background: 'var(--ec-b3)', color: 'var(--ec-text-7)', border: '1px solid var(--ec-b1)', fontSize: '13px' }}>
+                        <span className="pill">
                           {isKin ? 'Bitaratanzwe' : 'Not submitted'}
                         </span>
                       ) : r.marks_earned === null ? (
-                        <span className="px-3 py-1.5 rounded-full font-semibold"
-                          style={{ background: 'rgba(245,158,11,0.1)', color: '#f59e0b', border: '1px solid rgba(245,158,11,0.2)', fontSize: '13px' }}>
+                        <span className="pill">
                           {isKin ? 'Bitegereje amanota' : 'Awaiting grade'}
                         </span>
                       ) : (
                         <div>
-                          <p className="text-3xl font-bold" style={{ color: scoreColor }}>
-                            {r.marks_earned}<span className="text-base font-medium" style={{ color: 'var(--ec-text-6)' }}>/{r.total_marks}</span>
+                          <p className="text-3xl font-bold" style={{ color: 'var(--text)' }}>
+                            {r.marks_earned}<span className="text-base font-medium dim">/{r.total_marks}</span>
                           </p>
-                          <p className="font-semibold" style={{ color: scoreColor, fontSize: '15px' }}>
-                            {Math.round((r.marks_earned / r.total_marks) * 100)}%
+                          <p className="font-semibold" style={{ color: 'var(--text-2)', fontSize: '15px' }}>
+                            {scorePct}%
                           </p>
                         </div>
                       )}
@@ -249,33 +208,31 @@ export default function MyResultsPage({ language, onBack }: Props) {
                   </div>
 
                   {/* Score bar for graded */}
-                  {r.marks_earned !== null && (
+                  {scorePct !== null && (
                     <div className="mb-4">
-                      <div className="h-2 rounded-full overflow-hidden" style={{ background: 'var(--ec-b1)' }}>
-                        <div className="h-full rounded-full transition-all duration-700"
-                          style={{ width: `${Math.round((r.marks_earned / r.total_marks) * 100)}%`, background: scoreColor }} />
+                      <div className="bar">
+                        <i style={{ width: `${scorePct}%` }} />
                       </div>
                     </div>
                   )}
 
                   {/* Teacher feedback */}
                   {r.teacher_feedback && (
-                    <div className="flex items-start gap-3 px-4 py-3 rounded-xl"
-                      style={{ background: 'rgba(139,92,246,0.07)', border: '1px solid rgba(139,92,246,0.15)' }}>
-                      <MessageSquare size={15} className="shrink-0 mt-0.5" style={{ color: '#8b5cf6' }} />
+                    <div className="flex items-start gap-3 px-4 py-3" style={{ borderRadius: 'var(--radius)', background: 'var(--surface-2)', border: '1px solid var(--line)' }}>
+                      <MessageSquare size={15} className="shrink-0 mt-0.5" style={{ color: 'var(--text-2)' }} />
                       <div>
-                        <p className="font-semibold mb-1" style={{ color: '#8b5cf6', fontSize: '13px' }}>
+                        <p className="font-semibold mb-1" style={{ color: 'var(--text)', fontSize: '13px' }}>
                           {isKin ? 'Ibitekerezo by\'umwarimu' : 'Teacher feedback'}
                         </p>
-                        <p className="leading-relaxed" style={{ color: 'var(--ec-text-4)', fontSize: '14px' }}>{r.teacher_feedback}</p>
+                        <p className="leading-relaxed" style={{ color: 'var(--text-2)', fontSize: '14px' }}>{r.teacher_feedback}</p>
                       </div>
                     </div>
                   )}
 
                   {r.submitted && r.marks_earned !== null && (
                     <div className="flex items-center gap-2 mt-3">
-                      <CheckCircle size={14} style={{ color: '#00d4aa' }} />
-                      <span style={{ color: 'var(--ec-text-7)', fontSize: '13px' }}>
+                      <CheckCircle size={14} style={{ color: 'var(--text-2)' }} />
+                      <span className="dim" style={{ fontSize: '13px' }}>
                         {isKin ? 'Byahawe amanota' : 'Graded'}
                       </span>
                     </div>

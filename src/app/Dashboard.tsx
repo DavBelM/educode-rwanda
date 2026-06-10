@@ -56,17 +56,15 @@ function JoinClassModal({ language, onClose, onJoined }: {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }}>
-      <div className="w-full max-w-sm rounded-2xl p-6" style={{ background: 'var(--ec-surface)', border: '1px solid var(--ec-b2)', fontFamily: 'Inter, sans-serif' }}>
-        <div className="flex items-center justify-between mb-5">
-          <h2 className="text-base font-bold" style={{ color: 'var(--ec-text-1)' }}>
-            {isKin ? 'Injira mu Ishuri' : 'Join a Class'}
-          </h2>
-          <button onClick={onClose} style={{ color: 'var(--ec-text-6)' }} onMouseEnter={e => (e.currentTarget.style.color = 'var(--ec-text-4)')} onMouseLeave={e => (e.currentTarget.style.color = 'var(--ec-text-6)')}>
+      <div className="card pad-lg w-full max-w-sm">
+        <div className="card-head">
+          <h2 className="card-title">{isKin ? 'Injira mu Ishuri' : 'Join a Class'}</h2>
+          <button onClick={onClose} className="iconbtn" aria-label="Close">
             <X size={18} />
           </button>
         </div>
 
-        <p className="text-sm mb-4" style={{ color: 'var(--ec-text-5)' }}>
+        <p className="text-sm mb-4 dim">
           {isKin
             ? 'Shyiramo kode yo kwinjira wahawe n\'umwarimu wawe.'
             : 'Enter the invite code your teacher shared with you.'}
@@ -78,15 +76,13 @@ function JoinClassModal({ language, onClose, onJoined }: {
           onChange={e => setCode(e.target.value.toUpperCase())}
           placeholder="e.g. A3F8K2"
           maxLength={8}
-          className="w-full px-4 py-3 rounded-xl text-center text-xl font-bold tracking-widest focus:outline-none mb-4"
-          style={{ background: 'var(--ec-bg)', border: '1px solid var(--ec-b2)', color: '#00d4aa', letterSpacing: '0.15em' }}
-          onFocus={e => (e.target.style.border = '1px solid rgba(0,212,170,0.4)')}
-          onBlur={e => (e.target.style.border = '1px solid var(--ec-b2)')}
+          className="input mb-4"
+          style={{ textAlign: 'center', fontSize: '20px', fontWeight: 700, letterSpacing: '0.15em' }}
           onKeyDown={e => e.key === 'Enter' && handleJoin()}
         />
 
         {error && (
-          <p className="text-xs p-3 rounded-xl mb-4" style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#f87171' }}>
+          <p className="text-sm mb-4" style={{ color: 'var(--error)', background: 'var(--error-dim)', border: '1px solid var(--error)', borderRadius: 'var(--radius)', padding: '10px 13px' }}>
             {error}
           </p>
         )}
@@ -94,10 +90,7 @@ function JoinClassModal({ language, onClose, onJoined }: {
         <button
           onClick={handleJoin}
           disabled={code.trim().length < 4 || loading}
-          className="w-full py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 disabled:opacity-40 transition-all"
-          style={{ background: '#00d4aa', color: 'var(--ec-bg)' }}
-          onMouseEnter={e => { if (!loading) (e.currentTarget as HTMLButtonElement).style.background = '#00bfa0'; }}
-          onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = '#00d4aa'; }}
+          className="btn btn-primary btn-block"
         >
           {loading ? <Loader size={16} className="animate-spin" /> : (
             <>{isKin ? 'Injira mu Ishuri' : 'Join Class'} <ArrowRight size={14} /></>
