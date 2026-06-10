@@ -495,17 +495,12 @@ export async function getLessonProgress(): Promise<{ completed: number; total: n
   return { completed, total, pct: Math.round((completed / total) * 100) };
 }
 
-export async function getSelfLearnerStats(): Promise<{
-  streak: number;
-  courseProgress: CourseProgress[];
-  totalCompleted: number;
-  totalLessons: number;
-}> {
+export async function getCourseProgressList(): Promise<CourseProgress[]> {
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { streak: 0, courseProgress: [], totalCompleted: 0, totalLessons: 0 };
+  if (!user) return [];
 
   const courses = await getCourses();
-  if (!courses.length) return { streak: await getStreak(), courseProgress: [], totalCompleted: 0, totalLessons: 0 };
+  if (!courses.length) return [];
 
   // Fetch all modules + lessons in parallel
   const courseDetails = await Promise.all(courses.map(c => getCourseDetail(c.id)));
@@ -513,16 +508,13 @@ export async function getSelfLearnerStats(): Promise<{
   // All lesson ids across all courses
   const allLessonIds = courseDetails.flatMap(({ modules }) => modules.flatMap(m => m.lessons.map(l => l.id)));
 
-  const [{ data: progressRows }, streak] = await Promise.all([
-    allLessonIds.length > 0
-      ? supabase.from('student_lesson_progress').select('lesson_id').eq('student_id', user.id).in('lesson_id', allLessonIds)
-      : { data: [] },
-    getStreak(),
-  ]);
+  const { data: progressRows } = allLessonIds.length > 0
+    ? await supabase.from('student_lesson_progress').select('lesson_id').eq('student_id', user.id).in('lesson_id', allLessonIds)
+    : { data: [] };
 
   const completedSet = new Set((progressRows ?? []).map((r: { lesson_id: string }) => r.lesson_id));
 
-  const courseProgress: CourseProgress[] = courses.map((c, i) => {
+  return courses.map((c, i) => {
     const lessons = courseDetails[i].modules.flatMap(m => m.lessons);
     const completed = lessons.filter(l => completedSet.has(l.id)).length;
     return {
@@ -535,6 +527,18 @@ export async function getSelfLearnerStats(): Promise<{
       pct: lessons.length > 0 ? Math.round((completed / lessons.length) * 100) : 0,
     };
   });
+}
+
+export async function getSelfLearnerStats(): Promise<{
+  streak: number;
+  courseProgress: CourseProgress[];
+  totalCompleted: number;
+  totalLessons: number;
+}> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { streak: 0, courseProgress: [], totalCompleted: 0, totalLessons: 0 };
+
+  const [courseProgress, streak] = await Promise.all([getCourseProgressList(), getStreak()]);
 
   const totalCompleted = courseProgress.reduce((s, c) => s + c.completed_lessons, 0);
   const totalLessons   = courseProgress.reduce((s, c) => s + c.total_lessons, 0);

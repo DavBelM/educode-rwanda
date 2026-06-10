@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { AppNav } from './components/AppNav';
 import {
-  getCourses, getCourseDetail, getCompletedLessonIds,
-  type Course, type CourseModule, type CourseLesson,
+  getCourses, getCourseDetail, getCompletedLessonIds, getCourseProgressList,
+  type Course, type CourseModule, type CourseLesson, type CourseProgress,
 } from '../lib/db';
 import { CheckCircle, Clock, BookOpen, Code2, HelpCircle, Zap } from 'lucide-react';
 
@@ -15,8 +15,11 @@ interface Props {
 
 // ─── Course Catalog ───────────────────────────────────────────────────────────
 
-function CourseCatalog({ courses, language, onSelect }: {
+type CourseStatus = 'locked' | 'not-started' | 'in-progress' | 'completed';
+
+function CourseCatalog({ courses, progress, language, onSelect }: {
   courses: Course[];
+  progress: CourseProgress[];
   language: 'EN' | 'KIN';
   onSelect: (c: Course) => void;
 }) {
@@ -24,11 +27,33 @@ function CourseCatalog({ courses, language, onSelect }: {
   const [filter, setFilter] = useState<'all' | 'in-progress' | 'not-started' | 'completed'>('all');
   const [search, setSearch] = useState('');
 
-  const filtered = courses.filter(c => {
+  const progressById = new Map(progress.map(p => [p.course_id, p]));
+
+  const items = courses.map((c, i) => {
+    const pct = progressById.get(c.id)?.pct ?? 0;
+    const totalLessons = progressById.get(c.id)?.total_lessons ?? 0;
+    const prevPct = i === 0 ? 100 : (progressById.get(courses[i - 1].id)?.pct ?? 0);
+    const status: CourseStatus = prevPct < 100 ? 'locked'
+      : pct === 100 ? 'completed'
+      : pct > 0 ? 'in-progress'
+      : 'not-started';
+    return { course: c, pct, totalLessons, status, prevTitle: courses[i - 1] ? (isKin && courses[i - 1].title_kin ? courses[i - 1].title_kin! : courses[i - 1].title) : null };
+  });
+
+  const filtered = items.filter(({ course: c, status }) => {
     const title = isKin && c.title_kin ? c.title_kin : c.title;
     if (search && !title.toLowerCase().includes(search.toLowerCase())) return false;
-    return true;
+    if (filter === 'all') return true;
+    if (filter === 'not-started') return status === 'not-started' || status === 'locked';
+    return status === filter;
   });
+
+  const STATUS_LABEL: Record<CourseStatus, string> = {
+    locked: isKin ? 'Birafunze' : 'Locked',
+    'not-started': isKin ? 'Ntibiratangira' : 'Not started',
+    'in-progress': isKin ? 'Biragenda' : 'In progress',
+    completed: isKin ? 'Byarangiye' : 'Completed',
+  };
 
   return (
     <>
@@ -73,9 +98,10 @@ function CourseCatalog({ courses, language, onSelect }: {
         </div>
       ) : (
         <div className="courses rise-2">
-          {filtered.map((c, i) => {
+          {filtered.map(({ course: c, pct, totalLessons, status, prevTitle }, i) => {
             const title = isKin && c.title_kin ? c.title_kin : c.title;
             const desc  = isKin && c.description_kin ? c.description_kin : c.description;
+            const locked = status === 'locked';
             return (
               <a
                 key={c.id}
@@ -87,19 +113,35 @@ function CourseCatalog({ courses, language, onSelect }: {
               >
                 <div className="ctop">
                   <span className="cnum">{String(i + 1).padStart(2, '0')}</span>
-                  <span className="pill"><span className="dot"></span>{isKin ? 'Biragenda' : 'In progress'}</span>
+                  {status === 'completed' ? (
+                    <span className="pill solid"><span className="dot"></span>{STATUS_LABEL.completed}</span>
+                  ) : status === 'in-progress' ? (
+                    <span className="pill"><span className="dot"></span>{STATUS_LABEL['in-progress']}</span>
+                  ) : (
+                    <span className="pill">{STATUS_LABEL[status]}</span>
+                  )}
                 </div>
                 <h3>{title}</h3>
                 <p className="cdesc">{desc}</p>
                 <div className="cmeta">
                   <span>
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M4 5h16M4 12h16M4 19h10"/></svg>
-                    {c.estimated_hours ? `~${c.estimated_hours}h` : '—'}
+                    {totalLessons} {isKin ? 'amasomo' : 'lessons'}
                   </span>
                   <span>
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6"><path d="M12 2v20M2 12h20"/></svg>
                     {c.difficulty.charAt(0).toUpperCase() + c.difficulty.slice(1)}
                   </span>
+                </div>
+                <div className="cprog">
+                  {locked ? (
+                    <div className="pl"><span>{prevTitle ? (isKin ? `Maze "${prevTitle}" kugirango ufungure` : `Complete "${prevTitle}" to unlock`) : STATUS_LABEL.locked}</span></div>
+                  ) : status === 'not-started' ? (
+                    <div className="pl"><span>{STATUS_LABEL['not-started']}</span></div>
+                  ) : (
+                    <div className="pl"><span>{isKin ? 'Aho ugeze' : 'Progress'}</span><span>{pct}%</span></div>
+                  )}
+                  <div className="bar on-card"><i style={{ width: `${locked ? 0 : pct}%` }}></i></div>
                 </div>
               </a>
             );
@@ -271,11 +313,16 @@ function CourseDetail({ course, language, onBack, onOpenLesson }: {
 
 export default function CoursesPage({ language, onBack, onOpenLesson }: Props) {
   const [courses, setCourses] = useState<Course[]>([]);
+  const [progress, setProgress] = useState<CourseProgress[]>([]);
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getCourses().then(data => { setCourses(data); setLoading(false); });
+    Promise.all([getCourses(), getCourseProgressList()]).then(([data, prog]) => {
+      setCourses(data);
+      setProgress(prog);
+      setLoading(false);
+    });
   }, []);
 
   return (
@@ -300,6 +347,7 @@ export default function CoursesPage({ language, onBack, onOpenLesson }: Props) {
         ) : (
           <CourseCatalog
             courses={courses}
+            progress={progress}
             language={language}
             onSelect={setSelectedCourse}
           />
