@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
-import { Mail, Phone, MapPin, Clock, Send, ArrowRight, MessageSquare, Globe, Users, Linkedin, Facebook, Twitter, Instagram, ChevronRight } from 'lucide-react';
+import { Link } from 'react-router';
+import { Mail, Phone, MapPin, Clock, Send, Linkedin, Facebook, Twitter, Instagram, ChevronRight } from 'lucide-react';
+import { useTheme } from '../lib/theme';
 import { usePageTitle } from '../hooks/usePageTitle';
 
 export default function ContactPage() {
   usePageTitle('Contact · EduCode');
+  const { theme, toggleTheme } = useTheme();
   const [language, setLanguage] = useState<'EN' | 'KIN'>('EN');
   const [formData, setFormData] = useState({
     name: '',
@@ -15,7 +18,7 @@ export default function ContactPage() {
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
-  const isKinyarwanda = language === 'KIN';
+  const isKin = language === 'KIN';
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,29 +31,29 @@ export default function ContactPage() {
 
   const faqs = [
     {
-      question: isKinyarwanda ? 'Ni gute nahindura ijambo ryanjye ry\'ibanga?' : 'How do I reset my password?',
-      answer: isKinyarwanda
+      question: isKin ? 'Ni gute nahindura ijambo ryanjye ry\'ibanga?' : 'How do I reset my password?',
+      answer: isKin
         ? 'Kanda "Wibagiwe ijambo ryibanga?" ku rupapuro rwo kwinjira, hanyuma ukurikire amabwiriza.'
         : 'Click "Forgot Password?" on the login page and follow the instructions.',
       link: '#'
     },
     {
-      question: isKinyarwanda ? 'Bigura amafaranga angahe?' : 'How much does it cost?',
-      answer: isKinyarwanda
+      question: isKin ? 'Bigura amafaranga angahe?' : 'How much does it cost?',
+      answer: isKin
         ? 'Ni ubuntu ku mikoro 5 ya mbere. Premium ni 2,000 RWF ku kwezi.'
         : 'Free to start with 5 assignments. Premium is RWF 2,000/month.',
       link: '#pricing'
     },
     {
-      question: isKinyarwanda ? 'Hari igabanyirizwa muha amashuri?' : 'Do you offer school discounts?',
-      answer: isKinyarwanda
+      question: isKin ? 'Hari igabanyirizwa muha amashuri?' : 'Do you offer school discounts?',
+      answer: isKin
         ? 'Yego! Amashuri ahabwa amezi 3 y\'igerageza ku buntu. Saba demo.'
         : 'Yes! Schools get a 3-month free trial. Request a demo.',
       link: '#schools'
     },
     {
-      question: isKinyarwanda ? 'Nshobora kuyikoresha nta interineti ihari?' : 'Can I use it offline?',
-      answer: isKinyarwanda
+      question: isKin ? 'Nshobora kuyikoresha nta interineti ihari?' : 'Can I use it offline?',
+      answer: isKin
         ? 'Yego! Andika code nawe udafite interineti, amakuru azajyaho neza nuyihuza na interineti.'
         : 'Yes! Code offline and sync when you connect.',
       link: '#features'
@@ -58,167 +61,147 @@ export default function ContactPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-white" style={{ fontFamily: 'Inter, sans-serif' }}>
-      {/* Navigation */}
-      <nav className="border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center gap-2">
-              <span className="text-2xl">🇷🇼</span>
-              <span className="text-xl font-bold text-[#1e293b]">EduCode Rwanda</span>
+    <>
+      {/* NAV */}
+      <header className="nav">
+        <div className="nav-inner">
+          <Link className="logo" to="/"><span className="edu">EduCode</span></Link>
+          <nav className="nav-links nav-collapse" aria-label="Main">
+            <Link className="nav-link" to="/about">{isKin ? 'Abo turibo' : 'About'}</Link>
+            <Link className="nav-link active" to="/contact">{isKin ? 'Twandikire' : 'Contact'}</Link>
+          </nav>
+          <div className="nav-right">
+            <div className="lang-toggle">
+              {(['EN', 'KIN'] as const).map(l => (
+                <button key={l} className={language === l ? 'on' : ''} onClick={() => setLanguage(l)}>{l}</button>
+              ))}
             </div>
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-1 border border-gray-300 rounded-lg p-1">
-                <button
-                  onClick={() => setLanguage('EN')}
-                  className={`px-3 py-1 rounded text-sm font-semibold transition-all ${
-                    language === 'EN' ? 'bg-[#0ea5e9] text-white' : 'text-gray-600'
-                  }`}
-                >
-                  EN
-                </button>
-                <button
-                  onClick={() => setLanguage('KIN')}
-                  className={`px-3 py-1 rounded text-sm font-semibold transition-all ${
-                    language === 'KIN' ? 'bg-[#0ea5e9] text-white' : 'text-gray-600'
-                  }`}
-                >
-                  KIN
-                </button>
-              </div>
-              <a href="#" className="text-gray-700 hover:text-[#0ea5e9] font-medium">
-                {isKinyarwanda ? 'Injira' : 'Login'}
-              </a>
-            </div>
+            <button
+              className="iconbtn"
+              onClick={toggleTheme}
+              aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+              aria-pressed={theme === 'light'}
+            >
+              {theme === 'dark' ? (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+                </svg>
+              ) : (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+                </svg>
+              )}
+            </button>
+            <Link className="btn btn-tertiary" to="/login">{isKin ? 'Kwinjira' : 'Log in'}</Link>
+            <Link className="btn btn-primary sm" to="/signup">{isKin ? 'Tangira' : 'Get started'}</Link>
           </div>
         </div>
-      </nav>
+      </header>
 
-      {/* Main Content */}
-      <div className="py-16">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-12">
-            {/* Left Side - Contact Info */}
-            <div className="lg:col-span-2 bg-gradient-to-br from-[#0ea5e9] to-[#8b5cf6] rounded-2xl p-8 text-white">
-              <h1 className="text-3xl font-bold mb-2">
-                {isKinyarwanda ? 'Twandikire' : 'Get in Touch'}
-              </h1>
-              <p className="text-blue-100 mb-8">
-                {isKinyarwanda
-                  ? 'Duhe ubutumwa, tuzakusubiza vuba'
-                  : "Send us a message and we'll respond soon"}
-              </p>
+      <main className="wrap">
+        {/* HERO */}
+        <section className="hero">
+          <p className="eyebrow rise">{isKin ? 'Twandikire' : 'Contact'}</p>
+          <h1 className="rise-2">
+            {isKin ? 'Twandikire' : 'Get in touch.'}
+          </h1>
+          <p className="lede rise-3">
+            {isKin
+              ? 'Duhe ubutumwa, tuzakusubiza vuba.'
+              : "Send us a message and we'll respond soon."}
+          </p>
+        </section>
 
-              {/* Contact Information */}
-              <div className="space-y-6 mb-12">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
-                    <Mail className="w-6 h-6" />
+        {/* CONTACT INFO + FORM */}
+        <section className="section">
+          <div className="split">
+            <div>
+              <p className="eyebrow">{isKin ? 'Aho dukorera' : 'Reach us'}</p>
+              <h2 style={{ fontSize: 'clamp(26px,3.4vw,34px)', letterSpacing: '-0.03em', marginBottom: 18 }}>
+                {isKin ? 'Vuga natwe' : 'Talk to us'}
+              </h2>
+
+              <div className="stack" style={{ ['--gap' as string]: '18px' }}>
+                <div className="flex items-start gap-3">
+                  <div className="iconbtn" style={{ pointerEvents: 'none', flexShrink: 0 }}>
+                    <Mail size={16} />
                   </div>
                   <div>
-                    <div className="font-semibold mb-1">Email</div>
-                    <a href="mailto:info@educode.rw" className="text-blue-100 hover:text-white">
-                      info@educode.rw
-                    </a>
+                    <div className="font-semibold" style={{ color: 'var(--text)' }}>Email</div>
+                    <a href="mailto:info@educode.rw" className="dim">info@educode.rw</a>
                   </div>
                 </div>
-
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
-                    <Phone className="w-6 h-6" />
+                <div className="flex items-start gap-3">
+                  <div className="iconbtn" style={{ pointerEvents: 'none', flexShrink: 0 }}>
+                    <Phone size={16} />
                   </div>
                   <div>
-                    <div className="font-semibold mb-1">
-                      {isKinyarwanda ? 'Telefoni' : 'Phone'}
-                    </div>
-                    <a href="tel:+250" className="text-blue-100 hover:text-white">
-                      +250 XXX XXX XXX
-                    </a>
+                    <div className="font-semibold" style={{ color: 'var(--text)' }}>{isKin ? 'Telefoni' : 'Phone'}</div>
+                    <a href="tel:+250" className="dim">+250 XXX XXX XXX</a>
                   </div>
                 </div>
-
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
-                    <MapPin className="w-6 h-6" />
+                <div className="flex items-start gap-3">
+                  <div className="iconbtn" style={{ pointerEvents: 'none', flexShrink: 0 }}>
+                    <MapPin size={16} />
                   </div>
                   <div>
-                    <div className="font-semibold mb-1">
-                      {isKinyarwanda ? 'Aho turi' : 'Location'}
-                    </div>
-                    <p className="text-blue-100">Kigali, Rwanda</p>
+                    <div className="font-semibold" style={{ color: 'var(--text)' }}>{isKin ? 'Aho turi' : 'Location'}</div>
+                    <p className="dim">Kigali, Rwanda</p>
                   </div>
                 </div>
               </div>
 
-              {/* Office Hours */}
-              <div className="border-t border-white/20 pt-6 mb-8">
-                <div className="flex items-center gap-3 mb-4">
-                  <Clock className="w-6 h-6" />
-                  <h3 className="font-bold text-lg">
-                    {isKinyarwanda ? 'Amasaha y\'akazi' : 'Office Hours'}
-                  </h3>
+              <div className="divider" style={{ margin: '24px 0' }}></div>
+
+              <div className="flex items-center gap-3 mb-3">
+                <Clock size={18} style={{ color: 'var(--text)' }} />
+                <h3 className="font-bold" style={{ color: 'var(--text)' }}>
+                  {isKin ? 'Amasaha y\'akazi' : 'Office hours'}
+                </h3>
+              </div>
+              <div className="dim" style={{ display: 'flex', flexDirection: 'column', gap: 6, fontSize: 14 }}>
+                <div className="flex justify-between">
+                  <span>{isKin ? 'Kuwa mbere - Kuwa gatanu' : 'Monday - Friday'}</span>
+                  <span>8 AM - 5 PM</span>
                 </div>
-                <div className="space-y-2 text-sm text-blue-100">
-                  <div className="flex justify-between">
-                    <span>{isKinyarwanda ? 'Kuwa mbere - Kuwa gatanu' : 'Monday - Friday'}</span>
-                    <span>8 AM - 5 PM</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>{isKinyarwanda ? 'Ku wa gatandatu' : 'Saturday'}</span>
-                    <span>9 AM - 1 PM</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>{isKinyarwanda ? 'Ku cyumweru' : 'Sunday'}</span>
-                    <span>{isKinyarwanda ? 'Harafunze' : 'Closed'}</span>
-                  </div>
+                <div className="flex justify-between">
+                  <span>{isKin ? 'Ku wa gatandatu' : 'Saturday'}</span>
+                  <span>9 AM - 1 PM</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>{isKin ? 'Ku cyumweru' : 'Sunday'}</span>
+                  <span>{isKin ? 'Harafunze' : 'Closed'}</span>
                 </div>
               </div>
 
-              {/* Social Media */}
-              <div className="border-t border-white/20 pt-6">
-                <h3 className="font-bold mb-4">{isKinyarwanda ? 'Dukurikire' : 'Follow Us'}</h3>
-                <div className="flex gap-3">
-                  {[
-                    { Icon: Twitter, href: '#' },
-                    { Icon: Linkedin, href: '#' },
-                    { Icon: Facebook, href: '#' },
-                    { Icon: Instagram, href: '#' }
-                  ].map(({ Icon, href }, index) => (
-                    <a
-                      key={index}
-                      href={href}
-                      className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center hover:bg-white/30 transition-all"
-                    >
-                      <Icon className="w-5 h-5" />
-                    </a>
-                  ))}
-                </div>
-              </div>
+              <div className="divider" style={{ margin: '24px 0' }}></div>
 
-              {/* Illustration */}
-              <div className="mt-12">
-                <div className="bg-white/10 backdrop-blur rounded-xl p-8 flex items-center justify-center">
-                  <MessageSquare className="w-24 h-24 text-white/40" />
-                </div>
+              <h3 className="font-bold mb-3" style={{ color: 'var(--text)' }}>{isKin ? 'Dukurikire' : 'Follow us'}</h3>
+              <div className="flex gap-2">
+                {[
+                  { Icon: Twitter, href: '#' },
+                  { Icon: Linkedin, href: '#' },
+                  { Icon: Facebook, href: '#' },
+                  { Icon: Instagram, href: '#' }
+                ].map(({ Icon, href }, index) => (
+                  <a key={index} href={href} className="iconbtn">
+                    <Icon size={16} />
+                  </a>
+                ))}
               </div>
             </div>
 
-            {/* Right Side - Contact Form */}
-            <div className="lg:col-span-3">
-              <h2 className="text-3xl font-bold text-[#1e293b] mb-8">
-                {isKinyarwanda ? 'Twoherereze ubutumwa' : 'Send us a message'}
-              </h2>
-
+            <div className="card pad-lg">
               {submitted ? (
-                <div className="bg-green-50 border-2 border-green-200 rounded-xl p-8 text-center">
-                  <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Send className="w-8 h-8 text-[#22c55e]" />
+                <div className="text-center" style={{ padding: '24px 0' }}>
+                  <div className="iconbtn" style={{ width: 56, height: 56, margin: '0 auto 16px', pointerEvents: 'none' }}>
+                    <Send size={26} />
                   </div>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                    {isKinyarwanda ? 'Murakoze!' : 'Thank you!'}
+                  <h3 className="text-xl font-bold mb-2" style={{ color: 'var(--text)' }}>
+                    {isKin ? 'Murakoze!' : 'Thank you!'}
                   </h3>
-                  <p className="text-gray-600 mb-6">
-                    {isKinyarwanda
+                  <p className="dim mb-6">
+                    {isKin
                       ? 'Ubutumwa bwawe bwoherejwe. Tuzakusubiza mu gihe cy\'amasaha 24.'
                       : "Your message has been sent. We'll respond within 24 hours."}
                   </p>
@@ -227,111 +210,97 @@ export default function ContactPage() {
                       setSubmitted(false);
                       setFormData({ name: '', email: '', userType: '', subject: '', message: '' });
                     }}
-                    className="px-6 py-2 bg-[#0ea5e9] text-white rounded-lg font-semibold hover:bg-[#0284c7] transition-all"
+                    className="btn btn-secondary"
                   >
-                    {isKinyarwanda ? 'Ohereza Ubundi Butumwa' : 'Send Another Message'}
+                    {isKin ? 'Ohereza Ubundi Butumwa' : 'Send another message'}
                   </button>
                 </div>
               ) : (
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  {/* Name */}
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      {isKinyarwanda ? 'Amazina Yawe' : 'Your Name'} *
-                    </label>
+                <form onSubmit={handleSubmit} className="stack" style={{ ['--gap' as string]: '16px' }}>
+                  <h2 style={{ fontSize: 20, fontWeight: 700, color: 'var(--text)' }}>
+                    {isKin ? 'Twoherereze ubutumwa' : 'Send us a message'}
+                  </h2>
+
+                  <div className="field">
+                    <label className="label">{isKin ? 'Amazina Yawe' : 'Your name'} *</label>
                     <input
                       type="text"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       placeholder="Jean Mugisha"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]"
+                      className="input"
                       required
                     />
                   </div>
 
-                  {/* Email */}
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Email *
-                    </label>
+                  <div className="field">
+                    <label className="label">Email *</label>
                     <input
                       type="email"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       placeholder="jean@example.com"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]"
+                      className="input"
                       required
                     />
                   </div>
 
-                  {/* User Type */}
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      {isKinyarwanda ? 'Ndi' : 'I am a'} *
-                    </label>
+                  <div className="field">
+                    <label className="label">{isKin ? 'Ndi' : 'I am a'} *</label>
                     <select
                       value={formData.userType}
                       onChange={(e) => setFormData({ ...formData, userType: e.target.value })}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]"
+                      className="select"
                       required
                     >
-                      <option value="">{isKinyarwanda ? 'Hitamo' : 'Select'}</option>
-                      <option value="student">{isKinyarwanda ? 'Umunyeshuri' : 'Student'}</option>
-                      <option value="teacher">{isKinyarwanda ? 'Umwarimu' : 'Teacher'}</option>
-                      <option value="school">{isKinyarwanda ? 'Umuyobozi w\'ishuri' : 'School Admin'}</option>
-                      <option value="other">{isKinyarwanda ? 'Ikindi' : 'Other'}</option>
+                      <option value="">{isKin ? 'Hitamo' : 'Select'}</option>
+                      <option value="student">{isKin ? 'Umunyeshuri' : 'Student'}</option>
+                      <option value="teacher">{isKin ? 'Umwarimu' : 'Teacher'}</option>
+                      <option value="school">{isKin ? 'Umuyobozi w\'ishuri' : 'School admin'}</option>
+                      <option value="other">{isKin ? 'Ikindi' : 'Other'}</option>
                     </select>
                   </div>
 
-                  {/* Subject */}
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      {isKinyarwanda ? 'Icyo wandikira' : 'Subject'} *
-                    </label>
+                  <div className="field">
+                    <label className="label">{isKin ? 'Icyo wandikira' : 'Subject'} *</label>
                     <input
                       type="text"
                       value={formData.subject}
                       onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                      placeholder={isKinyarwanda ? 'Umutwe w\'ubutumwa bwawe' : 'Subject of your message'}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0ea5e9]"
+                      placeholder={isKin ? 'Umutwe w\'ubutumwa bwawe' : 'Subject of your message'}
+                      className="input"
                       required
                     />
                   </div>
 
-                  {/* Message */}
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      {isKinyarwanda ? 'Ubutumwa' : 'Message'} *
-                    </label>
+                  <div className="field">
+                    <label className="label">{isKin ? 'Ubutumwa' : 'Message'} *</label>
                     <textarea
                       value={formData.message}
                       onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                      placeholder={isKinyarwanda ? 'Tubwire uburyo twagufashamo...' : 'Tell us how we can help...'}
+                      placeholder={isKin ? 'Tubwire uburyo twagufashamo...' : 'Tell us how we can help...'}
                       rows={6}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0ea5e9] resize-none"
+                      className="textarea"
                       required
                     />
                   </div>
 
-                  {/* Submit Button */}
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="w-full py-3 bg-[#0ea5e9] text-white rounded-lg font-bold hover:bg-[#0284c7] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
-                  >
+                  <button type="submit" disabled={loading} className="btn btn-primary btn-block lg">
                     {loading ? (
-                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      <svg style={{ animation: 'spin 1s linear infinite' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16">
+                        <circle cx="12" cy="12" r="10" strokeOpacity=".25"/>
+                        <path d="M12 2a10 10 0 0 1 10 10" strokeOpacity=".85"/>
+                      </svg>
                     ) : (
                       <>
-                        <Send className="w-5 h-5" />
-                        {isKinyarwanda ? 'Ohereza Ubutumwa' : 'Send Message'}
+                        <Send size={16} />
+                        {isKin ? 'Ohereza Ubutumwa' : 'Send message'}
                       </>
                     )}
                   </button>
 
-                  {/* Response Time */}
-                  <p className="text-sm text-gray-500 text-center">
-                    {isKinyarwanda
+                  <p className="text-center text-xs dim">
+                    {isKin
                       ? 'Mubisanzwe dusubiza mu masaha 24'
                       : 'We typically respond within 24 hours'}
                   </p>
@@ -339,41 +308,43 @@ export default function ContactPage() {
               )}
             </div>
           </div>
-        </div>
-      </div>
+        </section>
 
-      {/* FAQ Section */}
-      <div className="py-16 bg-[#f8fafc]">
-        <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-[#1e293b] mb-8 text-center">
-            {isKinyarwanda ? 'Ibibazo Bikunze Kubazwa' : 'Quick Answers'}
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* FAQ */}
+        <section className="section">
+          <div className="section-head">
+            <p className="eyebrow">FAQ</p>
+            <h2>{isKin ? 'Ibibazo Bikunze Kubazwa' : 'Quick answers'}</h2>
+          </div>
+          <div className="grid g-2">
             {faqs.map((faq, index) => (
-              <div key={index} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-all">
-                <h3 className="font-bold text-gray-900 mb-2">{faq.question}</h3>
-                <p className="text-gray-600 text-sm mb-3">{faq.answer}</p>
-                <a href={faq.link} className="text-[#0ea5e9] text-sm font-semibold hover:underline inline-flex items-center gap-1">
-                  {isKinyarwanda ? 'Menya byinshi' : 'Learn more'}
-                  <ChevronRight className="w-4 h-4" />
+              <div key={index} className="card pad-lg">
+                <h3 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text)', marginBottom: 8 }}>{faq.question}</h3>
+                <p className="dim" style={{ fontSize: 14, marginBottom: 12 }}>{faq.answer}</p>
+                <a href={faq.link} className="btn btn-tertiary" style={{ padding: 0 }}>
+                  {isKin ? 'Menya byinshi' : 'Learn more'}
+                  <ChevronRight size={14} />
                 </a>
               </div>
             ))}
           </div>
-        </div>
-      </div>
+        </section>
+      </main>
 
-      {/* Footer */}
-      <footer className="bg-[#1e293b] text-white py-8">
-        <div className="max-w-7xl mx-auto px-4 text-center text-sm text-gray-400">
-          <p>© 2026 EduCode Rwanda. All rights reserved.</p>
-          <p className="mt-2">
-            {isKinyarwanda
-              ? 'Twubatswe mu Rwanda n\'urukundo'
-              : 'Built with ❤️ in Rwanda'}
-          </p>
+      <footer className="site-footer">
+        <div className="wrap foot">
+          <div>
+            <div className="logo" style={{ marginBottom: 8 }}><span className="edu">EduCode</span></div>
+            <div>{isKin ? '© 2026 EduCode Rwanda. Byubatswe mu Rwanda n\'urukundo.' : '© 2026 EduCode Rwanda. Built with ❤️ in Rwanda.'}</div>
+          </div>
+          <div className="foot-links">
+            <Link to="/login">{isKin ? 'Kwinjira' : 'Log in'}</Link>
+            <Link to="/signup">{isKin ? 'Iyandikishe' : 'Sign up'}</Link>
+            <Link to="/about">{isKin ? 'Abo turibo' : 'About'}</Link>
+            <Link to="/privacy">{isKin ? 'Ibanga' : 'Privacy'}</Link>
+          </div>
         </div>
       </footer>
-    </div>
+    </>
   );
 }
