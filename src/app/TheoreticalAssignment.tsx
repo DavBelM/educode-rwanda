@@ -1,6 +1,6 @@
-import { ThemeToggle } from './components/ThemeToggle';
+import { AppNav } from './components/AppNav';
 import { useState, useEffect, useRef } from 'react';
-import { ArrowLeft, Send, CheckCircle, Clock, BookOpen, AlertTriangle } from 'lucide-react';
+import { Send, CheckCircle, Clock, BookOpen, AlertTriangle } from 'lucide-react';
 import type { Assignment } from '../lib/db';
 import { submitTheoreticalAssignment, getStudentSubmissions } from '../lib/db';
 import { useExamMode } from '../hooks/useExamMode';
@@ -74,7 +74,7 @@ export default function TheoreticalAssignment({ assignment, language, onBack }: 
     }
   }, [secondsLeft, examMode, submitted, assignment.id, questions, answers, violations]);
 
-  const timerColor = secondsLeft > 60 ? '#00d4aa' : secondsLeft > 30 ? '#f59e0b' : '#ef4444';
+  const timerColor = secondsLeft > 60 ? '#9eaa84' : secondsLeft > 30 ? '#cda86a' : 'var(--error)';
   const timerDisplay = `${String(Math.floor(secondsLeft / 60)).padStart(2, '0')}:${String(secondsLeft % 60).padStart(2, '0')}`;
 
   useEffect(() => {
@@ -103,82 +103,61 @@ export default function TheoreticalAssignment({ assignment, language, onBack }: 
     setSubmitting(false);
   };
 
-  const difficultyColor: Record<string, { bg: string; text: string; border: string }> = {
-    beginner:     { bg: 'rgba(0,212,170,0.1)',   text: '#00d4aa', border: 'rgba(0,212,170,0.2)' },
-    intermediate: { bg: 'rgba(245,158,11,0.1)',  text: '#f59e0b', border: 'rgba(245,158,11,0.2)' },
-    advanced:     { bg: 'rgba(139,92,246,0.1)',  text: '#8b5cf6', border: 'rgba(139,92,246,0.2)' },
-  };
-  const diff = difficultyColor[assignment.difficulty] ?? difficultyColor.beginner;
-
   return (
-    <div className="min-h-screen" style={{ fontFamily: 'Inter, sans-serif', background: 'var(--ec-bg)' }} onPaste={examMode ? onPaste : undefined}>
+    <div className="min-h-screen" style={{ background: 'var(--bg)' }} onPaste={examMode ? onPaste : undefined}>
+      <AppNav />
 
       {/* Violation warning toast */}
       {violationWarning && (
-        <div className="flex items-center gap-2 px-4 py-2" style={{ background: 'rgba(239,68,68,0.12)', borderBottom: '1px solid rgba(239,68,68,0.25)' }}>
-          <AlertTriangle size={14} style={{ color: '#f87171' }} />
-          <p className="text-xs font-semibold" style={{ color: '#f87171' }}>{violationWarning}</p>
+        <div className="flex items-center gap-2 px-4 py-2" style={{ background: 'var(--error-dim)', borderBottom: '1px solid color-mix(in srgb, var(--error) 40%, transparent)' }}>
+          <AlertTriangle size={14} style={{ color: 'var(--error)' }} />
+          <p className="text-xs font-semibold" style={{ color: 'var(--error)' }}>{violationWarning}</p>
         </div>
       )}
 
       {/* Exam mode — enter fullscreen nudge */}
       {examMode && !isFullscreen && !submitted && (
-        <div className="flex items-center justify-between px-4 py-2" style={{ background: 'rgba(245,158,11,0.08)', borderBottom: '1px solid rgba(245,158,11,0.2)' }}>
-          <p className="text-xs font-semibold" style={{ color: '#f59e0b' }}>
+        <div className="flex items-center justify-between px-4 py-2" style={{ background: 'var(--surface-2)', borderBottom: '1px solid var(--line)' }}>
+          <p className="text-xs font-semibold" style={{ color: '#cda86a' }}>
             {isKin ? '⚠️ Injira mu screen yuzuye kugirango utangire' : '⚠️ Enter fullscreen to continue the exam'}
           </p>
-          <button onClick={requestFullscreen} className="text-xs font-bold px-3 py-1 rounded-lg" style={{ background: 'rgba(245,158,11,0.15)', color: '#f59e0b', border: '1px solid rgba(245,158,11,0.3)' }}>
+          <button onClick={requestFullscreen} className="btn btn-secondary sm">
             {isKin ? 'Injira' : 'Go Fullscreen'}
           </button>
         </div>
       )}
 
-      {/* Top bar */}
-      <div className="sticky top-0 z-10 px-6 py-4 flex items-center justify-between" style={{ background: 'var(--ec-bg-a90)', backdropFilter: 'blur(12px)', borderBottom: '1px solid var(--ec-b1)' }}>
-        <button
-          onClick={onBack}
-          className="flex items-center gap-2 text-sm font-medium transition-colors"
-          style={{ color: 'var(--ec-text-4)' }}
-          onMouseEnter={e => (e.currentTarget.style.color = 'var(--ec-text-1)')}
-          onMouseLeave={e => (e.currentTarget.style.color = 'var(--ec-text-4)')}
-        >
-          <ArrowLeft size={16} />
-          {isKin ? 'Garuka kuri Dashboard' : 'Back to Dashboard'}
-        </button>
-
-        <div className="flex items-center gap-3">
-          <ThemeToggle />
-          {examMode && !submitted && (
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-mono text-sm font-bold" style={{ background: 'var(--ec-b5)', border: `1px solid ${timerColor}40`, color: timerColor }}>
-              <Clock size={14} />
-              {timerDisplay}
-            </div>
-          )}
-          <span className="px-2.5 py-1 rounded-full text-xs font-semibold" style={{ background: diff.bg, color: diff.text, border: `1px solid ${diff.border}` }}>
-            {assignment.difficulty.charAt(0).toUpperCase() + assignment.difficulty.slice(1)}
-          </span>
-          <span className="px-2.5 py-1 rounded-full text-xs font-semibold" style={{ background: examMode ? 'rgba(239,68,68,0.1)' : 'rgba(139,92,246,0.1)', color: examMode ? '#f87171' : '#a78bfa', border: examMode ? '1px solid rgba(239,68,68,0.2)' : '1px solid rgba(139,92,246,0.2)' }}>
-            {examMode ? (isKin ? '🔒 Ikizamini' : '🔒 Exam') : (<><BookOpen size={11} className="inline mr-1" />{isKin ? 'Ibibazo bya Inyandiko' : 'Theoretical'}</>)}
-          </span>
-          {!examMode && assignment.due_date && (
-            <span className="hidden sm:flex items-center gap-1 text-xs" style={{ color: 'var(--ec-text-6)' }}>
-              <Clock size={12} />
-              {new Date(assignment.due_date).toLocaleDateString()}
-            </span>
-          )}
-        </div>
-      </div>
-
       {/* Content */}
-      <div className="max-w-3xl mx-auto px-4 py-10">
+      <main className="wrap page" style={{ maxWidth: '760px' }}>
 
         {/* Header */}
-        <div className="mb-10">
-          <h1 className="text-2xl font-bold mb-3" style={{ color: 'var(--ec-text-1)', letterSpacing: '-0.01em' }}>
+        <div className="stack" style={{ ['--gap' as string]: '14px' }}>
+          <div className="flex items-center gap-2 flex-wrap">
+            {examMode && !submitted && (
+              <span className="pill solid" style={{ color: timerColor, borderColor: timerColor }}>
+                <Clock size={12} />
+                {timerDisplay}
+              </span>
+            )}
+            <span className="pill">
+              {assignment.difficulty.charAt(0).toUpperCase() + assignment.difficulty.slice(1)}
+            </span>
+            <span className={`pill${examMode ? ' error' : ''}`}>
+              {examMode ? (isKin ? '🔒 Ikizamini' : '🔒 Exam') : (<><BookOpen size={11} />{isKin ? 'Ibibazo bya Inyandiko' : 'Theoretical'}</>)}
+            </span>
+            {!examMode && assignment.due_date && (
+              <span className="flex items-center gap-1 text-xs dim">
+                <Clock size={12} />
+                {new Date(assignment.due_date).toLocaleDateString()}
+              </span>
+            )}
+          </div>
+
+          <h1 className="text-2xl font-bold" style={{ color: 'var(--text)', letterSpacing: '-0.01em' }}>
             {title}
           </h1>
           {description && (
-            <p className="text-base leading-relaxed" style={{ color: 'var(--ec-text-5)' }}>
+            <p className="text-base leading-relaxed" style={{ color: 'var(--text-2)' }}>
               {description}
             </p>
           )}
@@ -186,41 +165,35 @@ export default function TheoreticalAssignment({ assignment, language, onBack }: 
 
         {/* Submitted state */}
         {submitted ? (
-          <div className="rounded-2xl p-10 text-center" style={{ background: 'var(--ec-surface)', border: '1px solid rgba(0,212,170,0.2)' }}>
-            <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: 'rgba(0,212,170,0.12)', border: '1px solid rgba(0,212,170,0.25)' }}>
-              <CheckCircle size={32} style={{ color: '#00d4aa' }} />
+          <div className="card pad-lg text-center" style={{ marginTop: '32px' }}>
+            <div className="iconbtn" style={{ width: 56, height: 56, margin: '0 auto 16px', pointerEvents: 'none' }}>
+              <CheckCircle size={26} />
             </div>
-            <h2 className="text-xl font-bold mb-2" style={{ color: 'var(--ec-text-1)' }}>
+            <h2 className="text-xl font-bold mb-2" style={{ color: 'var(--text)' }}>
               {isKin ? 'Byatanzwe!' : 'Submitted!'}
             </h2>
-            <p className="text-sm" style={{ color: 'var(--ec-text-5)' }}>
+            <p className="text-sm dim">
               {isKin
                 ? 'Ibisubizo byawe byoherejwe neza. Umwarimu wawe azabisuzuma.'
                 : 'Your answers have been submitted. Your teacher will review them.'}
             </p>
-            <button
-              onClick={onBack}
-              className="mt-6 px-6 py-2.5 rounded-xl text-sm font-semibold transition-all"
-              style={{ background: 'rgba(0,212,170,0.12)', color: '#00d4aa', border: '1px solid rgba(0,212,170,0.25)' }}
-              onMouseEnter={e => (e.currentTarget.style.background = 'rgba(0,212,170,0.2)')}
-              onMouseLeave={e => (e.currentTarget.style.background = 'rgba(0,212,170,0.12)')}
-            >
+            <button onClick={onBack} className="btn btn-secondary" style={{ marginTop: 24 }}>
               {isKin ? 'Garuka kuri Dashboard' : 'Back to Dashboard'}
             </button>
           </div>
         ) : (
-          <>
+          <div className="stack" style={{ ['--gap' as string]: '24px', marginTop: '32px' }}>
             {/* Questions */}
-            <div className="space-y-6 mb-8">
+            <div className="stack" style={{ ['--gap' as string]: '16px' }}>
               {questions.map((q, index) => {
                 const questionText = isKin ? (q.text_kin || q.text) : q.text;
                 return (
-                  <div key={q.id} className="rounded-2xl p-6" style={{ background: 'var(--ec-surface)', border: '1px solid var(--ec-b1)' }}>
+                  <div key={q.id} className="card pad-lg">
                     <label className="block mb-3">
-                      <span className="text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--ec-text-6)' }}>
+                      <span className="text-xs font-semibold uppercase tracking-wide dim">
                         {isKin ? `Ikibazo cya ${index + 1}` : `Question ${index + 1}`}
                       </span>
-                      <p className="text-base font-medium mt-1" style={{ color: 'var(--ec-text-1)' }}>
+                      <p className="text-base font-medium mt-1" style={{ color: 'var(--text)' }}>
                         {questionText}
                       </p>
                     </label>
@@ -229,18 +202,10 @@ export default function TheoreticalAssignment({ assignment, language, onBack }: 
                       onChange={(e) => setAnswers(prev => ({ ...prev, [q.id]: e.target.value }))}
                       placeholder={isKin ? 'Andika igisubizo cyawe hano...' : 'Write your answer here...'}
                       rows={4}
-                      className="w-full rounded-xl p-4 text-sm resize-none transition-all focus:outline-none"
-                      style={{
-                        background: 'var(--ec-bg)',
-                        border: '1px solid var(--ec-b2)',
-                        color: 'var(--ec-text-1)',
-                        lineHeight: '1.6',
-                      }}
-                      onFocus={e => (e.target.style.border = '1px solid rgba(0,212,170,0.4)')}
-                      onBlur={e => (e.target.style.border = '1px solid var(--ec-b2)')}
+                      className="textarea"
                     />
                     <div className="mt-1.5 flex justify-end">
-                      <span className="text-xs" style={{ color: (answers[q.id] ?? '').trim().length > 0 ? 'var(--ec-text-6)' : 'var(--ec-text-7)' }}>
+                      <span className="text-xs dim">
                         {(answers[q.id] ?? '').trim().split(/\s+/).filter(Boolean).length} {isKin ? 'amagambo' : 'words'}
                       </span>
                     </div>
@@ -251,14 +216,14 @@ export default function TheoreticalAssignment({ assignment, language, onBack }: 
 
             {/* Error */}
             {error && (
-              <div className="mb-4 p-3 rounded-xl text-sm" style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)', color: '#f87171' }}>
+              <div style={{ padding: '10px 14px', borderRadius: 'var(--radius)', background: 'var(--error-dim)', color: 'var(--error)', fontSize: 14 }}>
                 {error}
               </div>
             )}
 
             {/* Progress indicator */}
-            <div className="flex items-center justify-between mb-6">
-              <span className="text-sm" style={{ color: 'var(--ec-text-6)' }}>
+            <div className="flex items-center justify-between">
+              <span className="text-sm dim">
                 {questions.filter(q => (answers[q.id] ?? '').trim().length > 0).length} / {questions.length} {isKin ? 'byasubijwe' : 'answered'}
               </span>
               <div className="flex gap-1">
@@ -266,7 +231,7 @@ export default function TheoreticalAssignment({ assignment, language, onBack }: 
                   <div
                     key={q.id}
                     className="w-2 h-2 rounded-full transition-all"
-                    style={{ background: (answers[q.id] ?? '').trim().length > 0 ? '#00d4aa' : 'var(--ec-b4)' }}
+                    style={{ background: (answers[q.id] ?? '').trim().length > 0 ? 'var(--text)' : 'var(--line-strong)' }}
                   />
                 ))}
               </div>
@@ -276,13 +241,13 @@ export default function TheoreticalAssignment({ assignment, language, onBack }: 
             <button
               onClick={handleSubmit}
               disabled={!allAnswered || submitting}
-              className="w-full rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-              style={{ height: '52px', background: '#00d4aa', color: 'var(--ec-bg)', boxShadow: allAnswered ? '0 0 24px rgba(0,212,170,0.25)' : 'none' }}
-              onMouseEnter={e => { if (allAnswered) (e.currentTarget as HTMLButtonElement).style.background = '#00bfa0'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = '#00d4aa'; }}
+              className="btn btn-primary btn-block lg"
             >
               {submitting ? (
-                <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" style={{ borderColor: 'var(--ec-bg)', borderTopColor: 'transparent' }} />
+                <svg style={{ animation: 'spin 1s linear infinite' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="16" height="16">
+                  <circle cx="12" cy="12" r="10" strokeOpacity=".25"/>
+                  <path d="M12 2a10 10 0 0 1 10 10" strokeOpacity=".85"/>
+                </svg>
               ) : (
                 <>
                   <Send size={16} />
@@ -292,13 +257,13 @@ export default function TheoreticalAssignment({ assignment, language, onBack }: 
             </button>
 
             {!allAnswered && (
-              <p className="text-center text-xs mt-3" style={{ color: 'var(--ec-text-7)' }}>
+              <p className="text-center text-xs dim" style={{ marginTop: '-12px' }}>
                 {isKin ? 'Subiza ibibazo byose mbere yo kohereza' : 'Answer all questions before submitting'}
               </p>
             )}
-          </>
+          </div>
         )}
-      </div>
+      </main>
     </div>
   );
 }
