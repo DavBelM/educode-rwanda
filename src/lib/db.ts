@@ -1037,10 +1037,10 @@ export async function getClassAnalytics(classId: string): Promise<ClassAnalytics
       top_score: scores.length > 0 ? Math.max(...scores) : null,
       low_score: scores.length > 0 ? Math.min(...scores) : null,
       dist: [
-        { label: '0–49%', count: buckets[0], color: '#ef4444' },
-        { label: '50–69%', count: buckets[1], color: '#f59e0b' },
-        { label: '70–89%', count: buckets[2], color: '#00d4aa' },
-        { label: '90–100%', count: buckets[3], color: '#8b5cf6' },
+        { label: '0–49%', count: buckets[0], color: 'var(--error)' },
+        { label: '50–69%', count: buckets[1], color: '#cda86a' },
+        { label: '70–89%', count: buckets[2], color: 'rgba(158,170,132,0.6)' },
+        { label: '90–100%', count: buckets[3], color: '#9eaa84' },
       ],
     };
   });

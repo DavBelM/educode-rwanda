@@ -244,7 +244,7 @@ export default function SignupPage({ onSuccess, onLoginClick }: {
             )}
 
             {success && (
-              <div style={{ padding: '10px 14px', borderRadius: 'var(--radius)', background: 'rgba(34,197,94,0.08)', color: '#22c55e', fontSize: 14, border: '1px solid rgba(34,197,94,0.2)' }}>
+              <div className="callout success">
                 Account created! Check your email to confirm.
               </div>
             )}

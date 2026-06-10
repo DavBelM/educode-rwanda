@@ -1,14 +1,14 @@
 import { useState, useEffect } from 'react';
-import { Users, Plus, Copy, Check, X, ChevronDown, BookOpen, Code2, Loader, Trophy, Medal, Megaphone, Pin, Trash2, BarChart2, AlertCircle, Download } from 'lucide-react';
+import { Users, Plus, Check, X, ChevronDown, BookOpen, Code2, Loader, Megaphone, Pin, Trash2, BarChart2, AlertCircle, Download } from 'lucide-react';
 import { AppNav } from './components/AppNav';
 import { usePageTitle } from '../hooks/usePageTitle';
 import { useAuth } from '../lib/auth';
 import {
   createClass, getTeacherClasses, getClassAssignments, createAssignment, getClassStudentCount,
-  getAssignmentSubmissions, getAssignmentSubmissionCounts, gradeSubmission, releaseGrades, getClassLeaderboard,
+  getAssignmentSubmissions, getAssignmentSubmissionCounts, gradeSubmission, releaseGrades,
   getClassAnalytics, getClassGradesExport, getClassRoster, getClassPendingReviewCount,
   createAnnouncement, getClassAnnouncements, deleteAnnouncement,
-  type Class, type Assignment, type Question, type Submission, type LeaderboardEntry, type Announcement, type ClassAnalytics, type RosterStudent
+  type Class, type Assignment, type Question, type Submission, type Announcement, type ClassAnalytics, type RosterStudent
 } from '../lib/db';
 
 // ─── Create Class Modal ────────────────────────────────────────────────────────
@@ -785,14 +785,14 @@ function ClassAnalyticsModal({ cls, language, onClose }: { cls: Class & { studen
                             <div className="flex h-6 rounded-lg overflow-hidden gap-px">
                               {a.dist.filter(d => d.count > 0).map(d => (
                                 <div key={d.label} className="relative group flex-shrink-0"
-                                  style={{ width: `${(d.count / totalDist) * 100}%`, background: 'var(--text-3)', opacity: 0.8 }}
+                                  style={{ width: `${(d.count / totalDist) * 100}%`, background: d.color }}
                                   title={`${d.label}: ${d.count} student${d.count !== 1 ? 's' : ''}`} />
                               ))}
                             </div>
                             <div className="flex flex-wrap gap-3 mt-2">
                               {a.dist.map(d => (
                                 <div key={d.label} className="flex items-center gap-1">
-                                  <div className="w-2.5 h-2.5 rounded-sm" style={{ background: 'var(--text-3)' }} />
+                                  <div className="w-2.5 h-2.5 rounded-sm" style={{ background: d.color }} />
                                   <span className="text-xs dim">{d.label}: {d.count}</span>
                                 </div>
                               ))}
@@ -830,82 +830,6 @@ function ClassAnalyticsModal({ cls, language, onClose }: { cls: Class & { studen
     </div>
   );
 }
-
-// ─── Class Card ────────────────────────────────────────────────────────────────
-
-function ClassCard({ cls, language, onAnnouncements, onAnalytics }: { cls: Class & { studentCount?: number; assignmentCount?: number }; language: 'EN' | 'KIN'; onAnnouncements: () => void; onAnalytics: () => void }) {
-  const isKin = language === 'KIN';
-  const [copied, setCopied] = useState(false);
-
-  const copyCode = () => {
-    navigator.clipboard.writeText(cls.invite_code);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  return (
-    <div className="rounded-2xl p-5" style={{ background: 'var(--ec-surface)', border: '1px solid var(--ec-b1)' }}>
-      <div className="flex items-start justify-between mb-4">
-        <div>
-          <h3 className="text-base font-bold mb-0.5" style={{ color: 'var(--ec-text-1)', fontFamily: 'Inter, sans-serif' }}>{cls.name}</h3>
-          <p className="text-xs" style={{ color: 'var(--ec-text-6)', fontFamily: 'Inter, sans-serif' }}>{cls.subject}</p>
-        </div>
-        <div className="flex gap-3 text-center">
-          <div>
-            <p className="text-lg font-bold" style={{ color: 'var(--ec-text-1)', fontFamily: 'Inter, sans-serif' }}>{cls.studentCount ?? 0}</p>
-            <p className="text-xs" style={{ color: 'var(--ec-text-6)', fontFamily: 'Inter, sans-serif' }}>{isKin ? 'Abanyeshuri' : 'Students'}</p>
-          </div>
-          <div>
-            <p className="text-lg font-bold" style={{ color: 'var(--ec-text-1)', fontFamily: 'Inter, sans-serif' }}>{cls.assignmentCount ?? 0}</p>
-            <p className="text-xs" style={{ color: 'var(--ec-text-6)', fontFamily: 'Inter, sans-serif' }}>{isKin ? 'Imikoro yose' : 'Assignments'}</p>
-          </div>
-        </div>
-      </div>
-
-      <div className="flex items-center justify-between px-4 py-2.5 rounded-xl" style={{ background: 'rgba(0,212,170,0.06)', border: '1px solid rgba(0,212,170,0.15)' }}>
-        <div>
-          <p className="text-xs mb-0.5" style={{ color: 'var(--ec-text-6)', fontFamily: 'Inter, sans-serif' }}>
-            {isKin ? 'Kode yo kwinjira' : 'Invite Code'}
-          </p>
-          <p className="text-lg font-bold tracking-widest" style={{ color: '#00d4aa', fontFamily: 'monospace' }}>{cls.invite_code}</p>
-        </div>
-        <button
-          onClick={copyCode}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all"
-          style={{ background: copied ? 'rgba(0,212,170,0.2)' : 'rgba(0,212,170,0.1)', color: '#00d4aa', border: '1px solid rgba(0,212,170,0.25)', fontFamily: 'Inter, sans-serif' }}
-        >
-          {copied ? <Check size={12} /> : <Copy size={12} />}
-          {copied ? (isKin ? 'Byakopewe!' : 'Copied!') : (isKin ? 'Kopeya' : 'Copy')}
-        </button>
-      </div>
-
-      <div className="mt-3 grid grid-cols-2 gap-2">
-        <button
-          onClick={e => { e.stopPropagation(); onAnalytics(); }}
-          className="flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-semibold transition-all"
-          style={{ background: 'rgba(0,212,170,0.08)', color: '#00d4aa', border: '1px solid rgba(0,212,170,0.18)', fontFamily: 'Inter, sans-serif' }}
-          onMouseEnter={e => (e.currentTarget.style.background = 'rgba(0,212,170,0.15)')}
-          onMouseLeave={e => (e.currentTarget.style.background = 'rgba(0,212,170,0.08)')}
-        >
-          <BarChart2 size={13} />
-          {isKin ? 'Isesengura' : 'Analytics'}
-        </button>
-        <button
-          onClick={e => { e.stopPropagation(); onAnnouncements(); }}
-          className="flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-semibold transition-all"
-          style={{ background: 'rgba(245,158,11,0.08)', color: '#f59e0b', border: '1px solid rgba(245,158,11,0.18)', fontFamily: 'Inter, sans-serif' }}
-          onMouseEnter={e => (e.currentTarget.style.background = 'rgba(245,158,11,0.15)')}
-          onMouseLeave={e => (e.currentTarget.style.background = 'rgba(245,158,11,0.08)')}
-        >
-          <Megaphone size={13} />
-          {isKin ? 'Amatangazo' : 'Announcements'}
-        </button>
-      </div>
-    </div>
-  );
-}
-
-// ─── Assignment Row ────────────────────────────────────────────────────────────
 
 // ─── Submissions Panel ─────────────────────────────────────────────────────────
 
@@ -1151,123 +1075,6 @@ function SubmissionsPanel({ assignment, language, onClose }: {
           })}
         </div>
       </div>
-    </div>
-  );
-}
-
-// ─── Assignment Row ────────────────────────────────────────────────────────────
-
-function AssignmentRow({ assignment, submissionCount, language, onClick }: {
-  assignment: Assignment;
-  submissionCount: number;
-  language: 'EN' | 'KIN';
-  onClick: () => void;
-}) {
-  const isKin = language === 'KIN';
-  const diffColors: Record<string, string> = { beginner: '#00d4aa', intermediate: '#f59e0b', advanced: '#8b5cf6' };
-  const typeColor = assignment.assignment_type === 'theoretical'
-    ? { bg: 'rgba(139,92,246,0.1)', text: '#a78bfa', border: 'rgba(139,92,246,0.2)' }
-    : { bg: 'rgba(0,212,170,0.1)', text: '#00d4aa', border: 'rgba(0,212,170,0.2)' };
-  const title = isKin ? (assignment.title_kin || assignment.title) : assignment.title;
-
-  return (
-    <button
-      onClick={onClick}
-      className="w-full flex items-start gap-3 py-3 px-4 rounded-xl transition-all text-left"
-      style={{ borderBottom: '1px solid var(--ec-b3)' }}
-      onMouseEnter={e => (e.currentTarget.style.background = 'var(--ec-b6)')}
-      onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
-    >
-      {/* Type icon */}
-      <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5" style={{ background: typeColor.bg, border: `1px solid ${typeColor.border}` }}>
-        {assignment.assignment_type === 'theoretical' ? <BookOpen size={14} style={{ color: typeColor.text }} /> : <Code2 size={14} style={{ color: typeColor.text }} />}
-      </div>
-
-      {/* Content */}
-      <div className="flex-1 min-w-0">
-        {/* Title */}
-        <p className="text-sm font-semibold leading-snug" style={{ color: 'var(--ec-text-1)', fontFamily: 'Inter, sans-serif' }}>{title}</p>
-
-        {/* Badges row */}
-        <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
-          <span className="px-2 py-0.5 rounded-full text-xs font-semibold" style={{ background: 'rgba(0,212,170,0.08)', color: '#00d4aa', border: '1px solid rgba(0,212,170,0.15)', fontFamily: 'Inter, sans-serif' }}>
-            {submissionCount} {isKin ? 'byatanzwe' : submissionCount === 1 ? 'submission' : 'submissions'}
-          </span>
-          <span className="px-2 py-0.5 rounded-full text-xs font-semibold" style={{ background: typeColor.bg, color: typeColor.text, border: `1px solid ${typeColor.border}`, fontFamily: 'Inter, sans-serif' }}>
-            {assignment.assignment_type === 'theoretical' ? (isKin ? 'Inyandiko (Theory)' : 'Theory') : 'Code'}
-          </span>
-          <span className="px-2 py-0.5 rounded-full text-xs font-semibold" style={{ color: diffColors[assignment.difficulty], background: `${diffColors[assignment.difficulty]}18`, border: `1px solid ${diffColors[assignment.difficulty]}30`, fontFamily: 'Inter, sans-serif' }}>
-            {assignment.difficulty}
-          </span>
-          {assignment.due_date && (
-            <span className="text-xs" style={{ color: 'var(--ec-text-6)', fontFamily: 'Inter, sans-serif' }}>
-              · {isKin ? 'Itariki ntarengwa' : 'Due'}: {new Date(assignment.due_date).toLocaleDateString()}
-            </span>
-          )}
-        </div>
-      </div>
-    </button>
-  );
-}
-
-// ─── Leaderboard ──────────────────────────────────────────────────────────────
-
-function Leaderboard({ classId, language }: { classId: string; language: 'EN' | 'KIN' }) {
-  const isKin = language === 'KIN';
-  const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    getClassLeaderboard(classId).then(data => { setEntries(data); setLoading(false); });
-  }, [classId]);
-
-  const rankIcon = (rank: number) => {
-    if (rank === 1) return <Trophy size={14} style={{ color: '#f59e0b' }} />;
-    if (rank === 2) return <Medal size={14} style={{ color: 'var(--ec-text-4)' }} />;
-    if (rank === 3) return <Medal size={14} style={{ color: '#cd7c2e' }} />;
-    return <span className="text-xs font-bold" style={{ color: 'var(--ec-text-6)', fontFamily: 'Inter, sans-serif' }}>#{rank}</span>;
-  };
-
-  return (
-    <div className="rounded-2xl p-6" style={{ background: 'var(--ec-surface)', border: '1px solid var(--ec-b1)' }}>
-      <div className="flex items-center gap-2 mb-5">
-        <Trophy size={16} style={{ color: '#f59e0b' }} />
-        <h2 className="text-base font-bold" style={{ color: 'var(--ec-text-1)', fontFamily: 'Inter, sans-serif' }}>
-          {isKin ? 'Urutonde rw\'amanota mu ishuri' : 'Class Leaderboard'}
-        </h2>
-      </div>
-
-      {loading ? (
-        <div className="flex justify-center py-6"><Loader size={18} className="animate-spin" style={{ color: '#00d4aa' }} /></div>
-      ) : entries.length === 0 ? (
-        <p className="text-sm text-center py-6" style={{ color: 'var(--ec-text-6)', fontFamily: 'Inter, sans-serif' }}>
-          {isKin ? 'Nta manota arahagaragara' : 'No grades yet'}
-        </p>
-      ) : (
-        <div className="space-y-2">
-          {entries.map((e) => {
-            const initials = e.full_name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
-            const isTop = e.rank <= 3;
-            return (
-              <div key={e.student_id} className="flex items-center gap-3 px-3 py-2.5 rounded-xl" style={{ background: isTop ? 'rgba(245,158,11,0.04)' : 'rgba(255,255,255,0.02)', border: isTop ? '1px solid rgba(245,158,11,0.12)' : '1px solid var(--ec-b3)' }}>
-                <div className="w-6 flex items-center justify-center shrink-0">{rankIcon(e.rank)}</div>
-                <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0" style={{ background: 'rgba(0,212,170,0.1)', color: '#00d4aa', border: '1px solid rgba(0,212,170,0.2)' }}>
-                  {initials}
-                </div>
-                <p className="flex-1 text-sm font-semibold truncate" style={{ color: 'var(--ec-text-1)', fontFamily: 'Inter, sans-serif' }}>{e.full_name}</p>
-                <div className="text-right shrink-0">
-                  <p className="text-sm font-bold" style={{ color: isTop ? '#f59e0b' : 'var(--ec-text-1)', fontFamily: 'Inter, sans-serif' }}>
-                    {e.total_marks_earned} pts
-                  </p>
-                  {e.submissions_graded > 0 && (
-                    <p className="text-xs" style={{ color: 'var(--ec-text-6)', fontFamily: 'Inter, sans-serif' }}>{e.percentage}%</p>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
     </div>
   );
 }

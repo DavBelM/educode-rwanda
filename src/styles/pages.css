@@ -4,26 +4,6 @@
    educode.css provides all tokens and component classes.
    ========================================================================== */
 
-/* ---- Backwards-compat shim: map old --ec-* tokens to new design system --- */
-:root {
-  --ec-bg:        var(--bg);
-  --ec-surface:   var(--surface);
-  --ec-surface-2: var(--surface-2);
-  --ec-b1:        var(--line);
-  --ec-b2:        var(--line-strong);
-  --ec-b3:        var(--line);
-  --ec-b4:        var(--line);
-  --ec-b5:        var(--surface-2);
-  --ec-b6:        var(--surface);
-  --ec-text-1:    var(--text);
-  --ec-text-2:    var(--text);
-  --ec-text-3:    var(--text-2);
-  --ec-text-4:    var(--text-2);
-  --ec-text-5:    var(--text-2);
-  --ec-text-6:    var(--text-3);
-  --ec-text-7:    var(--text-3);
-}
-
 /* ---- Shared page chrome ------------------------------------------------- */
 .page { padding: 36px 0 90px; }
 
