@@ -29,6 +29,8 @@ export function AppNav({ streak }: AppNavProps) {
 
   const navClass = (active: boolean) => `nav-link${active ? ' active' : ''}`;
 
+  const isTeacher = profile?.user_type === 'teacher';
+
   return (
     <header className="nav">
       <div className="nav-inner">
@@ -40,15 +42,23 @@ export function AppNav({ streak }: AppNavProps) {
 
         {/* Centre links — hidden on small screens via .nav-collapse */}
         <nav className="nav-links nav-collapse" aria-label="Main">
-          <Link to="/" className={navClass(isDashboardActive)}>
-            Dashboard
-          </Link>
-          <Link to="/courses" className={navClass(isCoursesActive)}>
-            Courses
-          </Link>
-          <Link to="/workspace" className={navClass(isWorkspaceActive)}>
-            Workspace
-          </Link>
+          {isTeacher ? (
+            <Link to="/" className={navClass(true)}>
+              Overview
+            </Link>
+          ) : (
+            <>
+              <Link to="/" className={navClass(isDashboardActive)}>
+                Dashboard
+              </Link>
+              <Link to="/courses" className={navClass(isCoursesActive)}>
+                Courses
+              </Link>
+              <Link to="/workspace" className={navClass(isWorkspaceActive)}>
+                Workspace
+              </Link>
+            </>
+          )}
         </nav>
 
         {/* Right cluster */}
