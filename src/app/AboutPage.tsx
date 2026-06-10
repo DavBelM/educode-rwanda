@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { Users, Target, Globe, ArrowRight, Mail, Linkedin } from 'lucide-react';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 export default function AboutPage() {
+  usePageTitle('About · EduCode');
   const [language, setLanguage] = useState<'EN' | 'KIN'>('EN');
   const isKinyarwanda = language === 'KIN';
 

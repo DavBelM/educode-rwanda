@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { Mail, ArrowLeft, ArrowRight, CheckCircle } from 'lucide-react';
 import { useAuth } from '../lib/auth';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 interface Props {
   onBack: () => void;
 }
 
 export default function ForgotPasswordPage({ onBack }: Props) {
+  usePageTitle('Forgot Password · EduCode');
   const { requestPasswordReset } = useAuth();
   const [language, setLanguage] = useState<'EN' | 'KIN'>('EN');
   const isKin = language === 'KIN';

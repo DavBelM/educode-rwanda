@@ -4,6 +4,7 @@ import { ArrowLeft, Send, CheckCircle, Clock, BookOpen, AlertTriangle } from 'lu
 import type { Assignment } from '../lib/db';
 import { submitTheoreticalAssignment, getStudentSubmissions } from '../lib/db';
 import { useExamMode } from '../hooks/useExamMode';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 interface Props {
   assignment: Assignment;
@@ -13,6 +14,8 @@ interface Props {
 
 export default function TheoreticalAssignment({ assignment, language, onBack }: Props) {
   const isKin = language === 'KIN';
+  const assignmentTitle = isKin && assignment.title_kin ? assignment.title_kin : assignment.title;
+  usePageTitle(`${assignmentTitle} · EduCode`);
   const questions = assignment.questions ?? [];
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);

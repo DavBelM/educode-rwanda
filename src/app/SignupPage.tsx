@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { useAuth } from '../lib/auth';
 import { useTheme } from '../lib/theme';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 export default function SignupPage({ onSuccess, onLoginClick }: {
   onSuccess?: () => void;
   onLoginClick?: () => void;
 }) {
+  usePageTitle('Sign Up · EduCode');
   const { signUp } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const [showPassword, setShowPassword] = useState(false);

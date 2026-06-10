@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { Eye, EyeOff, Lock, ArrowRight, CheckCircle } from 'lucide-react';
 import { useAuth } from '../lib/auth';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 interface Props {
   onDone: () => void;
 }
 
 export default function ResetPasswordPage({ onDone }: Props) {
+  usePageTitle('Reset Password · EduCode');
   const { updatePassword } = useAuth();
   const [language, setLanguage] = useState<'EN' | 'KIN'>('EN');
   const isKin = language === 'KIN';

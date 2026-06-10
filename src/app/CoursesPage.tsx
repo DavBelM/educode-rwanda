@@ -5,6 +5,7 @@ import {
   type Course, type CourseModule, type CourseLesson, type CourseProgress,
 } from '../lib/db';
 import { CheckCircle, Clock, BookOpen, Code2, HelpCircle, Zap } from 'lucide-react';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 interface Props {
   language: 'EN' | 'KIN';
@@ -316,6 +317,8 @@ export default function CoursesPage({ language, onBack, onOpenLesson }: Props) {
   const [progress, setProgress] = useState<CourseProgress[]>([]);
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const [loading, setLoading] = useState(true);
+
+  usePageTitle(selectedCourse ? `${selectedCourse.title} · EduCode` : 'Courses · EduCode');
 
   useEffect(() => {
     Promise.all([getCourses(), getCourseProgressList()]).then(([data, prog]) => {

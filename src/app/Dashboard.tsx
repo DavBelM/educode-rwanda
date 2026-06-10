@@ -3,6 +3,7 @@ import { AppNav } from './components/AppNav';
 import { useAuth } from '../lib/auth';
 import { getStudentAssignments, getStudentClasses, getClassWithInviteCode, joinClass, getSubmittedAssignmentIds, getStudentGrades, recordDailyLogin, getStreak, getStudentAnnouncements, getNewGradeCount, getLessonProgress, type Assignment, type Announcement } from '../lib/db';
 import { Users, ArrowRight, Loader, X, Megaphone, Pin, Code2 } from 'lucide-react';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 interface Props {
   language: 'EN' | 'KIN';
@@ -110,6 +111,7 @@ function JoinClassModal({ language, onClose, onJoined }: {
 // ─── Main Dashboard ────────────────────────────────────────────────────────────
 
 export default function Dashboard({ language, onStartCoding, onOpenAssignment, onOpenCourses, onOpenResults, onContinueLearning }: Props) {
+  usePageTitle('Dashboard · EduCode');
   const { profile } = useAuth();
   const studentName = profile?.full_name ?? 'Student';
   const isKinyarwanda = language === 'KIN';

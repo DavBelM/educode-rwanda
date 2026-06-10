@@ -8,6 +8,7 @@ import {
   type School, type SchoolOverview, type SchoolTeacher, type SchoolStudent, type SchoolAnnouncement,
 } from '../lib/db';
 import { useAuth } from '../lib/auth';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 type Tab = 'overview' | 'teachers' | 'students' | 'engagement' | 'announcements';
 
@@ -178,6 +179,7 @@ function AnnouncementModal({ schoolId, language, onClose, onCreated }: {
 
 // ─── Main Dashboard ────────────────────────────────────────────────────────────
 export default function SchoolAdminDashboard() {
+  usePageTitle('School Admin · EduCode');
   const { user, profile } = useAuth();
   const [language, setLanguage] = useState<'EN' | 'KIN'>('EN');
   const isKin = language === 'KIN';

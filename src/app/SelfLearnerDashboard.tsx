@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { Code2, BookOpen, Zap, Flame, ChevronRight, Loader, Bot, Star, ArrowRight } from 'lucide-react';
 import { useAuth } from '../lib/auth';
 import { getSelfLearnerStats, getResumeLesson, type CourseProgress, type CourseLesson } from '../lib/db';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 interface Props {
   language: 'EN' | 'KIN';
@@ -43,6 +44,7 @@ function DifficultyBadge({ difficulty, isKin }: { difficulty: string; isKin: boo
 }
 
 export default function SelfLearnerDashboard({ language, onLanguageChange, onStartCoding, onOpenCourses, onContinueLearning, onOpenLesson }: Props) {
+  usePageTitle('Dashboard · EduCode');
   const { profile } = useAuth();
   const isKin = language === 'KIN';
   const firstName = (profile?.full_name ?? '').split(' ')[0] || 'Learner';

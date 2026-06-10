@@ -8,6 +8,7 @@ import { analyzeFeedback, formatFeedbackForUI } from '../lib/feedback-engine';
 import { warmUpSpace } from '../lib/ai';
 import { submitCodingAssignment, type Assignment } from '../lib/db';
 import { useExamMode } from '../hooks/useExamMode';
+import { usePageTitle } from '../hooks/usePageTitle';
 import { Send, CheckCircle, Loader, AlertTriangle, Clock } from 'lucide-react';
 
 const DEFAULT_JS = `// Welcome to EduCode Rwanda!
@@ -223,6 +224,8 @@ export default function CodingWorkspace({ assignment }: Props) {
   const title = assignment
     ? (isKin && assignment.title_kin ? assignment.title_kin : assignment.title)
     : (isKin ? 'Umwanya wo Kwimenyereza' : 'Practice Workspace');
+
+  usePageTitle(`${title} · EduCode`);
 
   const breadcrumb = assignment
     ? (isKin && assignment.description_kin ? assignment.description_kin : assignment.description) ?? ''

@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { Download, ChevronRight, Shield, Lock, Eye, Database, Users, Cookie, FileText, Mail } from 'lucide-react';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 export default function PrivacyPolicyPage() {
+  usePageTitle('Privacy Policy · EduCode');
   const [language, setLanguage] = useState<'EN' | 'KIN'>('EN');
   const [activeSection, setActiveSection] = useState('');
 

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Users, FileText, Plus, Copy, Check, X, ChevronDown, BookOpen, Code2, Loader, Trophy, Medal, Megaphone, Pin, Trash2, BarChart2, AlertCircle, Download } from 'lucide-react';
 import { AppNav } from './components/AppNav';
+import { usePageTitle } from '../hooks/usePageTitle';
 import {
   createClass, getTeacherClasses, getClassAssignments, createAssignment, getClassStudentCount,
   getAssignmentSubmissions, getAssignmentSubmissionCounts, gradeSubmission, releaseGrades, getClassLeaderboard,
@@ -1360,6 +1361,7 @@ function Leaderboard({ classId, language }: { classId: string; language: 'EN' | 
 // ─── Main Dashboard ────────────────────────────────────────────────────────────
 
 export default function TeacherDashboard() {
+  usePageTitle('Teacher Dashboard · EduCode');
   const [language] = useState<'EN' | 'KIN'>('EN');
   const isKin = language === 'KIN';
 

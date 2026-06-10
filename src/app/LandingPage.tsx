@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router';
 import { useTheme } from '../lib/theme';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 interface Props {
   onLogin?: () => void;
@@ -9,6 +10,7 @@ interface Props {
 }
 
 export default function LandingPage({ onLogin, onSignup, onSchoolSignup }: Props) {
+  usePageTitle('EduCode Rwanda — Learn to Code');
   const { theme, toggleTheme } = useTheme();
   const [aiLang, setAiLang] = useState<'EN' | 'RW'>('EN');
 

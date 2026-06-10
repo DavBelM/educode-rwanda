@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { Mail, Phone, MapPin, Clock, Send, ArrowRight, MessageSquare, Globe, Users, Linkedin, Facebook, Twitter, Instagram, ChevronRight } from 'lucide-react';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 export default function ContactPage() {
+  usePageTitle('Contact · EduCode');
   const [language, setLanguage] = useState<'EN' | 'KIN'>('EN');
   const [formData, setFormData] = useState({
     name: '',

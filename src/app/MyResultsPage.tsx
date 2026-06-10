@@ -2,6 +2,7 @@ import { ThemeToggle } from './components/ThemeToggle';
 import { useState, useEffect } from 'react';
 import { ArrowLeft, BookOpen, Code2, CheckCircle, Clock, MessageSquare, TrendingUp, Bell } from 'lucide-react';
 import { getStudentResults, type StudentResult } from '../lib/db';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 interface Props {
   language: 'EN' | 'KIN';
@@ -17,6 +18,7 @@ const difficultyStyle: Record<string, { bg: string; text: string; border: string
 };
 
 export default function MyResultsPage({ language, onBack }: Props) {
+  usePageTitle('My Results · EduCode');
   const isKin = language === 'KIN';
   const [results, setResults] = useState<StudentResult[]>([]);
   const [loading, setLoading] = useState(true);

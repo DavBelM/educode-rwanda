@@ -2,8 +2,10 @@ import { useState } from 'react';
 import { School, Users, Target, CheckCircle2, ArrowRight, Mail, Phone, ChevronDown, ChevronRight, Lock, Eye, EyeOff } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { createSchool, linkProfileToSchool } from '../lib/db';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 export default function SchoolSignupPage() {
+  usePageTitle('School Sign Up · EduCode');
   const [language, setLanguage] = useState<'EN' | 'KIN'>('EN');
   const [formData, setFormData] = useState({
     schoolName: '',

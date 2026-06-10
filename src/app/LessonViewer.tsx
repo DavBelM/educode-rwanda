@@ -8,6 +8,7 @@ import CodeMirror from '@uiw/react-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { html } from '@codemirror/lang-html';
 import { vscodeDark } from '@uiw/codemirror-theme-vscode';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 interface Props {
   lesson: CourseLesson;
@@ -603,12 +604,12 @@ function QuizLesson({ lesson, language, onComplete, completing }: {
 
 export default function LessonViewer({ lesson, courseTitle, allLessons, language, nextLesson, onBack, onCompleted, onNextLesson }: Props) {
   const isKin = language === 'KIN';
+  const lessonTitle = isKin && lesson.title_kin ? lesson.title_kin : lesson.title;
+  usePageTitle(`${lessonTitle} · EduCode`);
   const [completing, setCompleting] = useState(false);
   const [done, setDone] = useState(false);
   const [xpAwarded, setXpAwarded] = useState(0);
   const [readPct, setReadPct] = useState(0);
-
-  const lessonTitle = isKin && lesson.title_kin ? lesson.title_kin : lesson.title;
 
   const typeInfo = {
     reading: { icon: <BookOpen size={13} />, label: isKin ? 'Gusoma' : 'Reading',      color: '#7eb8cf', bg: 'rgba(126,184,207,0.08)', border: 'rgba(126,184,207,0.2)' },
