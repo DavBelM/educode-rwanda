@@ -1,13 +1,11 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { AppNav } from './components/AppNav';
 import { CodeEditor } from './components/CodeEditor';
-import { AIFeedbackPanel } from './components/AIFeedbackPanel';
-import { OutputConsole } from './components/OutputConsole';
-import { RunCodeButton } from './components/RunCodeButton';
-import { MobileAssignmentCard } from './components/MobileAssignmentCard';
+import { Console } from './components/Console';
+import { MwarimuPanel } from './components/MwarimuPanel';
 import { executeCode } from '../lib/code-executor';
 import { analyzeFeedback, formatFeedbackForUI } from '../lib/feedback-engine';
-import { getAIFeedback, warmUpSpace } from '../lib/ai';
+import { warmUpSpace } from '../lib/ai';
 import { submitCodingAssignment, type Assignment } from '../lib/db';
 import { useExamMode } from '../hooks/useExamMode';
 import { Send, CheckCircle, Loader, AlertTriangle, Clock } from 'lucide-react';
@@ -38,8 +36,18 @@ interface Props {
   language?: 'EN' | 'KIN';
 }
 
-export default function CodingWorkspace({ assignment, language: initialLanguage }: Props) {
-  const [language] = useState<'EN' | 'KIN'>(initialLanguage ?? 'EN');
+function dueLabel(dueDate: string | null, isKin: boolean): string | null {
+  if (!dueDate) return null;
+  const diffMs = new Date(dueDate).getTime() - Date.now();
+  const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+  if (diffMs < 0) return isKin ? 'BYARENZE IGIHE' : 'OVERDUE';
+  if (diffDays <= 0) return isKin ? 'BIGOMBA KUBA UYU MUNSI' : 'DUE TODAY';
+  if (diffDays === 1) return isKin ? 'BISIGAYE UMUNSI 1' : 'DUE IN 1 DAY';
+  return isKin ? `BISIGAYE IMINSI ${diffDays}` : `DUE IN ${diffDays} DAYS`;
+}
+
+export default function CodingWorkspace({ assignment }: Props) {
+  const [language, setLanguage] = useState<'EN' | 'KIN'>('EN');
   const isKin = language === 'KIN';
 
   // Auto-save key — per assignment or free practice
@@ -50,12 +58,11 @@ export default function CodingWorkspace({ assignment, language: initialLanguage 
   const [jsCode, setJsCode] = useState(savedJs ?? DEFAULT_JS);
   const [htmlCode, setHtmlCode] = useState(savedHtml ?? DEFAULT_HTML);
   const [output, setOutput] = useState('');
-  const [previewSrc, setPreviewSrc] = useState('');
   const [isRunning, setIsRunning] = useState(false);
   const [feedback, setFeedback] = useState<Array<{ type: 'success' | 'error' | 'info'; message: string }>>([]);
   const [errorLine, setErrorLine] = useState<number | undefined>(undefined);
-  const [aiResponse, setAiResponse] = useState<string | null>(null);
-  const [aiLoading, setAiLoading] = useState(false);
+  const [lastError, setLastError] = useState<string | null>(null);
+  const [runCount, setRunCount] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [submitError, setSubmitError] = useState('');
@@ -136,7 +143,7 @@ export default function CodingWorkspace({ assignment, language: initialLanguage 
     }
   }, [secondsLeft, examMode, submitted, assignment, jsCode, violations]);
 
-  const timerColor = secondsLeft > 60 ? '#00d4aa' : secondsLeft > 30 ? '#f59e0b' : '#ef4444';
+  const timerColor = secondsLeft > 60 ? '#9eaa84' : secondsLeft > 30 ? '#cda86a' : 'var(--error)';
   const timerDisplay = `${String(Math.floor(secondsLeft / 60)).padStart(2, '0')}:${String(secondsLeft % 60).padStart(2, '0')}`;
 
   const handleSubmit = async () => {
@@ -160,14 +167,22 @@ export default function CodingWorkspace({ assignment, language: initialLanguage 
     setSubmitting(false);
   };
 
+  const handleReset = () => {
+    if (!window.confirm(isKin ? 'Wifuza gusubiza kode yawe ku ntangiriro?' : 'Reset your code back to the starting point?')) return;
+    setJsCode(DEFAULT_JS);
+    setHtmlCode(DEFAULT_HTML);
+    setOutput('');
+    setFeedback([]);
+    setErrorLine(undefined);
+    setLastError(null);
+  };
+
   const runCode = useCallback(async () => {
     setIsRunning(true);
     setOutput('');
     setFeedback([]);
     setErrorLine(undefined);
-    setPreviewSrc('');
-    setAiResponse(null);
-    setAiLoading(true);
+    setLastError(null);
 
     const result = await executeCode(jsCode, htmlCode);
 
@@ -177,13 +192,7 @@ export default function CodingWorkspace({ assignment, language: initialLanguage 
       displayOutput = (result.output ? result.output + '\n' : '') + `❌ ${result.error}`;
     }
     setOutput(displayOutput);
-
-    // Build preview src (HTML + JS combined for the iframe preview)
-    if (!result.error) {
-      setPreviewSrc(`<!DOCTYPE html><html><head><meta charset="utf-8">
-<style>body{font-family:sans-serif;margin:0;padding:8px}</style>
-</head><body>${htmlCode}<script>${jsCode}<\/script></body></html>`);
-    }
+    setLastError(result.error ?? null);
 
     // Error line highlight
     const lineMatch = result.error?.match(/line (\d+)/i);
@@ -195,16 +204,8 @@ export default function CodingWorkspace({ assignment, language: initialLanguage 
 
     setIsRunning(false);
 
-    // AI feedback disabled during exam mode
-    if (examMode) {
-      setAiLoading(false);
-      return;
-    }
-
-    getAIFeedback(jsCode, result.error, language)
-      .then(response => setAiResponse(response))
-      .catch(() => setAiResponse(null))
-      .finally(() => setAiLoading(false));
+    // Trigger Mwarimu — disabled during exam mode (handled inside MwarimuPanel)
+    setRunCount(c => c + 1);
   }, [jsCode, htmlCode, language]);
 
   // Ctrl+Enter shortcut
@@ -219,120 +220,79 @@ export default function CodingWorkspace({ assignment, language: initialLanguage 
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isRunning, runCode]);
 
+  const title = assignment
+    ? (isKin && assignment.title_kin ? assignment.title_kin : assignment.title)
+    : (isKin ? 'Umwanya wo Kwimenyereza' : 'Practice Workspace');
+
+  const breadcrumb = assignment
+    ? (isKin && assignment.description_kin ? assignment.description_kin : assignment.description) ?? ''
+    : (isKin ? 'Umwanya wigenga · JavaScript' : 'Free practice · JavaScript');
+
+  const due = assignment ? dueLabel(assignment.due_date, isKin) : null;
+
   return (
     <div className="h-screen flex flex-col" style={{ background: 'var(--bg)' }}>
       <AppNav />
 
       {/* Violation warning toast */}
       {violationWarning && (
-        <div className="shrink-0 px-4 py-2 flex items-center gap-2" style={{ background: 'rgba(239,68,68,0.12)', borderBottom: '1px solid rgba(239,68,68,0.25)' }}>
-          <AlertTriangle size={14} style={{ color: '#f87171' }} />
-          <p className="text-xs font-semibold" style={{ color: '#f87171' }}>{violationWarning}</p>
+        <div className="shrink-0 px-4 py-2 flex items-center gap-2" style={{ background: 'var(--error-dim)', borderBottom: '1px solid color-mix(in srgb, var(--error) 40%, transparent)' }}>
+          <AlertTriangle size={14} style={{ color: 'var(--error)' }} />
+          <p className="text-xs font-semibold" style={{ color: 'var(--error)' }}>{violationWarning}</p>
         </div>
       )}
 
       {/* Exam mode — enter fullscreen nudge */}
       {examMode && !isFullscreen && !submitted && (
-        <div className="shrink-0 px-4 py-2 flex items-center justify-between" style={{ background: 'rgba(245,158,11,0.08)', borderBottom: '1px solid rgba(245,158,11,0.2)' }}>
-          <p className="text-xs font-semibold" style={{ color: '#f59e0b' }}>
+        <div className="shrink-0 px-4 py-2 flex items-center justify-between" style={{ background: 'var(--surface-2)', borderBottom: '1px solid var(--line)' }}>
+          <p className="text-xs font-semibold" style={{ color: '#cda86a' }}>
             {isKin ? '⚠️ Injira muri screen yuzuye kugirango ukomeze ikizamini' : '⚠️ Enter fullscreen to continue the exam'}
           </p>
-          <button onClick={requestFullscreen} className="text-xs font-bold px-3 py-1 rounded-lg" style={{ background: 'rgba(245,158,11,0.15)', color: '#f59e0b', border: '1px solid rgba(245,158,11,0.3)' }}>
+          <button onClick={requestFullscreen} className="btn btn-secondary sm">
             {isKin ? 'Koresha Screen Yose' : 'Go Fullscreen'}
           </button>
         </div>
       )}
 
-      {/* Assignment banner */}
-      {assignment && (
-        <div className="shrink-0 px-6 py-3 flex items-center justify-between" style={{ background: 'var(--ec-surface)', borderBottom: '1px solid var(--ec-b1)' }}>
-          <div className="min-w-0">
-            <p className="text-xs font-semibold uppercase mb-0.5" style={{ color: 'var(--ec-text-6)', letterSpacing: '0.05em' }}>
-              {examMode ? (isKin ? '🔒 Ikizamini' : '🔒 Exam') : (isKin ? 'Umukoro' : 'Assignment')}
-            </p>
-            <p className="text-sm font-bold truncate" style={{ color: 'var(--ec-text-1)' }}>
-              {isKin && assignment.title_kin ? assignment.title_kin : assignment.title}
-            </p>
-            {assignment.description && (
-              <p className="text-xs mt-0.5 truncate" style={{ color: 'var(--ec-text-6)' }}>
-                {isKin && assignment.description_kin ? assignment.description_kin : assignment.description}
-              </p>
-            )}
-          </div>
-
-          <div className="flex items-center gap-3 shrink-0 ml-4">
-            {/* Countdown timer */}
-            {examMode && !submitted && (
-              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-mono text-sm font-bold" style={{ background: 'var(--ec-b5)', border: `1px solid ${timerColor}40`, color: timerColor }}>
-                <Clock size={14} />
-                {timerDisplay}
-              </div>
-            )}
-            {submitError && (
-              <p className="text-xs" style={{ color: '#f87171' }}>{submitError}</p>
-            )}
-            {submitted ? (
-              <div className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold" style={{ background: 'rgba(0,212,170,0.12)', color: '#00d4aa', border: '1px solid rgba(0,212,170,0.25)' }}>
-                <CheckCircle size={15} />
-                {isKin ? 'Byatanzwe!' : 'Submitted!'}
-              </div>
-            ) : (
-              <button
-                onClick={handleSubmit}
-                disabled={submitting}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold transition-all disabled:opacity-50"
-                style={{ background: '#00d4aa', color: 'var(--ec-bg)' }}
-                onMouseEnter={e => { if (!submitting) (e.currentTarget as HTMLButtonElement).style.background = '#00bfa0'; }}
-                onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = '#00d4aa'; }}
-              >
-                {submitting ? <Loader size={14} className="animate-spin" /> : <Send size={14} />}
-                {isKin ? 'Ohereza' : 'Submit'}
+      <div className="ws" style={{ flex: 1, minHeight: 0, height: 'auto' }}>
+        {/* EDITOR SIDE */}
+        <section className="ws-main" onPaste={examMode ? onPaste : undefined}>
+          <div className="ws-bar">
+            <div className="ctx">
+              <div className="et">{title}</div>
+              {breadcrumb && <div className="ed">{breadcrumb}</div>}
+            </div>
+            <div className="acts">
+              {examMode && !submitted && (
+                <span className="pill solid" style={{ color: timerColor, borderColor: timerColor }}>
+                  <Clock size={12} />
+                  {timerDisplay}
+                </span>
+              )}
+              {due && !submitted && <span className="pill error">{due}</span>}
+              {submitError && <span className="pill error">{submitError}</span>}
+              <button className="btn btn-secondary sm" onClick={handleReset}>
+                {isKin ? 'Subiza' : 'Reset'}
               </button>
-            )}
+              <button className="btn btn-secondary sm" onClick={runCode} disabled={isRunning}>
+                {isRunning ? (isKin ? 'Birakora...' : 'Running...') : (isKin ? 'Tangiza' : 'Run')}
+              </button>
+              {assignment && (
+                submitted ? (
+                  <span className="pill solid">
+                    <CheckCircle size={12} />
+                    {isKin ? 'Byatanzwe' : 'Submitted'}
+                  </span>
+                ) : (
+                  <button className="btn btn-primary sm" onClick={handleSubmit} disabled={submitting}>
+                    {submitting ? <Loader size={12} className="animate-spin" /> : <Send size={12} />}
+                    {isKin ? 'Ohereza' : 'Submit'}
+                  </button>
+                )
+              )}
+            </div>
           </div>
-        </div>
-      )}
 
-      {/* Desktop Layout */}
-      <div className="hidden lg:flex flex-1 overflow-hidden">
-        {/* Left: Code Editor (60%) */}
-        <div className="w-[60%] flex flex-col" onPaste={examMode ? onPaste : undefined}>
-          <div className="flex-1 overflow-hidden">
-            <CodeEditor
-              jsCode={jsCode}
-              htmlCode={htmlCode}
-              onJsChange={setJsCode}
-              onHtmlChange={setHtmlCode}
-              language={language}
-              errorLine={errorLine}
-            />
-          </div>
-          <div className="shrink-0 px-4 py-3 flex items-center gap-3" style={{ background: 'var(--code-bg)', borderTop: '1px solid var(--line)' }}>
-            <RunCodeButton onClick={runCode} isRunning={isRunning} language={language} />
-          </div>
-        </div>
-
-        {/* Right: AI Feedback + Output (40%) */}
-        <div className="w-[40%] flex flex-col">
-          <div className="h-1/2">
-            <AIFeedbackPanel feedback={feedback} language={language} isLoading={isRunning} aiResponse={aiResponse} aiLoading={aiLoading} />
-          </div>
-          <div className="h-1/2">
-            <OutputConsole
-              output={output}
-              previewSrc={previewSrc}
-              isRunning={isRunning}
-              language={language}
-            />
-          </div>
-        </div>
-      </div>
-
-      {/* Mobile Layout */}
-      <div className="lg:hidden flex-1 overflow-hidden flex flex-col">
-        <MobileAssignmentCard language={language} />
-
-        <div className="h-[40%]" onPaste={examMode ? onPaste : undefined}>
           <CodeEditor
             jsCode={jsCode}
             htmlCode={htmlCode}
@@ -341,35 +301,26 @@ export default function CodingWorkspace({ assignment, language: initialLanguage 
             language={language}
             errorLine={errorLine}
           />
-        </div>
 
-        <div className="h-[25%]">
-          <OutputConsole
+          <Console
             output={output}
-            previewSrc={previewSrc}
+            feedback={feedback}
             isRunning={isRunning}
             language={language}
+            onClear={() => { setOutput(''); setFeedback([]); }}
           />
-        </div>
+        </section>
 
-        <div className="flex-1">
-          <AIFeedbackPanel feedback={feedback} language={language} isLoading={isRunning} />
-        </div>
-
-        <div className="sticky bottom-0 p-4 flex gap-3" style={{ background: 'var(--surface)', borderTop: '1px solid var(--line)' }}>
-          <RunCodeButton onClick={runCode} isRunning={isRunning} language={language} isMobile />
-          {assignment && !submitted && (
-            <button
-              onClick={handleSubmit}
-              disabled={submitting}
-              className="flex-1 flex items-center justify-center gap-1.5 py-3 rounded-xl text-sm font-bold disabled:opacity-50"
-              style={{ background: '#00d4aa', color: 'var(--ec-bg)' }}
-            >
-              {submitting ? <Loader size={14} className="animate-spin" /> : <Send size={14} />}
-              {isKin ? 'Ohereza' : 'Submit'}
-            </button>
-          )}
-        </div>
+        {/* MWARIMU SIDE */}
+        <MwarimuPanel
+          code={jsCode}
+          error={lastError}
+          runCount={runCount}
+          instructions={breadcrumb}
+          language={language}
+          onLanguageChange={setLanguage}
+          examMode={examMode}
+        />
       </div>
     </div>
   );

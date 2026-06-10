@@ -428,7 +428,7 @@ img { display: block; max-width: 100%; }
 .divider { height: 1px; background: var(--line); }
 @media (max-width: 900px) {
   .g-3, .g-4 { grid-template-columns: repeat(2, 1fr); }
-  .nav-links.collapse { display: none; }
+  .nav-links.nav-collapse { display: none; }
 }
 @media (max-width: 620px) {
   .g-2, .g-3, .g-4 { grid-template-columns: 1fr; }

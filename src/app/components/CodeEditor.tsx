@@ -2,9 +2,10 @@ import { useState } from 'react';
 import CodeMirror from '@uiw/react-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { html } from '@codemirror/lang-html';
-import { vscodeDark } from '@uiw/codemirror-theme-vscode';
 import { EditorView, Decoration, ViewPlugin, ViewUpdate } from '@codemirror/view';
 import { RangeSetBuilder } from '@codemirror/state';
+import { HighlightStyle, syntaxHighlighting } from '@codemirror/language';
+import { tags as t } from '@lezer/highlight';
 
 interface CodeEditorProps {
   jsCode: string;
@@ -35,7 +36,7 @@ function errorLinePlugin(line: number) {
               builder.add(
                 lineObj.from,
                 lineObj.from,
-                Decoration.line({ attributes: { style: 'background: rgba(239,68,68,0.12); border-left: 3px solid #ef4444;' } })
+                Decoration.line({ attributes: { class: 'cm-error-line' } })
               );
             }
             pos = lineObj.to + 1;
@@ -48,6 +49,71 @@ function errorLinePlugin(line: number) {
   );
 }
 
+// Monochrome editor theme matching design/educode.css tokens
+const educodeTheme = EditorView.theme({
+  '&': {
+    backgroundColor: 'var(--code-bg)',
+    color: 'var(--text)',
+    height: '100%',
+  },
+  '.cm-content': {
+    fontFamily: 'var(--mono)',
+    fontSize: '13.5px',
+    lineHeight: '1.85',
+    caretColor: 'var(--text)',
+    padding: '14px 0',
+  },
+  '.cm-scroller': {
+    fontFamily: 'var(--mono)',
+    backgroundColor: 'var(--code-bg)',
+  },
+  '.cm-gutters': {
+    backgroundColor: 'var(--code-bg)',
+    color: 'var(--text-3)',
+    border: 'none',
+  },
+  '.cm-gutterElement': {
+    opacity: 0.55,
+  },
+  '.cm-activeLine': {
+    backgroundColor: 'var(--surface)',
+  },
+  '.cm-activeLineGutter': {
+    backgroundColor: 'var(--surface)',
+    opacity: 1,
+  },
+  '.cm-error-line': {
+    backgroundColor: 'var(--error-dim)',
+  },
+  '.cm-error-line.cm-activeLine': {
+    backgroundColor: 'var(--error-dim)',
+  },
+  '.cm-error-line.cm-activeLineGutter': {
+    backgroundColor: 'var(--error-dim)',
+    color: 'var(--error)',
+  },
+  '.cm-selectionBackground, &.cm-focused .cm-selectionBackground, ::selection': {
+    backgroundColor: 'var(--line-strong) !important',
+  },
+  '.cm-cursor, .cm-dropCursor': {
+    borderLeftColor: 'var(--text)',
+  },
+  '&.cm-editor.cm-focused': {
+    outline: 'none',
+  },
+}, { dark: true });
+
+const educodeHighlight = HighlightStyle.define([
+  { tag: t.comment, color: 'var(--sx-comment)', fontStyle: 'italic' },
+  { tag: [t.keyword, t.controlKeyword, t.operatorKeyword, t.moduleKeyword], color: 'var(--sx-keyword)' },
+  { tag: [t.string, t.special(t.string), t.regexp], color: 'var(--sx-string)' },
+  { tag: [t.number, t.bool, t.null], color: 'var(--sx-number)' },
+  { tag: [t.function(t.variableName), t.function(t.propertyName)], color: 'var(--sx-func)' },
+  { tag: [t.variableName, t.definition(t.variableName), t.tagName], color: 'var(--sx-var)' },
+  { tag: [t.propertyName, t.attributeName], color: 'var(--sx-prop)' },
+  { tag: [t.punctuation, t.bracket, t.operator, t.angleBracket], color: 'var(--sx-punc)' },
+]);
+
 type Tab = 'js' | 'html';
 
 export function CodeEditor({ jsCode, htmlCode, onJsChange, onHtmlChange, language, errorLine }: CodeEditorProps) {
@@ -57,58 +123,38 @@ export function CodeEditor({ jsCode, htmlCode, onJsChange, onHtmlChange, languag
   const jsExtensions = [
     javascript(),
     EditorView.lineWrapping,
+    educodeTheme,
+    syntaxHighlighting(educodeHighlight),
     ...(errorLine && activeTab === 'js' ? [errorLinePlugin(errorLine)] : []),
   ];
 
   const htmlExtensions = [
     html(),
     EditorView.lineWrapping,
+    educodeTheme,
+    syntaxHighlighting(educodeHighlight),
   ];
 
   return (
-    <div className="h-full flex flex-col bg-[#1e1e2e]">
-      {/* Tabs + label row */}
-      <div className="flex items-center justify-between border-b border-gray-700 shrink-0">
-        <div className="flex">
-          <button
-            onClick={() => setActiveTab('js')}
-            className={`px-4 py-3 text-sm font-medium transition-colors border-b-2 ${
-              activeTab === 'js'
-                ? 'border-[#0ea5e9] text-[#0ea5e9] bg-[#1e1e2e]'
-                : 'border-transparent text-gray-400 hover:text-gray-200'
-            }`}
-            style={{ fontFamily: 'JetBrains Mono, monospace' }}
-          >
-            script.js
-          </button>
-          <button
-            onClick={() => setActiveTab('html')}
-            className={`px-4 py-3 text-sm font-medium transition-colors border-b-2 ${
-              activeTab === 'html'
-                ? 'border-[#f97316] text-[#f97316] bg-[#1e1e2e]'
-                : 'border-transparent text-gray-400 hover:text-gray-200'
-            }`}
-            style={{ fontFamily: 'JetBrains Mono, monospace' }}
-          >
-            index.html
-          </button>
-        </div>
-        <span className="text-xs text-gray-400 px-3 py-1 bg-gray-800 rounded mr-3" style={{ fontFamily: 'JetBrains Mono, monospace' }}>
-          {activeTab === 'js' ? 'JavaScript' : 'HTML'}
+    <div className="flex-1 min-h-0 flex flex-col" style={{ background: 'var(--code-bg)' }}>
+      <div className="tabs">
+        <span className={`tab${activeTab === 'js' ? ' on' : ''}`} onClick={() => setActiveTab('js')}>
+          script.js
+        </span>
+        <span className={`tab${activeTab === 'html' ? ' on' : ''}`} onClick={() => setActiveTab('html')}>
+          index.html
         </span>
       </div>
 
-      {/* Editor */}
-      <div className="flex-1 overflow-auto">
+      <div className="editor-area">
         {activeTab === 'js' ? (
           <CodeMirror
             key="js"
             value={jsCode}
             onChange={onJsChange}
-            theme={vscodeDark}
             extensions={jsExtensions}
             height="100%"
-            style={{ height: '100%', fontSize: '14px' }}
+            style={{ height: '100%' }}
             basicSetup={{
               lineNumbers: true,
               highlightActiveLine: true,
@@ -124,10 +170,9 @@ export function CodeEditor({ jsCode, htmlCode, onJsChange, onHtmlChange, languag
             key="html"
             value={htmlCode}
             onChange={onHtmlChange}
-            theme={vscodeDark}
             extensions={htmlExtensions}
             height="100%"
-            style={{ height: '100%', fontSize: '14px' }}
+            style={{ height: '100%' }}
             basicSetup={{
               lineNumbers: true,
               highlightActiveLine: true,

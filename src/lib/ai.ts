@@ -147,3 +147,29 @@ export async function getLessonAIHelp(
     return pool[Math.floor(Math.random() * pool.length)];
   }
 }
+
+// ── Mwarimu chat reply (Workspace AI panel) ───────────────────────────────────
+export async function getMwarimuReply(
+  question: string,
+  code: string,
+  instructions: string,
+  language: 'EN' | 'KIN'
+): Promise<string> {
+  const raw = await getLessonAIHelp(question, code, instructions, language);
+
+  // Model always responds in Kinyarwanda — use Gemini to deliver English when needed
+  if (language === 'EN') {
+    try {
+      const response = await fetch('/api/translate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: raw, targetLanguage: 'EN' }),
+        signal: AbortSignal.timeout(30_000),
+      });
+      const json = await response.json();
+      if (typeof json.text === 'string' && json.text.trim()) return json.text;
+    } catch { /* fall through to raw */ }
+  }
+
+  return raw;
+}

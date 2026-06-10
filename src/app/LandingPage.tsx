@@ -18,7 +18,7 @@ export default function LandingPage({ onLogin, onSignup, onSchoolSignup }: Props
       <header className="nav">
         <div className="nav-inner">
           <a className="logo" href="/"><span className="edu">EduCode</span></a>
-          <nav className="nav-links collapse" aria-label="Main">
+          <nav className="nav-links nav-collapse" aria-label="Main">
             <a className="nav-link" href="#platform">Platform</a>
             <a className="nav-link" href="#bilingual">Bilingual</a>
             <a className="nav-link" href="#teachers">For schools</a>

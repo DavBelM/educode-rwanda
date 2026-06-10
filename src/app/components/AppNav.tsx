@@ -38,8 +38,8 @@ export function AppNav({ streak }: AppNavProps) {
           <span className="edu">Edu</span><span className="code">Code</span>
         </Link>
 
-        {/* Centre links — hidden on small screens via .collapse */}
-        <nav className="nav-links collapse" aria-label="Main">
+        {/* Centre links — hidden on small screens via .nav-collapse */}
+        <nav className="nav-links nav-collapse" aria-label="Main">
           <Link to="/" className={navClass(isDashboardActive)}>
             Dashboard
           </Link>
