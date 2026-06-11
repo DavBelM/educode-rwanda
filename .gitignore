@@ -20,6 +20,10 @@ ml/data/kinyarwanda/
 ml/data/fixjs/
 hf-space/
 
+# Python
+__pycache__/
+*.pyc
+
 # OS files
 .DS_Store
 Thumbs.db

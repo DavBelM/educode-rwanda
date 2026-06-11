@@ -1,0 +1,55 @@
+You are helping create training data for an AI tutor that helps Rwandan TVET secondary-school students (Level 3, ages 16-18) learn JavaScript. The tutor gives clear, encouraging, beginner-appropriate feedback when students make common coding mistakes.
+
+Your task: Generate realistic examples of async/await bugs that beginner JavaScript students typically make. Each example must demonstrate the bug, provide the fix, and give a clear pedagogical explanation.
+
+Subcategory assignment: Each example you generate will be assigned a specific subcategory from this list. You must produce an example that demonstrates exactly that subcategory:
+
+- forgot_await — calling an async function or Promise-returning function without await, so the variable holds a Promise instead of the resolved value
+- missing_async_keyword — using await inside a regular (non-async) function, which is a syntax error
+- mixing_then_and_await — confusing or inconsistent mixing of .then() chains with await in the same function
+- unhandled_rejection — async code without proper try/catch error handling, where a failure would crash silently or noisily
+- sequential_when_parallel — awaiting two independent operations sequentially when they could run in parallel with Promise.all
+- wrong_try_catch_placement — try/catch structure that's malformed, in the wrong scope, or doesn't properly wrap the awaited code
+- returning_promise_directly — returning a Promise from an async function without awaiting it first, when awaiting was clearly intended
+
+Explanation style: About 70% of examples should use a direct explanation style. About 30% should use a Socratic style — instead of telling the student the answer, ask a guiding question that helps them think through the bug themselves. For Socratic examples, the fixed field still contains the correct code; only the explanation is a question rather than a statement.
+
+Quality requirements you must follow:
+
+- Use realistic beginner variable names like userName, totalPrice, getUserData, fetchProducts, loadOrders. Never use cryptic names like $foo, _internal, or single letters.
+- Use realistic beginner contexts: fetching from an API, reading user data, loading a list, processing a form, saving a record. Never use framework-specific code (no React, Vue, Express, jQuery, Angular).
+- Each buggy code snippet must be a complete, named, runnable function between 5 and 25 lines. Never use anonymous arrow functions assigned to nothing.
+- The bug should be one a real Level 3 student would write — not a tricky edge case requiring deep JavaScript knowledge.
+- Backtick rule (critical): Any string containing ${...} interpolation must be wrapped in backticks (template literal syntax), never single or double quotes. A string with ${...} inside "..." or '...' is a syntax error. Before outputting any example, check that every ${...} is inside a backtick-wrapped string.
+- Vary the function names and scenarios across examples. Do not reuse function names from earlier batches.
+- The explanation must avoid jargon without explaining it. If you use "Promise", briefly clarify what that means in context.
+- For Socratic explanations: ask genuine guiding questions, not leading ones that give the answer away. Good: "Look at line 3. The function fetchUser returns a Promise. What do you think userName will hold if we don't wait for that Promise?" Bad: "Did you forget to write 'await' on line 3?"
+- Each example must be self-contained. No external references like "as we saw in lesson 4".
+
+Special note for missing_async_keyword and wrong_try_catch_placement: The buggy code in these subcategories should be intentionally invalid JavaScript that fails to parse — the bug is the syntax error. The fixed code corrects the syntax. For all other subcategories, both buggy and fixed should be syntactically valid JavaScript that runs (but the buggy version produces wrong behavior).
+
+You will respond with a JSON array of objects matching the provided response schema. Two examples of the expected shape and quality:
+
+{
+  "buggy": "async function getUserName(userId) {\n  const user = fetchUser(userId);\n  return user.name;\n}",
+  "fixed": "async function getUserName(userId) {\n  const user = await fetchUser(userId);\n  return user.name;\n}",
+  "category": "async_await",
+  "subcategory": "forgot_await",
+  "explanation": "When you call fetchUser(userId), it returns a Promise, not the actual user data. A Promise is JavaScript's way of saying 'I'll have the answer later.' Without 'await', your 'user' variable holds the Promise itself, so 'user.name' is undefined. Adding 'await' tells JavaScript to pause and wait for the real user object before continuing.",
+  "explanation_style": "direct"
+}
+
+{
+  "buggy": "function loadProducts() {\n  const products = await fetch(`/api/products`);\n  const data = await products.json();\n  return data;\n}",
+  "fixed": "async function loadProducts() {\n  const products = await fetch(`/api/products`);\n  const data = await products.json();\n  return data;\n}",
+  "category": "async_await",
+  "subcategory": "missing_async_keyword",
+  "explanation": "Look carefully at the first line of your function. You're using 'await' inside the function body. Where in JavaScript is 'await' allowed to appear? Think about what kind of function it must be declared as.",
+  "explanation_style": "socratic"
+}
+
+For THIS batch, generate exactly {batch_size} examples. The subcategory and explanation_style for each of the {batch_size} examples, IN ORDER, must be:
+{slot_assignments}
+
+Do not reuse any of these function/scenario names from earlier batches:
+{exclusion_list}
