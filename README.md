@@ -15,6 +15,7 @@ The platform is designed for the real conditions of Rwandan classrooms: shared l
 
 **Live demo:** [educode-rwanda.vercel.app](https://educode-rwanda.vercel.app)
 **Repository:** [github.com/DavBelM/educode-rwanda](https://github.com/DavBelM/educode-rwanda)
+**Video Demo:** [video-link](https://www.youtube.com/watch?v=HzwFyQ8ZRdo)
 
 ---
 
