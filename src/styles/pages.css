@@ -182,7 +182,7 @@ footer.site-footer { border-top: 1px solid var(--line); margin-top: 40px; paddin
 .welcome h1 { font-size: 30px; letter-spacing: -0.03em; }
 .welcome .sub { color: var(--text-2); margin-top: 6px; font-size: 15px; }
 
-.dash { display: grid; grid-template-columns: 1fr 340px; gap: 22px; align-items: start; }
+.dash { display: grid; grid-template-columns: 1fr 360px; gap: 28px; align-items: start; }
 
 .continue { display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: center; }
 .continue .meta { color: var(--text-2); font-size: 13.5px; margin-bottom: 10px; }
