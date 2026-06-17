@@ -2,9 +2,10 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import {
   ArrowLeft, Lightbulb, Play, CheckCircle2, XCircle, Circle,
-  Star, Trophy, RotateCcw, ChevronRight, Zap, Clock,
+  Star, Trophy, RotateCcw, ChevronRight, Bot,
 } from 'lucide-react';
 import { CodeEditor } from './components/CodeEditor';
+import { MwarimuPanel } from './components/MwarimuPanel';
 import { runQuizTests, type TestResult } from '../lib/quiz-executor';
 import {
   getSetChallenges, getQuizSets, startQuizSession, upsertQuizAttempt,
@@ -54,6 +55,11 @@ export default function ChallengeRunner({ language }: Props) {
   const [xpEarned, setXpEarned] = useState(0);
   const [passedCount, setPassedCount] = useState(0);
 
+  // Right panel tab
+  const [rightTab, setRightTab] = useState<'challenge' | 'mwarimu'>('challenge');
+  const [mwarimuLang, setMwarimuLang] = useState<'EN' | 'KIN'>(language);
+  const [mwarimuDot, setMwarimuDot] = useState(false);
+
   usePageTitle(set ? `${set.title} · EduCode` : 'Challenge · EduCode');
 
   // Load data and start session
@@ -88,6 +94,8 @@ export default function ChallengeRunner({ language }: Props) {
     setShowHint(false);
     setHintUsed(false);
     setAttemptCount(0);
+    setRightTab('challenge');
+    setMwarimuDot(false);
     errorLogRef.current = [];
     setChallengeStartMs(Date.now());
   }, []);
@@ -105,6 +113,9 @@ export default function ChallengeRunner({ language }: Props) {
 
     const newCount = attemptCount + 1;
     setAttemptCount(newCount);
+
+    // Show blue dot on Mwarimu tab when student isn't already looking at it
+    if (rightTab !== 'mwarimu') setMwarimuDot(true);
 
     // Append to error log
     const entry: ErrorLogEntry = {
@@ -381,11 +392,59 @@ export default function ChallengeRunner({ language }: Props) {
           </div>
         </div>
 
-        {/* RIGHT: Challenge info + test results */}
+        {/* RIGHT: Tabbed panel */}
         <div style={{ flex: '0 0 40%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+
+          {/* Tab bar */}
+          <div style={{
+            display: 'flex', borderBottom: '1px solid var(--line)',
+            background: 'var(--surface-2)', flexShrink: 0,
+          }}>
+            {(['challenge', 'mwarimu'] as const).map(tab => (
+              <button
+                key={tab}
+                onClick={() => { setRightTab(tab); if (tab === 'mwarimu') setMwarimuDot(false); }}
+                style={{
+                  flex: 1, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  gap: 6, fontSize: 13, fontWeight: rightTab === tab ? 600 : 400,
+                  color: rightTab === tab ? 'var(--text)' : 'var(--text-3)',
+                  background: 'none', border: 'none', cursor: 'pointer',
+                  borderBottom: rightTab === tab ? '2px solid var(--text-2)' : '2px solid transparent',
+                  position: 'relative', transition: 'color 0.15s',
+                }}
+              >
+                {tab === 'mwarimu' && <Bot size={14} />}
+                {tab === 'challenge'
+                  ? (isKin ? 'Challenge' : 'Challenge')
+                  : (isKin ? 'Baza Mwarimu' : 'Ask Mwarimu')}
+                {tab === 'mwarimu' && mwarimuDot && (
+                  <span style={{
+                    position: 'absolute', top: 8, right: 12,
+                    width: 7, height: 7, borderRadius: '50%', background: '#3b82f6',
+                  }} />
+                )}
+              </button>
+            ))}
+          </div>
+
+          {/* Mwarimu panel (always mounted so chat history persists) */}
+          <div style={{ display: rightTab === 'mwarimu' ? 'flex' : 'none', flex: 1, flexDirection: 'column', overflow: 'hidden' }}>
+            {challenge && (
+              <MwarimuPanel
+                code={jsCode}
+                error={runtimeError}
+                runCount={attemptCount}
+                instructions={challenge.description}
+                language={mwarimuLang}
+                onLanguageChange={setMwarimuLang}
+                examMode={false}
+              />
+            )}
+          </div>
 
           {/* Challenge card */}
           <div style={{
+            display: rightTab === 'challenge' ? 'block' : 'none',
             padding: '16px', borderBottom: '1px solid var(--line)',
             overflowY: 'auto', maxHeight: '55%', flexShrink: 0,
           }}>
