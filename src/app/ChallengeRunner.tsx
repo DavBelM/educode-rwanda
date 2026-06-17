@@ -20,6 +20,28 @@ interface Props {
 
 type Phase = 'loading' | 'running' | 'success' | 'complete';
 
+function renderDescription(text: string): React.ReactNode {
+  const parts = text.split(/(\*\*[^*]+\*\*|`[^`]+`|\n)/g);
+  return parts.map((part, i) => {
+    if (part.startsWith('**') && part.endsWith('**')) {
+      return <strong key={i} style={{ color: 'var(--text)', fontWeight: 700 }}>{part.slice(2, -2)}</strong>;
+    }
+    if (part.startsWith('`') && part.endsWith('`')) {
+      return (
+        <code key={i} style={{
+          background: 'var(--surface-2)', border: '1px solid var(--line)',
+          padding: '1px 5px', borderRadius: 4, fontFamily: 'monospace',
+          fontSize: '0.88em', color: 'var(--text)',
+        }}>
+          {part.slice(1, -1)}
+        </code>
+      );
+    }
+    if (part === '\n') return <br key={i} />;
+    return <span key={i}>{part}</span>;
+  });
+}
+
 const TYPE_LABEL: Record<string, { en: string; kin: string; color: string }> = {
   fix_bug:       { en: 'Fix the Bug',        kin: 'Gusana Ikosa',          color: '#f59e0b' },
   complete_code: { en: 'Complete the Code',  kin: 'Uzuza Kode',            color: '#3b82f6' },
@@ -349,6 +371,70 @@ export default function ChallengeRunner({ language }: Props) {
 
         {/* LEFT: Code editor */}
         <div style={{ display: 'flex', flexDirection: 'column', flex: '0 0 60%', borderRight: '1px solid var(--line)', overflow: 'hidden' }}>
+
+          {/* complete_code instruction banner */}
+          {challenge.challenge_type === 'complete_code' && (
+            <div style={{
+              padding: '9px 16px', flexShrink: 0,
+              background: 'rgba(59,130,246,0.08)',
+              borderBottom: '1px solid rgba(59,130,246,0.2)',
+              borderLeft: '3px solid #3b82f6',
+              display: 'flex', alignItems: 'center', gap: 10,
+              fontSize: 13, color: 'var(--text-2)',
+            }}>
+              <span style={{ fontSize: 16 }}>✏️</span>
+              <span>
+                {isKin ? (
+                  <>Hindura buri{' '}
+                    <code style={{ background: 'rgba(59,130,246,0.15)', padding: '1px 6px', borderRadius: 4, fontFamily: 'monospace', fontSize: '0.9em', color: '#3b82f6', fontWeight: 700 }}>____</code>
+                    {' '}ukoreshe kode yawe, hanyuma kanda <strong>Run</strong>.</>
+                ) : (
+                  <>Replace each{' '}
+                    <code style={{ background: 'rgba(59,130,246,0.15)', padding: '1px 6px', borderRadius: 4, fontFamily: 'monospace', fontSize: '0.9em', color: '#3b82f6', fontWeight: 700 }}>____</code>
+                    {' '}with your code, then click <strong>Run</strong> to test it.</>
+                )}
+              </span>
+            </div>
+          )}
+
+          {/* DOM HTML notice */}
+          {challenge.starter_html && challenge.challenge_type !== 'complete_code' && (
+            <div style={{
+              padding: '9px 16px', flexShrink: 0,
+              background: 'rgba(16,185,129,0.08)',
+              borderBottom: '1px solid rgba(16,185,129,0.2)',
+              borderLeft: '3px solid #10b981',
+              display: 'flex', alignItems: 'center', gap: 10,
+              fontSize: 13, color: 'var(--text-2)',
+            }}>
+              <span style={{ fontSize: 16 }}>🌐</span>
+              <span>
+                {isKin
+                  ? <>Iyi challenge ikoresha <strong>HTML</strong>. Kanda tab ya <strong style={{ color: '#10b981' }}>HTML</strong> haruguru kugira ngo urebe urupapuro ruzagenzurwa na kode yawe.</>
+                  : <>This challenge controls a webpage. Click the <strong style={{ color: '#10b981' }}>HTML tab</strong> above to see the page your code will change.</>}
+              </span>
+            </div>
+          )}
+
+          {/* complete_code + has HTML: show both notices merged */}
+          {challenge.challenge_type === 'complete_code' && challenge.starter_html && (
+            <div style={{
+              padding: '9px 16px', flexShrink: 0,
+              background: 'rgba(16,185,129,0.08)',
+              borderBottom: '1px solid rgba(16,185,129,0.2)',
+              borderLeft: '3px solid #10b981',
+              display: 'flex', alignItems: 'center', gap: 10,
+              fontSize: 13, color: 'var(--text-2)',
+            }}>
+              <span style={{ fontSize: 16 }}>🌐</span>
+              <span>
+                {isKin
+                  ? <>Iyi challenge ikoresha <strong>HTML</strong>. Kanda tab ya <strong style={{ color: '#10b981' }}>HTML</strong> haruguru kugira ngo urebe urupapuro.</>
+                  : <>This challenge also has HTML. Click the <strong style={{ color: '#10b981' }}>HTML tab</strong> above to see the page structure.</>}
+              </span>
+            </div>
+          )}
+
           <CodeEditor
             jsCode={jsCode}
             htmlCode={htmlCode}
@@ -475,12 +561,8 @@ export default function ChallengeRunner({ language }: Props) {
             </h2>
 
             {/* Description */}
-            <div style={{
-              color: 'var(--text-2)', fontSize: 13.5, lineHeight: 1.65,
-              whiteSpace: 'pre-wrap',
-            }}>
-              {(isKin && challenge.description_kin ? challenge.description_kin : challenge.description)
-                .replace(/\*\*(.+?)\*\*/g, '$1')}
+            <div style={{ color: 'var(--text-2)', fontSize: 13.5, lineHeight: 1.65 }}>
+              {renderDescription(isKin && challenge.description_kin ? challenge.description_kin : challenge.description)}
             </div>
 
             {/* Hint */}
