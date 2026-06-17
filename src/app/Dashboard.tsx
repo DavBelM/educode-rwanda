@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { AppNav } from './components/AppNav';
 import { useAuth } from '../lib/auth';
 import { getStudentAssignments, getStudentClasses, getClassWithInviteCode, joinClass, getSubmittedAssignmentIds, getStudentGrades, recordDailyLogin, getStreak, getStudentAnnouncements, getNewGradeCount, getLessonProgress, type Assignment, type Announcement } from '../lib/db';
-import { Users, ArrowRight, Loader, X, Megaphone, Pin, Code2, Zap } from 'lucide-react';
+import { Users, ArrowRight, Loader, X, Megaphone, Pin, Code2 } from 'lucide-react';
 import { usePageTitle } from '../hooks/usePageTitle';
 
 interface Props {
@@ -497,6 +497,21 @@ export default function Dashboard({ language, onStartCoding, onOpenAssignment, o
               </div>
             </section>
 
+            {/* Challenge Mode card */}
+            <section className="card pad-lg rise-4">
+              <div className="card-head">
+                <h3 className="card-title">{isKinyarwanda ? 'Imikino yo Gukora' : 'Challenge Mode'}</h3>
+              </div>
+              <p style={{ fontSize: 13.5, color: 'var(--text-2)', lineHeight: 1.55, marginBottom: 14 }}>
+                {isKinyarwanda
+                  ? 'Gukora challenges za JavaScript kandi ube uronka XP.'
+                  : 'Solve challenges, earn XP. Fix bugs, complete code, write from scratch.'}
+              </p>
+              <button className="btn btn-secondary btn-block" onClick={() => onOpenChallenges?.()}>
+                {isKinyarwanda ? 'Tangira Challenge' : 'Start challenges'}
+              </button>
+            </section>
+
             {/* Achievements */}
             <section className="card pad-lg rise-4">
               <div className="card-head">
@@ -555,31 +570,6 @@ export default function Dashboard({ language, onStartCoding, onOpenAssignment, o
               </button>
             </section>
 
-            {/* Challenge Mode card */}
-            <section className="card pad-lg rise-4" style={{
-              background: 'linear-gradient(135deg, rgba(59,130,246,0.08), rgba(139,92,246,0.08))',
-              border: '1px solid rgba(139,92,246,0.25)',
-            }}>
-              <div className="flex items-center gap-2 mb-2">
-                <Zap size={16} style={{ color: '#8b5cf6' }} />
-                <h3 className="card-title" style={{ color: 'var(--text)' }}>
-                  {isKinyarwanda ? 'Imikino yo Gukora' : 'Challenge Mode'}
-                </h3>
-              </div>
-              <p style={{ fontSize: 13.5, color: 'var(--text-2)', lineHeight: 1.55, marginBottom: 14 }}>
-                {isKinyarwanda
-                  ? 'Gukora challenges za JavaScript kandi ube uronka XP.'
-                  : 'Solve JavaScript challenges and earn XP. Fix bugs, complete code, write from scratch.'}
-              </p>
-              <button
-                className="btn btn-primary btn-block"
-                onClick={() => onOpenChallenges?.()}
-                style={{ background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)', border: 'none' }}
-              >
-                <Zap size={14} />
-                {isKinyarwanda ? 'Tangira Challenge' : 'Start challenges'}
-              </button>
-            </section>
           </aside>
         </div>
       </main>

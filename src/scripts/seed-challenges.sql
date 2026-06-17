@@ -8,7 +8,7 @@
 
 INSERT INTO public.quiz_sets (id, title, title_kin, description, description_kin, order_index, xp_reward) VALUES
 (
-  'qs000001-0000-0000-0000-000000000001',
+  '10000000-0000-0000-0000-000000000001',
   'Variables & Data Types',
   'Impinduramimerere n''Ubwoko bw''Amakuru',
   'Learn to declare variables, work with strings, numbers, and booleans.',
@@ -16,7 +16,7 @@ INSERT INTO public.quiz_sets (id, title, title_kin, description, description_kin
   1, 60
 ),
 (
-  'qs000002-0000-0000-0000-000000000002',
+  '20000000-0000-0000-0000-000000000002',
   'Functions & Conditionals',
   'Imikorere n''Imiterere',
   'Write reusable functions and control code flow with if/else.',
@@ -24,7 +24,7 @@ INSERT INTO public.quiz_sets (id, title, title_kin, description, description_kin
   2, 70
 ),
 (
-  'qs000003-0000-0000-0000-000000000003',
+  '30000000-0000-0000-0000-000000000003',
   'Arrays & Loops',
   'Urutonde rw''Amakuru n''Inzira zo Gusubiramo',
   'Store collections of data and process them with for loops and array methods.',
@@ -32,7 +32,7 @@ INSERT INTO public.quiz_sets (id, title, title_kin, description, description_kin
   3, 80
 ),
 (
-  'qs000004-0000-0000-0000-000000000004',
+  '40000000-0000-0000-0000-000000000004',
   'Objects & Modern JS',
   'Ibintu n''JavaScript ya Kijyambere',
   'Master JavaScript objects, destructuring, arrow functions, and ES6+ features.',
@@ -40,7 +40,7 @@ INSERT INTO public.quiz_sets (id, title, title_kin, description, description_kin
   4, 90
 ),
 (
-  'qs000005-0000-0000-0000-000000000005',
+  '50000000-0000-0000-0000-000000000005',
   'DOM Manipulation',
   'Kugenzura DOM',
   'Control webpage elements with JavaScript — change text, styles, and handle events.',
@@ -58,7 +58,7 @@ INSERT INTO public.quiz_challenges
   (set_id, title, title_kin, description, description_kin, challenge_type, difficulty, starter_js, starter_html, test_cases, xp_reward, order_index, hint, hint_kin)
 VALUES
 (
-  'qs000001-0000-0000-0000-000000000001',
+  '10000000-0000-0000-0000-000000000001',
   'Declare Your First Variables',
   'Tangira Impinduramimerere Zawe za Mbere',
   'Declare a variable called **score** using `const` and give it the value `85`. Then declare a variable called **subject** using `let` and give it the value `''JavaScript''`. Use `console.log` to print both.',
@@ -78,7 +78,7 @@ VALUES
   'Koresha `const score = 85;` kugira ngo unyuze agaciro gatahinduwe. Koresha `let subject = ''JavaScript'';`. Hanyuma hamagara `console.log(score, subject);`.'
 ),
 (
-  'qs000001-0000-0000-0000-000000000001',
+  '10000000-0000-0000-0000-000000000001',
   'Fix the Constant Variable',
   'Gusana Impinduramimerere ya Constant',
   'This code crashes because it tries to reassign a `const` variable. Fix it so the program successfully logs `''Hello''`.',
@@ -98,7 +98,7 @@ console.log(greeting);',
   'Ntushobora kongera guha agaciro impinduramimerere ya `const`. Hindura `const` ukore `let` kugira ngo ushobore kuhindura agaciro.'
 ),
 (
-  'qs000001-0000-0000-0000-000000000001',
+  '10000000-0000-0000-0000-000000000001',
   'Combine First and Last Name',
   'Guhuza Izina n''Inkomoko',
   'Complete the code to create **fullName** by combining `firstName` and `lastName` with a space between them.',
@@ -119,7 +119,7 @@ console.log(fullName);',
   'Koresha operator `+` guhuza strings: `firstName + '' '' + lastName` yongeraho umwanya hagati.'
 ),
 (
-  'qs000001-0000-0000-0000-000000000001',
+  '10000000-0000-0000-0000-000000000001',
   'Build a Temperature Converter',
   'Kubaka Ihindura ry''Ubushyuhe',
   'Write a function called `celsiusToFahrenheit(c)` that converts Celsius to Fahrenheit. The formula is: **F = (C × 9/5) + 32**. Then call it and log `celsiusToFahrenheit(0)` — the result should be `32`.',
@@ -139,7 +139,7 @@ console.log(fullName);',
   'Andika: `function celsiusToFahrenheit(c) { return (c * 9/5) + 32; }` — ifishi ikuza kwa 9/5 mbere, hanyuma yongeraho 32.'
 ),
 (
-  'qs000001-0000-0000-0000-000000000001',
+  '10000000-0000-0000-0000-000000000001',
   'Fix the Total Calculation',
   'Gusana Ibarwa y''Igiteganyo',
   'The total is showing `''955''` instead of `100`. Find the bug and fix it so the program logs `Total: 100`.',
@@ -160,7 +160,7 @@ console.log("Total: " + total);',
   'Operator `+` hamwe na string itera guhuza inyandiko, si guteranya. Hindura `price` kugira ngo ibe inomero mbere ukoresheje `Number(price)` cyangwa `parseInt(price)`.'
 ),
 (
-  'qs000001-0000-0000-0000-000000000001',
+  '10000000-0000-0000-0000-000000000001',
   'Identify Data Types',
   'Gutahura Ubwoko bw''Amakuru',
   'Complete the `console.log` calls to print the type of each variable using `typeof`. The first one is done for you.',
@@ -191,7 +191,7 @@ INSERT INTO public.quiz_challenges
   (set_id, title, title_kin, description, description_kin, challenge_type, difficulty, starter_js, starter_html, test_cases, xp_reward, order_index, hint, hint_kin)
 VALUES
 (
-  'qs000002-0000-0000-0000-000000000002',
+  '20000000-0000-0000-0000-000000000002',
   'Write a Greeting Function',
   'Andika Imikorere y''Ubutumwa',
   'Write a function called `greet` that takes one parameter `name` and returns the string `''Hello, '' + name + ''!''`. Then call it and log the result.',
@@ -211,7 +211,7 @@ VALUES
   'Andika: `function greet(name) { return ''Hello, '' + name + ''!''; }` — imikorere ifata amakuru binyuze muri parameters kandi isubiza agaciro ukoresheje `return`.'
 ),
 (
-  'qs000002-0000-0000-0000-000000000002',
+  '20000000-0000-0000-0000-000000000002',
   'Fix the Missing Return',
   'Gusana Return Iyibuze',
   'This function should return the square of a number, but it always returns `undefined`. Add the missing statement to make it work.',
@@ -235,7 +235,7 @@ console.log(square(3));  // should print 9',
   'Imikorere ikeneye inyito ya `return` gusubiza agaciro. Nta yo hari, imikorere isubiza `undefined`. Ongeraho `return result;` mbere y''`}`.'
 ),
 (
-  'qs000002-0000-0000-0000-000000000002',
+  '20000000-0000-0000-0000-000000000002',
   'Complete the Age Checker',
   'Uzuza Isuzuma ry''Imyaka',
   'Complete the condition inside the `if` statement. If `age` is 18 or more, the function should return `''Adult''`. Otherwise it should return `''Minor''`.',
@@ -263,7 +263,7 @@ console.log(checkAge(15)); // Minor',
   'Koresha `>=` kugenzura niba imyaka igeze kuri 18 cyangwa irarenga: uzuza `age >= 18` nka condition.'
 ),
 (
-  'qs000002-0000-0000-0000-000000000002',
+  '20000000-0000-0000-0000-000000000002',
   'Build a Grade Calculator',
   'Kubaka Ibarwa y''Amanota',
   'Write a function `getGrade(score)` that returns a letter grade: `''A''` for 90 and above, `''B''` for 80–89, `''C''` for 70–79, `''D''` for 60–69, and `''F''` for anything below 60.',
@@ -285,7 +285,7 @@ console.log(checkAge(15)); // Minor',
   'Koresha `if / else if / else`, utangirira ku manota menshi: `if (score >= 90) return ''A''; else if (score >= 80) return ''B'';` ukageza kuri F.'
 ),
 (
-  'qs000002-0000-0000-0000-000000000002',
+  '20000000-0000-0000-0000-000000000002',
   'Fix the Comparison Operator',
   'Gusana Operator yo Gusuzuma',
   'This function checks if a number is even, but crashes with an error. Find the bug in the `if` condition and fix it.',
@@ -312,7 +312,7 @@ console.log(isEven(7));  // false',
   'Umwe `=` ahanahana agaciro — si ugusuzuma. Kugira ngo usuzume, koresha `===`: hindura `number % 2 = 0` ukore `number % 2 === 0`.'
 ),
 (
-  'qs000002-0000-0000-0000-000000000002',
+  '20000000-0000-0000-0000-000000000002',
   'Use the Ternary Operator',
   'Koresha Operator ya Ternary',
   'Complete the function using a ternary operator. Return `20` if `isMember` is `true`, or `0` if it is `false`. The format is: `condition ? valueIfTrue : valueIfFalse`.',
@@ -340,7 +340,7 @@ INSERT INTO public.quiz_challenges
   (set_id, title, title_kin, description, description_kin, challenge_type, difficulty, starter_js, starter_html, test_cases, xp_reward, order_index, hint, hint_kin)
 VALUES
 (
-  'qs000003-0000-0000-0000-000000000003',
+  '30000000-0000-0000-0000-000000000003',
   'Build Your First Array',
   'Kubaka Urutonde Rwawe rwa Mbere',
   'Create an array called `fruits` with at least 3 fruit names. Then add `''mango''` to the end using `.push()`. Finally, log `fruits.length` to show how many fruits are in the array.',
@@ -360,7 +360,7 @@ VALUES
   'Shiraho urutonde: `const fruits = [''banana'', ''orange'', ''apple''];`, hanyuma ongeraho: `fruits.push(''mango'');`, hanyuma ugaragaze: `console.log(fruits.length);`.'
 ),
 (
-  'qs000003-0000-0000-0000-000000000003',
+  '30000000-0000-0000-0000-000000000003',
   'Fix the Array Index',
   'Gusana Indangagaciro y''Urutonde',
   'This code tries to print the last student in the list, but it prints `undefined`. Arrays start at index 0 — find the correct index and fix it.',
@@ -379,7 +379,7 @@ console.log(students[4]); // Bug: prints undefined — fix this',
   'Indangagaciro z''urutonde zitangira kuri 0. Urutonde rufite ibintu 4 rufite indangagaciro 0, 1, 2, 3. Indangagaciro ya nyuma ni 3, si 4. Koresha `students[3]` cyangwa `students[students.length - 1]`.'
 ),
 (
-  'qs000003-0000-0000-0000-000000000003',
+  '30000000-0000-0000-0000-000000000003',
   'Add Up Numbers with a Loop',
   'Guteranya Inomero ukoresheje Inzira yo Gusubiramo',
   'Complete the `for` loop to add all the numbers in the array together. The result should be `150`.',
@@ -404,7 +404,7 @@ console.log(sum); // 150',
   'Koresha `numbers.length` nka nomero ya nyuma y''inzira kandi `numbers[i]` kugera kuri buri kintu: `for (let i = 0; i < numbers.length; i++) { sum += numbers[i]; }`.'
 ),
 (
-  'qs000003-0000-0000-0000-000000000003',
+  '30000000-0000-0000-0000-000000000003',
   'Double Every Number',
   'Guteranya Inomero Zose Inshuro Ebyiri',
   'Write a function `doubleAll(arr)` that takes an array of numbers and returns a **new** array with each number multiplied by 2. Use the `.map()` method.',
@@ -424,7 +424,7 @@ console.log(sum); // 150',
   'Andika: `function doubleAll(arr) { return arr.map(num => num * 2); }` — `.map()` ishyiraho urutonde rushya iguindura buri kintu.'
 ),
 (
-  'qs000003-0000-0000-0000-000000000003',
+  '30000000-0000-0000-0000-000000000003',
   'Use the Right Array Method',
   'Koresha Method Nziza y''Urutonde',
   'This code should return **all** scores above 80, but it only returns the first one it finds. Fix it by using the correct array method.',
@@ -445,7 +445,7 @@ console.log(highScores);',
   '`.find()` isubiza gusa igice **cya mbere** gikurikirana. Koresha `.filter()` aho gusubiza **ibice byose** bikurikirana condition.'
 ),
 (
-  'qs000003-0000-0000-0000-000000000003',
+  '30000000-0000-0000-0000-000000000003',
   'Capitalize Every Name',
   'Gushyira Inyuguti Nkuru kuri Buri Zina',
   'Use `.map()` to create a new array where each name starts with a capital letter. The first letter of each name should be uppercase, the rest lowercase.',
@@ -475,7 +475,7 @@ INSERT INTO public.quiz_challenges
   (set_id, title, title_kin, description, description_kin, challenge_type, difficulty, starter_js, starter_html, test_cases, xp_reward, order_index, hint, hint_kin)
 VALUES
 (
-  'qs000004-0000-0000-0000-000000000004',
+  '40000000-0000-0000-0000-000000000004',
   'Create a Student Object',
   'Gushyiraho Ikintu cy''Umunyeshuri',
   'Create an object called `student` with three properties: `name` (a string), `age` (a number), and `grade` (a string like `''S4''`). Then log the student''s name.',
@@ -496,7 +496,7 @@ VALUES
   'Shiraho: `const student = { name: ''Aline'', age: 17, grade: ''S4'' };` hanyuma ugere kuri property ukoresheje idomu: `console.log(student.name);`.'
 ),
 (
-  'qs000004-0000-0000-0000-000000000004',
+  '40000000-0000-0000-0000-000000000004',
   'Fix the Property Name',
   'Gusana Izina rya Property',
   'This code should print the car''s brand but it prints `undefined`. JavaScript property names are **case-sensitive** — find and fix the bug.',
@@ -519,7 +519,7 @@ console.log(car.Brand); // Bug: wrong property name',
   'JavaScript ikengurira imikorere y''inyuguti: `car.Brand` si nka `car.brand`. Koresha izina ryo nk''uko ryandikwa mu kintu: `car.brand`.'
 ),
 (
-  'qs000004-0000-0000-0000-000000000004',
+  '40000000-0000-0000-0000-000000000004',
   'Filter Even Numbers with an Arrow Function',
   'Gutoranya Inomero z''Incana ukoresheje Arrow Function',
   'Use `.filter()` with an arrow function to create a new array containing **only the even numbers**.',
@@ -541,7 +541,7 @@ console.log(evens); // [2, 4, 6, 8]',
   'Imiterere ya arrow function: `num => num % 2 === 0`. Isubiza `true` ku zinomero z''incana (aho igabanywa na 2 nta sura isigara).'
 ),
 (
-  'qs000004-0000-0000-0000-000000000004',
+  '40000000-0000-0000-0000-000000000004',
   'Introduce Yourself with Template Literals',
   'Iyerekane ukoresheje Template Literals',
   'Write a function `introduce(name, age, school)` that returns the string:\n`''My name is [name], I am [age] years old and I study at [school].''`\nUse **template literals** (backticks) with `${expression}` syntax.',
@@ -560,7 +560,7 @@ console.log(evens); // [2, 4, 6, 8]',
   'Koresha backticks na `${}`: `function introduce(name, age, school) { return `My name is ${name}, I am ${age} years old and I study at ${school}.`; }`.'
 ),
 (
-  'qs000004-0000-0000-0000-000000000004',
+  '40000000-0000-0000-0000-000000000004',
   'Fix the Object Destructuring',
   'Gusana Guturuhu gw''Ibintu',
   'The code tries to extract `name` and `age` from the object, but it uses the **wrong syntax**. Fix the destructuring so both variables are printed correctly.',
@@ -583,7 +583,7 @@ console.log(age);  // 20',
   'Ibintu bifunganye `[]` ni byerekeza **guturuhu k''urutonde**. Ku **binyabuzima**, koresha ibinyabuzima bifunganye: `const { name, age } = person;`.'
 ),
 (
-  'qs000004-0000-0000-0000-000000000004',
+  '40000000-0000-0000-0000-000000000004',
   'Combine Arrays with the Spread Operator',
   'Guhuza Inzitari ukoresheje Spread Operator',
   'Use the **spread operator** (`...`) to combine `group1` and `group2` into a single `allStudents` array.',
@@ -614,7 +614,7 @@ INSERT INTO public.quiz_challenges
   (set_id, title, title_kin, description, description_kin, challenge_type, difficulty, starter_js, starter_html, test_cases, xp_reward, order_index, hint, hint_kin)
 VALUES
 (
-  'qs000005-0000-0000-0000-000000000005',
+  '50000000-0000-0000-0000-000000000005',
   'Change the Page Title',
   'Guhindura Umutwe w''Urupapuro',
   'Use JavaScript to find the element with id `''title''` and change its text content to `''Welcome to EduCode!''`.',
@@ -632,7 +632,7 @@ VALUES
   'Koresha `document.getElementById(''title'')` gushaka igice, hanyuma ushyireho `.textContent`: `document.getElementById(''title'').textContent = ''Welcome to EduCode!'';`.'
 ),
 (
-  'qs000005-0000-0000-0000-000000000005',
+  '50000000-0000-0000-0000-000000000005',
   'Fix the Wrong Selector',
   'Gusana Selector Itari Nziza',
   'The code tries to change the paragraph text but it crashes. The problem is the wrong selector method is being used. Fix it.',
@@ -650,7 +650,7 @@ msg.textContent = ''Text changed!'';',
   '`getElementById` ishaka attribute ya `id`. Igice gifite `class`, si `id`. Koresha `querySelector(''.message'')` — werekeza indome ku mazina ya class.'
 ),
 (
-  'qs000005-0000-0000-0000-000000000005',
+  '50000000-0000-0000-0000-000000000005',
   'Create and Append a List Item',
   'Gushyiraho no Kongeraho Igice cy''Urutonde',
   'Complete the code to create a new `<li>` element and append it to the existing list.',
@@ -670,7 +670,7 @@ document.getElementById(''____'').appendChild(newItem);',
   'Shiraho igice `''li''`: `createElement(''li'')`. Hanyuma ugikurikize ku rutonde rufite id `''list''`: `getElementById(''list'').appendChild(newItem)`.'
 ),
 (
-  'qs000005-0000-0000-0000-000000000005',
+  '50000000-0000-0000-0000-000000000005',
   'Handle a Button Click',
   'Gukemura Kugunda kw''Buto',
   'Add a **click event listener** to the button with id `''btn''`. When the button is clicked, set the text content of the element with id `''output''` to `''Button clicked!''`.',
@@ -688,7 +688,7 @@ document.getElementById(''____'').appendChild(newItem);',
   'Koresha `addEventListener`: `document.getElementById(''btn'').addEventListener(''click'', function() { document.getElementById(''output'').textContent = ''Button clicked!''; });`.'
 ),
 (
-  'qs000005-0000-0000-0000-000000000005',
+  '50000000-0000-0000-0000-000000000005',
   'Fix the Method Name Typo',
   'Gusana Ikosa ry''Izina rya Method',
   'The code should log `''Clicked!''` when the button is pressed, but it crashes. There is a **typo** in one method name — find it and fix it.',
@@ -707,7 +707,7 @@ document.getElementById(''____'').appendChild(newItem);',
   'Reba neza izina rya method: rigomba kuba `addEventListener` — ufite `e` mbere ya `Listener`. Ikosa ni `addEventListner` (irengagije ''e'').'
 ),
 (
-  'qs000005-0000-0000-0000-000000000005',
+  '50000000-0000-0000-0000-000000000005',
   'Change Element Styles',
   'Guhindura Imiterere y''Igice',
   'Complete the code to change the box''s background color to `''blue''` and its text color to `''white''`.',
