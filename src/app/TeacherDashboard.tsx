@@ -468,6 +468,7 @@ function AnnouncementsModal({ cls, language, onClose }: {
   };
 
   const handleDelete = async (id: string) => {
+    if (!window.confirm('Delete this announcement? This cannot be undone.')) return;
     setDeleting(id);
     await deleteAnnouncement(id);
     setAnnouncements(prev => prev.filter(a => a.id !== id));

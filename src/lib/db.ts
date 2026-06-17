@@ -320,7 +320,44 @@ export async function getSubmittedAssignmentIds(): Promise<Set<string>> {
   return new Set((data ?? []).map((r: { assignment_id: string }) => r.assignment_id));
 }
 
+// ─── Ownership helpers (never exported — called internally) ───────────────────
+
+async function currentUserId(): Promise<string | null> {
+  const { data: { user } } = await supabase.auth.getUser();
+  return user?.id ?? null;
+}
+
+async function assertTeacherOwnsClass(classId: string): Promise<string | null> {
+  const uid = await currentUserId();
+  if (!uid) return 'Not authenticated';
+  const { data } = await supabase.from('classes').select('teacher_id').eq('id', classId).single();
+  if (!data || data.teacher_id !== uid) return 'Unauthorized';
+  return null;
+}
+
+async function assertTeacherOwnsAssignment(assignmentId: string): Promise<{ classId: string | null; error: string | null }> {
+  const uid = await currentUserId();
+  if (!uid) return { classId: null, error: 'Not authenticated' };
+  const { data } = await supabase.from('assignments').select('class_id, classes(teacher_id)').eq('id', assignmentId).single();
+  const cls = (Array.isArray(data?.classes) ? data?.classes[0] : data?.classes) as { teacher_id: string } | null;
+  if (!data || cls?.teacher_id !== uid) return { classId: null, error: 'Unauthorized' };
+  return { classId: data.class_id, error: null };
+}
+
+async function assertSchoolAdminOwnsSchool(schoolId: string): Promise<string | null> {
+  const uid = await currentUserId();
+  if (!uid) return 'Not authenticated';
+  const { data } = await supabase.from('profiles').select('school_id, user_type').eq('id', uid).single();
+  if (!data || data.school_id !== schoolId || data.user_type !== 'school_admin') return 'Unauthorized';
+  return null;
+}
+
+// ─── Submissions ───────────────────────────────────────────────────────────────
+
 export async function getAssignmentSubmissions(assignmentId: string): Promise<{ data: Submission[]; error: string | null }> {
+  const { error: authError } = await assertTeacherOwnsAssignment(assignmentId);
+  if (authError) return { data: [], error: authError };
+
   const { data, error } = await supabase
     .from('student_submissions')
     .select('*, profiles(full_name)')
@@ -348,15 +385,20 @@ export async function getAssignmentSubmissionCounts(assignmentIds: string[]): Pr
 // ─── Grading ──────────────────────────────────────────────────────────────────
 
 export async function gradeSubmission(submissionId: string, marksEarned: number, feedback?: string): Promise<{ error: string | null }> {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { error: 'Not authenticated' };
+  const uid = await currentUserId();
+  if (!uid) return { error: 'Not authenticated' };
+
+  const { data: sub } = await supabase.from('student_submissions').select('assignment_id').eq('id', submissionId).single();
+  if (!sub) return { error: 'Submission not found' };
+  const { error: authError } = await assertTeacherOwnsAssignment(sub.assignment_id);
+  if (authError) return { error: authError };
 
   const { error } = await supabase
     .from('student_submissions')
     .update({
       marks_earned: marksEarned,
       teacher_feedback: feedback ?? null,
-      graded_by: user.id,
+      graded_by: uid,
       graded_at: new Date().toISOString(),
     })
     .eq('id', submissionId);
@@ -919,6 +961,9 @@ export interface ClassGradeRow {
 }
 
 export async function getClassGradesExport(classId: string): Promise<ClassGradeRow[]> {
+  const authError = await assertTeacherOwnsClass(classId);
+  if (authError) return [];
+
   const [{ data: enrollments }, { data: assignments }] = await Promise.all([
     supabase.from('class_enrollments').select('student_id, profiles(full_name)').eq('class_id', classId),
     supabase.from('assignments').select('id, title, assignment_type, total_marks, weight_pct').eq('class_id', classId).order('created_at', { ascending: true }),
@@ -980,6 +1025,9 @@ export interface ClassAnalytics {
 }
 
 export async function getClassAnalytics(classId: string): Promise<ClassAnalytics> {
+  const authError = await assertTeacherOwnsClass(classId);
+  if (authError) return { total_students: 0, assignments: [], class_avg_pct: null, overall_submission_rate: null };
+
   const [{ data: enrollments }, { data: assignments }, { data: submissions }] = await Promise.all([
     supabase.from('class_enrollments').select('student_id, profiles(full_name)').eq('class_id', classId),
     supabase.from('assignments').select('id, title, title_kin, assignment_type, total_marks').eq('class_id', classId).order('created_at', { ascending: false }),
@@ -1079,6 +1127,9 @@ function usernameFromName(name: string): string {
 }
 
 export async function getClassRoster(classId: string): Promise<RosterStudent[]> {
+  const authError = await assertTeacherOwnsClass(classId);
+  if (authError) return [];
+
   const { data: enrollments } = await supabase
     .from('class_enrollments')
     .select('student_id, profiles(full_name)')
@@ -1224,6 +1275,9 @@ export async function getMySchool(): Promise<School | null> {
 }
 
 export async function getSchoolOverview(schoolId: string): Promise<SchoolOverview> {
+  const authError = await assertSchoolAdminOwnsSchool(schoolId);
+  if (authError) return { teacher_count: 0, student_count: 0, class_count: 0, avg_score_pct: null, active_this_week: 0 };
+
   const { data: teachers } = await supabase.from('profiles').select('id').eq('school_id', schoolId).eq('user_type', 'teacher');
   const teacherIds = (teachers ?? []).map((t: { id: string }) => t.id);
   if (teacherIds.length === 0) return { teacher_count: 0, student_count: 0, class_count: 0, avg_score_pct: null, active_this_week: 0 };
@@ -1264,6 +1318,9 @@ export async function getSchoolOverview(schoolId: string): Promise<SchoolOvervie
 }
 
 export async function getSchoolTeachers(schoolId: string): Promise<SchoolTeacher[]> {
+  const authError = await assertSchoolAdminOwnsSchool(schoolId);
+  if (authError) return [];
+
   const { data: teachers } = await supabase.from('profiles').select('id, full_name, email').eq('school_id', schoolId).eq('user_type', 'teacher');
   if (!teachers?.length) return [];
   const ids = (teachers as Array<{ id: string; full_name: string; email: string }>).map(t => t.id);
@@ -1308,6 +1365,9 @@ export async function getSchoolTeachers(schoolId: string): Promise<SchoolTeacher
 }
 
 export async function getSchoolStudents(schoolId: string): Promise<SchoolStudent[]> {
+  const authError = await assertSchoolAdminOwnsSchool(schoolId);
+  if (authError) return [];
+
   const { data: teachers } = await supabase.from('profiles').select('id').eq('school_id', schoolId).eq('user_type', 'teacher');
   if (!teachers?.length) return [];
   const teacherIds = (teachers as Array<{ id: string }>).map(t => t.id);

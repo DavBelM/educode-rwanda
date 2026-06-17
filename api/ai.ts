@@ -3,14 +3,27 @@ import { Client } from '@gradio/client';
 
 const HF_SPACE = 'DavBelaa/educode-rwanda-ai';
 
+const ipRequests = new Map<string, number[]>();
+
+function checkRateLimit(ip: string, maxPerMinute: number): boolean {
+  const now = Date.now();
+  const times = (ipRequests.get(ip) ?? []).filter(t => now - t < 60_000);
+  if (times.length >= maxPerMinute) return false;
+  times.push(now);
+  ipRequests.set(ip, times);
+  return true;
+}
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  // Allow CORS from our own app
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+
+  const ip = String(req.headers['x-forwarded-for'] ?? req.socket?.remoteAddress ?? 'unknown');
+  if (!checkRateLimit(ip, 5)) return res.status(429).json({ error: 'Too many requests. Please wait a moment.' });
 
   const { message, systemPrompt } = req.body ?? {};
   if (!message) return res.status(400).json({ error: 'message is required' });

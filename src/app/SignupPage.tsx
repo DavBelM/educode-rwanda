@@ -36,8 +36,16 @@ export default function SignupPage({ onSuccess, onLoginClick }: {
 
   const handleSubmit = async (e: React.BaseSyntheticEvent) => {
     e.preventDefault();
-    setLoading(true);
     setError('');
+
+    if (!formData.fullName.trim()) { setError('Full name is required.'); return; }
+    if (!formData.email.trim()) { setError('Email is required.'); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) { setError('Please enter a valid email address.'); return; }
+    if (!formData.password) { setError('Password is required.'); return; }
+    if (formData.password.length < 6) { setError('Password must be at least 6 characters.'); return; }
+    if (!formData.userType) { setError('Please select whether you are a student, teacher, or self-learner.'); return; }
+
+    setLoading(true);
     const { error } = await signUp({
       email: formData.email,
       password: formData.password,
@@ -149,7 +157,7 @@ export default function SignupPage({ onSuccess, onLoginClick }: {
               <span className="label">Email</span>
               <input
                 className="input"
-                type="text"
+                type="email"
                 value={formData.email}
                 onChange={e => set('email', e.target.value)}
                 placeholder="jean@example.com"

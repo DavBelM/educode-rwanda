@@ -1,5 +1,16 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
+const ipRequests = new Map<string, number[]>();
+
+function checkRateLimit(ip: string, maxPerMinute: number): boolean {
+  const now = Date.now();
+  const times = (ipRequests.get(ip) ?? []).filter(t => now - t < 60_000);
+  if (times.length >= maxPerMinute) return false;
+  times.push(now);
+  ipRequests.set(ip, times);
+  return true;
+}
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -7,6 +18,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+
+  const ip = String(req.headers['x-forwarded-for'] ?? req.socket?.remoteAddress ?? 'unknown');
+  if (!checkRateLimit(ip, 10)) return res.status(429).json({ error: 'Too many requests. Please wait a moment.' });
 
   const { text, targetLanguage = 'KIN' } = req.body ?? {};
   if (!text) return res.status(400).json({ error: 'text is required' });
