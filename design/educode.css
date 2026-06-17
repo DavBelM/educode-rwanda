@@ -297,7 +297,7 @@ img { display: block; max-width: 100%; }
 .checkbox { display: inline-flex; align-items: center; gap: 9px; font-size: 13.5px; color: var(--text-2); cursor: pointer; }
 .checkbox input { appearance: none; width: 17px; height: 17px; border: 1px solid var(--line-strong); border-radius: 4px; background: transparent; display: grid; place-items: center; cursor: pointer; }
 .checkbox input:checked { background: var(--accent); border-color: var(--accent); }
-.checkbox input:checked::after { content: ""; width: 9px; height: 9px; border-radius: 1px; background: var(--pri-fg); }
+.checkbox input:checked::after { content: ""; width: 4px; height: 8px; border-right: 2px solid var(--pri-fg); border-bottom: 2px solid var(--pri-fg); transform: rotate(45deg) translate(-1px, -1px); }
 
 /* Divider with centered label */
 .or { display: flex; align-items: center; gap: 14px; color: var(--text-3); font-size: 12.5px; }
