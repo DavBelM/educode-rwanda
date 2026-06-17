@@ -16,7 +16,6 @@ export default function SignupPage({ onSuccess, onLoginClick }: {
     email: '',
     password: '',
     userType: '',
-    preferredLanguage: '',
   });
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -31,9 +30,6 @@ export default function SignupPage({ onSuccess, onLoginClick }: {
   };
   const pwStrength = getPasswordStrength(formData.password);
 
-  const langMap: Record<string, 'en' | 'kin' | 'both'> = {
-    english: 'en', kinyarwanda: 'kin', both: 'both',
-  };
   const typeMap: Record<string, 'student' | 'teacher' | 'self_learner'> = {
     student: 'student', teacher: 'teacher', 'self-learner': 'self_learner',
   };
@@ -47,7 +43,7 @@ export default function SignupPage({ onSuccess, onLoginClick }: {
       password: formData.password,
       fullName: formData.fullName,
       userType: typeMap[formData.userType] ?? 'student',
-      preferredLanguage: langMap[formData.preferredLanguage] ?? 'en',
+      preferredLanguage: 'en',
     });
     if (error) {
       setError(error);
@@ -202,25 +198,6 @@ export default function SignupPage({ onSuccess, onLoginClick }: {
                       onChange={e => set('userType', e.target.value)}
                     />
                     <span>{v === 'self-learner' ? 'Self-learner' : v.charAt(0).toUpperCase() + v.slice(1)}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            {/* Preferred language */}
-            <div className="field">
-              <span className="label">Preferred language:</span>
-              <div className="lang-seg">
-                {(['english', 'kinyarwanda', 'both'] as const).map(v => (
-                  <label key={v}>
-                    <input
-                      type="radio"
-                      name="preferredLanguage"
-                      value={v}
-                      checked={formData.preferredLanguage === v}
-                      onChange={e => set('preferredLanguage', e.target.value)}
-                    />
-                    <span>{v.charAt(0).toUpperCase() + v.slice(1)}</span>
                   </label>
                 ))}
               </div>
