@@ -71,13 +71,33 @@ export default function SignupPage({ onSuccess, onLoginClick }: {
               <span className="fname">hello.js</span>
             </div>
             <pre>
-              <span style={{ color: 'var(--text-3)' }}>{'// Your first line of code'}</span>{'\n'}
-              <span style={{ color: 'var(--text)' }}>console</span>
-              <span style={{ color: 'var(--text-2)' }}>.</span>
-              <span style={{ color: 'var(--text)' }}>log</span>
-              <span style={{ color: 'var(--text-2)' }}>(</span>
-              <span style={{ color: 'var(--text)' }}>&quot;Muraho, isi!&quot;</span>
-              <span style={{ color: 'var(--text-2)' }}>);</span>
+              <span style={{ color: 'var(--text-3)' }}>{'// hello.js — your first program'}</span>{'\n'}
+              <span style={{ color: 'var(--cream)' }}>{'function'}</span>
+              {' '}<span style={{ color: 'var(--text)' }}>{'greetStudent'}</span>
+              <span style={{ color: 'var(--text-2)' }}>{'(name) {'}</span>{'\n'}
+              {'  '}<span style={{ color: 'var(--cream)' }}>{'const'}</span>
+              {' '}<span style={{ color: 'var(--text)' }}>{'msg'}</span>
+              <span style={{ color: 'var(--text-2)' }}>{' = '}</span>
+              <span style={{ color: 'var(--text)' }}>{'"Hello, "'}</span>
+              <span style={{ color: 'var(--text-2)' }}>{' + '}</span>
+              <span style={{ color: 'var(--text)' }}>{'name'}</span>
+              <span style={{ color: 'var(--text-2)' }}>{' + '}</span>
+              <span style={{ color: 'var(--text)' }}>{'"!"'}</span>
+              <span style={{ color: 'var(--text-2)' }}>{';\n'}</span>
+              {'  '}<span style={{ color: 'var(--text)' }}>{'console'}</span>
+              <span style={{ color: 'var(--text-2)' }}>{'.'}</span>
+              <span style={{ color: 'var(--text)' }}>{'log'}</span>
+              <span style={{ color: 'var(--text-2)' }}>{'(msg);\n'}</span>
+              {'  '}<span style={{ color: 'var(--cream)' }}>{'return'}</span>
+              {' '}<span style={{ color: 'var(--text)' }}>{'msg'}</span>
+              <span style={{ color: 'var(--text-2)' }}>{';\n'}</span>
+              <span style={{ color: 'var(--text-2)' }}>{'}'}</span>{'\n'}
+              {'\n'}
+              <span style={{ color: 'var(--text)' }}>{'greetStudent'}</span>
+              <span style={{ color: 'var(--text-2)' }}>{'('}</span>
+              <span style={{ color: 'var(--text)' }}>{'"World"'}</span>
+              <span style={{ color: 'var(--text-2)' }}>{');'}</span>{'\n'}
+              <span style={{ color: 'var(--text-3)' }}>{'// → "Hello, World!"'}</span>
             </pre>
           </div>
         </div>
