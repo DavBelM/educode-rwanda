@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Code2, BookOpen, Zap, ChevronRight, Loader, Bot, ArrowRight } from 'lucide-react';
+import { Code2, BookOpen, Zap, ChevronRight, Loader, Bot, ArrowRight, Trophy } from 'lucide-react';
 import { AppNav } from './components/AppNav';
 import { useAuth } from '../lib/auth';
 import { getSelfLearnerStats, getResumeLesson, type CourseProgress, type CourseLesson } from '../lib/db';
@@ -11,6 +11,7 @@ interface Props {
   onStartCoding: () => void;
   onOpenCourses: () => void;
   onContinueLearning: () => void;
+  onOpenChallenges: () => void;
   onOpenLesson: (lesson: CourseLesson, courseTitle: string, allLessons: CourseLesson[]) => void;
 }
 
@@ -29,7 +30,7 @@ function getLevel(xp: number) {
   return { level: level + 1, name: LEVEL_NAMES[level], xpToNext: next - xp, pct };
 }
 
-export default function SelfLearnerDashboard({ language, onStartCoding, onOpenCourses, onContinueLearning, onOpenLesson }: Props) {
+export default function SelfLearnerDashboard({ language, onStartCoding, onOpenCourses, onContinueLearning, onOpenChallenges, onOpenLesson }: Props) {
   usePageTitle('Dashboard · EduCode');
   const { profile } = useAuth();
   const isKin = language === 'KIN';
@@ -93,6 +94,14 @@ export default function SelfLearnerDashboard({ language, onStartCoding, onOpenCo
       loading: false,
       primary: false,
     },
+    {
+      icon: <Trophy size={18} />,
+      title: isKin ? 'Imikino yo Gukora' : 'Challenges',
+      sub: isKin ? 'Gukora challenge, ibe uronka XP' : 'Solve challenges, earn XP',
+      onClick: onOpenChallenges,
+      loading: false,
+      primary: false,
+    },
   ];
 
   return (
@@ -120,7 +129,7 @@ export default function SelfLearnerDashboard({ language, onStartCoding, onOpenCo
           <div className="stack" style={{ ['--gap' as string]: '22px' }}>
 
             {/* Quick actions */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 rise-2">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 rise-2">
               {quickActions.map(a => (
                 <button
                   key={a.title}

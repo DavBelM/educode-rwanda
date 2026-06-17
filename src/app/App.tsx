@@ -19,6 +19,8 @@ import MyResultsPage from './MyResultsPage';
 import OnboardingModal from './OnboardingModal';
 import SchoolAdminDashboard from './SchoolAdminDashboard';
 import SelfLearnerDashboard from './SelfLearnerDashboard';
+import ChallengePage from './ChallengePage';
+import ChallengeRunner from './ChallengeRunner';
 import { useAuth } from '../lib/auth';
 import { getResumeLesson, type Assignment, type CourseLesson } from '../lib/db';
 
@@ -146,11 +148,14 @@ export default function App() {
               />
             } />
             <Route path="/lesson" element={<LessonRoute language={language} />} />
+            <Route path="/challenges" element={<ChallengePage language={language} />} />
+            <Route path="/challenges/:setId" element={<ChallengeRunner language={language} />} />
             <Route path="*" element={
               <SelfLearnerDashboard
                 {...sharedCourseProps}
                 onStartCoding={() => navigate('/workspace')}
                 onOpenCourses={() => navigate('/courses')}
+                onOpenChallenges={() => navigate('/challenges')}
                 onContinueLearning={async () => {
                   const resume = await getResumeLesson();
                   if (resume) navigate('/lesson', { state: resume });
@@ -168,7 +173,7 @@ export default function App() {
       <>
         {onboardingModal}
         <Routes>
-          <Route path="/workspace" element={<WorkspaceRoute language={language} onLanguageChange={setLanguage} />} />
+          <Route path="/workspace" element={<WorkspaceRoute language={language} />} />
           <Route path="/assignment" element={<TheoreticalRoute language={language} />} />
           <Route path="/courses" element={
             <CoursesPage
@@ -183,6 +188,8 @@ export default function App() {
               onBack={() => navigate('/dashboard')}
             />
           } />
+          <Route path="/challenges" element={<ChallengePage language={language} />} />
+          <Route path="/challenges/:setId" element={<ChallengeRunner language={language} />} />
           <Route path="*" element={
             <Dashboard
               language={language}
@@ -191,6 +198,7 @@ export default function App() {
               onOpenAssignment={(a) => navigate('/assignment', { state: { assignment: a } })}
               onOpenCourses={() => navigate('/courses')}
               onOpenResults={() => navigate('/results')}
+              onOpenChallenges={() => navigate('/challenges')}
               onContinueLearning={async () => {
                 const resume = await getResumeLesson();
                 if (resume) navigate('/lesson', { state: resume });
