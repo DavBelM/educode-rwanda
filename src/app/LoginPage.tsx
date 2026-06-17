@@ -87,7 +87,7 @@ export default function LoginPage({ onSuccess, onSignupClick, onForgotPassword }
               <span className="label">Email</span>
               <input
                 className="input"
-                type="text"
+                type="email"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 placeholder="aline.u@school.rw"

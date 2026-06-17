@@ -3,6 +3,7 @@ import { BookOpen, Code2, CheckCircle, Clock, MessageSquare, TrendingUp, Bell } 
 import { getStudentResults, type StudentResult } from '../lib/db';
 import { usePageTitle } from '../hooks/usePageTitle';
 import { AppNav } from './components/AppNav';
+import { useAuth } from '../lib/auth';
 
 interface Props {
   language: 'EN' | 'KIN';
@@ -14,11 +15,13 @@ type Filter = 'all' | 'graded' | 'pending' | 'not-submitted';
 export default function MyResultsPage({ language }: Props) {
   usePageTitle('My Results · EduCode');
   const isKin = language === 'KIN';
+  const { profile } = useAuth();
+  const seenKey = `educode_seen_grades_${profile?.id ?? 'anon'}`;
   const [results, setResults] = useState<StudentResult[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<Filter>('all');
   const [seenGrades, setSeenGrades] = useState<Set<string>>(() => {
-    const saved = localStorage.getItem('educode_seen_grades');
+    const saved = localStorage.getItem(`educode_seen_grades_${profile?.id ?? 'anon'}`);
     return new Set(saved ? JSON.parse(saved) : []);
   });
 
@@ -37,7 +40,7 @@ export default function MyResultsPage({ language }: Props) {
       .map(r => r.assignment_id);
     const updated = new Set([...seenGrades, ...newGraded]);
     setSeenGrades(updated);
-    localStorage.setItem('educode_seen_grades', JSON.stringify([...updated]));
+    localStorage.setItem(seenKey, JSON.stringify([...updated]));
   }, [results]);
 
   const submitted = results.filter(r => r.submitted);

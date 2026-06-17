@@ -169,14 +169,15 @@ export async function createAssignment(params: {
   durationMinutes?: number;
   weightPct?: number;
 }): Promise<{ data: Assignment | null; error: string | null }> {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { data: null, error: 'Not authenticated' };
+  const authError = await assertTeacherOwnsClass(params.classId);
+  if (authError) return { data: null, error: authError };
+  const uid = await currentUserId();
 
   const { data, error } = await supabase
     .from('assignments')
     .insert({
       class_id: params.classId,
-      teacher_id: user.id,
+      teacher_id: uid,
       title: params.title,
       title_kin: params.titleKin,
       description: params.description,
@@ -479,6 +480,9 @@ export async function getStudentResults(): Promise<StudentResult[]> {
 }
 
 export async function releaseGrades(assignmentId: string): Promise<{ error: string | null }> {
+  const { error: authError } = await assertTeacherOwnsAssignment(assignmentId);
+  if (authError) return { error: authError };
+
   const { error } = await supabase
     .from('assignments')
     .update({ grades_released: true })
@@ -491,7 +495,7 @@ export async function getNewGradeCount(): Promise<number> {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return 0;
 
-  const seen: string[] = JSON.parse(localStorage.getItem('educode_seen_grades') ?? '[]');
+  const seen: string[] = JSON.parse(localStorage.getItem(`educode_seen_grades_${user.id}`) ?? '[]');
 
   const { data } = await supabase
     .from('student_submissions')
@@ -707,14 +711,15 @@ export async function createAnnouncement(params: {
   body: string;
   pinned?: boolean;
 }): Promise<{ data: Announcement | null; error: string | null }> {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { data: null, error: 'Not authenticated' };
+  const authError = await assertTeacherOwnsClass(params.classId);
+  if (authError) return { data: null, error: authError };
+  const uid = await currentUserId();
 
   const { data, error } = await supabase
     .from('announcements')
     .insert({
       class_id: params.classId,
-      teacher_id: user.id,
+      teacher_id: uid,
       title: params.title,
       body: params.body,
       pinned: params.pinned ?? false,
@@ -764,6 +769,11 @@ export async function getStudentAnnouncements(): Promise<{ data: Announcement[];
 }
 
 export async function deleteAnnouncement(id: string): Promise<{ error: string | null }> {
+  const uid = await currentUserId();
+  if (!uid) return { error: 'Not authenticated' };
+  const { data: ann } = await supabase.from('announcements').select('teacher_id').eq('id', id).single();
+  if (!ann || ann.teacher_id !== uid) return { error: 'Unauthorized' };
+
   const { error } = await supabase.from('announcements').delete().eq('id', id);
   if (error) return { error: error.message };
   return { error: null };
@@ -1426,6 +1436,9 @@ export async function getSchoolStudents(schoolId: string): Promise<SchoolStudent
 }
 
 export async function addTeacherToSchool(schoolId: string, teacherEmail: string): Promise<{ error: string | null }> {
+  const authError = await assertSchoolAdminOwnsSchool(schoolId);
+  if (authError) return { error: authError };
+
   const { data, error } = await supabase
     .from('profiles').update({ school_id: schoolId })
     .eq('email', teacherEmail).eq('user_type', 'teacher')
@@ -1435,6 +1448,13 @@ export async function addTeacherToSchool(schoolId: string, teacherEmail: string)
 }
 
 export async function removeTeacherFromSchool(teacherId: string): Promise<{ error: string | null }> {
+  const uid = await currentUserId();
+  if (!uid) return { error: 'Not authenticated' };
+  const { data: prof } = await supabase.from('profiles').select('school_id').eq('id', teacherId).single();
+  if (!prof?.school_id) return { error: 'Teacher not found' };
+  const authError = await assertSchoolAdminOwnsSchool(prof.school_id);
+  if (authError) return { error: authError };
+
   const { error } = await supabase.from('profiles').update({ school_id: null }).eq('id', teacherId);
   if (error) return { error: error.message };
   return { error: null };
@@ -1443,10 +1463,12 @@ export async function removeTeacherFromSchool(teacherId: string): Promise<{ erro
 export async function createSchoolAnnouncement(params: {
   schoolId: string; title: string; body: string; pinned?: boolean;
 }): Promise<{ data: SchoolAnnouncement | null; error: string | null }> {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { data: null, error: 'Not authenticated' };
+  const authError = await assertSchoolAdminOwnsSchool(params.schoolId);
+  if (authError) return { data: null, error: authError };
+  const uid = await currentUserId();
+
   const { data, error } = await supabase.from('school_announcements')
-    .insert({ school_id: params.schoolId, admin_id: user.id, title: params.title, body: params.body, pinned: params.pinned ?? false })
+    .insert({ school_id: params.schoolId, admin_id: uid, title: params.title, body: params.body, pinned: params.pinned ?? false })
     .select().single();
   if (error) return { data: null, error: error.message };
   return { data, error: null };
@@ -1459,6 +1481,11 @@ export async function getSchoolAnnouncements(schoolId: string): Promise<SchoolAn
 }
 
 export async function deleteSchoolAnnouncement(id: string): Promise<{ error: string | null }> {
+  const { data: ann } = await supabase.from('school_announcements').select('school_id').eq('id', id).single();
+  if (!ann) return { error: 'Not found' };
+  const authError = await assertSchoolAdminOwnsSchool(ann.school_id);
+  if (authError) return { error: authError };
+
   const { error } = await supabase.from('school_announcements').delete().eq('id', id);
   if (error) return { error: error.message };
   return { error: null };
