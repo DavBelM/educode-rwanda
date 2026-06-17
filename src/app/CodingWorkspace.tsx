@@ -9,6 +9,7 @@ import { warmUpSpace } from '../lib/ai';
 import { submitCodingAssignment, type Assignment } from '../lib/db';
 import { useExamMode } from '../hooks/useExamMode';
 import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../lib/auth';
 import { Send, CheckCircle, Loader, AlertTriangle, Clock } from 'lucide-react';
 
 const DEFAULT_JS = `// Welcome to EduCode Rwanda!
@@ -50,9 +51,14 @@ function dueLabel(dueDate: string | null, isKin: boolean): string | null {
 export default function CodingWorkspace({ assignment }: Props) {
   const [language, setLanguage] = useState<'EN' | 'KIN'>('EN');
   const isKin = language === 'KIN';
+  const { profile } = useAuth();
 
-  // Auto-save key — per assignment or free practice
-  const saveKey = assignment ? `educode_code_${assignment.id}` : 'educode_code_free';
+  // Auto-save key — scoped to user so different students on the same
+  // browser never share code drafts.
+  const userId = profile?.id ?? 'anon';
+  const saveKey = assignment
+    ? `educode_code_${userId}_${assignment.id}`
+    : `educode_code_${userId}_free`;
   const savedJs = localStorage.getItem(saveKey + '_js');
   const savedHtml = localStorage.getItem(saveKey + '_html');
 
