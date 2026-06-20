@@ -1,0 +1,254 @@
+[
+  {
+    "topic": "let_const_scope",
+    "title": "MDN: let statement",
+    "url": "https://developer.mozilla.org/en-US/Web/JavaScript/Reference/Statements/let",
+    "file": "web_javascript_reference_statements_let.md",
+    "size": 12702
+  },
+  {
+    "topic": "let_const_scope",
+    "title": "MDN: const statement",
+    "url": "https://developer.mozilla.org/en-US/Web/JavaScript/Reference/Statements/const",
+    "file": "web_javascript_reference_statements_const.md",
+    "size": 6737
+  },
+  {
+    "topic": "let_const_scope",
+    "title": "MDN: var statement",
+    "url": "https://developer.mozilla.org/en-US/Web/JavaScript/Reference/Statements/var",
+    "file": "web_javascript_reference_statements_var.md",
+    "size": 10144
+  },
+  {
+    "topic": "arrow_functions",
+    "title": "MDN: Arrow function expressions",
+    "url": "https://developer.mozilla.org/en-US/Web/JavaScript/Reference/Functions/Arrow_functions",
+    "file": "web_javascript_reference_functions_arrow_functions.md",
+    "size": 15587
+  },
+  {
+    "topic": "template_literals",
+    "title": "MDN: Template literals",
+    "url": "https://developer.mozilla.org/en-US/Web/JavaScript/Reference/Template_literals",
+    "file": "web_javascript_reference_template_literals.md",
+    "size": 16117
+  },
+  {
+    "topic": "async_await",
+    "title": "MDN: async function",
+    "url": "https://developer.mozilla.org/en-US/Web/JavaScript/Reference/Statements/async_function",
+    "file": "web_javascript_reference_statements_async_function.md",
+    "size": 13551
+  },
+  {
+    "topic": "async_await",
+    "title": "MDN: await operator",
+    "url": "https://developer.mozilla.org/en-US/Web/JavaScript/Reference/Operators/await",
+    "file": "web_javascript_reference_operators_await.md",
+    "size": 12442
+  },
+  {
+    "topic": "async_await",
+    "title": "MDN: Using promises",
+    "url": "https://developer.mozilla.org/en-US/Web/JavaScript/Guide/Using_promises",
+    "file": "web_javascript_guide_using_promises.md",
+    "size": 24966
+  },
+  {
+    "topic": "async_await",
+    "title": "MDN: Promise",
+    "url": "https://developer.mozilla.org/en-US/Web/JavaScript/Reference/Global_Objects/Promise",
+    "file": "web_javascript_reference_global_objects_promise.md",
+    "size": 29022
+  },
+  {
+    "topic": "array_methods",
+    "title": "MDN: Array.prototype.map()",
+    "url": "https://developer.mozilla.org/en-US/Web/JavaScript/Reference/Global_Objects/Array/map",
+    "file": "web_javascript_reference_global_objects_array_map.md",
+    "size": 9871
+  },
+  {
+    "topic": "array_methods",
+    "title": "MDN: Array.prototype.filter()",
+    "url": "https://developer.mozilla.org/en-US/Web/JavaScript/Reference/Global_Objects/Array/filter",
+    "file": "web_javascript_reference_global_objects_array_filter.md",
+    "size": 7440
+  },
+  {
+    "topic": "array_methods",
+    "title": "MDN: Array.prototype.forEach()",
+    "url": "https://developer.mozilla.org/en-US/Web/JavaScript/Reference/Global_Objects/Array/forEach",
+    "file": "web_javascript_reference_global_objects_array_foreach.md",
+    "size": 8909
+  },
+  {
+    "topic": "array_methods",
+    "title": "MDN: Array.prototype.reduce()",
+    "url": "https://developer.mozilla.org/en-US/Web/JavaScript/Reference/Global_Objects/Array/reduce",
+    "file": "web_javascript_reference_global_objects_array_reduce.md",
+    "size": 17940
+  },
+  {
+    "topic": "array_methods",
+    "title": "MDN: Array.prototype.find()",
+    "url": "https://developer.mozilla.org/en-US/Web/JavaScript/Reference/Global_Objects/Array/find",
+    "file": "web_javascript_reference_global_objects_array_find.md",
+    "size": 8251
+  },
+  {
+    "topic": "array_methods",
+    "title": "MDN: Array.prototype.findIndex()",
+    "url": "https://developer.mozilla.org/en-US/Web/JavaScript/Reference/Global_Objects/Array/findIndex",
+    "file": "web_javascript_reference_global_objects_array_findindex.md",
+    "size": 5873
+  },
+  {
+    "topic": "array_methods",
+    "title": "MDN: Array.prototype.slice()",
+    "url": "https://developer.mozilla.org/en-US/Web/JavaScript/Reference/Global_Objects/Array/slice",
+    "file": "web_javascript_reference_global_objects_array_slice.md",
+    "size": 8494
+  },
+  {
+    "topic": "array_methods",
+    "title": "MDN: Array.prototype.splice()",
+    "url": "https://developer.mozilla.org/en-US/Web/JavaScript/Reference/Global_Objects/Array/splice",
+    "file": "web_javascript_reference_global_objects_array_splice.md",
+    "size": 8152
+  },
+  {
+    "topic": "array_methods",
+    "title": "MDN: Array.prototype.push()",
+    "url": "https://developer.mozilla.org/en-US/Web/JavaScript/Reference/Global_Objects/Array/push",
+    "file": "web_javascript_reference_global_objects_array_push.md",
+    "size": 5520
+  },
+  {
+    "topic": "array_methods",
+    "title": "MDN: Array.prototype.pop()",
+    "url": "https://developer.mozilla.org/en-US/Web/JavaScript/Reference/Global_Objects/Array/pop",
+    "file": "web_javascript_reference_global_objects_array_pop.md",
+    "size": 4517
+  },
+  {
+    "topic": "operators",
+    "title": "MDN: Equality operator (==)",
+    "url": "https://developer.mozilla.org/en-US/Web/JavaScript/Reference/Operators/Equality",
+    "file": "web_javascript_reference_operators_equality.md",
+    "size": 6260
+  },
+  {
+    "topic": "equality",
+    "title": "MDN: Strict equality operator (===)",
+    "url": "https://developer.mozilla.org/en-US/Web/JavaScript/Reference/Operators/Strict_equality",
+    "file": "web_javascript_reference_operators_strict_equality.md",
+    "size": 2767
+  },
+  {
+    "topic": "operators",
+    "title": "MDN: typeof operator",
+    "url": "https://developer.mozilla.org/en-US/Web/JavaScript/Reference/Operators/typeof",
+    "file": "web_javascript_reference_operators_typeof.md",
+    "size": 11134
+  },
+  {
+    "topic": "operators",
+    "title": "MDN: Addition operator (+)",
+    "url": "https://developer.mozilla.org/en-US/Web/JavaScript/Reference/Operators/Addition",
+    "file": "web_javascript_reference_operators_addition.md",
+    "size": 4711
+  },
+  {
+    "topic": "off_by_one",
+    "title": "MDN: for statement",
+    "url": "https://developer.mozilla.org/en-US/Web/JavaScript/Reference/Statements/for",
+    "file": "web_javascript_reference_statements_for.md",
+    "size": 11162
+  },
+  {
+    "topic": "off_by_one",
+    "title": "MDN: while statement",
+    "url": "https://developer.mozilla.org/en-US/Web/JavaScript/Reference/Statements/while",
+    "file": "web_javascript_reference_statements_while.md",
+    "size": 6117
+  },
+  {
+    "topic": "off_by_one",
+    "title": "MDN: for...of statement",
+    "url": "https://developer.mozilla.org/en-US/Web/JavaScript/Reference/Statements/for...of",
+    "file": "web_javascript_reference_statements_for___of.md",
+    "size": 13308
+  },
+  {
+    "topic": "arrow_functions",
+    "title": "MDN: Functions guide",
+    "url": "https://developer.mozilla.org/en-US/Web/JavaScript/Guide/Functions",
+    "file": "web_javascript_guide_functions.md",
+    "size": 25246
+  },
+  {
+    "topic": "arrow_functions",
+    "title": "MDN: Default parameters",
+    "url": "https://developer.mozilla.org/en-US/Web/JavaScript/Reference/Functions/Default_parameters",
+    "file": "web_javascript_reference_functions_default_parameters.md",
+    "size": 7815
+  },
+  {
+    "topic": "destructuring",
+    "title": "MDN: Object initializer",
+    "url": "https://developer.mozilla.org/en-US/Web/JavaScript/Reference/Operators/Object_initializer",
+    "file": "web_javascript_reference_operators_object_initializer.md",
+    "size": 11565
+  },
+  {
+    "topic": "javascript_intro",
+    "title": "MDN: Error",
+    "url": "https://developer.mozilla.org/en-US/Web/JavaScript/Reference/Global_Objects/Error",
+    "file": "web_javascript_reference_global_objects_error.md",
+    "size": 10498
+  },
+  {
+    "topic": "javascript_intro",
+    "title": "MDN: TypeError",
+    "url": "https://developer.mozilla.org/en-US/Web/JavaScript/Reference/Global_Objects/TypeError",
+    "file": "web_javascript_reference_global_objects_typeerror.md",
+    "size": 2365
+  },
+  {
+    "topic": "javascript_intro",
+    "title": "MDN: ReferenceError",
+    "url": "https://developer.mozilla.org/en-US/Web/JavaScript/Reference/Global_Objects/ReferenceError",
+    "file": "web_javascript_reference_global_objects_referenceerror.md",
+    "size": 2240
+  },
+  {
+    "topic": "javascript_intro",
+    "title": "MDN: SyntaxError",
+    "url": "https://developer.mozilla.org/en-US/Web/JavaScript/Reference/Global_Objects/SyntaxError",
+    "file": "web_javascript_reference_global_objects_syntaxerror.md",
+    "size": 2204
+  },
+  {
+    "topic": "let_const_scope",
+    "title": "MDN: Closures",
+    "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Closures",
+    "file": "web_javascript_guide_closures.md",
+    "size": 21651
+  },
+  {
+    "topic": "destructuring",
+    "title": "MDN: Destructuring assignment",
+    "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring",
+    "file": "web_javascript_reference_operators_destructuring.md",
+    "size": 20347
+  },
+  {
+    "topic": "equality",
+    "title": "MDN: Equality comparisons and sameness",
+    "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Equality_comparisons_and_sameness",
+    "file": "web_javascript_guide_equality_comparisons_and_sameness.md",
+    "size": 18912
+  }
+]
