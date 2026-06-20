@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import CodeMirror from '@uiw/react-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { html } from '@codemirror/lang-html';
@@ -14,6 +14,7 @@ interface CodeEditorProps {
   onHtmlChange: (code: string) => void;
   language: 'EN' | 'KIN';
   errorLine?: number;
+  blockPaste?: boolean;
 }
 
 function errorLinePlugin(line: number) {
@@ -116,9 +117,27 @@ const educodeHighlight = HighlightStyle.define([
 
 type Tab = 'js' | 'html';
 
-export function CodeEditor({ jsCode, htmlCode, onJsChange, onHtmlChange, language, errorLine }: CodeEditorProps) {
+export function CodeEditor({ jsCode, htmlCode, onJsChange, onHtmlChange, language, errorLine, blockPaste }: CodeEditorProps) {
   const isKinyarwanda = language === 'KIN';
   const [activeTab, setActiveTab] = useState<Tab>('js');
+  const [pasteDenied, setPasteDenied] = useState(false);
+
+  useEffect(() => {
+    if (!pasteDenied) return;
+    const timer = setTimeout(() => setPasteDenied(false), 5000);
+    return () => clearTimeout(timer);
+  }, [pasteDenied]);
+
+  const pasteBlockExt = useMemo(() => {
+    if (!blockPaste) return [];
+    return [EditorView.domEventHandlers({
+      paste(event) {
+        event.preventDefault();
+        setPasteDenied(true);
+        return true;
+      },
+    })];
+  }, [blockPaste]);
 
   const jsExtensions = [
     javascript(),
@@ -126,6 +145,7 @@ export function CodeEditor({ jsCode, htmlCode, onJsChange, onHtmlChange, languag
     educodeTheme,
     syntaxHighlighting(educodeHighlight),
     ...(errorLine && activeTab === 'js' ? [errorLinePlugin(errorLine)] : []),
+    ...pasteBlockExt,
   ];
 
   const htmlExtensions = [
@@ -133,6 +153,7 @@ export function CodeEditor({ jsCode, htmlCode, onJsChange, onHtmlChange, languag
     EditorView.lineWrapping,
     educodeTheme,
     syntaxHighlighting(educodeHighlight),
+    ...pasteBlockExt,
   ];
 
   return (
@@ -145,6 +166,20 @@ export function CodeEditor({ jsCode, htmlCode, onJsChange, onHtmlChange, languag
           index.html
         </span>
       </div>
+
+      {blockPaste && pasteDenied && (
+        <div style={{
+          padding: '8px 14px', flexShrink: 0,
+          background: 'var(--surface)',
+          borderBottom: '1px solid var(--line)',
+          borderLeft: '3px solid var(--text-3)',
+          fontSize: 13, color: 'var(--text-2)', lineHeight: 1.5,
+        }}>
+          {isKinyarwanda
+            ? 'Gushyiraho ntibishoboka muri challenge mode. Andika kode yawe — nibyo bigufasha kwiga.'
+            : 'Paste disabled in challenge mode. Typing it yourself is how the skill sticks.'}
+        </div>
+      )}
 
       <div className="editor-area">
         {activeTab === 'js' ? (

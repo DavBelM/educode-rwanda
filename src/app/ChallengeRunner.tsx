@@ -84,8 +84,30 @@ export default function ChallengeRunner({ language }: Props) {
 
   const classIdRef = useRef<string | null>(null);
   const codenameRef = useRef<string | null>(null);
+  const tabSwitchesRef = useRef(0);
+  const [tabWarning, setTabWarning] = useState(false);
 
   usePageTitle(set ? `${set.title} · EduCode` : 'Challenge · EduCode');
+
+  // Tab visibility tracking — log switches, show soft warning on return
+  useEffect(() => {
+    if (phase !== 'running') return;
+    const onVisibilityChange = () => {
+      if (document.hidden) {
+        tabSwitchesRef.current++;
+      } else {
+        setTabWarning(true);
+      }
+    };
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', onVisibilityChange);
+  }, [phase]);
+
+  useEffect(() => {
+    if (!tabWarning) return;
+    const timer = setTimeout(() => setTabWarning(false), 7000);
+    return () => clearTimeout(timer);
+  }, [tabWarning]);
 
   useEffect(() => {
     if (!setId) return;
@@ -198,7 +220,7 @@ export default function ChallengeRunner({ language }: Props) {
     let xp = base;
     if (attempts === 1) xp = Math.round(xp * 1.5);
     else if (attempts > 3) xp = Math.round(xp * 0.7);
-    if (usedHint) xp = Math.round(xp * 0.5); // 50% reduction — hint is a meaningful trade-off
+    if (usedHint) xp = Math.round(xp * 0.75); // 25% reduction — keeps hints affordable
     return xp;
   };
 
@@ -446,7 +468,30 @@ export default function ChallengeRunner({ language }: Props) {
             onJsChange={setJsCode}
             onHtmlChange={setHtmlCode}
             language={language}
+            blockPaste
           />
+
+          {tabWarning && (
+            <div style={{
+              padding: '9px 14px', flexShrink: 0,
+              background: 'var(--surface-2)',
+              borderTop: '1px solid var(--line)',
+              borderLeft: '3px solid var(--text-3)',
+              display: 'flex', alignItems: 'flex-start', gap: 8,
+              fontSize: 13, color: 'var(--text-2)', lineHeight: 1.45,
+            }}>
+              <span style={{ flex: 1 }}>
+                {isKin
+                  ? 'Twabonye wasimbuye ibikari. Gerageza gukemura ikibazo wabikoze — nibyo bigufasha kwiga.'
+                  : "We noticed you switched tabs. If you're checking for the answer, you'll learn less — try to work it out yourself first."}
+              </span>
+              <button
+                onClick={() => setTabWarning(false)}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-3)', flexShrink: 0, fontSize: 16, lineHeight: 1, padding: '0 2px' }}
+                aria-label="Dismiss"
+              >×</button>
+            </div>
+          )}
 
           {/* Run bar */}
           <div style={{
@@ -591,7 +636,7 @@ export default function ChallengeRunner({ language }: Props) {
                     onClick={() => { setShowHint(true); setHintUsed(true); }}
                   >
                     <Lightbulb size={13} />
-                    {isKin ? 'Reba ikimenyetso (XP iza guke)' : 'Show hint (reduces XP)'}
+                    {isKin ? 'Reba ikimenyetso (XP iza guke)' : 'Show hint (costs a little XP)'}
                   </button>
                 )}
               </div>
@@ -656,6 +701,25 @@ export default function ChallengeRunner({ language }: Props) {
                     </div>
                   </div>
                 ))}
+
+                {results.some(r => !r.passed) && attemptCount >= 2 && rightTab !== 'mwarimu' && (
+                  <button
+                    onClick={() => { setRightTab('mwarimu'); setMwarimuDot(false); }}
+                    style={{
+                      marginTop: 14, width: '100%',
+                      padding: '9px 14px',
+                      background: 'none',
+                      border: '1px dashed var(--line-strong)',
+                      borderRadius: 'var(--radius)',
+                      cursor: 'pointer',
+                      display: 'flex', alignItems: 'center', gap: 8,
+                      fontSize: 13, color: 'var(--text-2)',
+                    }}
+                  >
+                    <Bot size={14} />
+                    {isKin ? 'Ntibishoboka? Baza Mwarimu' : 'Stuck? Ask Mwarimu'}
+                  </button>
+                )}
               </div>
             )}
           </div>
