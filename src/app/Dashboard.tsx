@@ -81,7 +81,7 @@ function JoinClassModal({ language, onClose, onJoined }: {
           placeholder="e.g. A3F8K2"
           maxLength={8}
           className="input mb-4"
-          style={{ textAlign: 'center', fontSize: '20px', fontWeight: 700, letterSpacing: '0.15em' }}
+          style={{ textAlign: 'center', fontSize: '20px', fontWeight: 600, letterSpacing: '0.15em' }}
           onKeyDown={e => e.key === 'Enter' && handleJoin()}
         />
 
@@ -387,7 +387,7 @@ export default function Dashboard({ language, onStartCoding, onOpenAssignment, o
                   {newGradeCount > 0 && (
                     <button className="btn btn-tertiary sm" onClick={onOpenResults} style={{ position: 'relative' }}>
                       {isKinyarwanda ? 'Amanota' : 'Results'}
-                      <span style={{ position: 'absolute', top: -6, right: -6, width: 16, height: 16, borderRadius: '50%', background: 'var(--error)', color: '#fff', fontSize: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700 }}>
+                      <span style={{ position: 'absolute', top: -6, right: -6, width: 16, height: 16, borderRadius: '50%', background: 'var(--error)', color: 'var(--bg)', fontSize: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600 }}>
                         {newGradeCount}
                       </span>
                     </button>

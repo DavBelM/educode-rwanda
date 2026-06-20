@@ -82,7 +82,7 @@ export default function ChallengePage({ language }: Props) {
                     background: 'var(--surface-2)',
                     border: '1px solid var(--line)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 14, fontWeight: 700, color: 'var(--text-2)',
+                    fontSize: 14, fontWeight: 600, color: 'var(--text-2)',
                   }}>
                     {String(set.order_index).padStart(2, '0')}
                   </div>

@@ -52,7 +52,7 @@
   --radius-sm: 5px;
   --radius-pill: 999px;
 
-  --font: "Geist", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
   --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
 
@@ -111,7 +111,7 @@ body {
   margin: 0;
   font-family: var(--font);
   font-weight: 400;
-  font-size: 16px;
+  font-size: 15px;
   line-height: 1.6;
   background: var(--bg);
   color: var(--text);
@@ -119,7 +119,8 @@ body {
   text-rendering: optimizeLegibility;
   letter-spacing: -0.006em;
 }
-h1, h2, h3, h4, h5 { margin: 0; font-weight: 600; letter-spacing: -0.02em; line-height: 1.2; }
+h1, h2 { margin: 0; font-weight: 600; letter-spacing: -0.02em; line-height: 1.2; }
+h3, h4, h5 { margin: 0; font-weight: 500; letter-spacing: -0.015em; line-height: 1.3; }
 p { margin: 0; }
 a { color: inherit; text-decoration: none; }
 button { font-family: inherit; font-size: inherit; color: inherit; cursor: pointer; }
@@ -311,7 +312,7 @@ img { display: block; max-width: 100%; }
   border: 1px solid var(--line);
   border-radius: var(--radius);
   font-family: var(--mono);
-  font-size: 13px; line-height: 1.7;
+  font-size: 14px; line-height: 1.5;
   overflow: hidden;
 }
 .code-bar {
@@ -417,6 +418,9 @@ img { display: block; max-width: 100%; }
 /* ==========================================================================
    UTILITIES
    ========================================================================== */
+/* Prose: long-form reading containers (lessons, AI responses, descriptions) */
+.prose { max-width: 65ch; }
+
 .grid { display: grid; gap: 18px; }
 .g-2 { grid-template-columns: repeat(2, 1fr); }
 .g-3 { grid-template-columns: repeat(3, 1fr); }

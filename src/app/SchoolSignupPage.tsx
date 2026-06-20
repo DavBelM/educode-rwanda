@@ -167,7 +167,7 @@ export default function SchoolSignupPage() {
               </div>
             ) : (
               <>
-                <h2 style={{ fontSize: 24, fontWeight: 700, color: 'var(--text)', marginBottom: 6, textAlign: 'center' }}>
+                <h2 style={{ fontSize: 24, fontWeight: 600, color: 'var(--text)', marginBottom: 6, textAlign: 'center' }}>
                   {isKin ? 'Saba amezi 3 y\'igerageza ku buntu' : 'Request your free 3-month trial'}
                 </h2>
                 <p className="dim text-center mb-6">
@@ -427,7 +427,7 @@ export default function SchoolSignupPage() {
               }
             ].map((item) => (
               <article key={item.step} className="card feat text-center">
-                <div className="iconbtn" style={{ margin: '0 auto 18px', pointerEvents: 'none', fontWeight: 700 }}>
+                <div className="iconbtn" style={{ margin: '0 auto 18px', pointerEvents: 'none', fontWeight: 600 }}>
                   {item.step}
                 </div>
                 <h3>{item.title}</h3>

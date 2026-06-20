@@ -345,7 +345,7 @@ export default function PrivacyPolicyPage() {
                     <div className="iconbtn" style={{ pointerEvents: 'none', flexShrink: 0 }}>
                       <section.icon size={16} />
                     </div>
-                    <h2 style={{ fontSize: 22, fontWeight: 700, color: 'var(--text)', letterSpacing: '-0.01em' }}>
+                    <h2 style={{ fontSize: 22, fontWeight: 600, color: 'var(--text)', letterSpacing: '-0.01em' }}>
                       {index + 1}. {section.title}
                     </h2>
                   </div>

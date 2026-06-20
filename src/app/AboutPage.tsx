@@ -168,11 +168,11 @@ export default function AboutPage() {
           </div>
           <div className="card pad-lg">
             <div className="flex flex-col md:flex-row items-center gap-8">
-              <div className="iconbtn" style={{ width: 88, height: 88, fontSize: 28, fontWeight: 700, flexShrink: 0, pointerEvents: 'none' }}>
+              <div className="iconbtn" style={{ width: 88, height: 88, fontSize: 28, fontWeight: 600, flexShrink: 0, pointerEvents: 'none' }}>
                 JD
               </div>
               <div className="flex-1 text-center md:text-left">
-                <h3 style={{ fontSize: 22, fontWeight: 700, color: 'var(--text)', marginBottom: 4 }}>[Your Name]</h3>
+                <h3 style={{ fontSize: 22, fontWeight: 600, color: 'var(--text)', marginBottom: 4 }}>[Your Name]</h3>
                 <p style={{ color: 'var(--text-2)', fontWeight: 600, marginBottom: 12 }}>
                   {isKin ? 'Umushinzwi & CEO' : 'Founder & CEO'}
                 </p>

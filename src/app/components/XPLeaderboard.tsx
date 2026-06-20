@@ -65,7 +65,7 @@ export function XPLeaderboard({ classId, language }: Props) {
                 background: e.rank <= 3 ? 'var(--text)' : 'var(--surface-2)',
                 color: e.rank <= 3 ? 'var(--bg)' : 'var(--text-2)',
                 fontSize: 12,
-                fontWeight: 700,
+                fontWeight: 600,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',

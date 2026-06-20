@@ -222,7 +222,7 @@ function CodingLesson({ lesson, language, onComplete, completing }: {
         <>
           <div className="card" style={{ overflow: 'hidden' }}>
             <div style={{ padding: '10px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--line)', background: 'var(--surface-2)' }}>
-              <span style={{ fontSize: 12.5, fontWeight: 600, fontFamily: 'var(--mono)', color: '#f97316' }}>index.html</span>
+              <span style={{ fontSize: 12.5, fontWeight: 500, fontFamily: 'var(--mono)', color: 'var(--sx-keyword)' }}>index.html</span>
               <button onClick={run} className="btn btn-primary sm" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                 <Monitor size={12} />
                 {isKin ? 'Reba uko bimeze' : 'Preview'}
@@ -293,7 +293,7 @@ function CodingLesson({ lesson, language, onComplete, completing }: {
                 <p style={{ fontSize: 13.5, fontWeight: 600, color: 'var(--text)' }}>
                   {isKin ? 'Ibigerageza' : 'Test Cases'}
                 </p>
-                <span style={{ fontSize: 13, fontWeight: 700, padding: '2px 8px', borderRadius: 99,
+                <span style={{ fontSize: 13, fontWeight: 500, padding: '2px 8px', borderRadius: 99,
                   background: testResults.every(r => r.passed) ? 'rgba(158,170,132,0.15)' : 'rgba(210,136,123,0.12)',
                   color: testResults.every(r => r.passed) ? '#9eaa84' : 'var(--error)' }}>
                   {testResults.filter(r => r.passed).length}/{testResults.length} {isKin ? 'byatsinzwe' : 'passed'}
@@ -571,7 +571,7 @@ function QuizLesson({ lesson, language, onComplete, completing }: {
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <div className="card pad-lg" style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-            <div style={{ fontSize: 28, fontWeight: 700, color: 'var(--text)' }}>
+            <div style={{ fontSize: 28, fontWeight: 600, color: 'var(--text)' }}>
               {score}/{questions.length}
             </div>
             <p style={{ fontSize: 14, color: 'var(--text-2)', lineHeight: 1.5 }}>
@@ -649,7 +649,7 @@ export default function LessonViewer({ lesson, courseTitle, allLessons, language
           <p style={{ fontSize: 14, marginBottom: 16, color: 'var(--text-2)' }}>{lessonTitle}</p>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 32, color: xpAwarded > 0 ? '#cda86a' : 'var(--text-3)' }}>
             <Zap size={18} fill={xpAwarded > 0 ? '#cda86a' : 'none'} />
-            <span style={{ fontSize: 18, fontWeight: 700 }}>
+            <span style={{ fontSize: 18, fontWeight: 600 }}>
               {xpAwarded > 0 ? `+${xpAwarded} XP` : isKin ? 'Nta XP (wakoresheje igisubizo)' : 'No XP (solution used)'}
             </span>
           </div>

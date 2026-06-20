@@ -26,13 +26,13 @@ function renderDescription(text: string): React.ReactNode {
   const parts = text.split(/(\*\*[^*]+\*\*|`[^`]+`|\n)/g);
   return parts.map((part, i) => {
     if (part.startsWith('**') && part.endsWith('**')) {
-      return <strong key={i} style={{ color: 'var(--text)', fontWeight: 700 }}>{part.slice(2, -2)}</strong>;
+      return <strong key={i} style={{ color: 'var(--text)', fontWeight: 600 }}>{part.slice(2, -2)}</strong>;
     }
     if (part.startsWith('`') && part.endsWith('`')) {
       return (
         <code key={i} style={{
           background: 'var(--surface-2)', border: '1px solid var(--line)',
-          padding: '1px 5px', borderRadius: 4, fontFamily: 'monospace',
+          padding: '1px 5px', borderRadius: 4, fontFamily: 'var(--mono)',
           fontSize: '0.88em', color: 'var(--text)',
         }}>
           {part.slice(1, -1)}
@@ -365,7 +365,7 @@ export default function ChallengeRunner({ language }: Props) {
         </div>
 
         {/* XP counter */}
-        <span className="pill" style={{ fontWeight: 700, fontSize: 13 }}>
+        <span className="pill" style={{ fontWeight: 500, fontSize: 13 }}>
           {xpEarned} XP
         </span>
 
@@ -393,11 +393,11 @@ export default function ChallengeRunner({ language }: Props) {
               <span>
                 {isKin ? (
                   <>Hindura buri{' '}
-                    <code style={{ background: 'var(--surface)', border: '1px solid var(--line-strong)', padding: '1px 6px', borderRadius: 4, fontFamily: 'monospace', fontSize: '0.9em', color: 'var(--text)', fontWeight: 700 }}>____</code>
+                    <code style={{ background: 'var(--surface)', border: '1px solid var(--line-strong)', padding: '1px 6px', borderRadius: 4, fontFamily: 'var(--mono)', fontSize: '0.9em', color: 'var(--text)', fontWeight: 600 }}>____</code>
                     {' '}ukoreshe kode yawe, hanyuma kanda <strong style={{ color: 'var(--text)' }}>Run</strong>.</>
                 ) : (
                   <>Replace each{' '}
-                    <code style={{ background: 'var(--surface)', border: '1px solid var(--line-strong)', padding: '1px 6px', borderRadius: 4, fontFamily: 'monospace', fontSize: '0.9em', color: 'var(--text)', fontWeight: 700 }}>____</code>
+                    <code style={{ background: 'var(--surface)', border: '1px solid var(--line-strong)', padding: '1px 6px', borderRadius: 4, fontFamily: 'var(--mono)', fontSize: '0.9em', color: 'var(--text)', fontWeight: 600 }}>____</code>
                     {' '}with your code, then click <strong style={{ color: 'var(--text)' }}>Run</strong>.</>
                 )}
               </span>
@@ -455,12 +455,12 @@ export default function ChallengeRunner({ language }: Props) {
             background: 'var(--surface-2)', flexShrink: 0,
           }}>
             {runtimeError && (
-              <span style={{ flex: 1, fontSize: 12, color: 'var(--text-2)', fontFamily: 'monospace' }} className="truncate">
+              <span style={{ flex: 1, fontSize: 12, color: 'var(--text-2)', fontFamily: 'var(--mono)' }} className="truncate">
                 {runtimeError.replace(/^Error:\s*/, '')}
               </span>
             )}
             {!runtimeError && output && (
-              <span style={{ flex: 1, fontSize: 12, color: 'var(--text-3)', fontFamily: 'monospace' }} className="truncate">
+              <span style={{ flex: 1, fontSize: 12, color: 'var(--text-3)', fontFamily: 'var(--mono)' }} className="truncate">
                 {output.split('\n')[0]}
               </span>
             )}
@@ -557,7 +557,7 @@ export default function ChallengeRunner({ language }: Props) {
             </div>
 
             {/* Title */}
-            <h2 style={{ color: 'var(--text)', fontSize: 15, fontWeight: 700, marginBottom: 10, lineHeight: 1.4 }}>
+            <h2 style={{ color: 'var(--text)', fontSize: 15, fontWeight: 600, marginBottom: 10, lineHeight: 1.4 }}>
               {isKin && challenge.title_kin ? challenge.title_kin : challenge.title}
             </h2>
 
@@ -605,7 +605,7 @@ export default function ChallengeRunner({ language }: Props) {
                 {isKin ? 'Ibigeragezo' : 'Tests'}
               </span>
               {results.length > 0 && (
-                <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--text-2)' }}>
+                <span style={{ fontSize: 12, fontWeight: 500, color: 'var(--text-2)' }}>
                   {passedTests}/{totalTests}
                 </span>
               )}
@@ -631,7 +631,7 @@ export default function ChallengeRunner({ language }: Props) {
                   <div style={{
                     padding: '10px 12px', borderRadius: 8, marginBottom: 12,
                     background: 'var(--surface-2)', border: '1px solid var(--line-strong)',
-                    fontSize: 12, color: 'var(--text-2)', fontFamily: 'monospace',
+                    fontSize: 12, color: 'var(--text-2)', fontFamily: 'var(--mono)',
                   }}>
                     {runtimeError}
                   </div>
@@ -649,7 +649,7 @@ export default function ChallengeRunner({ language }: Props) {
                           : r.description}
                       </span>
                       {r.error && (
-                        <div style={{ color: 'var(--text-3)', fontSize: 11, fontFamily: 'monospace', marginTop: 2 }}>
+                        <div style={{ color: 'var(--text-3)', fontSize: 11, fontFamily: 'var(--mono)', marginTop: 2 }}>
                           {r.error}
                         </div>
                       )}
@@ -684,7 +684,7 @@ export default function ChallengeRunner({ language }: Props) {
             `}</style>
 
             <div style={{ textAlign: 'center', marginBottom: 20 }}>
-              <h3 style={{ color: 'var(--text)', fontSize: 20, fontWeight: 800, marginBottom: 4 }}>
+              <h3 style={{ color: 'var(--text)', fontSize: 20, fontWeight: 600, marginBottom: 4 }}>
                 {attemptCount === 1
                   ? (isKin ? 'Ushobora cyane!' : 'Perfect first try!')
                   : (isKin ? 'Byarangiye neza!' : 'Challenge passed!')}
@@ -703,7 +703,7 @@ export default function ChallengeRunner({ language }: Props) {
               background: 'var(--surface)', border: '1px solid var(--line)',
               borderRadius: 12, marginBottom: 20,
             }}>
-              <span style={{ fontSize: 22, fontWeight: 800, color: 'var(--text)' }}>
+              <span style={{ fontSize: 22, fontWeight: 600, color: 'var(--text)' }}>
                 +{computeXp(challenge.xp_reward, attemptCount, hintUsed)} XP
               </span>
               {xpEarned > 0 && (
