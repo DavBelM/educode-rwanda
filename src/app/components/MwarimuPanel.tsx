@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { getAIFeedback, getMwarimuReply } from '../../lib/ai';
+import { logAIInteraction } from '../../lib/quiz-db';
 
 interface Msg {
   id: number;
@@ -34,11 +35,25 @@ interface MwarimuPanelProps {
   language: 'EN' | 'KIN';
   onLanguageChange: (l: 'EN' | 'KIN') => void;
   examMode: boolean;
+  sessionId?: string | null;
+  challengeId?: string | null;
+  onInteractionLogged?: () => void;
 }
 
 let nextId = 1;
 
-export function MwarimuPanel({ code, error, runCount, instructions, language, onLanguageChange, examMode }: MwarimuPanelProps) {
+function addMsg(prev: Msg[], msg: Omit<Msg, 'id'>): Msg[] {
+  return [...prev, { id: nextId++, ...msg }];
+}
+
+function clearQuick(prev: Msg[]): Msg[] {
+  return prev.map(m => ({ ...m, showQuick: false }));
+}
+
+export function MwarimuPanel({
+  code, error, runCount, instructions, language, onLanguageChange, examMode,
+  sessionId, challengeId, onInteractionLogged,
+}: MwarimuPanelProps) {
   const isKin = language === 'KIN';
   const [messages, setMessages] = useState<Msg[]>([]);
   const [loading, setLoading] = useState(false);
@@ -49,13 +64,18 @@ export function MwarimuPanel({ code, error, runCount, instructions, language, on
     feedRef.current?.scrollTo({ top: feedRef.current.scrollHeight, behavior: 'smooth' });
   }, [messages, loading]);
 
-  // React to a code run
+  // Auto-feedback when student runs code
   useEffect(() => {
     if (runCount === 0 || examMode) return;
+    const question = error
+      ? `My code has an error: ${error}`
+      : 'I ran my code successfully. Any feedback?';
     setLoading(true);
     getAIFeedback(code, error, language)
       .then(response => {
-        setMessages(m => [...m, { id: nextId++, role: 'mw', text: response, showQuick: !!error }]);
+        setMessages(prev => addMsg(prev, { role: 'mw', text: response, showQuick: !!error }));
+        logAIInteraction({ question, response, language, sessionId, challengeId })
+          .then(() => onInteractionLogged?.());
       })
       .catch(() => {})
       .finally(() => setLoading(false));
@@ -66,7 +86,9 @@ export function MwarimuPanel({ code, error, runCount, instructions, language, on
     setLoading(true);
     try {
       const response = await getMwarimuReply(question, code, instructions, language);
-      setMessages(m => [...m, { id: nextId++, role: 'mw', text: response }]);
+      setMessages(prev => addMsg(prev, { role: 'mw', text: response }));
+      logAIInteraction({ question, response, language, sessionId, challengeId })
+        .then(() => onInteractionLogged?.());
     } catch {
       // ignore — leave the conversation as-is
     } finally {
@@ -76,11 +98,7 @@ export function MwarimuPanel({ code, error, runCount, instructions, language, on
 
   function handleQuick(action: typeof QUICK_ACTIONS[number]) {
     if (loading) return;
-    setMessages(m => m.map(msg => ({ ...msg, showQuick: false })).concat({
-      id: nextId++,
-      role: 'me',
-      text: isKin ? action.kin : action.en,
-    }));
+    setMessages(prev => addMsg(clearQuick(prev), { role: 'me', text: isKin ? action.kin : action.en }));
     ask(action.prompt);
   }
 
@@ -88,7 +106,7 @@ export function MwarimuPanel({ code, error, runCount, instructions, language, on
     const text = input.trim();
     if (!text || loading) return;
     setInput('');
-    setMessages(m => m.map(msg => ({ ...msg, showQuick: false })).concat({ id: nextId++, role: 'me', text }));
+    setMessages(prev => addMsg(clearQuick(prev), { role: 'me', text }));
     ask(text);
   }
 

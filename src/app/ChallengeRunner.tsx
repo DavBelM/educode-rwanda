@@ -10,8 +10,10 @@ import { runQuizTests, type TestResult } from '../lib/quiz-executor';
 import {
   getSetChallenges, getQuizSets, startQuizSession, upsertQuizAttempt,
   completeQuizSession, markSetCompleted, awardXp,
+  getOrCreateMyCodename, postPeerActivity,
   type QuizSet, type QuizChallenge, type ErrorLogEntry,
 } from '../lib/quiz-db';
+import { getStudentClasses } from '../lib/db';
 import { usePageTitle } from '../hooks/usePageTitle';
 
 interface Props {
@@ -78,6 +80,10 @@ export default function ChallengeRunner({ language }: Props) {
   const [rightTab, setRightTab] = useState<'challenge' | 'mwarimu'>('challenge');
   const [mwarimuLang, setMwarimuLang] = useState<'EN' | 'KIN'>(language);
   const [mwarimuDot, setMwarimuDot] = useState(false);
+  const [mwarimuCount, setMwarimuCount] = useState(0);
+
+  const classIdRef = useRef<string | null>(null);
+  const codenameRef = useRef<string | null>(null);
 
   usePageTitle(set ? `${set.title} · EduCode` : 'Challenge · EduCode');
 
@@ -86,18 +92,25 @@ export default function ChallengeRunner({ language }: Props) {
     Promise.all([
       getQuizSets(),
       getSetChallenges(setId),
-      startQuizSession(setId),
-    ]).then(([allSets, chs, session]) => {
+      getStudentClasses(),
+      getOrCreateMyCodename(),
+    ]).then(([allSets, chs, { data: classes }, codename]) => {
       const found = allSets.find(s => s.id === setId) ?? null;
       setSet(found);
       setChallenges(chs);
-      if (session.data) sessionIdRef.current = session.data.id;
-      if (chs.length > 0) {
-        setJsCode(chs[0].starter_js);
-        setHtmlCode(chs[0].starter_html);
-      }
-      setPhase('running');
-      setChallengeStartMs(Date.now());
+      classIdRef.current = classes?.[0]?.id ?? null;
+      codenameRef.current = codename;
+      // Start session after we have class_id
+      return startQuizSession(setId, classIdRef.current ?? undefined)
+        .then(session => {
+          if (session.data) sessionIdRef.current = session.data.id;
+          if (chs.length > 0) {
+            setJsCode(chs[0].starter_js);
+            setHtmlCode(chs[0].starter_html);
+          }
+          setPhase('running');
+          setChallengeStartMs(Date.now());
+        });
     });
   }, [setId]);
 
@@ -185,11 +198,19 @@ export default function ChallengeRunner({ language }: Props) {
     let xp = base;
     if (attempts === 1) xp = Math.round(xp * 1.5);
     else if (attempts > 3) xp = Math.round(xp * 0.7);
-    if (usedHint) xp = Math.round(xp * 0.8);
+    if (usedHint) xp = Math.round(xp * 0.5); // 50% reduction — hint is a meaningful trade-off
     return xp;
   };
 
   const handleNext = async () => {
+    // Post peer activity for completed challenge
+    if (challenge && classIdRef.current && codenameRef.current) {
+      postPeerActivity(
+        classIdRef.current, codenameRef.current,
+        'challenge_completed', challenge.title,
+      );
+    }
+
     const nextIdx = idx + 1;
     if (nextIdx >= challenges.length) {
       const total = xpEarned;
@@ -197,6 +218,13 @@ export default function ChallengeRunner({ language }: Props) {
         await completeQuizSession(sessionIdRef.current, total, passedCount, challenges.length);
         if (passedCount === challenges.length) {
           await markSetCompleted(set.id, total);
+          // Post set completion to peer feed
+          if (classIdRef.current && codenameRef.current) {
+            postPeerActivity(
+              classIdRef.current, codenameRef.current,
+              'set_completed', set.title,
+            );
+          }
         }
         await awardXp(total);
       }
@@ -229,7 +257,6 @@ export default function ChallengeRunner({ language }: Props) {
   const typeInfo = TYPE_LABEL[challenge.challenge_type];
   const passedTests = results.filter(r => r.passed).length;
   const totalTests = challenge.test_cases.length;
-  const allPassed = results.length > 0 && results.every(r => r.passed);
 
   // ── SESSION COMPLETE ───────────────────────────────────────────────────────
   if (phase === 'complete') {
@@ -500,6 +527,9 @@ export default function ChallengeRunner({ language }: Props) {
                 language={mwarimuLang}
                 onLanguageChange={setMwarimuLang}
                 examMode={false}
+                sessionId={sessionIdRef.current}
+                challengeId={challenge.id}
+                onInteractionLogged={() => setMwarimuCount(c => c + 1)}
               />
             )}
           </div>

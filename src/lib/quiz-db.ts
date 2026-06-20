@@ -1,5 +1,19 @@
 import { supabase } from './supabase';
 
+// ── Codename pool ─────────────────────────────────────────────────────────────
+const ANIMALS = [
+  'Eagle', 'Tiger', 'Hawk', 'Lion', 'Wolf', 'Bear', 'Fox', 'Shark',
+  'Raven', 'Crane', 'Owl', 'Deer', 'Lynx', 'Falcon', 'Otter', 'Cobra',
+  'Finch', 'Drake', 'Viper', 'Manta', 'Panda', 'Bison', 'Rhino', 'Gecko',
+  'Moose', 'Kite', 'Heron', 'Ibis', 'Lark', 'Swift',
+];
+
+function randomCodename(): string {
+  const animal = ANIMALS[Math.floor(Math.random() * ANIMALS.length)];
+  const num = Math.floor(Math.random() * 900) + 100; // 100–999
+  return `${animal}-${num}`;
+}
+
 export interface QuizSet {
   id: string;
   title: string;
@@ -179,4 +193,183 @@ export async function awardXp(amount: number): Promise<void> {
     .from('profiles')
     .update({ xp_points: (prof?.xp_points ?? 0) + amount })
     .eq('id', user.id);
+}
+
+// ── Codenames ─────────────────────────────────────────────────────────────────
+
+export async function getOrCreateMyCodename(): Promise<string | null> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return null;
+
+  // Check if already assigned
+  const { data: existing } = await supabase
+    .from('student_codenames')
+    .select('codename')
+    .eq('student_id', user.id)
+    .maybeSingle();
+
+  if (existing?.codename) return existing.codename;
+
+  // Try up to 8 times to get a unique codename
+  for (let i = 0; i < 8; i++) {
+    const codename = randomCodename();
+    const { error } = await supabase
+      .from('student_codenames')
+      .insert({ student_id: user.id, codename });
+    if (!error) return codename;
+    // unique constraint violation → try again
+    if (!error.message.includes('unique') && !error.message.includes('duplicate')) break;
+  }
+  return null;
+}
+
+// ── XP Leaderboard ────────────────────────────────────────────────────────────
+
+export interface XPLeaderboardEntry {
+  codename: string;
+  xp: number;
+  currentSet: string | null;
+  rank: number;
+  isMe: boolean;
+  showRank: boolean; // false for bottom half → show "Top X%" instead
+  topPct: number;    // e.g. 72 means "Top 72%"
+}
+
+export async function getClassXPLeaderboard(classId: string): Promise<XPLeaderboardEntry[]> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return [];
+
+  // 1. All enrolled students + their XP
+  const { data: enrollments } = await supabase
+    .from('class_enrollments')
+    .select('student_id, profiles(xp_points)')
+    .eq('class_id', classId);
+  if (!enrollments?.length) return [];
+
+  const studentIds = enrollments.map((e: { student_id: string }) => e.student_id);
+
+  // 2. Codenames for those students
+  const { data: codenames } = await supabase
+    .from('student_codenames')
+    .select('student_id, codename')
+    .in('student_id', studentIds);
+
+  const codenameMap = new Map<string, string>(
+    (codenames ?? []).map((c: { student_id: string; codename: string }) => [c.student_id, c.codename])
+  );
+
+  // 3. Latest quiz session per student (for "current set" display)
+  const { data: sessions } = await supabase
+    .from('quiz_sessions')
+    .select('student_id, set_id, started_at, quiz_sets(title)')
+    .in('student_id', studentIds)
+    .order('started_at', { ascending: false });
+
+  const latestSetByStudent = new Map<string, string>();
+  for (const s of sessions ?? []) {
+    if (!latestSetByStudent.has(s.student_id)) {
+      const setTitle = (Array.isArray(s.quiz_sets) ? s.quiz_sets[0] : s.quiz_sets) as { title: string } | null;
+      latestSetByStudent.set(s.student_id, setTitle?.title ?? null);
+    }
+  }
+
+  // 4. Build entries (only students with a codename appear)
+  const entries: Omit<XPLeaderboardEntry, 'rank' | 'showRank' | 'topPct'>[] = [];
+  for (const enr of enrollments) {
+    const codename = codenameMap.get(enr.student_id);
+    if (!codename) continue; // hasn't started yet
+    const prof = (Array.isArray(enr.profiles) ? enr.profiles[0] : enr.profiles) as { xp_points: number } | null;
+    entries.push({
+      codename,
+      xp: prof?.xp_points ?? 0,
+      currentSet: latestSetByStudent.get(enr.student_id) ?? null,
+      isMe: enr.student_id === user.id,
+    });
+  }
+
+  // 5. Sort by XP descending, assign ranks
+  entries.sort((a, b) => b.xp - a.xp);
+  const total = entries.length;
+
+  return entries.map((e, i) => {
+    const rank = i + 1;
+    const topPct = Math.round((rank / total) * 100);
+    // Show exact rank for top 50%, else show percentile
+    const showRank = rank <= Math.ceil(total / 2);
+    return { ...e, rank, showRank, topPct };
+  });
+}
+
+// ── Peer Activity Feed ────────────────────────────────────────────────────────
+
+export interface PeerActivity {
+  codename: string;
+  event_type: 'challenge_completed' | 'set_completed';
+  title: string;
+  created_at: string;
+}
+
+export async function postPeerActivity(
+  classId: string,
+  codename: string,
+  eventType: 'challenge_completed' | 'set_completed',
+  title: string,
+): Promise<void> {
+  await supabase.from('peer_activity_feed').insert({
+    class_id: classId,
+    codename,
+    event_type: eventType,
+    title,
+  });
+}
+
+export async function getRecentPeerActivity(
+  classId: string,
+  limit = 12,
+): Promise<PeerActivity[]> {
+  const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+  const { data } = await supabase
+    .from('peer_activity_feed')
+    .select('codename, event_type, title, created_at')
+    .eq('class_id', classId)
+    .gte('created_at', cutoff)
+    .order('created_at', { ascending: false })
+    .limit(limit);
+  return (data ?? []) as PeerActivity[];
+}
+
+// ── AI Interaction Logging ────────────────────────────────────────────────────
+
+export async function logAIInteraction(params: {
+  question: string;
+  response: string;
+  language: 'EN' | 'KIN';
+  sessionId?: string | null;
+  challengeId?: string | null;
+}): Promise<void> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return;
+
+  await supabase.from('ai_interactions').insert({
+    student_id:   user.id,
+    session_id:   params.sessionId   ?? null,
+    challenge_id: params.challengeId ?? null,
+    question:     params.question,
+    response:     params.response,
+    language:     params.language,
+  });
+}
+
+export async function getMwarimuWeekCount(): Promise<number> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return 0;
+
+  const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+  const { count } = await supabase
+    .from('ai_interactions')
+    .select('*', { count: 'exact', head: true })
+    .eq('student_id', user.id)
+    .gte('created_at', weekAgo);
+
+  return count ?? 0;
 }

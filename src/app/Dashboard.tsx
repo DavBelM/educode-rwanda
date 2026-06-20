@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react';
 import { AppNav } from './components/AppNav';
+import { XPLeaderboard } from './components/XPLeaderboard';
+import { PeerActivityFeed } from './components/PeerActivityFeed';
 import { useAuth } from '../lib/auth';
 import { getStudentAssignments, getStudentClasses, getClassWithInviteCode, joinClass, getSubmittedAssignmentIds, getStudentGrades, recordDailyLogin, getStreak, getStudentAnnouncements, getNewGradeCount, getLessonProgress, type Assignment, type Announcement } from '../lib/db';
+import { getMwarimuWeekCount } from '../lib/quiz-db';
 import { Users, ArrowRight, Loader, X, Megaphone, Pin, Code2 } from 'lucide-react';
 import { usePageTitle } from '../hooks/usePageTitle';
 
@@ -124,10 +127,12 @@ export default function Dashboard({ language, onStartCoding, onOpenAssignment, o
   const [newGradeCount, setNewGradeCount] = useState(0);
   const [showAnnouncements, setShowAnnouncements] = useState(false);
   const [lessonProgress, setLessonProgress] = useState({ completed: 0, total: 0, pct: 0 });
+  const [classId, setClassId] = useState<string | null>(null);
+  const [mwarimuWeekCount, setMwarimuWeekCount] = useState(0);
 
   const loadAssignments = async () => {
     setLoadingAssignments(true);
-    const [{ data: classes }, { data: asgns }, submitted, grades, currentStreak, { data: ann }, newGrades, lessonProg] = await Promise.all([
+    const [{ data: classes }, { data: asgns }, submitted, grades, currentStreak, { data: ann }, newGrades, lessonProg, weekCount] = await Promise.all([
       getStudentClasses(),
       getStudentAssignments(),
       getSubmittedAssignmentIds(),
@@ -136,12 +141,15 @@ export default function Dashboard({ language, onStartCoding, onOpenAssignment, o
       getStudentAnnouncements(),
       getNewGradeCount(),
       getLessonProgress(),
+      getMwarimuWeekCount(),
     ]);
     setNewGradeCount(newGrades);
     setLessonProgress(lessonProg);
     setAnnouncements(ann ?? []);
     setStreak(currentStreak);
     setHasClass(classes.length > 0);
+    setClassId(classes[0]?.id ?? null);
+    setMwarimuWeekCount(weekCount);
     setAssignments(asgns);
     setSubmittedIds(submitted);
 
@@ -493,7 +501,7 @@ export default function Dashboard({ language, onStartCoding, onOpenAssignment, o
                 <div className="stat"><b>{streak}</b><span>{isKinyarwanda ? 'Iminsi ikurikirana' : 'Day streak'}</span></div>
                 <div className="stat"><b>{lessonProgress.completed}</b><span>{isKinyarwanda ? 'Amasomo yarangiye' : 'Lessons done'}</span></div>
                 <div className="stat"><b>{totalPossible > 0 ? Math.round((totalEarned / totalPossible) * 100) : 0}%</b><span>{isKinyarwanda ? 'Amanota y\'averaze' : 'Avg. score'}</span></div>
-                <div className="stat"><b>{profileXp}</b><span>XP {isKinyarwanda ? 'yose' : 'total'}</span></div>
+                <div className="stat"><b>{mwarimuWeekCount}</b><span>{isKinyarwanda ? 'Ibibazo bya Mwarimu' : 'Mwarimu asks'}</span></div>
               </div>
             </section>
 
@@ -569,6 +577,14 @@ export default function Dashboard({ language, onStartCoding, onOpenAssignment, o
                 {isKinyarwanda ? 'Fungura Editor' : 'Open Editor'}
               </button>
             </section>
+
+            {/* Class leaderboard + activity feed (only when enrolled) */}
+            {classId && (
+              <>
+                <XPLeaderboard classId={classId} language={language} />
+                <PeerActivityFeed classId={classId} language={language} />
+              </>
+            )}
 
           </aside>
         </div>
