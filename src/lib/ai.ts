@@ -51,21 +51,22 @@ function getMockResponse(error: string | null, language: 'EN' | 'KIN'): string {
 
 // ── Warm up the Space (fire-and-forget, called when workspace opens) ──────────
 export function warmUpSpace(): void {
-  // Fire-and-forget ping through our proxy to wake ZeroGPU
   fetch('/api/ai', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ message: 'ping', systemPrompt: SYSTEM_PROMPT_EN }),
+    body: JSON.stringify({ message: 'ping' }),
   }).catch(() => {});
 }
 
-// ── Call our Vercel proxy → HuggingFace Space (no browser restrictions) ───────
-async function callSpace(message: string, systemPrompt: string): Promise<string> {
+// ── Call our Vercel proxy → HuggingFace Space ─────────────────────────────────
+// systemPrompt is now built server-side with RAG context; the parameter is kept
+// for call-site compatibility but is no longer sent to the server.
+async function callSpace(message: string, _systemPrompt?: string): Promise<string> {
   const response = await fetch('/api/ai', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ message, systemPrompt }),
-    signal: AbortSignal.timeout(300_000), // 5 minute timeout
+    body: JSON.stringify({ message }),
+    signal: AbortSignal.timeout(300_000),
   });
 
   if (!response.ok) throw new Error(`API returned ${response.status}`);
