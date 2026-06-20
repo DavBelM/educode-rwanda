@@ -58,7 +58,7 @@ const educodeTheme = EditorView.theme({
   },
   '.cm-content': {
     fontFamily: 'var(--mono)',
-    fontSize: 17,
+    fontSize: '13.5px',
     lineHeight: '1.85',
     caretColor: 'var(--text)',
     padding: '14px 0',

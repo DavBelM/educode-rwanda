@@ -116,7 +116,7 @@ export default function ForgotPasswordPage({ onBack }: Props) {
                 </div>
 
                 {error && (
-                  <div style={{ padding: '10px 14px', borderRadius: 'var(--radius)', background: 'var(--error-dim)', color: 'var(--error)', fontSize: 16 }}>
+                  <div style={{ padding: '10px 14px', borderRadius: 'var(--radius)', background: 'var(--error-dim)', color: 'var(--error)', fontSize: 14 }}>
                     {error}
                   </div>
                 )}

@@ -77,7 +77,7 @@ export default function PrivacyPolicyPage() {
               {isKin ? 'Ibiranga platform bishya n\'amahirwe yo kwiga' : 'New features and training opportunities'}
             </li>
           </ul>
-          <p className="dim" style={{ fontSize: 16 }}>
+          <p className="dim" style={{ fontSize: 14 }}>
             {isKin
               ? 'Urashobora guhagarika kwakira i-meyili z\'ubucuruzi igihe cyose.'
               : 'You can opt out of marketing emails anytime.'}
@@ -193,7 +193,7 @@ export default function PrivacyPolicyPage() {
                 : 'We do NOT use tracking cookies for ads. Only essential cookies.'}
             </p>
           </div>
-          <p className="dim" style={{ fontSize: 16 }}>
+          <p className="dim" style={{ fontSize: 14 }}>
             {isKin
               ? 'Urashobora kugenzura cookies muri browser yawe, ariko bishobora gutuma platform itakora neza.'
               : 'You can manage cookies in your browser settings, but this may affect functionality.'}
@@ -213,7 +213,7 @@ export default function PrivacyPolicyPage() {
             <li>{isKin ? 'Itariki "Last updated" izahinduka' : 'The "Last updated" date will change'}</li>
             <li>{isKin ? 'Gukomeza kuyikoresha bivuze ko wemeye izo mpinduka' : 'Continued use means you accept changes'}</li>
           </ul>
-          <p className="dim" style={{ fontSize: 16 }}>
+          <p className="dim" style={{ fontSize: 14 }}>
             {isKin
               ? 'Niba utemeye impinduka, urashobora gusiba konti yawe.'
               : "If you don't agree with changes, you can delete your account."}
@@ -240,7 +240,7 @@ export default function PrivacyPolicyPage() {
                 <a href="mailto:privacy@educode.rw" className="dim">privacy@educode.rw</a>
               </div>
             </div>
-            <p className="dim" style={{ fontSize: 16 }}>
+            <p className="dim" style={{ fontSize: 14 }}>
               {isKin ? 'Tuzakusubiza mu gihe cy\'iminsi 5 y\'akazi.' : "We'll respond within 5 business days."}
             </p>
           </div>
@@ -309,7 +309,7 @@ export default function PrivacyPolicyPage() {
             <aside className="privacy-toc">
               <div className="card pad-sm" style={{ position: 'sticky', top: 90 }}>
                 <div className="flex items-center justify-between mb-3">
-                  <h3 className="font-bold" style={{ color: 'var(--text)', fontSize: 16 }}>
+                  <h3 className="font-bold" style={{ color: 'var(--text)', fontSize: 14 }}>
                     {isKin ? 'Ibirimo' : 'Contents'}
                   </h3>
                   <button className="btn btn-tertiary sm">
@@ -345,11 +345,11 @@ export default function PrivacyPolicyPage() {
                     <div className="iconbtn" style={{ pointerEvents: 'none', flexShrink: 0 }}>
                       <section.icon size={16} />
                     </div>
-                    <h2 style={{ fontSize: 25, fontWeight: 600, color: 'var(--text)', letterSpacing: '-0.01em' }}>
+                    <h2 style={{ fontSize: 22, fontWeight: 600, color: 'var(--text)', letterSpacing: '-0.01em' }}>
                       {index + 1}. {section.title}
                     </h2>
                   </div>
-                  <div className="dim" style={{ fontSize: 17, lineHeight: 1.7, marginLeft: 48 }}>
+                  <div className="dim" style={{ fontSize: 15, lineHeight: 1.7, marginLeft: 48 }}>
                     {section.content}
                   </div>
                 </section>

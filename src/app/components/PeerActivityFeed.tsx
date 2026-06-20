@@ -62,7 +62,7 @@ export function PeerActivityFeed({ classId, language }: Props) {
           <div style={{ width: 16, height: 16, border: '2px solid var(--line)', borderTopColor: 'var(--text-2)', borderRadius: '50%', margin: '0 auto', animation: 'spin 0.8s linear infinite' }} />
         </div>
       ) : activities.length === 0 ? (
-        <p style={{ fontSize: 16, color: 'var(--text-3)', paddingTop: 8 }}>
+        <p style={{ fontSize: 14, color: 'var(--text-3)', paddingTop: 8 }}>
           {isKin ? 'Nta bikorwa mu masaha 24. Jya mbere!' : 'No activity in the last 24 hours. Go first!'}
         </p>
       ) : (
@@ -88,7 +88,7 @@ export function PeerActivityFeed({ classId, language }: Props) {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: 12,
+                fontSize: 11,
                 fontWeight: 600,
                 color: 'var(--text-2)',
                 flexShrink: 0,
@@ -98,12 +98,12 @@ export function PeerActivityFeed({ classId, language }: Props) {
               </span>
 
               <div style={{ flex: 1, minWidth: 0 }}>
-                <p style={{ fontSize: 15, color: 'var(--text)', lineHeight: 1.4 }}>
+                <p style={{ fontSize: 13.5, color: 'var(--text)', lineHeight: 1.4 }}>
                   <span style={{ fontWeight: 600 }}>{a.codename}</span>
                   {' '}
                   <span style={{ color: 'var(--text-2)' }}>{eventLabel(a.event_type, a.title, isKin)}</span>
                 </p>
-                <p style={{ fontSize: 13, color: 'var(--text-3)', marginTop: 2 }}>
+                <p style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 2 }}>
                   {timeAgo(a.created_at, isKin)}
                 </p>
               </div>

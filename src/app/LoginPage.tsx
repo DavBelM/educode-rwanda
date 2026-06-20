@@ -101,7 +101,7 @@ export default function LoginPage({ onSuccess, onSignupClick, onForgotPassword }
                 <button
                   type="button"
                   onClick={onForgotPassword}
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-2)', fontSize: 15, padding: 0 }}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-2)', fontSize: 13, padding: 0 }}
                 >
                   Forgot?
                 </button>
@@ -141,7 +141,7 @@ export default function LoginPage({ onSuccess, onSignupClick, onForgotPassword }
             </label>
 
             {error && (
-              <div style={{ padding: '10px 14px', borderRadius: 'var(--radius)', background: 'var(--error-dim)', color: 'var(--error)', fontSize: 16 }}>
+              <div style={{ padding: '10px 14px', borderRadius: 'var(--radius)', background: 'var(--error-dim)', color: 'var(--error)', fontSize: 14 }}>
                 {error}
               </div>
             )}

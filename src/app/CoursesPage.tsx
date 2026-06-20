@@ -93,7 +93,7 @@ function CourseCatalog({ courses, progress, language, onSelect }: {
 
       {filtered.length === 0 ? (
         <div style={{ padding: '64px 0', textAlign: 'center' }}>
-          <p style={{ color: 'var(--text-3)', fontSize: 17 }}>
+          <p style={{ color: 'var(--text-3)', fontSize: 15 }}>
             {isKin ? 'Nta masomo arabonetse.' : 'No courses found.'}
           </p>
         </div>
@@ -229,7 +229,7 @@ function CourseDetail({ course, language, onBack, onOpenLesson }: {
         <aside className="card pad-lg sidecard">
           <div className="row between" style={{ marginBottom: 14 }}>
             <span className="card-title">{isKin ? 'Aho ugeze' : 'Your progress'}</span>
-            <span className="dim mono" style={{ fontSize: 15 }}>{pct}%</span>
+            <span className="dim mono" style={{ fontSize: 13 }}>{pct}%</span>
           </div>
           <div className="bar on-card"><i style={{ width: `${pct}%` }}></i></div>
           <div style={{ marginTop: 8 }}></div>

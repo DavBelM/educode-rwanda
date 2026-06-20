@@ -157,7 +157,7 @@ export default function MyResultsPage({ language }: Props) {
                   {isNew && (
                     <div className="flex items-center gap-2 mb-3 px-3 py-1.5" style={{ borderRadius: 'var(--radius-sm)', background: 'var(--accent-soft)', border: '1px solid var(--accent)' }}>
                       <Bell size={13} style={{ color: 'var(--text)' }} />
-                      <span style={{ color: 'var(--text)', fontSize: 17, fontWeight: 600 }}>
+                      <span style={{ color: 'var(--text)', fontSize: '13px', fontWeight: 600 }}>
                         {isKin ? 'Amanota mashya yasohotse!' : 'New grade released!'}
                       </span>
                     </div>
@@ -170,7 +170,7 @@ export default function MyResultsPage({ language }: Props) {
                         {r.assignment_type === 'coding'
                           ? <Code2 size={16} style={{ color: 'var(--text-2)', flexShrink: 0 }} />
                           : <BookOpen size={16} style={{ color: 'var(--text-2)', flexShrink: 0 }} />}
-                        <p className="font-semibold truncate" style={{ color: 'var(--text)', fontSize: 20 }}>
+                        <p className="font-semibold truncate" style={{ color: 'var(--text)', fontSize: '16px' }}>
                           {isKin && r.title_kin ? r.title_kin : r.title}
                         </p>
                       </div>
@@ -179,7 +179,7 @@ export default function MyResultsPage({ language }: Props) {
                           {r.difficulty.charAt(0).toUpperCase() + r.difficulty.slice(1)}
                         </span>
                         {r.submitted_at && (
-                          <span className="flex items-center gap-1 dim" style={{ fontSize: 17 }}>
+                          <span className="flex items-center gap-1 dim" style={{ fontSize: '13px' }}>
                             <Clock size={12} />
                             {new Date(r.submitted_at).toLocaleDateString()}
                           </span>
@@ -202,7 +202,7 @@ export default function MyResultsPage({ language }: Props) {
                           <p className="text-3xl font-bold" style={{ color: 'var(--text)' }}>
                             {r.marks_earned}<span className="text-base font-medium dim">/{r.total_marks}</span>
                           </p>
-                          <p className="font-semibold" style={{ color: 'var(--text-2)', fontSize: 19 }}>
+                          <p className="font-semibold" style={{ color: 'var(--text-2)', fontSize: '15px' }}>
                             {scorePct}%
                           </p>
                         </div>
@@ -224,10 +224,10 @@ export default function MyResultsPage({ language }: Props) {
                     <div className="flex items-start gap-3 px-4 py-3" style={{ borderRadius: 'var(--radius)', background: 'var(--surface-2)', border: '1px solid var(--line)' }}>
                       <MessageSquare size={15} className="shrink-0 mt-0.5" style={{ color: 'var(--text-2)' }} />
                       <div>
-                        <p className="font-semibold mb-1" style={{ color: 'var(--text)', fontSize: 17 }}>
+                        <p className="font-semibold mb-1" style={{ color: 'var(--text)', fontSize: '13px' }}>
                           {isKin ? 'Ibitekerezo by\'umwarimu' : 'Teacher feedback'}
                         </p>
-                        <p className="leading-relaxed" style={{ color: 'var(--text-2)', fontSize: 18 }}>{r.teacher_feedback}</p>
+                        <p className="leading-relaxed" style={{ color: 'var(--text-2)', fontSize: '14px' }}>{r.teacher_feedback}</p>
                       </div>
                     </div>
                   )}
@@ -235,7 +235,7 @@ export default function MyResultsPage({ language }: Props) {
                   {r.submitted && r.marks_earned !== null && (
                     <div className="flex items-center gap-2 mt-3">
                       <CheckCircle size={14} style={{ color: 'var(--text-2)' }} />
-                      <span className="dim" style={{ fontSize: 17 }}>
+                      <span className="dim" style={{ fontSize: '13px' }}>
                         {isKin ? 'Byahawe amanota' : 'Graded'}
                       </span>
                     </div>
