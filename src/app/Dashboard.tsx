@@ -327,7 +327,9 @@ export default function Dashboard({ language, onStartCoding, onOpenAssignment, o
         <div className="welcome rise">
           <div>
             <h1>
-              {isKinyarwanda ? `Murakaza neza, ${firstName}.` : `Welcome back, ${firstName}.`}
+              {profileXp === 0
+                ? (isKinyarwanda ? `Murakaza neza, ${firstName}.` : `Welcome, ${firstName}.`)
+                : `${firstName}.`}
             </h1>
             <p className="sub">
               {streak > 0
