@@ -25,7 +25,8 @@ export function AppNav({ streak }: AppNavProps) {
     pathname.startsWith('/courses') || pathname.startsWith('/lesson');
   const isWorkspaceActive =
     pathname.startsWith('/workspace') || pathname.startsWith('/assignment');
-  const isDashboardActive = !isCoursesActive && !isWorkspaceActive;
+  const isChallengesActive = pathname.startsWith('/challenges');
+  const isDashboardActive = !isCoursesActive && !isWorkspaceActive && !isChallengesActive;
 
   const navClass = (active: boolean) => `nav-link${active ? ' active' : ''}`;
 
@@ -56,6 +57,9 @@ export function AppNav({ streak }: AppNavProps) {
               </Link>
               <Link to="/workspace" className={navClass(isWorkspaceActive)}>
                 Workspace
+              </Link>
+              <Link to="/challenges" className={navClass(isChallengesActive)}>
+                Challenges
               </Link>
             </>
           )}
