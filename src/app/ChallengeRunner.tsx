@@ -272,7 +272,7 @@ export default function ChallengeRunner({ language }: Props) {
               ? (isKin ? 'Set Yarangiye!' : 'Set Complete!')
               : (isKin ? 'Imikino Yarangiye' : 'Session Finished')}
           </h2>
-          <p style={{ color: 'var(--text-2)', fontSize: 15, marginBottom: 32 }}>
+          <p style={{ color: 'var(--text-2)', fontSize: 16, marginBottom: 32 }}>
             {isKin
               ? `Warangije challenge ${passedCount} muri ${challenges.length} neza.`
               : `You passed ${passedCount} out of ${challenges.length} challenges.`}
@@ -287,7 +287,7 @@ export default function ChallengeRunner({ language }: Props) {
               <p className="text-2xl font-bold mb-1" style={{ color: 'var(--text)' }}>
                 {xpEarned}
               </p>
-              <p style={{ color: 'var(--text-3)', fontSize: 12 }}>XP {isKin ? 'wabonanye' : 'earned'}</p>
+              <p style={{ color: 'var(--text-3)', fontSize: 13 }}>XP {isKin ? 'wabonanye' : 'earned'}</p>
             </div>
             <div style={{
               padding: '16px', borderRadius: 'var(--radius)',
@@ -297,7 +297,7 @@ export default function ChallengeRunner({ language }: Props) {
               <p className="text-2xl font-bold mb-1" style={{ color: 'var(--text)' }}>
                 {passedCount}/{challenges.length}
               </p>
-              <p style={{ color: 'var(--text-3)', fontSize: 12 }}>{isKin ? 'Byaranguye' : 'Passed'}</p>
+              <p style={{ color: 'var(--text-3)', fontSize: 13 }}>{isKin ? 'Byaranguye' : 'Passed'}</p>
             </div>
           </div>
 
@@ -344,9 +344,9 @@ export default function ChallengeRunner({ language }: Props) {
 
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span style={{ color: 'var(--text-3)', fontSize: 13 }}>{isKin && set.title_kin ? set.title_kin : set.title}</span>
+            <span style={{ color: 'var(--text-3)', fontSize: 14 }}>{isKin && set.title_kin ? set.title_kin : set.title}</span>
             <span style={{ color: 'var(--line-strong)' }}>›</span>
-            <span className="font-semibold" style={{ color: 'var(--text)', fontSize: 13 }}>
+            <span className="font-semibold" style={{ color: 'var(--text)', fontSize: 14 }}>
               {isKin && challenge.title_kin ? challenge.title_kin : challenge.title}
             </span>
           </div>
@@ -365,11 +365,11 @@ export default function ChallengeRunner({ language }: Props) {
         </div>
 
         {/* XP counter */}
-        <span className="pill" style={{ fontWeight: 500, fontSize: 13 }}>
+        <span className="pill" style={{ fontWeight: 500, fontSize: 14 }}>
           {xpEarned} XP
         </span>
 
-        <span style={{ color: 'var(--text-3)', fontSize: 13 }}>
+        <span style={{ color: 'var(--text-3)', fontSize: 14 }}>
           {idx + 1}/{challenges.length}
         </span>
       </div>
@@ -388,7 +388,7 @@ export default function ChallengeRunner({ language }: Props) {
               borderBottom: '1px solid var(--line)',
               borderLeft: '3px solid var(--line-strong)',
               display: 'flex', alignItems: 'center', gap: 10,
-              fontSize: 13, color: 'var(--text-2)',
+              fontSize: 14, color: 'var(--text-2)',
             }}>
               <span>
                 {isKin ? (
@@ -412,7 +412,7 @@ export default function ChallengeRunner({ language }: Props) {
               borderBottom: '1px solid var(--line)',
               borderLeft: '3px solid var(--line-strong)',
               display: 'flex', alignItems: 'center', gap: 10,
-              fontSize: 13, color: 'var(--text-2)',
+              fontSize: 14, color: 'var(--text-2)',
             }}>
               <span>
                 {isKin
@@ -430,7 +430,7 @@ export default function ChallengeRunner({ language }: Props) {
               borderBottom: '1px solid var(--line)',
               borderLeft: '3px solid var(--line-strong)',
               display: 'flex', alignItems: 'center', gap: 10,
-              fontSize: 13, color: 'var(--text-2)',
+              fontSize: 14, color: 'var(--text-2)',
             }}>
               <span>
                 {isKin
@@ -455,12 +455,12 @@ export default function ChallengeRunner({ language }: Props) {
             background: 'var(--surface-2)', flexShrink: 0,
           }}>
             {runtimeError && (
-              <span style={{ flex: 1, fontSize: 12, color: 'var(--text-2)', fontFamily: 'var(--mono)' }} className="truncate">
+              <span style={{ flex: 1, fontSize: 13, color: 'var(--text-2)', fontFamily: 'var(--mono)' }} className="truncate">
                 {runtimeError.replace(/^Error:\s*/, '')}
               </span>
             )}
             {!runtimeError && output && (
-              <span style={{ flex: 1, fontSize: 12, color: 'var(--text-3)', fontFamily: 'var(--mono)' }} className="truncate">
+              <span style={{ flex: 1, fontSize: 13, color: 'var(--text-3)', fontFamily: 'var(--mono)' }} className="truncate">
                 {output.split('\n')[0]}
               </span>
             )}
@@ -468,7 +468,7 @@ export default function ChallengeRunner({ language }: Props) {
 
             <button
               className="btn btn-primary"
-              style={{ gap: 6, padding: '6px 16px', fontSize: 13, flexShrink: 0 }}
+              style={{ gap: 6, padding: '6px 16px', fontSize: 14, flexShrink: 0 }}
               onClick={handleRun}
               disabled={running}
             >
@@ -497,7 +497,7 @@ export default function ChallengeRunner({ language }: Props) {
                 onClick={() => { setRightTab(tab); if (tab === 'mwarimu') setMwarimuDot(false); }}
                 style={{
                   flex: 1, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  gap: 6, fontSize: 13, fontWeight: rightTab === tab ? 600 : 400,
+                  gap: 6, fontSize: 14, fontWeight: rightTab === tab ? 600 : 400,
                   color: rightTab === tab ? 'var(--text)' : 'var(--text-3)',
                   background: 'none', border: 'none', cursor: 'pointer',
                   borderBottom: rightTab === tab ? '2px solid var(--text-2)' : '2px solid transparent',
@@ -542,14 +542,14 @@ export default function ChallengeRunner({ language }: Props) {
           }}>
             {/* Type badge */}
             <div className="flex items-center gap-2 mb-3">
-              <span className="pill" style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              <span className="pill" style={{ fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                 {isKin ? typeInfo.kin : typeInfo.en}
               </span>
-              <span className="pill" style={{ fontSize: 11 }}>
+              <span className="pill" style={{ fontSize: 12 }}>
                 {challenge.difficulty}
               </span>
               {attemptCount > 0 && (
-                <span className="flex items-center gap-1" style={{ fontSize: 11, color: 'var(--text-3)' }}>
+                <span className="flex items-center gap-1" style={{ fontSize: 12, color: 'var(--text-3)' }}>
                   <RotateCcw size={10} />
                   {attemptCount}×
                 </span>
@@ -557,12 +557,12 @@ export default function ChallengeRunner({ language }: Props) {
             </div>
 
             {/* Title */}
-            <h2 style={{ color: 'var(--text)', fontSize: 15, fontWeight: 600, marginBottom: 10, lineHeight: 1.4 }}>
+            <h2 style={{ color: 'var(--text)', fontSize: 16, fontWeight: 600, marginBottom: 10, lineHeight: 1.4 }}>
               {isKin && challenge.title_kin ? challenge.title_kin : challenge.title}
             </h2>
 
             {/* Description */}
-            <div style={{ color: 'var(--text-2)', fontSize: 13.5, lineHeight: 1.65 }}>
+            <div style={{ color: 'var(--text-2)', fontSize: 15, lineHeight: 1.65 }}>
               {renderDescription(isKin && challenge.description_kin ? challenge.description_kin : challenge.description)}
             </div>
 
@@ -573,9 +573,9 @@ export default function ChallengeRunner({ language }: Props) {
                   <div style={{
                     padding: '10px 14px', borderRadius: 'var(--radius)',
                     background: 'var(--surface-2)', border: '1px solid var(--line)',
-                    fontSize: 13, color: 'var(--text-2)', lineHeight: 1.55,
+                    fontSize: 14, color: 'var(--text-2)', lineHeight: 1.55,
                   }}>
-                    <div className="flex items-center gap-1.5 mb-1.5" style={{ color: 'var(--text-3)', fontWeight: 600, fontSize: 12 }}>
+                    <div className="flex items-center gap-1.5 mb-1.5" style={{ color: 'var(--text-3)', fontWeight: 600, fontSize: 13 }}>
                       <Lightbulb size={13} />
                       {isKin ? 'Ikimenyetso' : 'Hint'}
                     </div>
@@ -586,7 +586,7 @@ export default function ChallengeRunner({ language }: Props) {
                     style={{
                       background: 'none', border: '1px dashed var(--line-strong)',
                       borderRadius: 8, padding: '6px 12px', cursor: 'pointer',
-                      color: 'var(--text-3)', fontSize: 12, display: 'flex', alignItems: 'center', gap: 6,
+                      color: 'var(--text-3)', fontSize: 13, display: 'flex', alignItems: 'center', gap: 6,
                     }}
                     onClick={() => { setShowHint(true); setHintUsed(true); }}
                   >
@@ -601,11 +601,11 @@ export default function ChallengeRunner({ language }: Props) {
           {/* Test results panel */}
           <div style={{ flex: 1, overflowY: 'auto', padding: '12px 16px' }}>
             <div className="flex items-center gap-2 mb-3">
-              <span style={{ color: 'var(--text-3)', fontSize: 12, fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+              <span style={{ color: 'var(--text-3)', fontSize: 13, fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
                 {isKin ? 'Ibigeragezo' : 'Tests'}
               </span>
               {results.length > 0 && (
-                <span style={{ fontSize: 12, fontWeight: 500, color: 'var(--text-2)' }}>
+                <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-2)' }}>
                   {passedTests}/{totalTests}
                 </span>
               )}
@@ -616,12 +616,12 @@ export default function ChallengeRunner({ language }: Props) {
                 {challenge.test_cases.map((tc, i) => (
                   <div key={i} className="flex items-start gap-2 mb-2">
                     <Circle size={14} style={{ color: 'var(--line-strong)', flexShrink: 0, marginTop: 1 }} />
-                    <span style={{ color: 'var(--text-3)', fontSize: 13 }}>
+                    <span style={{ color: 'var(--text-3)', fontSize: 14 }}>
                       {isKin && tc.description_kin ? tc.description_kin : tc.description}
                     </span>
                   </div>
                 ))}
-                <p style={{ color: 'var(--text-3)', fontSize: 12, marginTop: 16, fontStyle: 'italic' }}>
+                <p style={{ color: 'var(--text-3)', fontSize: 13, marginTop: 16, fontStyle: 'italic' }}>
                   {isKin ? 'Kanda "Gukomeza" kugenzura kode yawe.' : 'Click "Run" to check your code.'}
                 </p>
               </div>
@@ -631,7 +631,7 @@ export default function ChallengeRunner({ language }: Props) {
                   <div style={{
                     padding: '10px 12px', borderRadius: 8, marginBottom: 12,
                     background: 'var(--surface-2)', border: '1px solid var(--line-strong)',
-                    fontSize: 12, color: 'var(--text-2)', fontFamily: 'var(--mono)',
+                    fontSize: 13, color: 'var(--text-2)', fontFamily: 'var(--mono)',
                   }}>
                     {runtimeError}
                   </div>
@@ -643,13 +643,13 @@ export default function ChallengeRunner({ language }: Props) {
                       : <XCircle size={15} style={{ color: 'var(--text-3)', flexShrink: 0, marginTop: 1 }} />
                     }
                     <div>
-                      <span style={{ color: r.passed ? 'var(--text)' : 'var(--text-2)', fontSize: 13 }}>
+                      <span style={{ color: r.passed ? 'var(--text)' : 'var(--text-2)', fontSize: 14 }}>
                         {isKin && challenge.test_cases[i]?.description_kin
                           ? challenge.test_cases[i].description_kin
                           : r.description}
                       </span>
                       {r.error && (
-                        <div style={{ color: 'var(--text-3)', fontSize: 11, fontFamily: 'var(--mono)', marginTop: 2 }}>
+                        <div style={{ color: 'var(--text-3)', fontSize: 12, fontFamily: 'var(--mono)', marginTop: 2 }}>
                           {r.error}
                         </div>
                       )}
@@ -684,12 +684,12 @@ export default function ChallengeRunner({ language }: Props) {
             `}</style>
 
             <div style={{ textAlign: 'center', marginBottom: 20 }}>
-              <h3 style={{ color: 'var(--text)', fontSize: 20, fontWeight: 600, marginBottom: 4 }}>
+              <h3 style={{ color: 'var(--text)', fontSize: 22, fontWeight: 600, marginBottom: 4 }}>
                 {attemptCount === 1
                   ? (isKin ? 'Ushobora cyane!' : 'Perfect first try!')
                   : (isKin ? 'Byarangiye neza!' : 'Challenge passed!')}
               </h3>
-              <p style={{ color: 'var(--text-2)', fontSize: 14 }}>
+              <p style={{ color: 'var(--text-2)', fontSize: 15 }}>
                 {isKin
                   ? `Wagerageje inshuro ${attemptCount}${hintUsed ? ', wikoreye ikimenyetso' : ''}`
                   : `${attemptCount} attempt${attemptCount > 1 ? 's' : ''}${hintUsed ? ', hint used' : ''}`}
@@ -703,18 +703,18 @@ export default function ChallengeRunner({ language }: Props) {
               background: 'var(--surface)', border: '1px solid var(--line)',
               borderRadius: 12, marginBottom: 20,
             }}>
-              <span style={{ fontSize: 22, fontWeight: 600, color: 'var(--text)' }}>
+              <span style={{ fontSize: 24, fontWeight: 600, color: 'var(--text)' }}>
                 +{computeXp(challenge.xp_reward, attemptCount, hintUsed)} XP
               </span>
               {xpEarned > 0 && (
-                <span style={{ color: 'var(--text-3)', fontSize: 13 }}>
+                <span style={{ color: 'var(--text-3)', fontSize: 14 }}>
                   ({isKin ? 'Igiteranyo' : 'Total'}: {xpEarned})
                 </span>
               )}
             </div>
 
             {/* Test summary */}
-            <div className="flex items-center gap-2 justify-center mb-6" style={{ fontSize: 13, color: 'var(--text-2)' }}>
+            <div className="flex items-center gap-2 justify-center mb-6" style={{ fontSize: 14, color: 'var(--text-2)' }}>
               <CheckCircle2 size={15} style={{ color: 'var(--text-2)' }} />
               {results.length}/{results.length} {isKin ? 'bigeragezo byaranguye' : 'tests passed'}
             </div>
