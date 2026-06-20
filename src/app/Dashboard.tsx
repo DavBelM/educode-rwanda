@@ -81,7 +81,7 @@ function JoinClassModal({ language, onClose, onJoined }: {
           placeholder="e.g. A3F8K2"
           maxLength={8}
           className="input mb-4"
-          style={{ textAlign: 'center', fontSize: '20px', fontWeight: 600, letterSpacing: '0.15em' }}
+          style={{ textAlign: 'center', fontSize: 25, fontWeight: 600, letterSpacing: '0.15em' }}
           onKeyDown={e => e.key === 'Enter' && handleJoin()}
         />
 
@@ -389,7 +389,7 @@ export default function Dashboard({ language, onStartCoding, onOpenAssignment, o
                   {newGradeCount > 0 && (
                     <button className="btn btn-tertiary sm" onClick={onOpenResults} style={{ position: 'relative' }}>
                       {isKinyarwanda ? 'Amanota' : 'Results'}
-                      <span style={{ position: 'absolute', top: -6, right: -6, width: 16, height: 16, borderRadius: '50%', background: 'var(--error)', color: 'var(--bg)', fontSize: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600 }}>
+                      <span style={{ position: 'absolute', top: -6, right: -6, width: 16, height: 16, borderRadius: '50%', background: 'var(--error)', color: 'var(--bg)', fontSize: 11, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600 }}>
                         {newGradeCount}
                       </span>
                     </button>
@@ -407,10 +407,10 @@ export default function Dashboard({ language, onStartCoding, onOpenAssignment, o
               ) : hasClass === false ? (
                 <div style={{ padding: '32px 0', textAlign: 'center' }}>
                   <Users size={28} style={{ color: 'var(--text-3)', margin: '0 auto 12px' }} />
-                  <p style={{ fontSize: 14, color: 'var(--text-2)', marginBottom: 6 }}>
+                  <p style={{ fontSize: 16, color: 'var(--text-2)', marginBottom: 6 }}>
                     {isKinyarwanda ? 'Ntabwo uri mu ishuri' : "You're not in a class yet"}
                   </p>
-                  <p style={{ fontSize: 13, color: 'var(--text-3)', marginBottom: 16 }}>
+                  <p style={{ fontSize: 15, color: 'var(--text-3)', marginBottom: 16 }}>
                     {isKinyarwanda ? 'Shyiramo kode wahawe n\'umwarimu.' : 'Enter your teacher\'s invite code.'}
                   </p>
                   <button className="btn btn-primary sm" onClick={() => setShowJoinModal(true)}>
@@ -419,7 +419,7 @@ export default function Dashboard({ language, onStartCoding, onOpenAssignment, o
                 </div>
               ) : assignments.length === 0 ? (
                 <div style={{ padding: '32px 0', textAlign: 'center' }}>
-                  <p style={{ fontSize: 14, color: 'var(--text-3)' }}>
+                  <p style={{ fontSize: 16, color: 'var(--text-3)' }}>
                     {isKinyarwanda ? 'Nta mikoro urahabwa.' : 'No assignments yet.'}
                   </p>
                 </div>
@@ -457,7 +457,7 @@ export default function Dashboard({ language, onStartCoding, onOpenAssignment, o
               </div>
               <div className="stack" style={{ ['--gap' as string]: '16px' }}>
                 {insights.length === 0 ? (
-                  <p style={{ fontSize: 14, color: 'var(--text-3)' }}>
+                  <p style={{ fontSize: 16, color: 'var(--text-3)' }}>
                     {isKinyarwanda ? 'Nta makuru arahari ubu.' : 'No insights yet — keep coding!'}
                   </p>
                 ) : (
@@ -496,7 +496,7 @@ export default function Dashboard({ language, onStartCoding, onOpenAssignment, o
               <div className="bar on-card">
                 <i style={{ width: `${Math.min(100, (profileXp % 100))}%` }}></i>
               </div>
-              <p className="dim" style={{ fontSize: 12.5, marginTop: 10 }}>
+              <p className="dim" style={{ fontSize: 14, marginTop: 10 }}>
                 {100 - (profileXp % 100)} XP {isKinyarwanda ? 'kugeza iry\'ubuninahazwa' : 'to next level'}
               </p>
               <div className="stat-grid">
@@ -512,7 +512,7 @@ export default function Dashboard({ language, onStartCoding, onOpenAssignment, o
               <div className="card-head">
                 <h3 className="card-title">{isKinyarwanda ? 'Imikino yo Gukora' : 'Challenge Mode'}</h3>
               </div>
-              <p style={{ fontSize: 13.5, color: 'var(--text-2)', lineHeight: 1.55, marginBottom: 14 }}>
+              <p style={{ fontSize: 15, color: 'var(--text-2)', lineHeight: 1.55, marginBottom: 14 }}>
                 {isKinyarwanda
                   ? 'Gukora challenges za JavaScript kandi ube uronka XP.'
                   : 'Solve challenges, earn XP. Fix bugs, complete code, write from scratch.'}
@@ -526,7 +526,7 @@ export default function Dashboard({ language, onStartCoding, onOpenAssignment, o
             <section className="card pad-lg rise-4">
               <div className="card-head">
                 <h3 className="card-title">{isKinyarwanda ? 'Ibyagezweho' : 'Achievements'}</h3>
-                <span className="dim" style={{ fontSize: 12.5 }}>
+                <span className="dim" style={{ fontSize: 14 }}>
                   {badges.filter(b => b.earned).length} / {badges.length}
                 </span>
               </div>
@@ -569,7 +569,7 @@ export default function Dashboard({ language, onStartCoding, onOpenAssignment, o
               <div className="card-head">
                 <h3 className="card-title">{isKinyarwanda ? 'Imenyereze' : 'Free practice'}</h3>
               </div>
-              <p style={{ fontSize: 13.5, color: 'var(--text-2)', lineHeight: 1.55, marginBottom: 14 }}>
+              <p style={{ fontSize: 15, color: 'var(--text-2)', lineHeight: 1.55, marginBottom: 14 }}>
                 {isKinyarwanda
                   ? 'Fungura editor uko ushaka — AI izagufasha.'
                   : 'Open the editor freely — AI feedback included.'}
@@ -605,7 +605,7 @@ export default function Dashboard({ language, onStartCoding, onOpenAssignment, o
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderBottom: '1px solid var(--line)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <Megaphone size={16} style={{ color: 'var(--text-2)' }} />
-                <h2 style={{ fontSize: 16, fontWeight: 600, color: 'var(--text)' }}>
+                <h2 style={{ fontSize: 18, fontWeight: 600, color: 'var(--text)' }}>
                   {isKinyarwanda ? 'Amatangazo' : 'Announcements'}
                 </h2>
                 {announcements.length > 0 && <span className="pill">{announcements.length}</span>}
@@ -617,7 +617,7 @@ export default function Dashboard({ language, onStartCoding, onOpenAssignment, o
             <div style={{ overflowY: 'auto', padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
               {announcements.length === 0 ? (
                 <div style={{ padding: '32px 0', textAlign: 'center' }}>
-                  <p style={{ color: 'var(--text-3)', fontSize: 14 }}>
+                  <p style={{ color: 'var(--text-3)', fontSize: 16 }}>
                     {isKinyarwanda ? 'Nta matangazo arahari' : 'No announcements yet'}
                   </p>
                 </div>
@@ -628,11 +628,11 @@ export default function Dashboard({ language, onStartCoding, onOpenAssignment, o
                     <div key={a.id} className="card pad-sm" style={{ borderColor: a.pinned ? 'var(--line-strong)' : undefined }}>
                       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 8 }}>
                         {a.pinned && <Pin size={12} style={{ color: 'var(--text-2)', flexShrink: 0, marginTop: 2 }} />}
-                        <p style={{ fontWeight: 500, color: 'var(--text)', fontSize: 15, flex: 1 }}>{a.title}</p>
+                        <p style={{ fontWeight: 500, color: 'var(--text)', fontSize: 17, flex: 1 }}>{a.title}</p>
                         {cls && <span className="pill" style={{ flexShrink: 0 }}>{cls}</span>}
                       </div>
-                      <p style={{ color: 'var(--text-2)', fontSize: 14, lineHeight: 1.55, whiteSpace: 'pre-wrap', marginBottom: 8 }}>{a.body}</p>
-                      <p style={{ color: 'var(--text-3)', fontSize: 12 }}>{new Date(a.created_at).toLocaleString()}</p>
+                      <p style={{ color: 'var(--text-2)', fontSize: 16, lineHeight: 1.55, whiteSpace: 'pre-wrap', marginBottom: 8 }}>{a.body}</p>
+                      <p style={{ color: 'var(--text-3)', fontSize: 13 }}>{new Date(a.created_at).toLocaleString()}</p>
                     </div>
                   );
                 })

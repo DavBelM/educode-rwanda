@@ -196,7 +196,7 @@ export default function LandingPage({ onLogin, onSignup, onSchoolSignup }: Props
               <h2 style={{ fontSize: 'clamp(26px,3.4vw,34px)', letterSpacing: '-0.03em' }}>
                 Read the explanation in the language you think in.
               </h2>
-              <p className="muted" style={{ marginTop: 14, fontSize: 16, lineHeight: 1.6 }}>
+              <p className="muted" style={{ marginTop: 14, fontSize: 18, lineHeight: 1.6 }}>
                 Every hint, error explanation, and lesson summary has a one-tap switch between English and
                 Kinyarwanda. Nothing reloads, and you never lose your place.
               </p>
@@ -223,7 +223,7 @@ export default function LandingPage({ onLogin, onSignup, onSchoolSignup }: Props
             </div>
             <div className="card pad-lg">
               <div className="ai-head" style={{ marginBottom: 16 }}>
-                <div className="ai-who" style={{ fontSize: 14 }}>
+                <div className="ai-who" style={{ fontSize: 16 }}>
                   <span className="ai-mwicon">M</span>Mwarimu · explaining an error
                 </div>
               </div>
@@ -232,13 +232,13 @@ export default function LandingPage({ onLogin, onSignup, onSchoolSignup }: Props
                 <span style={{ color: 'var(--text-2)' }}> = price * qty;</span><br/>
                 <span style={{ color: 'var(--text-3)' }}>{'// ReferenceError: price is not defined'}</span>
               </div>
-              <p className="ai-msg" style={{ fontSize: '14.5px' }}>
+              <p className="ai-msg" style={{ fontSize: 18 }}>
                 <b>The name <span className="code-inline">price</span> doesn't exist yet.</b>{' '}
                 You used it before declaring it. Declare it with{' '}
                 <span className="code-inline">const price = …</span> above this line, then run again.
               </p>
               <div className="divider" style={{ margin: '18px 0' }}></div>
-              <p className="ai-msg" style={{ fontSize: '14.5px' }}>
+              <p className="ai-msg" style={{ fontSize: 18 }}>
                 <b>Izina <span className="code-inline">price</span> ntiriraho.</b>{' '}
                 Wararikoresheje mbere yo kuritangaza. Ritangaze ukoresheje{' '}
                 <span className="code-inline">const price = …</span>{' '}

@@ -159,7 +159,7 @@ export default function ContactPage() {
                   {isKin ? 'Amasaha y\'akazi' : 'Office hours'}
                 </h3>
               </div>
-              <div className="dim" style={{ display: 'flex', flexDirection: 'column', gap: 6, fontSize: 14 }}>
+              <div className="dim" style={{ display: 'flex', flexDirection: 'column', gap: 6, fontSize: 16 }}>
                 <div className="flex justify-between">
                   <span>{isKin ? 'Kuwa mbere - Kuwa gatanu' : 'Monday - Friday'}</span>
                   <span>8 AM - 5 PM</span>
@@ -217,7 +217,7 @@ export default function ContactPage() {
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="stack" style={{ ['--gap' as string]: '16px' }}>
-                  <h2 style={{ fontSize: 20, fontWeight: 600, color: 'var(--text)' }}>
+                  <h2 style={{ fontSize: 22, fontWeight: 600, color: 'var(--text)' }}>
                     {isKin ? 'Twoherereze ubutumwa' : 'Send us a message'}
                   </h2>
 
@@ -319,8 +319,8 @@ export default function ContactPage() {
           <div className="grid g-2">
             {faqs.map((faq, index) => (
               <div key={index} className="card pad-lg">
-                <h3 style={{ fontSize: 16, fontWeight: 600, color: 'var(--text)', marginBottom: 8 }}>{faq.question}</h3>
-                <p className="dim" style={{ fontSize: 14, marginBottom: 12 }}>{faq.answer}</p>
+                <h3 style={{ fontSize: 18, fontWeight: 600, color: 'var(--text)', marginBottom: 8 }}>{faq.question}</h3>
+                <p className="dim" style={{ fontSize: 16, marginBottom: 12 }}>{faq.answer}</p>
                 <a href={faq.link} className="btn btn-tertiary" style={{ padding: 0 }}>
                   {isKin ? 'Menya byinshi' : 'Learn more'}
                   <ChevronRight size={14} />

@@ -39,7 +39,7 @@ export function XPLeaderboard({ classId, language }: Props) {
           <Loader size={18} style={{ animation: 'spin 1s linear infinite', color: 'var(--text-2)' }} />
         </div>
       ) : entries.length === 0 ? (
-        <p style={{ fontSize: 14, color: 'var(--text-3)', paddingTop: 8 }}>
+        <p style={{ fontSize: 16, color: 'var(--text-3)', paddingTop: 8 }}>
           {isKin ? 'Ntamuntu warangije challenge. Uba uwa mbere!' : 'No one has completed a challenge yet. Be the first!'}
         </p>
       ) : (
@@ -64,7 +64,7 @@ export function XPLeaderboard({ classId, language }: Props) {
                 borderRadius: 6,
                 background: e.rank <= 3 ? 'var(--text)' : 'var(--surface-2)',
                 color: e.rank <= 3 ? 'var(--bg)' : 'var(--text-2)',
-                fontSize: 12,
+                fontSize: 13,
                 fontWeight: 600,
                 display: 'flex',
                 alignItems: 'center',
@@ -76,23 +76,23 @@ export function XPLeaderboard({ classId, language }: Props) {
 
               {/* Name + set */}
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 13.5, fontWeight: e.isMe ? 600 : 400, color: 'var(--text)', display: 'flex', alignItems: 'center', gap: 6 }}>
+                <div style={{ fontSize: 15, fontWeight: e.isMe ? 600 : 400, color: 'var(--text)', display: 'flex', alignItems: 'center', gap: 6 }}>
                   {e.codename}
                   {e.isMe && (
-                    <span style={{ fontSize: 11, color: 'var(--text-3)', fontWeight: 400 }}>
+                    <span style={{ fontSize: 12, color: 'var(--text-3)', fontWeight: 400 }}>
                       {isKin ? '(Wowe)' : '(you)'}
                     </span>
                   )}
                 </div>
                 {e.currentSet && (
-                  <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <div style={{ fontSize: 13, color: 'var(--text-3)', marginTop: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {e.currentSet}
                   </div>
                 )}
               </div>
 
               {/* XP */}
-              <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-2)', flexShrink: 0 }}>
+              <span style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-2)', flexShrink: 0 }}>
                 {e.xp} XP
               </span>
             </div>

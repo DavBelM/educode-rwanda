@@ -32,7 +32,7 @@ function RenderContent({ text }: { text: string }) {
         if (codeMatch) {
           return (
             <div key={i} className="code" style={{ margin: '22px 0' }}>
-              <pre style={{ fontSize: 13, lineHeight: 1.7 }}>{codeMatch[1].trim()}</pre>
+              <pre style={{ fontSize: 15, lineHeight: 1.7 }}>{codeMatch[1].trim()}</pre>
             </div>
           );
         }
@@ -42,7 +42,7 @@ function RenderContent({ text }: { text: string }) {
               if (!line.trim()) return <div key={li} style={{ height: 8 }} />;
               const parts = line.split(/\*\*(.+?)\*\*/g);
               return (
-                <p key={li} style={{ fontSize: 16, lineHeight: 1.72, color: 'var(--text)', marginBottom: 18 }}>
+                <p key={li} style={{ fontSize: 18, lineHeight: 1.72, color: 'var(--text)', marginBottom: 18 }}>
                   {parts.map((p, pi) =>
                     pi % 2 === 1
                       ? <strong key={pi} style={{ fontWeight: 500 }}>{p}</strong>
@@ -180,7 +180,7 @@ function CodingLesson({ lesson, language, onComplete, completing }: {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       {/* Instructions */}
       <div className="card pad-lg" style={{ background: 'var(--surface)' }}>
-        <p style={{ fontSize: 14, color: 'var(--text-2)', whiteSpace: 'pre-line', lineHeight: 1.6 }}>
+        <p style={{ fontSize: 16, color: 'var(--text-2)', whiteSpace: 'pre-line', lineHeight: 1.6 }}>
           {lesson.exercise_data?.instructions}
         </p>
         {(() => {
@@ -192,16 +192,16 @@ function CodingLesson({ lesson, language, onComplete, completing }: {
             <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 8 }}>
               {hints.slice(0, hintsRevealed).map((h, i) => (
                 <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, padding: '8px 12px', borderRadius: 'var(--radius)', background: 'var(--surface-2)', border: '1px solid var(--line)' }}>
-                  <span style={{ fontSize: 12, fontWeight: 600, marginTop: 2, color: 'var(--text)', flexShrink: 0 }}>
+                  <span style={{ fontSize: 13, fontWeight: 600, marginTop: 2, color: 'var(--text)', flexShrink: 0 }}>
                     {isKin ? `Icyifuzo ${i + 1}` : `Hint ${i + 1}`}
                   </span>
-                  <p style={{ fontSize: 12.5, lineHeight: 1.55, color: 'var(--text-2)', margin: 0 }}>{h}</p>
+                  <p style={{ fontSize: 14, lineHeight: 1.55, color: 'var(--text-2)', margin: 0 }}>{h}</p>
                 </div>
               ))}
               {hintsRevealed < hints.length && (
                 <button
                   onClick={() => setHintsRevealed(n => n + 1)}
-                  style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12.5, fontWeight: 600, color: 'var(--text)', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                  style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 14, fontWeight: 600, color: 'var(--text)', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
                 >
                   💡 {isKin
                     ? `Bona icyifuzo ${hintsRevealed + 1} (${hints.length - hintsRevealed} bisigaye)`
@@ -209,7 +209,7 @@ function CodingLesson({ lesson, language, onComplete, completing }: {
                 </button>
               )}
               {hintsRevealed === hints.length && hintsRevealed > 0 && (
-                <p style={{ fontSize: 12, color: 'var(--text-3)' }}>
+                <p style={{ fontSize: 13, color: 'var(--text-3)' }}>
                   {isKin ? '✓ Ibyifuzo byose biragaragara' : '✓ All hints revealed'}
                 </p>
               )}
@@ -222,7 +222,7 @@ function CodingLesson({ lesson, language, onComplete, completing }: {
         <>
           <div className="card" style={{ overflow: 'hidden' }}>
             <div style={{ padding: '10px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--line)', background: 'var(--surface-2)' }}>
-              <span style={{ fontSize: 12.5, fontWeight: 500, fontFamily: 'var(--mono)', color: 'var(--sx-keyword)' }}>index.html</span>
+              <span style={{ fontSize: 14, fontWeight: 500, fontFamily: 'var(--mono)', color: 'var(--sx-keyword)' }}>index.html</span>
               <button onClick={run} className="btn btn-primary sm" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                 <Monitor size={12} />
                 {isKin ? 'Reba uko bimeze' : 'Preview'}
@@ -234,7 +234,7 @@ function CodingLesson({ lesson, language, onComplete, completing }: {
               theme={vscodeDark}
               extensions={[html()]}
               basicSetup={{ lineNumbers: true, highlightActiveLine: true, foldGutter: false }}
-              style={{ fontSize: '13px' }}
+              style={{ fontSize: 17 }}
               placeholder="<!-- Write your full HTML page here -->"
             />
           </div>
@@ -242,7 +242,7 @@ function CodingLesson({ lesson, language, onComplete, completing }: {
           {previewSrc && (
             <div className="card" style={{ overflow: 'hidden' }}>
               <div style={{ padding: '8px 16px', borderBottom: '1px solid var(--line)', background: 'var(--surface-2)' }}>
-                <span style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--text-3)' }}>Preview</span>
+                <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-3)' }}>Preview</span>
               </div>
               <iframe
                 srcDoc={previewSrc}
@@ -257,7 +257,7 @@ function CodingLesson({ lesson, language, onComplete, completing }: {
         <>
           <div className="card" style={{ overflow: 'hidden' }}>
             <div style={{ padding: '10px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--line)', background: 'var(--surface-2)' }}>
-              <span style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--text-3)' }}>JavaScript</span>
+              <span style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-3)' }}>JavaScript</span>
               <button onClick={run} disabled={running} className="btn btn-primary sm" style={{ display: 'flex', alignItems: 'center', gap: 6, opacity: running ? 0.5 : 1 }}>
                 {running ? (
                   <svg style={{ animation: 'spin 1s linear infinite' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="12" height="12">
@@ -274,14 +274,14 @@ function CodingLesson({ lesson, language, onComplete, completing }: {
               theme={vscodeDark}
               extensions={[javascript()]}
               basicSetup={{ lineNumbers: true, highlightActiveLine: true, foldGutter: false }}
-              style={{ fontSize: '13px' }}
+              style={{ fontSize: 17 }}
             />
           </div>
 
           {output && (
             <div style={{ padding: '14px 16px', borderRadius: 'var(--radius)', background: 'var(--bg)', border: '1px solid var(--line)' }}>
-              <p style={{ fontSize: 12, fontWeight: 600, marginBottom: 8, color: 'var(--text-3)' }}>Output</p>
-              <pre style={{ fontSize: 13.5, whiteSpace: 'pre-wrap', fontFamily: 'var(--mono)', color: hasError ? 'var(--error)' : '#9eaa84', lineHeight: 1.6 }}>
+              <p style={{ fontSize: 13, fontWeight: 600, marginBottom: 8, color: 'var(--text-3)' }}>Output</p>
+              <pre style={{ fontSize: 15, whiteSpace: 'pre-wrap', fontFamily: 'var(--mono)', color: hasError ? 'var(--error)' : '#9eaa84', lineHeight: 1.6 }}>
                 {output}
               </pre>
             </div>
@@ -290,10 +290,10 @@ function CodingLesson({ lesson, language, onComplete, completing }: {
           {testResults.length > 0 && (
             <div className="card" style={{ overflow: 'hidden' }}>
               <div style={{ padding: '10px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--line)', background: 'var(--surface-2)' }}>
-                <p style={{ fontSize: 13.5, fontWeight: 600, color: 'var(--text)' }}>
+                <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--text)' }}>
                   {isKin ? 'Ibigerageza' : 'Test Cases'}
                 </p>
-                <span style={{ fontSize: 13, fontWeight: 500, padding: '2px 8px', borderRadius: 99,
+                <span style={{ fontSize: 15, fontWeight: 500, padding: '2px 8px', borderRadius: 99,
                   background: testResults.every(r => r.passed) ? 'rgba(158,170,132,0.15)' : 'rgba(210,136,123,0.12)',
                   color: testResults.every(r => r.passed) ? '#9eaa84' : 'var(--error)' }}>
                   {testResults.filter(r => r.passed).length}/{testResults.length} {isKin ? 'byatsinzwe' : 'passed'}
@@ -305,16 +305,16 @@ function CodingLesson({ lesson, language, onComplete, completing }: {
                   const passed = res?.passed ?? false;
                   return (
                     <div key={i} style={{ padding: '12px 16px', borderBottom: '1px solid var(--line)', display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-                      <span style={{ marginTop: 2, flexShrink: 0, fontSize: 14 }}>{passed ? '✅' : '❌'}</span>
+                      <span style={{ marginTop: 2, flexShrink: 0, fontSize: 16 }}>{passed ? '✅' : '❌'}</span>
                       <div style={{ flex: 1, minWidth: 0 }}>
-                        <p style={{ fontSize: 13.5, fontWeight: 500, color: 'var(--text)' }}>{t.description}</p>
+                        <p style={{ fontSize: 15, fontWeight: 500, color: 'var(--text)' }}>{t.description}</p>
                         {!passed && res && (
                           <div style={{ marginTop: 4 }}>
-                            <p style={{ fontSize: 12, color: 'var(--text-3)' }}>
+                            <p style={{ fontSize: 13, color: 'var(--text-3)' }}>
                               {isKin ? 'Byategerezwaga' : 'Expected'}:{' '}
                               <span style={{ fontFamily: 'var(--mono)', color: '#9eaa84' }}>{t.expectedOutput}</span>
                             </p>
-                            <p style={{ fontSize: 12, color: 'var(--text-3)' }}>
+                            <p style={{ fontSize: 13, color: 'var(--text-3)' }}>
                               {isKin ? 'Byaboneka' : 'Got'}:{' '}
                               <span style={{ fontFamily: 'var(--mono)', color: 'var(--error)' }}>{res.actual || '(no output)'}</span>
                             </p>
@@ -336,7 +336,7 @@ function CodingLesson({ lesson, language, onComplete, completing }: {
           {!solutionRevealed ? (
             <button
               onClick={() => setShowSolutionWarning(true)}
-              style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13.5, fontWeight: 600, color: 'var(--text-3)', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+              style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 15, fontWeight: 600, color: 'var(--text-3)', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
               onMouseEnter={e => (e.currentTarget.style.color = 'var(--error)')}
               onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-3)')}
             >
@@ -345,7 +345,7 @@ function CodingLesson({ lesson, language, onComplete, completing }: {
           ) : (
             <div className="card" style={{ overflow: 'hidden', border: '1px solid rgba(210,136,123,0.25)' }}>
               <div style={{ padding: '10px 16px', background: 'rgba(210,136,123,0.06)', borderBottom: '1px solid rgba(210,136,123,0.15)' }}>
-                <span style={{ fontSize: 13.5, fontWeight: 600, color: 'var(--error)' }}>
+                <span style={{ fontSize: 15, fontWeight: 600, color: 'var(--error)' }}>
                   {isKin ? '💡 Igisubizo — XP ntizahabwa' : '💡 Solution — no XP awarded'}
                 </span>
               </div>
@@ -355,7 +355,7 @@ function CodingLesson({ lesson, language, onComplete, completing }: {
                 extensions={[javascript()]}
                 editable={false}
                 basicSetup={{ lineNumbers: true, highlightActiveLine: false, foldGutter: false }}
-                style={{ fontSize: '13px' }}
+                style={{ fontSize: 17 }}
               />
             </div>
           )}
@@ -369,7 +369,7 @@ function CodingLesson({ lesson, language, onComplete, completing }: {
             <h3 style={{ fontSize: 15.5, fontWeight: 600, marginBottom: 8, color: 'var(--text)' }}>
               {isKin ? 'Urashaka kureba igisubizo?' : 'View the solution?'}
             </h3>
-            <p style={{ fontSize: 13.5, marginBottom: 20, color: 'var(--text-2)', lineHeight: 1.55 }}>
+            <p style={{ fontSize: 15, marginBottom: 20, color: 'var(--text-2)', lineHeight: 1.55 }}>
               {isKin
                 ? "Niba ureba igisubizo, ntuzahabwa XP kuri iri somo."
                 : "Viewing the solution means no XP for this lesson."}
@@ -384,7 +384,7 @@ function CodingLesson({ lesson, language, onComplete, completing }: {
               </button>
               <button
                 onClick={() => { setSolutionRevealed(true); setShowSolutionWarning(false); }}
-                style={{ flex: 1, padding: '10px', borderRadius: 'var(--radius)', fontSize: 13.5, fontWeight: 600, cursor: 'pointer', background: 'rgba(210,136,123,0.1)', color: 'var(--error)', border: '1px solid rgba(210,136,123,0.25)' }}
+                style={{ flex: 1, padding: '10px', borderRadius: 'var(--radius)', fontSize: 15, fontWeight: 600, cursor: 'pointer', background: 'rgba(210,136,123,0.1)', color: 'var(--error)', border: '1px solid rgba(210,136,123,0.25)' }}
               >
                 {isKin ? 'Yego, reba igisubizo' : 'Yes, show solution'}
               </button>
@@ -401,23 +401,23 @@ function CodingLesson({ lesson, language, onComplete, completing }: {
           onMouseEnter={e => (e.currentTarget.style.background = 'var(--surface-2)')}
           onMouseLeave={e => (e.currentTarget.style.background = 'var(--surface)')}
         >
-          <span className="ai-mwicon" style={{ width: 28, height: 28, borderRadius: 7, background: 'var(--surface-2)', display: 'grid', placeItems: 'center', fontFamily: 'var(--mono)', fontSize: 13, color: 'var(--text)', flexShrink: 0 }}>M</span>
+          <span className="ai-mwicon" style={{ width: 28, height: 28, borderRadius: 7, background: 'var(--surface-2)', display: 'grid', placeItems: 'center', fontFamily: 'var(--mono)', fontSize: 15, color: 'var(--text)', flexShrink: 0 }}>M</span>
           <div style={{ flex: 1 }}>
-            <p style={{ fontSize: 13.5, fontWeight: 500, color: 'var(--text)', marginBottom: 2 }}>
+            <p style={{ fontSize: 15, fontWeight: 500, color: 'var(--text)', marginBottom: 2 }}>
               {isKin ? 'Baza Mwarimu' : 'Ask Mwarimu'}
             </p>
-            <p style={{ fontSize: 12, color: 'var(--text-3)' }}>
+            <p style={{ fontSize: 13, color: 'var(--text-3)' }}>
               {isKin ? 'AI igufasha ariko ntiguha igisubizo cyose' : 'Guides you without giving away the answer'}
             </p>
           </div>
-          <span style={{ color: 'var(--text-3)', fontSize: 12 }}>{aiOpen ? '▲' : '▼'}</span>
+          <span style={{ color: 'var(--text-3)', fontSize: 13 }}>{aiOpen ? '▲' : '▼'}</span>
         </button>
 
         {aiOpen && (
           <div style={{ borderTop: '1px solid var(--line)', background: 'var(--bg)' }}>
             <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: 12, maxHeight: 256, overflowY: 'auto' }}>
               {aiMessages.length === 0 && (
-                <p style={{ fontSize: 12.5, textAlign: 'center', padding: '16px 0', color: 'var(--text-3)' }}>
+                <p style={{ fontSize: 14, textAlign: 'center', padding: '16px 0', color: 'var(--text-3)' }}>
                   {isKin
                     ? 'Baza ikibazo kijyanye na code yawe...'
                     : 'Ask anything about your code or the lesson...'}
@@ -426,7 +426,7 @@ function CodingLesson({ lesson, language, onComplete, completing }: {
               {aiMessages.map((m, i) => (
                 <div key={i} style={{ display: 'flex', justifyContent: m.role === 'user' ? 'flex-end' : 'flex-start' }}>
                   <div style={{
-                    maxWidth: '85%', padding: '8px 12px', borderRadius: 'var(--radius)', fontSize: 13.5, lineHeight: 1.55,
+                    maxWidth: '85%', padding: '8px 12px', borderRadius: 'var(--radius)', fontSize: 15, lineHeight: 1.55,
                     background: m.role === 'user' ? 'var(--surface-2)' : 'var(--surface)',
                     color: m.role === 'user' ? 'var(--text-2)' : 'var(--text)',
                     border: '1px solid var(--line)',
@@ -438,7 +438,7 @@ function CodingLesson({ lesson, language, onComplete, completing }: {
               {aiLoading && (
                 <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
                   <div style={{ padding: '8px 14px', borderRadius: 'var(--radius)', background: 'var(--surface)', border: '1px solid var(--line)', display: 'flex', alignItems: 'center', gap: 4 }}>
-                    <span style={{ color: 'var(--text-3)', fontSize: 12 }}>Mwarimu is thinking…</span>
+                    <span style={{ color: 'var(--text-3)', fontSize: 13 }}>Mwarimu is thinking…</span>
                   </div>
                 </div>
               )}
@@ -452,7 +452,7 @@ function CodingLesson({ lesson, language, onComplete, completing }: {
                 onKeyDown={e => e.key === 'Enter' && askAI()}
                 placeholder={isKin ? 'Andika ikibazo cyawe...' : 'Type your question...'}
                 className="input"
-                style={{ flex: 1, fontSize: 13.5 }}
+                style={{ flex: 1, fontSize: 15 }}
               />
               <button
                 onClick={askAI}
@@ -474,7 +474,7 @@ function CodingLesson({ lesson, language, onComplete, completing }: {
         if (!canComplete) {
           if (hasRun && tests.length > 0 && !allTestsPassed) {
             return (
-              <p style={{ fontSize: 13.5, textAlign: 'center', padding: '8px 0', color: 'var(--text-3)' }}>
+              <p style={{ fontSize: 15, textAlign: 'center', padding: '8px 0', color: 'var(--text-3)' }}>
                 {isKin
                   ? '⚠️ Rangiza ibigerageza byose mbere yo gusoza isomo'
                   : '⚠️ Pass all test cases to complete the lesson'}
@@ -531,7 +531,7 @@ function QuizLesson({ lesson, language, onComplete, completing }: {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
       {questions.map((q, qi) => (
         <div key={q.id} className="card pad-lg">
-          <p style={{ fontSize: 14, fontWeight: 600, marginBottom: 16, color: 'var(--text)', lineHeight: 1.5 }}>
+          <p style={{ fontSize: 16, fontWeight: 600, marginBottom: 16, color: 'var(--text)', lineHeight: 1.5 }}>
             {qi + 1}. {q.text}
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -546,7 +546,7 @@ function QuizLesson({ lesson, language, onComplete, completing }: {
                   disabled={submitted}
                   style={{
                     width: '100%', textAlign: 'left', padding: '12px 16px',
-                    borderRadius: 'var(--radius)', fontSize: 13.5, cursor: submitted ? 'default' : 'pointer',
+                    borderRadius: 'var(--radius)', fontSize: 15, cursor: submitted ? 'default' : 'pointer',
                     background: correct ? 'rgba(158,170,132,0.12)' : wrong ? 'var(--error-dim)' : selected ? 'var(--surface-2)' : 'var(--surface)',
                     border: correct ? '1px solid rgba(158,170,132,0.3)' : wrong ? '1px solid rgba(210,136,123,0.25)' : selected ? '1px solid var(--line-strong)' : '1px solid var(--line)',
                     color: correct ? '#9eaa84' : wrong ? 'var(--error)' : selected ? 'var(--text)' : 'var(--text-2)',
@@ -571,10 +571,10 @@ function QuizLesson({ lesson, language, onComplete, completing }: {
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <div className="card pad-lg" style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-            <div style={{ fontSize: 28, fontWeight: 600, color: 'var(--text)' }}>
+            <div style={{ fontSize: 32, fontWeight: 600, color: 'var(--text)' }}>
               {score}/{questions.length}
             </div>
-            <p style={{ fontSize: 14, color: 'var(--text-2)', lineHeight: 1.5 }}>
+            <p style={{ fontSize: 16, color: 'var(--text-2)', lineHeight: 1.5 }}>
               {perfect
                 ? (isKin ? 'Ni byiza cyane! Wasubije neza byose.' : 'Perfect! You got everything right.')
                 : (isKin ? 'Wagerageje! Ongera usuzume ibyo utatsinze.' : "Good effort! Review the ones you missed.")}
@@ -643,13 +643,13 @@ export default function LessonViewer({ lesson, courseTitle, allLessons, language
           <div style={{ width: 72, height: 72, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px', background: 'rgba(158,170,132,0.08)', border: '1px solid rgba(158,170,132,0.25)' }}>
             <CheckCircle size={32} style={{ color: '#9eaa84' }} />
           </div>
-          <h2 style={{ fontSize: 22, fontWeight: 600, marginBottom: 8, color: 'var(--text)', letterSpacing: '-0.02em' }}>
+          <h2 style={{ fontSize: 25, fontWeight: 600, marginBottom: 8, color: 'var(--text)', letterSpacing: '-0.02em' }}>
             {isKin ? 'Warangije Isomo!' : 'Lesson Complete!'}
           </h2>
-          <p style={{ fontSize: 14, marginBottom: 16, color: 'var(--text-2)' }}>{lessonTitle}</p>
+          <p style={{ fontSize: 16, marginBottom: 16, color: 'var(--text-2)' }}>{lessonTitle}</p>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 32, color: xpAwarded > 0 ? '#cda86a' : 'var(--text-3)' }}>
             <Zap size={18} fill={xpAwarded > 0 ? '#cda86a' : 'none'} />
-            <span style={{ fontSize: 18, fontWeight: 600 }}>
+            <span style={{ fontSize: 20, fontWeight: 600 }}>
               {xpAwarded > 0 ? `+${xpAwarded} XP` : isKin ? 'Nta XP (wakoresheje igisubizo)' : 'No XP (solution used)'}
             </span>
           </div>
@@ -702,7 +702,7 @@ export default function LessonViewer({ lesson, courseTitle, allLessons, language
           <div style={{ marginBottom: 32 }}>
             <button
               onClick={onBack}
-              style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: 'var(--text-3)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 13, marginBottom: 20, padding: 0 }}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: 'var(--text-3)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 15, marginBottom: 20, padding: 0 }}
               onMouseEnter={e => (e.currentTarget.style.color = 'var(--text-2)')}
               onMouseLeave={e => (e.currentTarget.style.color = 'var(--text-3)')}
             >
@@ -716,11 +716,11 @@ export default function LessonViewer({ lesson, courseTitle, allLessons, language
             </p>
             <h1>{lessonTitle}</h1>
             <div className="meta">
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '3px 10px', borderRadius: 99, background: typeInfo.bg, color: typeInfo.color, border: `1px solid ${typeInfo.border}`, fontSize: 12 }}>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '3px 10px', borderRadius: 99, background: typeInfo.bg, color: typeInfo.color, border: `1px solid ${typeInfo.border}`, fontSize: 13 }}>
                 {typeInfo.icon} {typeInfo.label}
               </span>
               {lesson.xp_reward > 0 && (
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: '#cda86a', fontSize: 13 }}>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, color: '#cda86a', fontSize: 15 }}>
                   <Zap size={13} fill="#cda86a" /> {lesson.xp_reward} XP
                 </span>
               )}
@@ -764,7 +764,7 @@ export default function LessonViewer({ lesson, courseTitle, allLessons, language
                 ? "Ufite ikibazo? Baza Mwarimu ikijyanye n'isomo ubu."
                 : "Have a question? Ask Mwarimu about this lesson."}
             </p>
-            <button className="btn btn-secondary" style={{ width: '100%', fontSize: 13 }}>
+            <button className="btn btn-secondary" style={{ width: '100%', fontSize: 15 }}>
               {isKin ? 'Baza Mwarimu' : 'Ask Mwarimu'}
             </button>
           </div>

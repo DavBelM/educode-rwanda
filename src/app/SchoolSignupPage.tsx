@@ -158,7 +158,7 @@ export default function SchoolSignupPage() {
                     ? 'Injira ukoresheje i-meyili n\'ijambo ry\'ibanga umaze gushyiraho.'
                     : 'Log in with the email and password you just set.'}
                 </p>
-                <p className="dim" style={{ fontSize: 13, marginBottom: 24 }}>
+                <p className="dim" style={{ fontSize: 15, marginBottom: 24 }}>
                   {isKin ? 'Uzabona dashboard ya konti y\'ishuri ryawe.' : "You'll see your school admin dashboard after logging in."}
                 </p>
                 <Link to="/login" className="btn btn-primary lg">
@@ -177,7 +177,7 @@ export default function SchoolSignupPage() {
                 <form onSubmit={handleSubmit} className="stack" style={{ ['--gap' as string]: '20px' }}>
                   {/* School information */}
                   <div className="stack" style={{ ['--gap' as string]: '14px' }}>
-                    <h3 className="font-bold" style={{ color: 'var(--text)', fontSize: 14, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                    <h3 className="font-bold" style={{ color: 'var(--text)', fontSize: 16, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                       {isKin ? 'Amakuru y\'Ishuri' : 'School information'}
                     </h3>
 
@@ -248,7 +248,7 @@ export default function SchoolSignupPage() {
 
                   {/* Contact person */}
                   <div className="stack" style={{ ['--gap' as string]: '14px' }}>
-                    <h3 className="font-bold" style={{ color: 'var(--text)', fontSize: 14, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                    <h3 className="font-bold" style={{ color: 'var(--text)', fontSize: 16, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
                       {isKin ? 'Umuntu wo guhamagara' : 'Contact person'}
                     </h3>
 
@@ -361,7 +361,7 @@ export default function SchoolSignupPage() {
                   </div>
 
                   {error && (
-                    <div style={{ padding: '10px 14px', borderRadius: 'var(--radius)', background: 'var(--error-dim)', color: 'var(--error)', fontSize: 14 }}>
+                    <div style={{ padding: '10px 14px', borderRadius: 'var(--radius)', background: 'var(--error-dim)', color: 'var(--error)', fontSize: 16 }}>
                       {error}
                     </div>
                   )}
@@ -381,7 +381,7 @@ export default function SchoolSignupPage() {
                   </button>
 
                   <div className="callout success">
-                    <div className="stack" style={{ ['--gap' as string]: '6px', fontSize: 14 }}>
+                    <div className="stack" style={{ ['--gap' as string]: '6px', fontSize: 16 }}>
                       <div className="flex items-center gap-2">
                         <CheckCircle2 size={14} style={{ flexShrink: 0 }} />
                         <span>{isKin ? 'Ntabwo ari itegeko gukomeza nyuma' : 'No commitment required'}</span>
@@ -449,7 +449,7 @@ export default function SchoolSignupPage() {
                 <button
                   onClick={() => setExpandedFAQ(expandedFAQ === index ? null : index)}
                   className="flex items-center justify-between"
-                  style={{ width: '100%', padding: '16px 20px', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', color: 'var(--text)', fontWeight: 600, fontSize: 15 }}
+                  style={{ width: '100%', padding: '16px 20px', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', color: 'var(--text)', fontWeight: 600, fontSize: 17 }}
                 >
                   <span>{faq.question}</span>
                   <ChevronDown
@@ -458,7 +458,7 @@ export default function SchoolSignupPage() {
                   />
                 </button>
                 {expandedFAQ === index && (
-                  <div className="dim" style={{ padding: '0 20px 16px', fontSize: 14 }}>
+                  <div className="dim" style={{ padding: '0 20px 16px', fontSize: 16 }}>
                     {faq.answer}
                   </div>
                 )}

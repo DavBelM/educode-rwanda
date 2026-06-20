@@ -54,7 +54,7 @@ export default function ChallengePage({ language }: Props) {
           <h1 className="text-xl font-bold" style={{ color: 'var(--text)', marginBottom: 6 }}>
             {isKin ? 'Imikino yo Gukora' : 'Challenge Mode'}
           </h1>
-          <p style={{ color: 'var(--text-3)', fontSize: 14 }}>
+          <p style={{ color: 'var(--text-3)', fontSize: 16 }}>
             {isKin
               ? 'Menya JavaScript unyuze muri challenge imwe na imwe. Rangiza set kugira ngo ufungure ikurikiraho.'
               : 'Master JavaScript one challenge at a time. Complete a set to unlock the next.'}
@@ -82,26 +82,26 @@ export default function ChallengePage({ language }: Props) {
                     background: 'var(--surface-2)',
                     border: '1px solid var(--line)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 14, fontWeight: 600, color: 'var(--text-2)',
+                    fontSize: 16, fontWeight: 600, color: 'var(--text-2)',
                   }}>
                     {String(set.order_index).padStart(2, '0')}
                   </div>
 
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div className="flex items-center gap-2 mb-1">
-                      <h3 style={{ fontSize: 15, fontWeight: 600, color: 'var(--text)' }}>
+                      <h3 style={{ fontSize: 17, fontWeight: 600, color: 'var(--text)' }}>
                         {isKin && set.title_kin ? set.title_kin : set.title}
                       </h3>
                       {done && (
-                        <span className="pill" style={{ fontSize: 11 }}>
+                        <span className="pill" style={{ fontSize: 12 }}>
                           {isKin ? 'Byarangiye' : 'Completed'}
                         </span>
                       )}
                     </div>
-                    <p style={{ color: 'var(--text-3)', fontSize: 13, lineHeight: 1.5 }}>
+                    <p style={{ color: 'var(--text-3)', fontSize: 15, lineHeight: 1.5 }}>
                       {isKin && set.description_kin ? set.description_kin : set.description}
                     </p>
-                    <p style={{ color: 'var(--text-3)', fontSize: 12, marginTop: 6 }}>
+                    <p style={{ color: 'var(--text-3)', fontSize: 13, marginTop: 6 }}>
                       6 {isKin ? 'challenge' : 'challenges'} · {set.xp_reward} XP
                     </p>
                   </div>
@@ -115,7 +115,7 @@ export default function ChallengePage({ language }: Props) {
           })}
         </div>
 
-        <p style={{ color: 'var(--text-3)', fontSize: 13, marginTop: 24 }}>
+        <p style={{ color: 'var(--text-3)', fontSize: 15, marginTop: 24 }}>
           {isKin
             ? 'XP wabonye igaragarira ku dashboard yawe.'
             : 'XP you earn appears on your dashboard.'}

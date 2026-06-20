@@ -207,7 +207,7 @@ export default function SignupPage({ onSuccess, onLoginClick }: {
                       />
                     ))}
                   </div>
-                  <span style={{ fontSize: 12, color: 'var(--text-3)' }}>{pwStrength.label} strength</span>
+                  <span style={{ fontSize: 13, color: 'var(--text-3)' }}>{pwStrength.label} strength</span>
                 </div>
               )}
             </div>
@@ -243,7 +243,7 @@ export default function SignupPage({ onSuccess, onLoginClick }: {
             </label>
 
             {error && (
-              <div style={{ padding: '10px 14px', borderRadius: 'var(--radius)', background: 'var(--error-dim)', color: 'var(--error)', fontSize: 14 }}>
+              <div style={{ padding: '10px 14px', borderRadius: 'var(--radius)', background: 'var(--error-dim)', color: 'var(--error)', fontSize: 16 }}>
                 {error}
               </div>
             )}

@@ -72,7 +72,7 @@ export default function AboutPage() {
               <h2 style={{ fontSize: 'clamp(26px,3.4vw,34px)', letterSpacing: '-0.03em' }}>
                 {isKin ? 'Yavutse mu ishuri.' : 'Born from the classroom.'}
               </h2>
-              <p className="muted" style={{ marginTop: 14, fontSize: 16, lineHeight: 1.6 }}>
+              <p className="muted" style={{ marginTop: 14, fontSize: 18, lineHeight: 1.6 }}>
                 {isKin
                   ? 'Yashinzwe mu 2026 n\'umunyeshuri wiga Computer Science muri African Leadership University akaba n\'umwarimu wa JavaScript mu ishuri ryaho. Ikibazo cyari gisobanutse: abanyeshuri babonaga bigoye kwiga programming.'
                   : 'Founded in 2026 by a Computer Science student at African Leadership University and JavaScript teacher at a local school. The problem was clear: students struggled to learn programming.'}
@@ -109,7 +109,7 @@ export default function AboutPage() {
                 { icon: <Users size={22} />, number: '5,000+', label: isKin ? 'Abanyeshuri Biga' : 'Students learning' },
                 { icon: <Target size={22} />, number: '50+', label: isKin ? 'Amashuri akoresha' : 'Schools using it' },
                 { icon: <Globe size={22} />, number: '95%', label: isKin ? 'Igipimo cy\'abatsinda' : 'Pass rate' },
-                { icon: <span style={{ fontSize: 22 }}>🇷🇼</span>, number: '#1', label: isKin ? 'Mu Rwanda' : 'In Rwanda' },
+                { icon: <span style={{ fontSize: 25 }}>🇷🇼</span>, number: '#1', label: isKin ? 'Mu Rwanda' : 'In Rwanda' },
               ].map((stat) => (
                 <div key={stat.label} className="card pad-sm text-center">
                   <div className="iconbtn" style={{ margin: '0 auto 12px', pointerEvents: 'none' }}>
@@ -168,11 +168,11 @@ export default function AboutPage() {
           </div>
           <div className="card pad-lg">
             <div className="flex flex-col md:flex-row items-center gap-8">
-              <div className="iconbtn" style={{ width: 88, height: 88, fontSize: 28, fontWeight: 600, flexShrink: 0, pointerEvents: 'none' }}>
+              <div className="iconbtn" style={{ width: 88, height: 88, fontSize: 32, fontWeight: 600, flexShrink: 0, pointerEvents: 'none' }}>
                 JD
               </div>
               <div className="flex-1 text-center md:text-left">
-                <h3 style={{ fontSize: 22, fontWeight: 600, color: 'var(--text)', marginBottom: 4 }}>[Your Name]</h3>
+                <h3 style={{ fontSize: 25, fontWeight: 600, color: 'var(--text)', marginBottom: 4 }}>[Your Name]</h3>
                 <p style={{ color: 'var(--text-2)', fontWeight: 600, marginBottom: 12 }}>
                   {isKin ? 'Umushinzwi & CEO' : 'Founder & CEO'}
                 </p>

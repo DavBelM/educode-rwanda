@@ -208,7 +208,7 @@ export default function SelfLearnerDashboard({ language, onStartCoding, onOpenCo
               <div className="bar on-card">
                 <i style={{ width: `${lvl.pct}%` }} />
               </div>
-              <p className="dim" style={{ fontSize: 12.5, marginTop: 10 }}>
+              <p className="dim" style={{ fontSize: 14, marginTop: 10 }}>
                 {lvl.xpToNext > 0
                   ? (isKin ? `Hasigaye ${lvl.xpToNext} XP ngo ugere ku rwego rukurikira` : `${lvl.xpToNext} XP to next level`)
                   : (isKin ? 'Wageze ku rwego rwa nyuma!' : 'Max level!')}
@@ -223,7 +223,7 @@ export default function SelfLearnerDashboard({ language, onStartCoding, onOpenCo
                   <div className="bar on-card">
                     <i style={{ width: `${overallPct}%` }} />
                   </div>
-                  <p className="dim" style={{ fontSize: 12.5, marginTop: 6 }}>
+                  <p className="dim" style={{ fontSize: 14, marginTop: 6 }}>
                     {totalCompleted} / {totalLessons} {isKin ? 'amasomo yarangiye' : 'lessons completed'}
                   </p>
                 </>
