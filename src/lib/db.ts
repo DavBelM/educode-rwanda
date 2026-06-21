@@ -1490,3 +1490,84 @@ export async function deleteSchoolAnnouncement(id: string): Promise<{ error: str
   if (error) return { error: error.message };
   return { error: null };
 }
+
+// ── Teacher: per-student AI profile ──────────────────────────────────────────
+
+export interface StudentAIProfile {
+  totalInteractions: number;
+  weekInteractions: number;
+  challengeInteractions: number;
+  topErrors: Array<{ type: string; count: number }>;
+  recentQuestions: Array<{ question: string; created_at: string; in_challenge: boolean }>;
+  languageSplit: { en: number; kin: number };
+}
+
+export async function getStudentAIProfile(
+  studentId: string,
+  classId: string
+): Promise<StudentAIProfile | null> {
+  // Only the teacher who owns this class may access student AI data
+  const authError = await assertTeacherOwnsClass(classId);
+  if (authError) return null;
+
+  // Confirm student is actually enrolled in this class
+  const { data: enrollment } = await supabase
+    .from('class_enrollments')
+    .select('student_id')
+    .eq('class_id', classId)
+    .eq('student_id', studentId)
+    .single();
+  if (!enrollment) return null;
+
+  const { data: interactions } = await supabase
+    .from('ai_interactions')
+    .select('question, language, challenge_id, created_at')
+    .eq('student_id', studentId)
+    .order('created_at', { ascending: false });
+
+  if (!interactions) return {
+    totalInteractions: 0, weekInteractions: 0, challengeInteractions: 0,
+    topErrors: [], recentQuestions: [], languageSplit: { en: 0, kin: 0 },
+  };
+
+  const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+  const weekInteractions = interactions.filter(i => i.created_at >= weekAgo).length;
+  const challengeInteractions = interactions.filter(i => !!i.challenge_id).length;
+
+  // Tally error types from the question text
+  const errorCounts: Record<string, number> = {};
+  const ERROR_TYPES = ['TypeError', 'ReferenceError', 'SyntaxError', 'RangeError'];
+  for (const i of interactions) {
+    for (const t of ERROR_TYPES) {
+      if (i.question.includes(t)) errorCounts[t] = (errorCounts[t] ?? 0) + 1;
+    }
+  }
+  const topErrors = Object.entries(errorCounts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 4)
+    .map(([type, count]) => ({ type, count }));
+
+  // Filter out auto-feedback messages (those are not the student's own questions)
+  const studentQuestions = interactions.filter(
+    i => !i.question.startsWith('My code has an error') &&
+         !i.question.startsWith('I ran my code') &&
+         !i.question.startsWith('[CHALLENGE MODE')
+  );
+  const recentQuestions = studentQuestions.slice(0, 6).map(i => ({
+    question: i.question.replace(/^\[INSTRUCTION[^\]]*\]\n\n/, '').slice(0, 140),
+    created_at: i.created_at,
+    in_challenge: !!i.challenge_id,
+  }));
+
+  const en = interactions.filter(i => i.language === 'EN').length;
+  const kin = interactions.filter(i => i.language === 'KIN').length;
+
+  return {
+    totalInteractions: interactions.length,
+    weekInteractions,
+    challengeInteractions,
+    topErrors,
+    recentQuestions,
+    languageSplit: { en, kin },
+  };
+}

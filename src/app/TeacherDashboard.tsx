@@ -8,7 +8,8 @@ import {
   getAssignmentSubmissions, getAssignmentSubmissionCounts, gradeSubmission, releaseGrades,
   getClassAnalytics, getClassGradesExport, getClassRoster, getClassPendingReviewCount,
   createAnnouncement, getClassAnnouncements, deleteAnnouncement,
-  type Class, type Assignment, type Question, type Submission, type Announcement, type ClassAnalytics, type RosterStudent
+  getStudentAIProfile,
+  type Class, type Assignment, type Question, type Submission, type Announcement, type ClassAnalytics, type RosterStudent, type StudentAIProfile
 } from '../lib/db';
 
 // ─── Create Class Modal ────────────────────────────────────────────────────────
@@ -1111,6 +1112,159 @@ function formatRelativeTime(iso: string | null, isKin: boolean): string {
   return isKin ? `Iminsi ${diffDays} ishize` : `${diffDays} days ago`;
 }
 
+// ── Student AI Profile Modal ──────────────────────────────────────────────────
+
+function StudentProfileModal({ student, classId, language, onClose }: {
+  student: RosterStudent;
+  classId: string;
+  language: 'EN' | 'KIN';
+  onClose: () => void;
+}) {
+  const isKin = language === 'KIN';
+  const [profile, setProfile] = useState<StudentAIProfile | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getStudentAIProfile(student.student_id, classId).then(p => {
+      setProfile(p);
+      setLoading(false);
+    });
+  }, [student.student_id, classId]);
+
+  const ERROR_COLORS: Record<string, string> = {
+    TypeError: '#d2887b',
+    ReferenceError: '#cda86a',
+    SyntaxError: '#7eb8cf',
+    RangeError: '#9eaa84',
+  };
+
+  const total = (profile?.languageSplit.en ?? 0) + (profile?.languageSplit.kin ?? 0);
+  const enPct = total > 0 ? Math.round(((profile?.languageSplit.en ?? 0) / total) * 100) : 50;
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, zIndex: 60, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, background: 'rgba(0,0,0,0.65)', backdropFilter: 'blur(4px)' }}>
+      <div className="card" style={{ width: '100%', maxWidth: 520, maxHeight: '85vh', overflowY: 'auto' }}>
+        {/* Header */}
+        <div className="card-head" style={{ padding: '18px 20px', borderBottom: '1px solid var(--line)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <span className="av" style={{ width: 40, height: 40, fontSize: 15 }}>{initials(student.full_name)}</span>
+            <div>
+              <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--text)' }}>{student.full_name}</div>
+              <div style={{ fontSize: 12, color: 'var(--text-3)' }}>@{student.username}</div>
+            </div>
+          </div>
+          <button onClick={onClose} className="iconbtn"><X size={18} /></button>
+        </div>
+
+        <div style={{ padding: '20px' }}>
+          {loading ? (
+            <div style={{ display: 'flex', justifyContent: 'center', padding: '32px 0' }}>
+              <Loader size={22} style={{ animation: 'spin 1s linear infinite', color: 'var(--text-3)' }} />
+            </div>
+          ) : !profile || profile.totalInteractions === 0 ? (
+            <div style={{ textAlign: 'center', padding: '32px 0', color: 'var(--text-3)' }}>
+              <BarChart2 size={32} style={{ margin: '0 auto 12px', opacity: 0.4 }} />
+              <p style={{ fontSize: 14 }}>
+                {isKin ? 'Uyu munyeshuri ntiyabajije Mwarimu ubu.' : "This student hasn't used Mwarimu yet."}
+              </p>
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+
+              {/* Stats row */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
+                {[
+                  { label: isKin ? 'Ibibazo byose' : 'Total asks', value: profile.totalInteractions },
+                  { label: isKin ? 'Iki cyumweru' : 'This week', value: profile.weekInteractions },
+                  { label: isKin ? 'Mu bigeragezo' : 'In challenges', value: profile.challengeInteractions },
+                ].map(s => (
+                  <div key={s.label} className="card" style={{ padding: '12px 14px', textAlign: 'center' }}>
+                    <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--text)', letterSpacing: '-0.03em' }}>{s.value}</div>
+                    <div style={{ fontSize: 11.5, color: 'var(--text-3)', marginTop: 2 }}>{s.label}</div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Top errors */}
+              {profile.topErrors.length > 0 && (
+                <div>
+                  <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>
+                    {isKin ? 'Amakosa akunze kugaragara' : 'Most frequent errors'}
+                  </p>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    {profile.topErrors.map(e => {
+                      const maxCount = profile.topErrors[0].count;
+                      const barW = Math.round((e.count / maxCount) * 100);
+                      return (
+                        <div key={e.type} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                          <div style={{ width: 110, fontSize: 12.5, fontFamily: 'var(--mono)', color: ERROR_COLORS[e.type] ?? 'var(--text-2)', flexShrink: 0 }}>
+                            {e.type}
+                          </div>
+                          <div style={{ flex: 1, height: 6, borderRadius: 3, background: 'var(--surface)' }}>
+                            <div style={{ width: `${barW}%`, height: '100%', borderRadius: 3, background: ERROR_COLORS[e.type] ?? 'var(--text-3)', opacity: 0.7 }} />
+                          </div>
+                          <div style={{ width: 24, textAlign: 'right', fontSize: 12, color: 'var(--text-3)', flexShrink: 0 }}>{e.count}×</div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Language preference */}
+              <div>
+                <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>
+                  {isKin ? 'Ururimi rukozwe' : 'Language used'}
+                </p>
+                <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                  <span style={{ fontSize: 12, color: 'var(--text-2)', width: 28, flexShrink: 0 }}>EN</span>
+                  <div style={{ flex: 1, height: 8, borderRadius: 4, background: 'var(--surface)', overflow: 'hidden', display: 'flex' }}>
+                    <div style={{ width: `${enPct}%`, background: '#7eb8cf', height: '100%' }} />
+                    <div style={{ flex: 1, background: '#9eaa84', height: '100%' }} />
+                  </div>
+                  <span style={{ fontSize: 12, color: 'var(--text-2)', width: 28, textAlign: 'right', flexShrink: 0 }}>RW</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 11.5, color: 'var(--text-3)', marginTop: 4 }}>
+                  <span>{enPct}% English</span>
+                  <span>{100 - enPct}% Kinyarwanda</span>
+                </div>
+              </div>
+
+              {/* Recent questions */}
+              {profile.recentQuestions.length > 0 && (
+                <div>
+                  <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 10 }}>
+                    {isKin ? 'Ibibazo byahise' : 'Recent questions'}
+                  </p>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    {profile.recentQuestions.map((q, i) => (
+                      <div key={i} style={{ padding: '10px 12px', borderRadius: 'var(--radius)', background: 'var(--surface)', border: '1px solid var(--line)' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                          {q.in_challenge && (
+                            <span style={{ fontSize: 11, padding: '1px 7px', borderRadius: 99, background: 'rgba(205,168,106,0.12)', color: '#cda86a', border: '1px solid rgba(205,168,106,0.25)' }}>
+                              {isKin ? 'Ikigeragezo' : 'Challenge'}
+                            </span>
+                          )}
+                          <span style={{ fontSize: 11, color: 'var(--text-3)', marginLeft: 'auto' }}>
+                            {formatRelativeTime(q.created_at, isKin)}
+                          </span>
+                        </div>
+                        <p style={{ fontSize: 13, color: 'var(--text-2)', lineHeight: 1.45, margin: 0 }}>
+                          {q.question}{q.question.length === 140 ? '…' : ''}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function StatusPill({ status, isKin }: { status: RosterStudent['status']; isKin: boolean }) {
   if (status === 'on-track') return <span className="pill solid"><span className="dot" />{isKin ? 'Biri neza' : 'On track'}</span>;
   if (status === 'behind') return <span className="pill error">{isKin ? 'Birasubira inyuma' : 'Behind'}</span>;
@@ -1156,6 +1310,7 @@ export default function TeacherDashboard() {
   const [analyticsClass, setAnalyticsClass] = useState<Class | null>(null);
   const [roster, setRoster] = useState<RosterStudent[]>([]);
   const [pendingReview, setPendingReview] = useState(0);
+  const [selectedRosterStudent, setSelectedRosterStudent] = useState<RosterStudent | null>(null);
   const { profile } = useAuth();
 
   const loadData = async () => {
@@ -1352,7 +1507,12 @@ export default function TeacherDashboard() {
                     </thead>
                     <tbody>
                       {roster.map(s => (
-                        <tr key={s.student_id}>
+                        <tr
+                          key={s.student_id}
+                          onClick={() => setSelectedRosterStudent(s)}
+                          style={{ cursor: 'pointer' }}
+                          title={isKin ? 'Reba umwirondoro w\'umunyeshuri' : "View student's AI profile"}
+                        >
                           <td>
                             <div className="stu">
                               <span className="av">{initials(s.full_name)}</span>
@@ -1480,6 +1640,15 @@ export default function TeacherDashboard() {
           cls={analyticsClass}
           language={language}
           onClose={() => setAnalyticsClass(null)}
+        />
+      )}
+
+      {selectedRosterStudent && selectedClassId && (
+        <StudentProfileModal
+          student={selectedRosterStudent}
+          classId={selectedClassId}
+          language={language}
+          onClose={() => setSelectedRosterStudent(null)}
         />
       )}
     </div>
