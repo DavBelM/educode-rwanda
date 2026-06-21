@@ -29,8 +29,35 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (!apiKey) return res.status(500).json({ error: 'GEMINI_API_KEY not configured' });
 
   const prompt = targetLanguage === 'EN'
-    ? `Translate the following to English. Keep code terms (variable names, function names, keywords like const/let/var/function) in English as-is. If it is already in English, return it unchanged:\n\n${text}`
-    : `Translate the following JavaScript error explanation to Kinyarwanda. Keep code terms (variable names, function names, keywords like const/let/var) in English. Only translate the explanation text:\n\n${text}`;
+    ? [
+        'Translate the following AI tutor message to English.',
+        'Rules:',
+        '1. Keep all code blocks (text inside triple backticks) exactly as they are — do not translate or reformat them.',
+        '2. Keep JavaScript keywords and identifiers (const, let, var, function, console.log, etc.) in English.',
+        '3. Preserve all markdown formatting: **bold**, `inline code`, bullet points, numbered lists.',
+        '4. If the text is already in English, return it unchanged.',
+        '5. Match the warm, encouraging tone of a student tutor.',
+        '',
+        'Text to translate:',
+        text,
+      ].join('\n')
+    : [
+        'You are translating an AI coding tutor response from English to Kinyarwanda.',
+        'The audience is Rwandan TVET secondary-school students (ages 16–21) learning JavaScript for the first time.',
+        '',
+        'Rules:',
+        '1. Translate the explanation text naturally into Kinyarwanda that a teenage student would understand.',
+        '2. Do NOT translate or modify code blocks (text inside triple backticks ```). Leave them exactly as they appear.',
+        '3. Do NOT translate JavaScript keywords, identifiers, or syntax: const, let, var, function, if, else, return, console.log, true, false, null, undefined, etc.',
+        '4. Keep inline code wrapped in backticks (e.g. `const`) in English.',
+        '5. Preserve all markdown formatting exactly: **bold**, `inline code`, bullet points (- or *), numbered lists.',
+        '6. Technical terms with no clear Kinyarwanda equivalent (like "variable", "function", "error", "assignment") can be kept in English or briefly explained in parentheses.',
+        '7. Keep the same warm, patient, encouraging tone as the original. Never sound formal or robotic.',
+        '8. Do not add any introduction or explanation of what you are doing — output only the translated text.',
+        '',
+        'Text to translate:',
+        text,
+      ].join('\n');
 
   try {
     const response = await fetch(
@@ -40,7 +67,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { maxOutputTokens: 200, temperature: 0.1 },
+          generationConfig: { maxOutputTokens: 500, temperature: 0.1 },
         }),
       }
     );

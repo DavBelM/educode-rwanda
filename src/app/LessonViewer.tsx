@@ -1,5 +1,6 @@
 import { AppNav } from './components/AppNav';
 import { useState, useCallback, useRef, useEffect } from 'react';
+import ReactMarkdown from 'react-markdown';
 import { Play, CheckCircle, Loader, Zap, BookOpen, Code2, HelpCircle, Monitor, Send, ArrowLeft } from 'lucide-react';
 import { completeLesson, type CourseLesson } from '../lib/db';
 import { executeCode } from '../lib/code-executor';
@@ -92,8 +93,9 @@ function ReadingLesson({ lesson, language, onComplete, completing }: {
 
 // ─── Coding Lesson ────────────────────────────────────────────────────────────
 
-function CodingLesson({ lesson, language, onComplete, completing }: {
+function CodingLesson({ lesson, language, onComplete, completing, onCodeChange }: {
   lesson: CourseLesson; language: 'EN' | 'KIN'; onComplete: (usedSolution?: boolean) => void; completing: boolean;
+  onCodeChange?: (code: string) => void;
 }) {
   const isKin = language === 'KIN';
   const isHtmlExercise = !lesson.exercise_data?.starter_code;
@@ -119,6 +121,11 @@ function CodingLesson({ lesson, language, onComplete, completing }: {
   const [aiMessages, setAiMessages] = useState<Array<{ role: 'user' | 'ai'; text: string }>>([]);
   const [aiLoading, setAiLoading] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
+
+  // Expose current code to parent (for rail chat context)
+  useEffect(() => {
+    onCodeChange?.(isHtmlExercise ? htmlCode : code);
+  }, [code, htmlCode]);
 
   const askAI = async () => {
     const q = aiQuestion.trim();
@@ -431,14 +438,16 @@ function CodingLesson({ lesson, language, onComplete, completing }: {
                     color: m.role === 'user' ? 'var(--text-2)' : 'var(--text)',
                     border: '1px solid var(--line)',
                   }}>
-                    {m.text}
+                    {m.role === 'ai'
+                      ? <div className="bubble" style={{ background: 'none', border: 'none', padding: 0 }}><ReactMarkdown>{m.text}</ReactMarkdown></div>
+                      : m.text}
                   </div>
                 </div>
               ))}
               {aiLoading && (
                 <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-                  <div style={{ padding: '8px 14px', borderRadius: 'var(--radius)', background: 'var(--surface)', border: '1px solid var(--line)', display: 'flex', alignItems: 'center', gap: 4 }}>
-                    <span style={{ color: 'var(--text-3)', fontSize: 12 }}>Mwarimu is thinking…</span>
+                  <div style={{ padding: '8px 14px', borderRadius: 'var(--radius)', background: 'var(--surface)', border: '1px solid var(--line)' }}>
+                    <div className="typing-dots"><span /><span /><span /></div>
                   </div>
                 </div>
               )}
@@ -611,6 +620,29 @@ export default function LessonViewer({ lesson, courseTitle, allLessons, language
   const [xpAwarded, setXpAwarded] = useState(0);
   const [readPct, setReadPct] = useState(0);
 
+  // ── Rail Mwarimu chat (works for all lesson types) ────────────────────────
+  const codeCtxRef = useRef('');
+  const instrCtx = lesson.exercise_data?.instructions ?? '';
+  const [railMessages, setRailMessages] = useState<Array<{ role: 'user' | 'ai'; text: string }>>([]);
+  const [railLoading, setRailLoading] = useState(false);
+  const [railInput, setRailInput] = useState('');
+  const railEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    railEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [railMessages, railLoading]);
+
+  const askRail = async () => {
+    const q = railInput.trim();
+    if (!q || railLoading) return;
+    setRailInput('');
+    setRailMessages(prev => [...prev, { role: 'user', text: q }]);
+    setRailLoading(true);
+    const answer = await getLessonAIHelp(q, codeCtxRef.current, instrCtx, language);
+    setRailMessages(prev => [...prev, { role: 'ai', text: answer }]);
+    setRailLoading(false);
+  };
+
   const typeInfo = {
     reading: { icon: <BookOpen size={13} />, label: isKin ? 'Gusoma' : 'Reading',      color: '#7eb8cf', bg: 'rgba(126,184,207,0.08)', border: 'rgba(126,184,207,0.2)' },
     coding:  { icon: <Code2 size={13} />,    label: isKin ? 'Gukora Code' : 'Coding',  color: '#9eaa84', bg: 'rgba(158,170,132,0.08)', border: 'rgba(158,170,132,0.2)' },
@@ -731,7 +763,7 @@ export default function LessonViewer({ lesson, courseTitle, allLessons, language
             <ReadingLesson lesson={lesson} language={language} onComplete={() => handleComplete()} completing={completing} />
           )}
           {lesson.lesson_type === 'coding' && (
-            <CodingLesson lesson={lesson} language={language} onComplete={(usedSolution) => handleComplete(undefined, usedSolution)} completing={completing} />
+            <CodingLesson lesson={lesson} language={language} onComplete={(usedSolution) => handleComplete(undefined, usedSolution)} completing={completing} onCodeChange={c => { codeCtxRef.current = c; }} />
           )}
           {lesson.lesson_type === 'quiz' && (
             <QuizLesson lesson={lesson} language={language} onComplete={(s) => handleComplete(s)} completing={completing} />
@@ -754,19 +786,62 @@ export default function LessonViewer({ lesson, courseTitle, allLessons, language
 
         {/* RIGHT RAIL */}
         <aside className="rail">
-          <div className="ask">
-            <div className="ah">
+          <div className="ask" style={{ display: 'flex', flexDirection: 'column', gap: 0, padding: 0, overflow: 'hidden' }}>
+            <div className="ah" style={{ padding: '12px 16px', borderBottom: '1px solid var(--line)', flexShrink: 0 }}>
               <span className="ai-mwicon">M</span>
               Mwarimu
             </div>
-            <p>
-              {isKin
-                ? "Ufite ikibazo? Baza Mwarimu ikijyanye n'isomo ubu."
-                : "Have a question? Ask Mwarimu about this lesson."}
-            </p>
-            <button className="btn btn-secondary" style={{ width: '100%', fontSize: 13 }}>
-              {isKin ? 'Baza Mwarimu' : 'Ask Mwarimu'}
-            </button>
+
+            {/* Messages */}
+            <div style={{ flex: 1, overflowY: 'auto', padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: 10, minHeight: 120, maxHeight: 360 }}>
+              {railMessages.length === 0 && !railLoading && (
+                <p style={{ fontSize: 12.5, color: 'var(--text-3)', textAlign: 'center', padding: '8px 0' }}>
+                  {isKin ? "Ufite ikibazo? Baza Mwarimu." : "Have a question? Ask Mwarimu."}
+                </p>
+              )}
+              {railMessages.map((m, i) => (
+                <div key={i} style={{ display: 'flex', justifyContent: m.role === 'user' ? 'flex-end' : 'flex-start' }}>
+                  <div style={{
+                    maxWidth: '90%', padding: '7px 11px', borderRadius: 'var(--radius)', fontSize: 13, lineHeight: 1.55,
+                    background: m.role === 'user' ? 'var(--surface-2)' : 'var(--surface)',
+                    color: m.role === 'user' ? 'var(--text-2)' : 'var(--text)',
+                    border: '1px solid var(--line)',
+                  }}>
+                    {m.role === 'ai'
+                      ? <div className="bubble" style={{ background: 'none', border: 'none', padding: 0, fontSize: 13 }}><ReactMarkdown>{m.text}</ReactMarkdown></div>
+                      : m.text}
+                  </div>
+                </div>
+              ))}
+              {railLoading && (
+                <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+                  <div style={{ padding: '8px 12px', borderRadius: 'var(--radius)', background: 'var(--surface)', border: '1px solid var(--line)' }}>
+                    <div className="typing-dots"><span /><span /><span /></div>
+                  </div>
+                </div>
+              )}
+              <div ref={railEndRef} />
+            </div>
+
+            {/* Input */}
+            <div style={{ display: 'flex', gap: 6, padding: '10px 12px', borderTop: '1px solid var(--line)', flexShrink: 0 }}>
+              <input
+                value={railInput}
+                onChange={e => setRailInput(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && askRail()}
+                placeholder={isKin ? 'Baza ikibazo...' : 'Ask a question...'}
+                className="input"
+                style={{ flex: 1, fontSize: 12.5 }}
+              />
+              <button
+                onClick={askRail}
+                disabled={!railInput.trim() || railLoading}
+                className="btn btn-secondary"
+                style={{ padding: '0 10px', display: 'flex', alignItems: 'center', opacity: (!railInput.trim() || railLoading) ? 0.4 : 1 }}
+              >
+                <Send size={13} />
+              </button>
+            </div>
           </div>
         </aside>
       </div>
