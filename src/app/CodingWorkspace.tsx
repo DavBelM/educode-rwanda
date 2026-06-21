@@ -75,6 +75,63 @@ export default function CodingWorkspace({ assignment }: Props) {
   const [submitError, setSubmitError] = useState('');
   const [violationWarning, setViolationWarning] = useState('');
 
+  // ── Resize state ─────────────────────────────────────────────────────────────
+  const [editorPct, setEditorPct] = useState(62);
+  const [consoleHeight, setConsoleHeight] = useState(180);
+  const isDraggingH = useRef(false);
+  const isDraggingV = useRef(false);
+  const dragStartX = useRef(0);
+  const dragStartPct = useRef(62);
+  const dragStartY = useRef(0);
+  const dragStartConsole = useRef(180);
+
+  useEffect(() => {
+    const onMove = (e: MouseEvent) => {
+      if (isDraggingH.current) {
+        const dx = e.clientX - dragStartX.current;
+        const totalW = window.innerWidth;
+        const newPct = Math.min(80, Math.max(30, dragStartPct.current + (dx / totalW) * 100));
+        setEditorPct(newPct);
+      }
+      if (isDraggingV.current) {
+        const dy = dragStartY.current - e.clientY;
+        const newH = Math.min(480, Math.max(56, dragStartConsole.current + dy));
+        setConsoleHeight(newH);
+      }
+    };
+    const onUp = () => {
+      isDraggingH.current = false;
+      isDraggingV.current = false;
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+    return () => {
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+    };
+  }, []);
+
+  const startHDrag = (e: React.MouseEvent) => {
+    isDraggingH.current = true;
+    dragStartX.current = e.clientX;
+    dragStartPct.current = editorPct;
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+  };
+
+  const startVDrag = (e: React.MouseEvent) => {
+    isDraggingV.current = true;
+    dragStartY.current = e.clientY;
+    dragStartConsole.current = consoleHeight;
+    document.body.style.cursor = 'row-resize';
+    document.body.style.userSelect = 'none';
+  };
+
+  // ── HTML preview ──────────────────────────────────────────────────────────────
+  const [previewSrcdoc, setPreviewSrcdoc] = useState('');
+
   // Auto-save code as student types
   useEffect(() => {
     localStorage.setItem(saveKey + '_js', jsCode);
@@ -211,6 +268,10 @@ export default function CodingWorkspace({ assignment }: Props) {
 
     setIsRunning(false);
 
+    // Build preview — runs HTML + JS in a sandboxed iframe
+    const srcdoc = `<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{margin:0;padding:10px;font-family:sans-serif}</style></head><body>${htmlCode}<script>try{${jsCode}}catch(e){document.body.insertAdjacentHTML('beforeend','<pre style="color:#ef4444;padding:8px;font-size:12px;background:#fff5f5;border-radius:4px;margin:8px 0">'+e+'<\/pre>')}<\/script></body></html>`;
+    setPreviewSrcdoc(srcdoc);
+
     // Trigger Mwarimu — disabled during exam mode (handled inside MwarimuPanel)
     setRunCount(c => c + 1);
   }, [jsCode, htmlCode, language]);
@@ -263,9 +324,13 @@ export default function CodingWorkspace({ assignment }: Props) {
         </div>
       )}
 
-      <div className="ws" style={{ flex: 1, minHeight: 0, height: 'auto' }}>
+      <div className="ws">
         {/* EDITOR SIDE */}
-        <section className="ws-main" onPaste={examMode ? onPaste : undefined}>
+        <section
+          className="ws-main"
+          style={{ flex: `0 0 ${editorPct}%` }}
+          onPaste={examMode ? onPaste : undefined}
+        >
           <div className="ws-bar">
             <div className="ctx">
               <div className="et">{title}</div>
@@ -311,21 +376,30 @@ export default function CodingWorkspace({ assignment }: Props) {
             errorLine={errorLine}
           />
 
-          <Console
-            output={output}
-            feedback={feedback}
-            isRunning={isRunning}
-            language={language}
-            onClear={() => { setOutput(''); setFeedback([]); }}
-          />
+          {/* Vertical resize handle */}
+          <div className="ws-resizer-v" onMouseDown={startVDrag} />
+
+          <div style={{ height: consoleHeight, flexShrink: 0 }}>
+            <Console
+              output={output}
+              feedback={feedback}
+              isRunning={isRunning}
+              language={language}
+              onClear={() => { setOutput(''); setFeedback([]); }}
+              previewSrcdoc={previewSrcdoc}
+            />
+          </div>
         </section>
+
+        {/* Horizontal resize handle */}
+        <div className="ws-resizer-h" onMouseDown={startHDrag} />
 
         {/* MWARIMU SIDE */}
         <MwarimuPanel
           code={jsCode}
           error={lastError}
           runCount={runCount}
-          instructions={breadcrumb}
+          instructions={assignment?.description ?? ''}
           language={language}
           onLanguageChange={setLanguage}
           examMode={examMode}

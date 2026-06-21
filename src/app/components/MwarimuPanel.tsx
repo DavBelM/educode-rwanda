@@ -155,7 +155,9 @@ export function MwarimuPanel({
         {loading && (
           <div className="msg mw">
             <span className="ava">M</span>
-            <div className="bubble"><p>...</p></div>
+            <div className="bubble">
+              <div className="typing-dots"><span /><span /><span /></div>
+            </div>
           </div>
         )}
       </div>

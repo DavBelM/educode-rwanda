@@ -130,9 +130,22 @@ export async function getLessonAIHelp(
   instructions: string,
   language: 'EN' | 'KIN'
 ): Promise<string> {
+  // Question comes first so the model treats this as a conversation, not a code task.
+  // Code and instructions follow as optional context.
+  const codeBlock = code.trim()
+    ? (language === 'KIN'
+        ? `\n\nCode y'umunyeshuri ubu:\n\`\`\`javascript\n${code}\n\`\`\``
+        : `\n\nStudent's current code:\n\`\`\`javascript\n${code}\n\`\`\``)
+    : '';
+  const instructionBlock = instructions.trim()
+    ? (language === 'KIN'
+        ? `\n\nAmabwiriza y'umurimo: ${instructions}`
+        : `\n\nLesson instructions: ${instructions}`)
+    : '';
+
   const context = language === 'KIN'
-    ? `Iri somo rigira aya mabwiriza:\n${instructions}\n\nCode y'umunyeshuri ubu:\n\`\`\`javascript\n${code}\n\`\`\`\n\nUmunyeshuri arabaza: ${question}`
-    : `This lesson has these instructions:\n${instructions}\n\nStudent's current code:\n\`\`\`javascript\n${code}\n\`\`\`\n\nStudent asks: ${question}`;
+    ? `Umunyeshuri arabaza: ${question}${codeBlock}${instructionBlock}`
+    : `Student says: ${question}${codeBlock}${instructionBlock}`;
 
   const base = language === 'KIN' ? SYSTEM_PROMPT_KIN : SYSTEM_PROMPT_EN;
   const tutorPrompt = base +
