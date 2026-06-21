@@ -66,7 +66,7 @@ export function MwarimuPanel({
 
   // Auto-feedback when student runs code
   useEffect(() => {
-    if (runCount === 0 || examMode) return;
+    if (runCount === 0 || examMode || !error) return;
     const question = error
       ? `My code has an error: ${error}`
       : 'I ran my code successfully. Any feedback?';
