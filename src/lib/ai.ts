@@ -130,14 +130,17 @@ export async function getLessonAIHelp(
   instructions: string,
   language: 'EN' | 'KIN'
 ): Promise<string> {
-  // Question comes first so the model treats this as a conversation, not a code task.
-  // Code and instructions follow as optional context.
-  const codeBlock = code.trim()
+  // Greetings and casual messages should not trigger code analysis.
+  // If the user is just chatting, omit the code and instruction context so the
+  // model doesn't treat the starter template as something that needs debugging.
+  const isGreeting = /^(hi|hello|hey|thanks|thank you|ok|okay|good|great|bye|goodbye|yo|sup|what's up|salut|bonjour|muraho|mwaramutse)[\s!?.😊👋]*$/i.test(question.trim());
+
+  const codeBlock = !isGreeting && code.trim()
     ? (language === 'KIN'
         ? `\n\nCode y'umunyeshuri ubu:\n\`\`\`javascript\n${code}\n\`\`\``
         : `\n\nStudent's current code:\n\`\`\`javascript\n${code}\n\`\`\``)
     : '';
-  const instructionBlock = instructions.trim()
+  const instructionBlock = !isGreeting && instructions.trim()
     ? (language === 'KIN'
         ? `\n\nAmabwiriza y'umurimo: ${instructions}`
         : `\n\nLesson instructions: ${instructions}`)
