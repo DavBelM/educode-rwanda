@@ -74,13 +74,28 @@ export interface StudentGrade {
 
 // ─── Classes ──────────────────────────────────────────────────────────────────
 
+function generateInviteCode(): string {
+  // Avoids visually ambiguous chars: 0/O, 1/I
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  return Array.from({ length: 6 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+}
+
 export async function createClass(name: string, subject: string): Promise<{ data: Class | null; error: string | null }> {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { data: null, error: 'Not authenticated' };
 
+  // Generate a unique invite code — retry if collision (extremely unlikely)
+  let invite_code = generateInviteCode();
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const { data: existing } = await supabase
+      .from('classes').select('id').eq('invite_code', invite_code).maybeSingle();
+    if (!existing) break;
+    invite_code = generateInviteCode();
+  }
+
   const { data, error } = await supabase
     .from('classes')
-    .insert({ name, subject, teacher_id: user.id })
+    .insert({ name, subject, teacher_id: user.id, invite_code })
     .select()
     .single();
 

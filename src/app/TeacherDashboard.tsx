@@ -1311,6 +1311,7 @@ export default function TeacherDashboard() {
   const [roster, setRoster] = useState<RosterStudent[]>([]);
   const [pendingReview, setPendingReview] = useState(0);
   const [selectedRosterStudent, setSelectedRosterStudent] = useState<RosterStudent | null>(null);
+  const [codeCopied, setCodeCopied] = useState(false);
   const { profile } = useAuth();
 
   const loadData = async () => {
@@ -1450,6 +1451,29 @@ export default function TeacherDashboard() {
                 </button>
               </div>
             </div>
+
+            {/* CLASS JOIN CODE */}
+            {selectedClass?.invite_code && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 16px', borderRadius: 'var(--radius)', background: 'var(--surface)', border: '1px solid var(--line)', width: 'fit-content' }}>
+                <span style={{ fontSize: 12, color: 'var(--text-3)', fontWeight: 500 }}>
+                  {isKin ? 'Kode yo kwinjira' : 'Class join code'}
+                </span>
+                <span style={{ fontFamily: 'var(--mono)', fontSize: 17, fontWeight: 700, letterSpacing: '0.15em', color: 'var(--text)' }}>
+                  {selectedClass.invite_code}
+                </span>
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(selectedClass.invite_code);
+                    setCodeCopied(true);
+                    setTimeout(() => setCodeCopied(false), 2000);
+                  }}
+                  className="btn btn-tertiary sm"
+                  style={{ fontSize: 12, padding: '3px 10px' }}
+                >
+                  {codeCopied ? (isKin ? '✓ Nakopiye' : '✓ Copied') : (isKin ? 'Kopa' : 'Copy')}
+                </button>
+              </div>
+            )}
 
             {/* STATS */}
             <div className="stats rise-2">
