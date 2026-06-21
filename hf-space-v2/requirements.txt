@@ -1,0 +1,6 @@
+torch>=2.1.0
+transformers>=4.46.0
+peft>=0.12.0
+bitsandbytes>=0.42.0
+accelerate>=0.26.0
+spaces
