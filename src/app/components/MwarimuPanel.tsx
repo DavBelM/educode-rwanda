@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import ReactMarkdown from 'react-markdown';
 import { getAIFeedback, getMwarimuReply } from '../../lib/ai';
 import { logAIInteraction } from '../../lib/quiz-db';
 
@@ -140,7 +141,9 @@ export function MwarimuPanel({
           <div key={m.id} className={`msg ${m.role}`}>
             <span className="ava">{m.role === 'mw' ? 'M' : 'A'}</span>
             <div className="bubble">
-              <p>{m.text}</p>
+              {m.role === 'mw'
+                ? <ReactMarkdown>{m.text}</ReactMarkdown>
+                : <p>{m.text}</p>}
               {m.showQuick && (
                 <div className="quick">
                   {QUICK_ACTIONS.map(a => (
