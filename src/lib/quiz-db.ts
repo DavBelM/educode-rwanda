@@ -269,7 +269,7 @@ export async function getClassXPLeaderboard(classId: string): Promise<XPLeaderbo
   for (const s of sessions ?? []) {
     if (!latestSetByStudent.has(s.student_id)) {
       const setTitle = (Array.isArray(s.quiz_sets) ? s.quiz_sets[0] : s.quiz_sets) as { title: string } | null;
-      latestSetByStudent.set(s.student_id, setTitle?.title ?? null);
+      latestSetByStudent.set(s.student_id, setTitle?.title ?? '');
     }
   }
 
@@ -358,6 +358,32 @@ export async function logAIInteraction(params: {
     response:     params.response,
     language:     params.language,
   });
+}
+
+// ── Pilot survey / ratings ────────────────────────────────────────────────────
+
+export async function submitRating(params: {
+  contentType: 'lesson' | 'challenge';
+  contentId: string;
+  difficulty: 1 | 2 | 3 | 4 | 5;
+  mwarimuHelped: boolean | null;
+  usedMwarimu: boolean;
+  language: 'EN' | 'KIN';
+}): Promise<void> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return;
+  // Errors are swallowed — a failed rating must never block the student
+  try {
+    await supabase.from('ratings').insert({
+      student_id:     user.id,
+      content_type:   params.contentType,
+      content_id:     params.contentId,
+      difficulty:     params.difficulty,
+      mwarimu_helped: params.usedMwarimu ? params.mwarimuHelped : null,
+      used_mwarimu:   params.usedMwarimu,
+      language:       params.language,
+    });
+  } catch { /* rating failure must never block the student */ }
 }
 
 export async function getMwarimuWeekCount(): Promise<number> {

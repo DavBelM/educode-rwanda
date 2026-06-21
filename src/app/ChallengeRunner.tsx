@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { CodeEditor } from './components/CodeEditor';
 import { MwarimuPanel } from './components/MwarimuPanel';
+import { RatingModal } from './components/RatingModal';
 import { runQuizTests, type TestResult } from '../lib/quiz-executor';
 import {
   getSetChallenges, getQuizSets, startQuizSession, upsertQuizAttempt,
@@ -81,6 +82,7 @@ export default function ChallengeRunner({ language }: Props) {
   const [mwarimuLang, setMwarimuLang] = useState<'EN' | 'KIN'>(language);
   const [mwarimuDot, setMwarimuDot] = useState(false);
   const [mwarimuCount, setMwarimuCount] = useState(0);
+  const [showRating, setShowRating] = useState(false);
 
   const classIdRef = useRef<string | null>(null);
   const codenameRef = useRef<string | null>(null);
@@ -251,6 +253,7 @@ export default function ChallengeRunner({ language }: Props) {
         await awardXp(total);
       }
       setPhase('complete');
+      setShowRating(true);
     } else {
       setIdx(nextIdx);
       resetForChallenge(challenges[nextIdx]);
@@ -286,6 +289,15 @@ export default function ChallengeRunner({ language }: Props) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-6"
         style={{ background: 'var(--bg)' }}>
+        {showRating && set && (
+          <RatingModal
+            contentType="challenge"
+            contentId={set.id}
+            usedMwarimu={mwarimuCount > 0}
+            language={language}
+            onDone={() => setShowRating(false)}
+          />
+        )}
         <div className="card" style={{
           maxWidth: 480, width: '100%', textAlign: 'center', padding: '40px 32px',
         }}>

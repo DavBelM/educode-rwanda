@@ -1,6 +1,7 @@
 import { AppNav } from './components/AppNav';
 import { useState, useCallback, useRef, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
+import { RatingModal } from './components/RatingModal';
 import { Play, CheckCircle, Loader, Zap, BookOpen, Code2, HelpCircle, Monitor, Send, ArrowLeft } from 'lucide-react';
 import { completeLesson, type CourseLesson } from '../lib/db';
 import { executeCode } from '../lib/code-executor';
@@ -617,6 +618,7 @@ export default function LessonViewer({ lesson, courseTitle, allLessons, language
   usePageTitle(`${lessonTitle} · EduCode`);
   const [completing, setCompleting] = useState(false);
   const [done, setDone] = useState(false);
+  const [showRating, setShowRating] = useState(false);
   const [xpAwarded, setXpAwarded] = useState(0);
   const [readPct, setReadPct] = useState(0);
 
@@ -663,9 +665,26 @@ export default function LessonViewer({ lesson, courseTitle, allLessons, language
     setCompleting(true);
     const { xpAwarded: earned } = await completeLesson(lesson.id, score, usedSolution ? 0 : undefined);
     setXpAwarded(earned);
-    setDone(true);
     setCompleting(false);
+    setShowRating(true); // show survey before the done screen
   };
+
+  // Rating modal — appears right after completion, before the done screen
+  if (showRating) {
+    return (
+      <>
+        {/* blurred background so student knows they finished */}
+        <div style={{ minHeight: '100vh', background: 'var(--bg)', filter: 'blur(2px)', pointerEvents: 'none' }} />
+        <RatingModal
+          contentType="lesson"
+          contentId={lesson.id}
+          usedMwarimu={railMessages.some(m => m.role === 'ai')}
+          language={language}
+          onDone={() => { setShowRating(false); setDone(true); }}
+        />
+      </>
+    );
+  }
 
   // Completion screen
   if (done) {

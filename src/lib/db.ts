@@ -114,6 +114,17 @@ export async function getTeacherClasses(): Promise<{ data: Class[]; error: strin
     .order('created_at', { ascending: false });
 
   if (error) return { data: [], error: error.message };
+
+  // Backfill invite codes for any existing class that doesn't have one
+  const missing = (data ?? []).filter(c => !c.invite_code);
+  if (missing.length > 0) {
+    await Promise.all(missing.map(async c => {
+      const code = generateInviteCode();
+      await supabase.from('classes').update({ invite_code: code }).eq('id', c.id);
+      c.invite_code = code;
+    }));
+  }
+
   return { data: data ?? [], error: null };
 }
 
