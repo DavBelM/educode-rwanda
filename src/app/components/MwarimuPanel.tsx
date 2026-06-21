@@ -14,17 +14,23 @@ const QUICK_ACTIONS = [
   {
     en: 'Walk me through it',
     kin: 'Nyobora intambwe ku yindi',
-    prompt: "Walk me through finding and fixing this error step by step. Give one hint at a time — don't reveal the full fix yet.",
+    // One hint only — do NOT write code
+    prompt: '[INSTRUCTION: Give ONE observation about what is wrong. Do not write any code. Do not show the fix. End with a single question that helps the student think about the cause.]\nWalk me through this error one hint at a time.',
+    challengeAllowed: true,
   },
   {
     en: 'Show the fix',
     kin: 'Nyereka igisubizo',
-    prompt: 'Show me exactly what is wrong and how to fix it.',
+    // Student explicitly asked — code is appropriate here
+    prompt: '[INSTRUCTION: The student has explicitly asked to see the corrected code. Show what is wrong and provide the working corrected code.]\nShow me exactly what is wrong and how to fix it.',
+    challengeAllowed: false, // hidden in exam/challenge mode
   },
   {
     en: 'Quiz me instead',
     kin: 'Mbaza ikibazo gusa',
-    prompt: "Don't tell me the fix. Ask me a guiding question that helps me find the bug myself.",
+    // No code at all — just one question
+    prompt: '[INSTRUCTION: Ask ONE short guiding question only. Do not write any code, do not show a corrected version, do not explain the answer. Just the question — nothing else after it.]\nAsk me a question that helps me find the bug myself.',
+    challengeAllowed: true,
   },
 ];
 
@@ -85,8 +91,13 @@ export function MwarimuPanel({
 
   async function ask(question: string) {
     setLoading(true);
+    // In challenge/exam mode, prepend a strict no-solution guard so the model
+    // never reveals the answer regardless of what the student asks.
+    const wrappedQuestion = examMode
+      ? `[CHALLENGE MODE: This student is in a graded challenge. Under NO circumstances reveal the solution or write corrected code. You may ask guiding questions and explain concepts only.]\n\n${question}`
+      : question;
     try {
-      const response = await getMwarimuReply(question, code, instructions, language);
+      const response = await getMwarimuReply(wrappedQuestion, code, instructions, language);
       setMessages(prev => addMsg(prev, { role: 'mw', text: response }));
       logAIInteraction({ question, response, language, sessionId, challengeId })
         .then(() => onInteractionLogged?.());
@@ -102,6 +113,8 @@ export function MwarimuPanel({
     setMessages(prev => addMsg(clearQuick(prev), { role: 'me', text: isKin ? action.kin : action.en }));
     ask(action.prompt);
   }
+
+  const visibleQuickActions = QUICK_ACTIONS.filter(a => !examMode || a.challengeAllowed);
 
   function handleSend() {
     const text = input.trim();
@@ -144,9 +157,9 @@ export function MwarimuPanel({
               {m.role === 'mw'
                 ? <ReactMarkdown>{m.text}</ReactMarkdown>
                 : <p>{m.text}</p>}
-              {m.showQuick && (
+              {m.showQuick && visibleQuickActions.length > 0 && (
                 <div className="quick">
-                  {QUICK_ACTIONS.map(a => (
+                  {visibleQuickActions.map(a => (
                     <button key={a.en} onClick={() => handleQuick(a)}>{isKin ? a.kin : a.en}</button>
                   ))}
                 </div>
