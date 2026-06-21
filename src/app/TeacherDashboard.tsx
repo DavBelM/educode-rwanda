@@ -8,8 +8,8 @@ import {
   getAssignmentSubmissions, getAssignmentSubmissionCounts, gradeSubmission, releaseGrades,
   getClassAnalytics, getClassGradesExport, getClassRoster, getClassPendingReviewCount,
   createAnnouncement, getClassAnnouncements, deleteAnnouncement,
-  getStudentAIProfile,
-  type Class, type Assignment, type Question, type Submission, type Announcement, type ClassAnalytics, type RosterStudent, type StudentAIProfile
+  getStudentAIProfile, getClassRatingsSummary,
+  type Class, type Assignment, type Question, type Submission, type Announcement, type ClassAnalytics, type RosterStudent, type StudentAIProfile, type ClassRatingsSummary
 } from '../lib/db';
 
 // ─── Create Class Modal ────────────────────────────────────────────────────────
@@ -1312,6 +1312,7 @@ export default function TeacherDashboard() {
   const [pendingReview, setPendingReview] = useState(0);
   const [selectedRosterStudent, setSelectedRosterStudent] = useState<RosterStudent | null>(null);
   const [codeCopied, setCodeCopied] = useState(false);
+  const [ratingsSummary, setRatingsSummary] = useState<ClassRatingsSummary | null>(null);
   const { profile } = useAuth();
 
   const loadData = async () => {
@@ -1334,14 +1335,16 @@ export default function TeacherDashboard() {
       setSelectedClassId(targetId);
       const { data: aData } = await getClassAssignments(targetId);
       setAssignments(aData);
-      const [counts, rosterData, pending] = await Promise.all([
+      const [counts, rosterData, pending, ratings] = await Promise.all([
         getAssignmentSubmissionCounts(aData.map(a => a.id)),
         getClassRoster(targetId),
         getClassPendingReviewCount(targetId),
+        getClassRatingsSummary(targetId),
       ]);
       setSubmissionCounts(counts);
       setRoster(rosterData);
       setPendingReview(pending);
+      setRatingsSummary(ratings);
     }
 
     setLoadingData(false);
@@ -1353,14 +1356,16 @@ export default function TeacherDashboard() {
     if (!selectedClassId) return;
     getClassAssignments(selectedClassId).then(async ({ data }) => {
       setAssignments(data);
-      const [counts, rosterData, pending] = await Promise.all([
+      const [counts, rosterData, pending, ratings] = await Promise.all([
         getAssignmentSubmissionCounts(data.map(a => a.id)),
         getClassRoster(selectedClassId),
         getClassPendingReviewCount(selectedClassId),
+        getClassRatingsSummary(selectedClassId),
       ]);
       setSubmissionCounts(counts);
       setRoster(rosterData);
       setPendingReview(pending);
+      setRatingsSummary(ratings);
     });
   }, [selectedClassId]);
 
@@ -1613,6 +1618,71 @@ export default function TeacherDashboard() {
                     ))
                   )}
                 </section>
+
+                {/* PILOT FEEDBACK */}
+                {ratingsSummary !== null && (
+                  <section className="card pad-lg rise-3">
+                    <div className="card-head" style={{ marginBottom: 14 }}>
+                      <h3 className="card-title">{isKin ? 'Ibitekerezo by\'abanyeshuri' : 'Pilot feedback'}</h3>
+                      <span className="pill">{ratingsSummary.totalResponses} {isKin ? 'igisubizo' : 'responses'}</span>
+                    </div>
+                    {ratingsSummary.totalResponses === 0 ? (
+                      <p className="text-sm" style={{ color: 'var(--text-2)' }}>
+                        {isKin ? 'Nta bitekerezo byakiriwe.' : 'No feedback collected yet.'}
+                      </p>
+                    ) : (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                        {/* Avg difficulty */}
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <span style={{ fontSize: 12.5, color: 'var(--text-2)' }}>
+                            {isKin ? 'Uburemere bw\'isomo' : 'Avg difficulty'}
+                          </span>
+                          <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text)', fontFamily: 'var(--mono)' }}>
+                            {ratingsSummary.avgDifficulty ?? '—'} / 5
+                          </span>
+                        </div>
+                        {/* Mwarimu used */}
+                        {ratingsSummary.mwarimuUsedPct !== null && (
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <span style={{ fontSize: 12.5, color: 'var(--text-2)' }}>
+                              {isKin ? 'Bakoresheje Mwarimu' : 'Used Mwarimu'}
+                            </span>
+                            <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text)', fontFamily: 'var(--mono)' }}>
+                              {ratingsSummary.mwarimuUsedPct}%
+                            </span>
+                          </div>
+                        )}
+                        {/* Mwarimu helped */}
+                        {ratingsSummary.mwarimuHelpedPct !== null && (
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <span style={{ fontSize: 12.5, color: 'var(--text-2)' }}>
+                              {isKin ? 'Mwarimu yabafashije' : 'Mwarimu helped'}
+                            </span>
+                            <span style={{ fontSize: 14, fontWeight: 700, color: ratingsSummary.mwarimuHelpedPct >= 70 ? 'var(--success, #22c55e)' : 'var(--text)', fontFamily: 'var(--mono)' }}>
+                              {ratingsSummary.mwarimuHelpedPct}%
+                            </span>
+                          </div>
+                        )}
+                        {/* Language split */}
+                        {ratingsSummary.kinPct !== null && (
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <span style={{ fontSize: 12.5, color: 'var(--text-2)' }}>
+                              {isKin ? 'Bakoresheje Ikinyarwanda' : 'Used Kinyarwanda'}
+                            </span>
+                            <span style={{ fontSize: 14, fontWeight: 700, color: 'var(--text)', fontFamily: 'var(--mono)' }}>
+                              {ratingsSummary.kinPct}%
+                            </span>
+                          </div>
+                        )}
+                        {/* Type breakdown */}
+                        <div style={{ fontSize: 11.5, color: 'var(--text-3)', marginTop: 4, borderTop: '1px solid var(--line)', paddingTop: 10, display: 'flex', gap: 16 }}>
+                          <span>{isKin ? 'Amasomo' : 'Lessons'}: {ratingsSummary.lessonCount}</span>
+                          <span>{isKin ? 'Ibigeragezo' : 'Challenges'}: {ratingsSummary.challengeCount}</span>
+                        </div>
+                      </div>
+                    )}
+                  </section>
+                )}
               </aside>
             </div>
           </>

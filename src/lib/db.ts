@@ -1517,6 +1517,56 @@ export async function deleteSchoolAnnouncement(id: string): Promise<{ error: str
   return { error: null };
 }
 
+// ── Teacher: class ratings summary ───────────────────────────────────────────
+
+export interface ClassRatingsSummary {
+  totalResponses: number;
+  avgDifficulty: number | null;
+  mwarimuUsedPct: number | null;
+  mwarimuHelpedPct: number | null;
+  kinPct: number | null;
+  lessonCount: number;
+  challengeCount: number;
+}
+
+export async function getClassRatingsSummary(classId: string): Promise<ClassRatingsSummary | null> {
+  const authError = await assertTeacherOwnsClass(classId);
+  if (authError) return null;
+
+  const { data: enrollments } = await supabase
+    .from('class_enrollments')
+    .select('student_id')
+    .eq('class_id', classId);
+  if (!enrollments?.length) return { totalResponses: 0, avgDifficulty: null, mwarimuUsedPct: null, mwarimuHelpedPct: null, kinPct: null, lessonCount: 0, challengeCount: 0 };
+
+  const studentIds = enrollments.map((e: { student_id: string }) => e.student_id);
+
+  const { data: ratings } = await supabase
+    .from('ratings')
+    .select('difficulty, used_mwarimu, mwarimu_helped, language, content_type')
+    .in('student_id', studentIds);
+
+  if (!ratings?.length) return { totalResponses: 0, avgDifficulty: null, mwarimuUsedPct: null, mwarimuHelpedPct: null, kinPct: null, lessonCount: 0, challengeCount: 0 };
+
+  const total = ratings.length;
+  const avgDifficulty = Math.round((ratings.reduce((s, r) => s + r.difficulty, 0) / total) * 10) / 10;
+  const usedMwarimu = ratings.filter(r => r.used_mwarimu).length;
+  const mwarimuHelped = ratings.filter(r => r.mwarimu_helped === true).length;
+  const kinCount = ratings.filter(r => r.language === 'KIN').length;
+  const lessonCount = ratings.filter(r => r.content_type === 'lesson').length;
+  const challengeCount = ratings.filter(r => r.content_type === 'challenge').length;
+
+  return {
+    totalResponses: total,
+    avgDifficulty,
+    mwarimuUsedPct: total > 0 ? Math.round((usedMwarimu / total) * 100) : null,
+    mwarimuHelpedPct: usedMwarimu > 0 ? Math.round((mwarimuHelped / usedMwarimu) * 100) : null,
+    kinPct: total > 0 ? Math.round((kinCount / total) * 100) : null,
+    lessonCount,
+    challengeCount,
+  };
+}
+
 // ── Teacher: per-student AI profile ──────────────────────────────────────────
 
 export interface StudentAIProfile {
