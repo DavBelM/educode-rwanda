@@ -3,17 +3,21 @@ import { Client } from '@gradio/client';
 
 const HF_SPACE = process.env.HF_SPACE_URL ?? 'DavBelaa/educode-rwanda-mwarimu-v2';
 
-// The fine-tuned model produces a good assessment paragraph then derails into
-// coding mode (LoRA pull). Two forms of derail:
+// The fine-tuned model produces a good assessment paragraph then derails.
+// Three forms of derail we strip:
 //   1. Reaches a code block → strip from first ```
-//   2. Starts a coding-exercise prompt (ends with ':') before the code block
-//      e.g. "What went wrong with this JavaScript code? Explain the bug..."
-//      Strip any trailing blank-line + prompt-line(s) ending with ':'
+//   2. Starts a coding-exercise prompt before a code block (line ending with ':')
+//   3. Adds an imperative directive sentence at the end
+//      e.g. "Continue providing clear examples and gentle feedback."
+const IMPERATIVE_PREFIX = /^(Continue|Provide|Give|Encourage|Help|Consider|Make|Try|Use|Focus|Ensure|Support|Review|Offer|Add|Include|Allow|Create|Monitor)\b/i;
+
 function extractAssessment(raw: string): string {
   const codeBlockIdx = raw.indexOf('```');
   let text = codeBlockIdx > 0 ? raw.slice(0, codeBlockIdx) : raw;
-  // Repeatedly strip trailing (blank line + line ending with ':') until none left
+  // Strip trailing blank-line + prompt-line(s) ending with ':'
   text = text.replace(/(\n[ \t]*\n[^\n]*:\s*)+$/g, '');
+  // Strip trailing imperative directive sentences (directed at the teacher, not about the student)
+  text = text.replace(/\s+(?:Continue|Provide|Give|Encourage|Help|Consider|Make|Try|Use|Focus|Ensure|Support|Review|Offer|Add|Include|Allow|Create|Monitor)\b[^.!?]*[.!?]\s*$/gi, '');
   return text.trim();
 }
 
@@ -30,7 +34,8 @@ function buildStudentPromptEN(d: StudentData): string {
   return [
     'You are an educational AI assistant helping a Rwandan TVET teacher understand a student\'s learning status.',
     'Write a 3-4 sentence assessment of this student. Do NOT list the numbers — synthesize them into a narrative.',
-    'The teacher needs to know: what the student understands, what they struggle with, how engaged they are, and one recommendation.',
+    'Focus on observations: what the student understands, what they struggle with, and how engaged they are.',
+    'Do NOT include recommendations, directives, or sentences telling the teacher what to do.',
     '',
     `Student: ${d.name}`,
     `Course progress: ${d.progress_pct}% of lessons completed, current module: ${d.current_module}`,
