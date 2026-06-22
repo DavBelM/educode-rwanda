@@ -1651,61 +1651,63 @@ export default function TeacherDashboard() {
                     </p>
                   </div>
                 ) : (
-                  <table className="tbl">
-                    <thead>
-                      <tr>
-                        <th>{isKin ? 'Umunyeshuri' : 'Student'}</th>
-                        <th>{isKin ? 'Aho agejeje' : 'Course progress'}</th>
-                        <th>{isKin ? 'Ibigeragezo' : 'Challenges'}</th>
-                        <th>{isKin ? 'Mwarimu' : 'Mwarimu'}</th>
-                        <th>{isKin ? 'Igice agezeho' : 'Current module'}</th>
-                        <th>{isKin ? 'Igihe yagaragaye' : 'Last active'}</th>
-                        <th>{isKin ? 'Imiterere' : 'Status'}</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {roster.map(s => (
-                        <tr
-                          key={s.student_id}
-                          onClick={() => setSelectedRosterStudent(s)}
-                          style={{ cursor: 'pointer' }}
-                          title={isKin ? 'Reba umwirondoro w\'umunyeshuri' : "View student's AI profile"}
-                        >
-                          <td>
-                            <div className="stu">
-                              <span className="av">{initials(s.full_name)}</span>
-                              <div>
-                                <div className="nm">{s.full_name}</div>
-                                <div className="un">{s.username}</div>
-                              </div>
-                            </div>
-                          </td>
-                          <td>
-                            <div className="pcell">
-                              <div className="bar"><i style={{ width: `${s.progress_pct}%` }} /></div>
-                              <span className="pv">{s.progress_pct}%</span>
-                            </div>
-                          </td>
-                          <td>
-                            <span style={{ fontVariantNumeric: 'tabular-nums', fontSize: 13 }}>
-                              {s.challenges_passed}
-                              {s.challenges_attempted > 0 && (
-                                <span style={{ color: 'var(--text-3)' }}>/{s.challenges_attempted}</span>
-                              )}
-                            </span>
-                          </td>
-                          <td>
-                            <span style={{ fontVariantNumeric: 'tabular-nums', fontSize: 13, color: s.ai_interactions > 0 ? 'var(--text-2)' : 'var(--text-3)' }}>
-                              {s.ai_interactions > 0 ? `${s.ai_interactions}×` : '—'}
-                            </span>
-                          </td>
-                          <td>{s.current_module}</td>
-                          <td><span className="when">{formatRelativeTime(s.last_active, isKin)}</span></td>
-                          <td><StatusPill status={s.status} isKin={isKin} /></td>
+                  <div className="tbl-scroll">
+                    <table className="tbl">
+                      <thead>
+                        <tr>
+                          <th>{isKin ? 'Umunyeshuri' : 'Student'}</th>
+                          <th>{isKin ? 'Aho agejeje' : 'Progress'}</th>
+                          <th>{isKin ? 'Ibigeragezo' : 'Challenges'}</th>
+                          <th className="th-roster-opt">Mwarimu</th>
+                          <th className="th-roster-opt">{isKin ? 'Igice agezeho' : 'Module'}</th>
+                          <th>{isKin ? 'Igihe yagaragaye' : 'Last active'}</th>
+                          <th>{isKin ? 'Imiterere' : 'Status'}</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody>
+                        {roster.map(s => (
+                          <tr
+                            key={s.student_id}
+                            onClick={() => setSelectedRosterStudent(s)}
+                            style={{ cursor: 'pointer' }}
+                            title={isKin ? 'Reba umwirondoro w\'umunyeshuri' : "View student's AI profile"}
+                          >
+                            <td>
+                              <div className="stu">
+                                <span className="av">{initials(s.full_name)}</span>
+                                <div>
+                                  <div className="nm">{s.full_name}</div>
+                                  <div className="un">{s.username}</div>
+                                </div>
+                              </div>
+                            </td>
+                            <td>
+                              <div className="pcell">
+                                <div className="bar"><i style={{ width: `${s.progress_pct}%` }} /></div>
+                                <span className="pv">{s.progress_pct}%</span>
+                              </div>
+                            </td>
+                            <td>
+                              <span style={{ fontVariantNumeric: 'tabular-nums', fontSize: 13 }}>
+                                {s.challenges_passed}
+                                {s.challenges_attempted > 0 && (
+                                  <span style={{ color: 'var(--text-3)' }}>/{s.challenges_attempted}</span>
+                                )}
+                              </span>
+                            </td>
+                            <td className="td-roster-opt">
+                              <span style={{ fontVariantNumeric: 'tabular-nums', fontSize: 13, color: s.ai_interactions > 0 ? 'var(--text-2)' : 'var(--text-3)' }}>
+                                {s.ai_interactions > 0 ? `${s.ai_interactions}×` : '—'}
+                              </span>
+                            </td>
+                            <td className="td-roster-opt td-module" title={s.current_module}>{s.current_module}</td>
+                            <td><span className="when">{formatRelativeTime(s.last_active, isKin)}</span></td>
+                            <td><StatusPill status={s.status} isKin={isKin} /></td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 )}
               </section>
 
