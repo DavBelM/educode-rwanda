@@ -11,7 +11,14 @@ function checkRateLimit(ip: string, maxPerMinute: number): boolean {
   return true;
 }
 
-// Classroom networks share one IP — allow 120/min so a class of 30 isn't rate-limited
+// Heuristic: if > 75% of non-code words are ASCII, the text is already in English
+function isLikelyEnglish(text: string): boolean {
+  const stripped = text.replace(/```[\s\S]*?```/g, '').replace(/`[^`]+`/g, '');
+  const words = stripped.split(/\s+/).filter(w => w.length > 1);
+  if (words.length < 3) return true;
+  const asciiWords = words.filter(w => /^[a-zA-Z0-9.,!?;:'"()\-–—[\]{}<>/@#$%^&*+=|\\~`_*]+$/.test(w));
+  return asciiWords.length / words.length > 0.75;
+}
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -30,41 +37,44 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'GEMINI_API_KEY not configured' });
 
+  // Skip Gemini entirely if the text is already in English and we want English
+  if (targetLanguage === 'EN' && isLikelyEnglish(text)) {
+    return res.status(200).json({ text });
+  }
+
   const prompt = targetLanguage === 'EN'
     ? [
         'Translate the following AI tutor message to English.',
         'Rules:',
-        '1. Keep all code blocks (text inside triple backticks) exactly as they are — do not translate or reformat them.',
-        '2. Keep JavaScript keywords and identifiers (const, let, var, function, console.log, etc.) in English.',
-        '3. Preserve all markdown formatting: **bold**, `inline code`, bullet points, numbered lists.',
-        '4. If the text is already in English, return it unchanged.',
-        '5. Match the warm, encouraging tone of a student tutor.',
+        '1. Keep all code blocks (text inside triple backticks) exactly as they are.',
+        '2. Keep JavaScript keywords and identifiers in English.',
+        '3. Preserve all markdown formatting.',
+        '4. Match the warm, encouraging tone of a student tutor.',
         '',
         'Text to translate:',
         text,
       ].join('\n')
     : [
         'You are EduCode Mwarimu, an AI coding tutor helping Rwandan TVET secondary-school students (ages 16–21) learn JavaScript for the first time.',
-        'Your job: take this AI tutor response and rewrite it as a clear, friendly explanation in Kinyarwanda that a Rwandan teenager can easily understand.',
-        'Do NOT just translate word-for-word. Simplify technical language, use relatable examples if needed, and sound like a supportive older sibling, not a textbook.',
+        'Take this AI tutor response and rewrite it as a clear, friendly explanation in Kinyarwanda that a Rwandan teenager can easily understand.',
+        'Do NOT translate word-for-word. Simplify technical language and sound like a supportive older sibling, not a textbook.',
         '',
         'Rules:',
-        '1. Write natural, conversational Kinyarwanda — avoid overly formal or stiff language.',
-        '2. Do NOT translate or modify code blocks (text inside triple backticks ```). Leave them exactly as they appear.',
-        '3. Do NOT translate JavaScript keywords or syntax: const, let, var, function, if, else, return, console.log, true, false, null, undefined, etc.',
-        '4. Keep inline code wrapped in backticks (e.g. `const`) in English.',
-        '5. Preserve markdown formatting: **bold**, `inline code`, bullet points, numbered lists.',
-        '6. Technical terms like "variable", "function", "error", "loop" can be kept in English with a brief Kinyarwanda explanation in parentheses on first use.',
-        '7. Be warm, encouraging, and never condescending. If the student made an error, help them see it without making them feel bad.',
-        '8. Output only the final Kinyarwanda explanation — no preamble, no "here is my translation".',
+        '1. Write natural, conversational Kinyarwanda.',
+        '2. Do NOT translate or modify code blocks (text inside triple backticks). Leave them exactly as they appear.',
+        '3. Do NOT translate JavaScript keywords: const, let, var, function, if, else, return, console.log, true, false, null, undefined, etc.',
+        '4. Keep inline code in backticks in English.',
+        '5. Preserve markdown formatting.',
+        '6. Technical terms (variable, function, error, loop) can stay in English with a brief Kinyarwanda explanation in parentheses.',
+        '7. Be warm and encouraging. Output only the final explanation — no preamble.',
         '',
         'AI tutor response to adapt:',
         text,
       ].join('\n');
 
   try {
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+    const geminiRes = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -75,26 +85,51 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
     );
 
-    const json = await response.json();
+    const json = await geminiRes.json();
 
-    // Safety block or quota exhaustion — log and surface the reason
+    // Gemini-level API error (bad key, quota, invalid model, etc.)
+    if (json.error) {
+      console.error('[EduCode Translate] Gemini API error:', JSON.stringify(json.error));
+      // For EN: fall back to original text; for KIN: return 502 so UI shows retry
+      if (targetLanguage === 'EN') return res.status(200).json({ text });
+      return res.status(502).json({ error: `Gemini error: ${json.error.message ?? json.error.code}` });
+    }
+
+    // Prompt blocked before any candidate was generated
+    const blockReason = json.promptFeedback?.blockReason;
+    if (blockReason) {
+      console.warn('[EduCode Translate] Prompt blocked:', blockReason);
+      return res.status(200).json({ text, _blocked: true });
+    }
+
     const candidate = json.candidates?.[0];
-    const finishReason = candidate?.finishReason;
+
+    // Empty candidates array (quota, safety, or other server-side reason)
+    if (!candidate) {
+      console.error('[EduCode Translate] No candidates in response:', JSON.stringify(json).slice(0, 400));
+      if (targetLanguage === 'EN') return res.status(200).json({ text });
+      return res.status(502).json({ error: 'No candidates returned by Gemini' });
+    }
+
+    const finishReason = candidate.finishReason;
+    // Note: check each reason individually — `=== 'SAFETY' || 'RECITATION'` is always true (bug)
     if (finishReason === 'SAFETY' || finishReason === 'RECITATION') {
-      console.warn('[EduCode Translate] Gemini blocked response:', finishReason, JSON.stringify(json.promptFeedback ?? {}));
-      // Return the original text untranslated rather than failing hard
+      console.warn('[EduCode Translate] Content blocked:', finishReason);
       return res.status(200).json({ text, _blocked: true });
     }
 
     const translated = candidate?.content?.parts?.[0]?.text;
     if (!translated?.trim()) {
-      console.error('[EduCode Translate] Empty Gemini response:', JSON.stringify(json).slice(0, 300));
-      return res.status(502).json({ error: 'Empty response from Gemini' });
+      console.error('[EduCode Translate] Empty text in candidate. finishReason:', finishReason, '| Full response:', JSON.stringify(json).slice(0, 500));
+      if (targetLanguage === 'EN') return res.status(200).json({ text });
+      return res.status(502).json({ error: `Empty translation (finishReason: ${finishReason ?? 'unknown'})` });
     }
+
     return res.status(200).json({ text: translated });
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
-    console.error('[EduCode Translate] Error:', msg);
+    console.error('[EduCode Translate] Fetch error:', msg);
+    if (targetLanguage === 'EN') return res.status(200).json({ text });
     return res.status(502).json({ error: msg });
   }
 }
