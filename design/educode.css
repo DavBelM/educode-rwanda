@@ -26,6 +26,7 @@
   /* The one accent — cream. */
   --cream:        #efe9dc;
   --accent:       var(--cream);
+  --accent-rgb:   239, 233, 220;
   --accent-soft:  #efe9dc1a;
   /* Primary button: cream surface, dark ink. */
   --pri-bg:   var(--cream);
@@ -76,6 +77,7 @@
 
   --cream:       #efe9dc;
   --accent:      #2a2722;
+  --accent-rgb:  42, 39, 34;
   --accent-soft: #2a27220f;
   /* Primary button inverts: dark warm-gray surface, cream ink. */
   --pri-bg:   #2a2722;
@@ -132,8 +134,8 @@ img { display: block; max-width: 100%; }
 ::-webkit-scrollbar-thumb:hover { background: var(--text-3); background-clip: padding-box; border: 3px solid var(--bg); }
 
 /* ---- Layout helpers ---------------------------------------------------- */
-.wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 20px; }
-.wrap-narrow { max-width: 760px; margin: 0 auto; padding: 0 20px; }
+.wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 clamp(20px, 4vw, 60px); }
+.wrap-narrow { max-width: 760px; margin: 0 auto; padding: 0 clamp(20px, 4vw, 48px); }
 .stack > * + * { margin-top: var(--gap, 16px); }
 .muted { color: var(--text-2); }
 .dim { color: var(--text-3); }
