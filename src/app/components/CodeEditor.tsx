@@ -93,11 +93,8 @@ const educodeTheme = EditorView.theme({
     backgroundColor: 'var(--error-dim)',
     color: 'var(--error)',
   },
-  // Solid color per theme via CSS variable — no opacity fighting the background.
-  // Native ::selection is suppressed inside .cm-editor so only this div-based
-  // overlay is active; the text keeps its syntax highlight colors underneath.
   '.cm-selectionBackground, &.cm-focused .cm-selectionBackground': {
-    backgroundColor: 'var(--code-selection) !important',
+    backgroundColor: '#264f78 !important',
   },
   '.cm-cursor, .cm-dropCursor': {
     borderLeftColor: 'var(--text)',
