@@ -93,10 +93,11 @@ const educodeTheme = EditorView.theme({
     backgroundColor: 'var(--error-dim)',
     color: 'var(--error)',
   },
-  // Semi-transparent blue works in both dark (#0a0a09) and light (#f4f2ea) editor backgrounds.
-  // Avoid CSS variables here — browsers do not resolve them inside ::selection.
+  // Solid color per theme via CSS variable — no opacity fighting the background.
+  // Native ::selection is suppressed inside .cm-editor so only this div-based
+  // overlay is active; the text keeps its syntax highlight colors underneath.
   '.cm-selectionBackground, &.cm-focused .cm-selectionBackground': {
-    backgroundColor: 'rgba(82, 139, 255, 0.30) !important',
+    backgroundColor: 'var(--code-selection) !important',
   },
   '.cm-cursor, .cm-dropCursor': {
     borderLeftColor: 'var(--text)',
