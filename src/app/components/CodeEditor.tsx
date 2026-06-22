@@ -93,9 +93,6 @@ const educodeTheme = EditorView.theme({
     backgroundColor: 'var(--error-dim)',
     color: 'var(--error)',
   },
-  '.cm-selectionBackground, &.cm-focused .cm-selectionBackground': {
-    backgroundColor: '#264f78 !important',
-  },
   '.cm-cursor, .cm-dropCursor': {
     borderLeftColor: 'var(--text)',
   },
@@ -197,6 +194,7 @@ export function CodeEditor({ jsCode, htmlCode, onJsChange, onHtmlChange, languag
               foldGutter: false,
               dropCursor: false,
               allowMultipleSelections: false,
+              drawSelection: false,
             }}
             placeholder={isKinyarwanda ? '// Andika JavaScript yawe hano...' : '// Write your JavaScript here...'}
           />
@@ -215,6 +213,7 @@ export function CodeEditor({ jsCode, htmlCode, onJsChange, onHtmlChange, languag
               foldGutter: false,
               dropCursor: false,
               allowMultipleSelections: false,
+              drawSelection: false,
             }}
             placeholder="<!-- Add your HTML elements here -->"
           />

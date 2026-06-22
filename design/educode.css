@@ -129,7 +129,7 @@ p { margin: 0; }
 a { color: inherit; text-decoration: none; }
 button { font-family: inherit; font-size: inherit; color: inherit; cursor: pointer; }
 img { display: block; max-width: 100%; }
-::selection { background-color: #264f78; color: #ffffff; }
+::selection { background-color: #3c6eb4; color: inherit; }
 ::selection { background: var(--accent); color: var(--pri-fg); }
 
 ::-webkit-scrollbar { width: 11px; height: 11px; }
