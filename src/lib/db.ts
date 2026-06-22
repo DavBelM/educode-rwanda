@@ -1153,6 +1153,8 @@ export interface RosterStudent {
   current_module: string;
   last_active: string | null;
   status: 'on-track' | 'behind' | 'needs-help';
+  challenges_passed: number;
+  challenges_attempted: number;
 }
 
 function usernameFromName(name: string): string {
@@ -1188,6 +1190,12 @@ export async function getClassRoster(classId: string): Promise<RosterStudent[]> 
         .in('lesson_id', allLessonIds)
     : { data: [] };
 
+  // Also fetch challenge attempts so we can show challenge progress + factor into last_active
+  const { data: challengeRows } = await supabase
+    .from('quiz_attempts')
+    .select('student_id, passed, completed_at')
+    .in('student_id', studentIds);
+
   return enrollments.map((e: { student_id: string; profiles: unknown }) => {
     const p = (Array.isArray(e.profiles) ? e.profiles[0] : e.profiles) as { full_name: string } | null;
     const fullName = p?.full_name ?? 'Student';
@@ -1199,13 +1207,25 @@ export async function getClassRoster(classId: string): Promise<RosterStudent[]> 
     const nextLesson = orderedLessons.find(l => !completedSet.has(l.lessonId));
     const currentModule = nextLesson?.moduleTitle ?? orderedLessons[orderedLessons.length - 1]?.moduleTitle ?? '—';
 
-    const lastActive = myProgress.reduce<string | null>((latest: string | null, r: { completed_at: string | null }) => {
+    const lessonLastActive = myProgress.reduce<string | null>((latest, r: { completed_at: string | null }) => {
       if (!r.completed_at) return latest;
       return !latest || r.completed_at > latest ? r.completed_at : latest;
     }, null);
 
+    const myChallenges = (challengeRows ?? []).filter((r: { student_id: string }) => r.student_id === e.student_id);
+    const challengeLastActive = myChallenges.reduce<string | null>((latest, r: { completed_at: string | null }) => {
+      if (!r.completed_at) return latest;
+      return !latest || r.completed_at > latest ? r.completed_at : latest;
+    }, null);
+
+    // Use the most recent activity across lessons and challenges
+    const lastActive = [lessonLastActive, challengeLastActive].filter(Boolean).sort().pop() ?? null;
+
+    const challengesPassed = myChallenges.filter((r: { passed: boolean }) => r.passed).length;
+    const challengesAttempted = myChallenges.length;
+
     const daysSinceActive = lastActive ? (Date.now() - new Date(lastActive).getTime()) / (1000 * 60 * 60 * 24) : Infinity;
-    const status: RosterStudent['status'] = daysSinceActive > 5 ? 'behind' : pct < 50 ? 'needs-help' : 'on-track';
+    const status: RosterStudent['status'] = daysSinceActive > 5 ? 'behind' : pct < 50 && challengesPassed === 0 ? 'needs-help' : 'on-track';
 
     return {
       student_id: e.student_id,
@@ -1215,6 +1235,8 @@ export async function getClassRoster(classId: string): Promise<RosterStudent[]> 
       current_module: currentModule,
       last_active: lastActive,
       status,
+      challenges_passed: challengesPassed,
+      challenges_attempted: challengesAttempted,
     };
   }).sort((a, b) => b.progress_pct - a.progress_pct);
 }

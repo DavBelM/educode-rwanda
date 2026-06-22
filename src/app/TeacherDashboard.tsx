@@ -1529,6 +1529,7 @@ export default function TeacherDashboard() {
                       <tr>
                         <th>{isKin ? 'Umunyeshuri' : 'Student'}</th>
                         <th>{isKin ? 'Aho agejeje' : 'Course progress'}</th>
+                        <th>{isKin ? 'Ibigeragezo' : 'Challenges'}</th>
                         <th>{isKin ? 'Igice agezeho' : 'Current module'}</th>
                         <th>{isKin ? 'Igihe yagaragaye' : 'Last active'}</th>
                         <th>{isKin ? 'Imiterere' : 'Status'}</th>
@@ -1556,6 +1557,14 @@ export default function TeacherDashboard() {
                               <div className="bar"><i style={{ width: `${s.progress_pct}%` }} /></div>
                               <span className="pv">{s.progress_pct}%</span>
                             </div>
+                          </td>
+                          <td>
+                            <span style={{ fontVariantNumeric: 'tabular-nums', fontSize: 13 }}>
+                              {s.challenges_passed}
+                              {s.challenges_attempted > 0 && (
+                                <span style={{ color: 'var(--text-3)' }}>/{s.challenges_attempted}</span>
+                              )}
+                            </span>
                           </td>
                           <td>{s.current_module}</td>
                           <td><span className="when">{formatRelativeTime(s.last_active, isKin)}</span></td>

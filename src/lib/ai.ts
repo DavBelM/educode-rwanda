@@ -112,17 +112,31 @@ export async function getAIFeedback(
 }
 
 export async function translateToKinyarwanda(text: string): Promise<string> {
-  const response = await fetch('/api/translate', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ text, targetLanguage: 'KIN' }),
-    signal: AbortSignal.timeout(30_000),
-  });
-  // On any server error, fall back to original text so the UI never breaks
-  if (!response.ok) return text;
-  const json = await response.json();
-  if (typeof json.text === 'string' && json.text.trim()) return json.text;
-  return text;
+  const attempt = async () => {
+    const response = await fetch('/api/translate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text, targetLanguage: 'KIN' }),
+      signal: AbortSignal.timeout(30_000),
+    });
+    if (response.status === 429) throw Object.assign(new Error('rate-limited'), { retryable: true });
+    if (!response.ok) throw new Error(`translate ${response.status}`);
+    const json = await response.json();
+    if (typeof json.text === 'string' && json.text.trim()) return json.text;
+    throw new Error('empty-response');
+  };
+
+  try {
+    return await attempt();
+  } catch (err: unknown) {
+    const e = err as { retryable?: boolean };
+    if (e.retryable) {
+      await new Promise(r => setTimeout(r, 2000));
+      try { return await attempt(); } catch { /* fall through */ }
+    }
+    // Signal failure with a sentinel so the UI can show an error state
+    throw err;
+  }
 }
 
 export async function getLessonAIHelp(

@@ -9,6 +9,7 @@ interface Msg {
   text: string;
   textKin?: string;
   translating?: boolean;
+  translateFailed?: boolean;
 }
 
 interface MwarimuPanelProps {
@@ -47,7 +48,7 @@ function studentCtx(name?: string, xp?: number): string {
 }
 
 function saveMsgs(chatKey: string, msgs: Msg[]) {
-  const toStore = msgs.map(({ translating: _, ...m }) => m);
+  const toStore = msgs.map(({ translating: _t, translateFailed: _f, ...m }) => m);
   try { localStorage.setItem(chatKey, JSON.stringify(toStore)); } catch { /* storage full */ }
 }
 
@@ -115,12 +116,12 @@ export function MwarimuPanel({
       translateToKinyarwanda(m.text)
         .then(textKin => {
           setMessages(prev => prev.map(msg =>
-            msg.id === m.id ? { ...msg, textKin, translating: false } : msg
+            msg.id === m.id ? { ...msg, textKin, translating: false, translateFailed: false } : msg
           ));
         })
         .catch(() => {
           setMessages(prev => prev.map(msg =>
-            msg.id === m.id ? { ...msg, translating: false } : msg
+            msg.id === m.id ? { ...msg, translating: false, translateFailed: true } : msg
           ));
         });
     });
@@ -139,8 +140,8 @@ export function MwarimuPanel({
         const id = nextId;
         setMessages(prev => addMsg(prev, { role: 'mw', text: response, translating: true }));
         translateToKinyarwanda(response)
-          .then(textKin => setMessages(prev => prev.map(m => m.id === id ? { ...m, textKin, translating: false } : m)))
-          .catch(() => setMessages(prev => prev.map(m => m.id === id ? { ...m, translating: false } : m)));
+          .then(textKin => setMessages(prev => prev.map(m => m.id === id ? { ...m, textKin, translating: false, translateFailed: false } : m)))
+          .catch(() => setMessages(prev => prev.map(m => m.id === id ? { ...m, translating: false, translateFailed: true } : m)));
       } else {
         setMessages(prev => addMsg(prev, { role: 'mw', text: response }));
       }
@@ -174,7 +175,25 @@ export function MwarimuPanel({
   function renderMwMsg(m: Msg) {
     if (isKin) {
       if (m.translating) return <div className="typing-dots"><span /><span /><span /></div>;
-      if (m.textKin)     return <ReactMarkdown>{m.textKin}</ReactMarkdown>;
+      if (m.translateFailed) return (
+        <div>
+          <p style={{ color: 'var(--text-3)', fontSize: 13, marginBottom: 6 }}>
+            Guhindura mu Kinyarwanda byanze. Gerageza nanone:
+          </p>
+          <button
+            style={{ fontSize: 12, background: 'none', border: '1px solid var(--line)', borderRadius: 6, padding: '3px 10px', cursor: 'pointer', color: 'var(--text-2)' }}
+            onClick={() => {
+              setMessages(prev => prev.map(msg => msg.id === m.id ? { ...msg, translating: true, translateFailed: false } : msg));
+              translateToKinyarwanda(m.text)
+                .then(textKin => setMessages(prev => prev.map(msg => msg.id === m.id ? { ...msg, textKin, translating: false, translateFailed: false } : msg)))
+                .catch(() => setMessages(prev => prev.map(msg => msg.id === m.id ? { ...msg, translating: false, translateFailed: true } : msg)));
+            }}
+          >
+            Gerageza nanone
+          </button>
+        </div>
+      );
+      if (m.textKin) return <ReactMarkdown>{m.textKin}</ReactMarkdown>;
     }
     return <ReactMarkdown>{m.text}</ReactMarkdown>;
   }

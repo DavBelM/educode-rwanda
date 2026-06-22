@@ -11,6 +11,8 @@ function checkRateLimit(ip: string, maxPerMinute: number): boolean {
   return true;
 }
 
+// Classroom networks share one IP — allow 120/min so a class of 30 isn't rate-limited
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -20,7 +22,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   const ip = String(req.headers['x-forwarded-for'] ?? req.socket?.remoteAddress ?? 'unknown');
-  if (!checkRateLimit(ip, 10)) return res.status(429).json({ error: 'Too many requests. Please wait a moment.' });
+  if (!checkRateLimit(ip, 120)) return res.status(429).json({ error: 'Too many requests. Please wait a moment.' });
 
   const { text, targetLanguage = 'KIN' } = req.body ?? {};
   if (!text) return res.status(400).json({ error: 'text is required' });
@@ -42,20 +44,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         text,
       ].join('\n')
     : [
-        'You are translating an AI coding tutor response from English to Kinyarwanda.',
-        'The audience is Rwandan TVET secondary-school students (ages 16–21) learning JavaScript for the first time.',
+        'You are EduCode Mwarimu, an AI coding tutor helping Rwandan TVET secondary-school students (ages 16–21) learn JavaScript for the first time.',
+        'Your job: take this AI tutor response and rewrite it as a clear, friendly explanation in Kinyarwanda that a Rwandan teenager can easily understand.',
+        'Do NOT just translate word-for-word. Simplify technical language, use relatable examples if needed, and sound like a supportive older sibling, not a textbook.',
         '',
         'Rules:',
-        '1. Translate the explanation text naturally into Kinyarwanda that a teenage student would understand.',
+        '1. Write natural, conversational Kinyarwanda — avoid overly formal or stiff language.',
         '2. Do NOT translate or modify code blocks (text inside triple backticks ```). Leave them exactly as they appear.',
-        '3. Do NOT translate JavaScript keywords, identifiers, or syntax: const, let, var, function, if, else, return, console.log, true, false, null, undefined, etc.',
+        '3. Do NOT translate JavaScript keywords or syntax: const, let, var, function, if, else, return, console.log, true, false, null, undefined, etc.',
         '4. Keep inline code wrapped in backticks (e.g. `const`) in English.',
-        '5. Preserve all markdown formatting exactly: **bold**, `inline code`, bullet points (- or *), numbered lists.',
-        '6. Technical terms with no clear Kinyarwanda equivalent (like "variable", "function", "error", "assignment") can be kept in English or briefly explained in parentheses.',
-        '7. Keep the same warm, patient, encouraging tone as the original. Never sound formal or robotic.',
-        '8. Do not add any introduction or explanation of what you are doing — output only the translated text.',
+        '5. Preserve markdown formatting: **bold**, `inline code`, bullet points, numbered lists.',
+        '6. Technical terms like "variable", "function", "error", "loop" can be kept in English with a brief Kinyarwanda explanation in parentheses on first use.',
+        '7. Be warm, encouraging, and never condescending. If the student made an error, help them see it without making them feel bad.',
+        '8. Output only the final Kinyarwanda explanation — no preamble, no "here is my translation".',
         '',
-        'Text to translate:',
+        'AI tutor response to adapt:',
         text,
       ].join('\n');
 
