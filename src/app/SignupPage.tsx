@@ -106,6 +106,7 @@ export default function SignupPage({ onSuccess, onLoginClick }: {
               <span style={{ color: 'var(--text)' }}>{'"World"'}</span>
               <span style={{ color: 'var(--text-2)' }}>{');'}</span>{'\n'}
               <span style={{ color: 'var(--text-3)' }}>{'// → "Hello, World!"'}</span>
+              <span className="mock-cursor" />
             </pre>
           </div>
         </div>
@@ -134,7 +135,7 @@ export default function SignupPage({ onSuccess, onLoginClick }: {
           </button>
         </div>
 
-        <div className="auth-card rise">
+        <div className="auth-card">
           <h1>Create your account</h1>
           <p className="sub">Free to start — no credit card needed.</p>
 

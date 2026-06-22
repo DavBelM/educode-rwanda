@@ -50,6 +50,7 @@ export default function LoginPage({ onSuccess, onSignupClick, onForgotPassword }
               <span style={{ color: 'var(--text)' }}>12</span>
               <span style={{ color: 'var(--text-2)' }}>;</span>{'\n'}
               <span style={{ color: 'var(--text-3)' }}>{'// keep it going today'}</span>
+              <span className="mock-cursor" />
             </pre>
           </div>
         </div>
@@ -78,7 +79,7 @@ export default function LoginPage({ onSuccess, onSignupClick, onForgotPassword }
           </button>
         </div>
 
-        <div className="auth-card rise">
+        <div className="auth-card">
           <h1>Welcome back</h1>
           <p className="sub">Log in to continue learning.</p>
 

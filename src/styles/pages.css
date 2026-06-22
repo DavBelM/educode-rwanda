@@ -144,6 +144,50 @@ footer.site-footer { border-top: 1px solid var(--line); margin-top: 40px; paddin
 .pw-bars { display: flex; gap: 4px; }
 .pw-bar { height: 3px; flex: 1; border-radius: 99px; background: var(--line); transition: background .2s; }
 
+/* ── Auth animations ─────────────────────────────────────────────────────── */
+
+@keyframes auth-left-in  { from { opacity: 0; transform: translateX(-22px); } to { opacity: 1; transform: none; } }
+@keyframes auth-right-in { from { opacity: 0; transform: translateX(22px);  } to { opacity: 1; transform: none; } }
+@keyframes code-glow {
+  0%, 100% { box-shadow: 0 12px 40px rgba(0,0,0,.4), 0 0 0 1px var(--line); }
+  50%       { box-shadow: 0 12px 40px rgba(0,0,0,.4), 0 0 28px 6px rgba(var(--accent-rgb, 239,233,220), 0.08); }
+}
+
+.auth-aside {
+  animation: auth-left-in .6s var(--ease) both;
+  position: relative; overflow: hidden;
+}
+.auth-aside::before {
+  content: ''; pointer-events: none;
+  position: absolute; inset: -60%; border-radius: 50%;
+  background: radial-gradient(ellipse at 30% 60%, rgba(var(--accent-rgb, 239,233,220), 0.06) 0%, transparent 60%);
+  animation: cta-shimmer 7s ease-in-out infinite;
+}
+.auth-main  { animation: auth-right-in .6s var(--ease) .1s both; }
+
+/* Form card heading and sub stagger */
+.auth-card h1   { animation: rise .45s var(--ease) .18s both; }
+.auth-card .sub { animation: rise .45s var(--ease) .24s both; }
+
+/* Each form field staggers in */
+.auth-form .field:nth-child(1) { animation: rise .4s var(--ease) .28s both; }
+.auth-form .field:nth-child(2) { animation: rise .4s var(--ease) .36s both; }
+.auth-form .field:nth-child(3) { animation: rise .4s var(--ease) .44s both; }
+.auth-form .field:nth-child(4) { animation: rise .4s var(--ease) .52s both; }
+.auth-form .checkbox           { animation: rise .4s var(--ease) .56s both; }
+.auth-form .btn-primary        { animation: rise .4s var(--ease) .60s both; }
+
+/* Code block in the aside glows */
+.aside-code { animation: code-glow 5s ease-in-out 1.2s infinite; }
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .auth-aside, .auth-main, .auth-card h1, .auth-card .sub,
+  .auth-form .field, .auth-form .checkbox, .auth-form .btn-primary,
+  .aside-code { animation: none; }
+  .auth-aside::before { animation: none; }
+}
+
 @media (max-width: 760px) {
   .auth { grid-template-columns: 1fr; }
   .auth-aside { display: none; }
