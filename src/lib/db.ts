@@ -1676,3 +1676,19 @@ export async function getStudentAIProfile(
     languageSplit: { en, kin },
   };
 }
+
+// ── Account deletion request ──────────────────────────────────────────────────
+// Deactivates the account immediately (student can no longer use the platform)
+// but preserves data so teachers retain academic records during the pilot.
+// Mitali processes actual data deletion manually after the pilot ends.
+
+export async function requestAccountDeletion(): Promise<{ error: string | null }> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: 'Not authenticated' };
+  const { error } = await supabase
+    .from('profiles')
+    .update({ is_deactivated: true, deletion_requested_at: new Date().toISOString() })
+    .eq('id', user.id);
+  if (error) return { error: error.message };
+  return { error: null };
+}

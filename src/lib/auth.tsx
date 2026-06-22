@@ -10,6 +10,7 @@ interface Profile {
   preferred_language: 'en' | 'kin' | 'both';
   xp_points: number;
   streak_days: number;
+  is_deactivated: boolean;
 }
 
 interface AuthContextType {
@@ -64,13 +65,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const base = buildProfileFromUser(user);
       const { data } = await supabase
         .from('profiles')
-        .select('xp_points, streak_days')
+        .select('xp_points, streak_days, is_deactivated')
         .eq('id', user.id)
         .maybeSingle();
       setProfile({
         ...base,
         xp_points: data?.xp_points ?? 0,
         streak_days: data?.streak_days ?? 0,
+        is_deactivated: data?.is_deactivated ?? false,
       });
     }
 

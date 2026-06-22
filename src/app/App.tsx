@@ -79,7 +79,7 @@ function LessonRoute({ language }: { language: 'EN' | 'KIN' }) {
 // ── Main App ──────────────────────────────────────────────────────────────────
 
 export default function App() {
-  const { user, profile, loading, isRecoveryMode } = useAuth();
+  const { user, profile, loading, isRecoveryMode, signOut } = useAuth();
   const navigate = useNavigate();
   const [showEthics, setShowEthics] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
@@ -132,6 +132,30 @@ export default function App() {
   }
 
   if (isRecoveryMode) return <ResetPasswordPage onDone={() => navigate('/login')} />;
+
+  // Deactivated account — shown instead of the full app
+  if (user && profile?.is_deactivated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-6" style={{ background: 'var(--bg)' }}>
+        <div className="card pad-lg" style={{ maxWidth: 420, width: '100%', textAlign: 'center', animation: 'rise 0.4s ease both' }}>
+          <div style={{ fontSize: 36, marginBottom: 16 }}>🔒</div>
+          <h2 style={{ fontSize: 18, fontWeight: 600, color: 'var(--text)', marginBottom: 8 }}>
+            Account deactivation requested
+          </h2>
+          <p style={{ fontSize: 13.5, color: 'var(--text-2)', lineHeight: 1.6, marginBottom: 6 }}>
+            Your account has been deactivated. Your teacher can still see your work and grades during the pilot period.
+          </p>
+          <p style={{ fontSize: 13, color: 'var(--text-3)', lineHeight: 1.6, marginBottom: 24 }}>
+            Your data will be deleted after the pilot ends. If you did this by mistake, contact your teacher or{' '}
+            <span style={{ color: 'var(--text-2)' }}>belamitali@gmail.com</span>.
+          </p>
+          <button className="btn btn-secondary" style={{ width: '100%' }} onClick={signOut}>
+            Sign out
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   // ── Authenticated ──────────────────────────────────────────────────────────
   if (user && profile) {

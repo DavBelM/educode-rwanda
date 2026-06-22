@@ -1,7 +1,9 @@
+import { useState } from 'react';
 import { Link, useLocation } from 'react-router';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { useAuth } from '../../lib/auth';
 import { useTheme } from '../../lib/theme';
+import { requestAccountDeletion } from '../../lib/db';
 
 interface AppNavProps {
   /** Current streak count. Shown when > 0; hidden when undefined or 0. */
@@ -12,6 +14,24 @@ export function AppNav({ streak }: AppNavProps) {
   const { profile, signOut } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { pathname } = useLocation();
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
+
+  const isStudent = profile?.user_type === 'student' || profile?.user_type === 'self_learner';
+
+  const handleRequestDeletion = async () => {
+    setDeleting(true);
+    setDeleteError('');
+    const { error } = await requestAccountDeletion();
+    if (error) {
+      setDeleteError(error);
+      setDeleting(false);
+      return;
+    }
+    // Reload so App.tsx picks up is_deactivated = true from the profile query
+    window.location.reload();
+  };
 
   const initials = profile?.full_name
     ? profile.full_name.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)
@@ -33,6 +53,7 @@ export function AppNav({ streak }: AppNavProps) {
   const isTeacher = profile?.user_type === 'teacher';
 
   return (
+    <>
     <header className="nav">
       <div className="nav-inner">
 
@@ -148,6 +169,19 @@ export function AppNav({ streak }: AppNavProps) {
 
                 <DropdownMenu.Separator className="nav-dropdown-sep" />
 
+                {isStudent && (
+                  <DropdownMenu.Item
+                    className="nav-dropdown-item"
+                    onSelect={(e) => { e.preventDefault(); setShowDeleteConfirm(true); }}
+                    style={{ color: 'var(--error)', fontSize: 13 }}
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{ width: 15, height: 15, flexShrink: 0 }}>
+                      <polyline points="3 6 5 6 21 6" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /><path d="M10 11v6M14 11v6" /><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                    </svg>
+                    Request account deletion
+                  </DropdownMenu.Item>
+                )}
+
                 <DropdownMenu.Item
                   className="nav-dropdown-item signout"
                   onSelect={signOut}
@@ -173,5 +207,45 @@ export function AppNav({ streak }: AppNavProps) {
         </div>
       </div>
     </header>
+
+    {/* Deletion confirmation modal */}
+    {showDeleteConfirm && (
+      <div className="fixed inset-0 z-[80] flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }}>
+        <div className="card pad-lg w-full" style={{ maxWidth: 380, animation: 'ethics-card-in 0.3s cubic-bezier(0.22,0.61,0.36,1) both' }}>
+          <div style={{ textAlign: 'center', marginBottom: 18 }}>
+            <div style={{ fontSize: 32, marginBottom: 10 }}>⚠️</div>
+            <h3 style={{ fontSize: 16, fontWeight: 600, color: 'var(--text)', marginBottom: 8 }}>
+              Request account deletion?
+            </h3>
+            <p style={{ fontSize: 13, color: 'var(--text-2)', lineHeight: 1.6, marginBottom: 8 }}>
+              Your account will be <strong>deactivated immediately</strong> — you will no longer be able to log in.
+            </p>
+            <p style={{ fontSize: 13, color: 'var(--text-2)', lineHeight: 1.6, marginBottom: 8 }}>
+              Your teacher will still be able to see your work and grades during the pilot period. Your data will be permanently deleted after the pilot ends.
+            </p>
+            <p style={{ fontSize: 12.5, color: 'var(--text-3)', lineHeight: 1.5 }}>
+              If you did this by mistake, contact your teacher or <span style={{ color: 'var(--text-2)' }}>belamitali@gmail.com</span>.
+            </p>
+          </div>
+          {deleteError && (
+            <p style={{ fontSize: 12.5, color: 'var(--error)', marginBottom: 12, textAlign: 'center' }}>{deleteError}</p>
+          )}
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button className="btn btn-secondary" style={{ flex: 1 }} onClick={() => setShowDeleteConfirm(false)} disabled={deleting}>
+              Cancel
+            </button>
+            <button
+              className="btn"
+              style={{ flex: 1, background: 'var(--error)', color: '#fff', border: 'none', opacity: deleting ? 0.6 : 1 }}
+              onClick={handleRequestDeletion}
+              disabled={deleting}
+            >
+              {deleting ? 'Processing...' : 'Yes, deactivate'}
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
+    </>
   );
 }
