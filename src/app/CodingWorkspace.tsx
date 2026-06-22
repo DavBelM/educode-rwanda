@@ -59,6 +59,7 @@ export default function CodingWorkspace({ assignment }: Props) {
   const saveKey = assignment
     ? `educode_code_${userId}_${assignment.id}`
     : `educode_code_${userId}_free`;
+  const chatKey = saveKey.replace('educode_code_', 'educode_chat_');
   const savedJs = localStorage.getItem(saveKey + '_js');
   const savedHtml = localStorage.getItem(saveKey + '_html');
 
@@ -131,6 +132,20 @@ export default function CodingWorkspace({ assignment }: Props) {
 
   // ── HTML preview ──────────────────────────────────────────────────────────────
   const [previewSrcdoc, setPreviewSrcdoc] = useState('');
+
+  function handleNewSession() {
+    setJsCode(DEFAULT_JS);
+    setHtmlCode(DEFAULT_HTML);
+    setOutput('');
+    setFeedback([]);
+    setLastError(null);
+    setRunCount(0);
+    setPreviewSrcdoc('');
+    try {
+      localStorage.removeItem(saveKey + '_js');
+      localStorage.removeItem(saveKey + '_html');
+    } catch { /* ignore */ }
+  }
 
   // Auto-save code as student types
   useEffect(() => {
@@ -403,6 +418,10 @@ export default function CodingWorkspace({ assignment }: Props) {
           language={language}
           onLanguageChange={setLanguage}
           examMode={examMode}
+          chatKey={chatKey}
+          studentName={profile?.full_name}
+          xp={profile?.xp_points}
+          onNewSession={handleNewSession}
         />
       </div>
     </div>
