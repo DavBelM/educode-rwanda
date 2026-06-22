@@ -16,6 +16,7 @@ import {
 } from '../lib/quiz-db';
 import { getStudentClasses } from '../lib/db';
 import { usePageTitle } from '../hooks/usePageTitle';
+import { useAuth } from '../lib/auth';
 
 interface Props {
   language: 'EN' | 'KIN';
@@ -55,6 +56,8 @@ export default function ChallengeRunner({ language }: Props) {
   const { setId } = useParams<{ setId: string }>();
   const navigate = useNavigate();
   const isKin = language === 'KIN';
+  const { profile } = useAuth();
+  const chatKey = `educode_chat_challenge_${profile?.id ?? 'anon'}_${setId ?? 'unknown'}`;
 
   const [set, setSet] = useState<QuizSet | null>(null);
   const [challenges, setChallenges] = useState<QuizChallenge[]>([]);
@@ -583,10 +586,13 @@ export default function ChallengeRunner({ language }: Props) {
                 instructions={challenge.description}
                 language={mwarimuLang}
                 onLanguageChange={setMwarimuLang}
-                examMode={false}
+                examMode={true}
                 sessionId={sessionIdRef.current}
                 challengeId={challenge.id}
                 onInteractionLogged={() => setMwarimuCount(c => c + 1)}
+                chatKey={chatKey}
+                studentName={profile?.full_name}
+                xp={profile?.xp_points}
               />
             )}
           </div>
@@ -655,8 +661,8 @@ export default function ChallengeRunner({ language }: Props) {
             )}
           </div>
 
-          {/* Test results panel */}
-          <div style={{ flex: 1, overflowY: 'auto', padding: '12px 16px' }}>
+          {/* Test results panel — only visible on Challenge tab */}
+          <div style={{ display: rightTab === 'challenge' ? 'block' : 'none', flex: 1, overflowY: 'auto', padding: '12px 16px' }}>
             <div className="flex items-center gap-2 mb-3">
               <span style={{ color: 'var(--text-3)', fontSize: 13, fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
                 {isKin ? 'Ibigeragezo' : 'Tests'}
