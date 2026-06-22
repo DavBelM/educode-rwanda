@@ -205,3 +205,37 @@ export async function getMwarimuReply(
 
   return raw;
 }
+
+// ── AI assessment (Gemini-powered, teacher-facing) ────────────────────────────
+
+export async function generateStudentAssessment(
+  data: object,
+  language: 'EN' | 'KIN'
+): Promise<string> {
+  const response = await fetch('/api/assess', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ type: 'student', data, language }),
+    signal: AbortSignal.timeout(30_000),
+  });
+  if (!response.ok) throw new Error(`assess ${response.status}`);
+  const json = await response.json();
+  if (typeof json.assessment === 'string' && json.assessment.trim()) return json.assessment;
+  throw new Error('Empty assessment');
+}
+
+export async function generateClassSummary(
+  data: object,
+  language: 'EN' | 'KIN'
+): Promise<string> {
+  const response = await fetch('/api/assess', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ type: 'class', data, language }),
+    signal: AbortSignal.timeout(30_000),
+  });
+  if (!response.ok) throw new Error(`assess ${response.status}`);
+  const json = await response.json();
+  if (typeof json.assessment === 'string' && json.assessment.trim()) return json.assessment;
+  throw new Error('Empty assessment');
+}

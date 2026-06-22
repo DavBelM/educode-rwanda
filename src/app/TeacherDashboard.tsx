@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Users, Plus, Check, X, ChevronDown, BookOpen, Code2, Loader, Megaphone, Pin, Trash2, BarChart2, AlertCircle, Download } from 'lucide-react';
+import { Users, Plus, Check, X, ChevronDown, BookOpen, Code2, Loader, Megaphone, Pin, Trash2, BarChart2, AlertCircle, Download, Sparkles } from 'lucide-react';
+import { generateStudentAssessment, generateClassSummary } from '../lib/ai';
 import { AppNav } from './components/AppNav';
 import { usePageTitle } from '../hooks/usePageTitle';
 import { useAuth } from '../lib/auth';
@@ -1123,6 +1124,9 @@ function StudentProfileModal({ student, classId, language, onClose }: {
   const isKin = language === 'KIN';
   const [profile, setProfile] = useState<StudentAIProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const [assessment, setAssessment] = useState<string | null>(null);
+  const [assessmentLoading, setAssessmentLoading] = useState(false);
+  const [assessmentError, setAssessmentError] = useState(false);
 
   useEffect(() => {
     getStudentAIProfile(student.student_id, classId).then(p => {
@@ -1130,6 +1134,34 @@ function StudentProfileModal({ student, classId, language, onClose }: {
       setLoading(false);
     });
   }, [student.student_id, classId]);
+
+  async function handleGenerateAssessment() {
+    if (!profile) return;
+    setAssessmentLoading(true);
+    setAssessmentError(false);
+    try {
+      const result = await generateStudentAssessment({
+        name: student.full_name,
+        progress_pct: student.progress_pct,
+        current_module: student.current_module,
+        challenges_passed: student.challenges_passed,
+        challenges_attempted: student.challenges_attempted,
+        status: student.status,
+        last_active: student.last_active,
+        totalInteractions: profile.totalInteractions,
+        weekInteractions: profile.weekInteractions,
+        challengeInteractions: profile.challengeInteractions,
+        topErrors: profile.topErrors,
+        recentQuestions: profile.recentQuestions,
+        languageSplit: profile.languageSplit,
+      }, language);
+      setAssessment(result);
+    } catch {
+      setAssessmentError(true);
+    } finally {
+      setAssessmentLoading(false);
+    }
+  }
 
   const ERROR_COLORS: Record<string, string> = {
     TypeError: '#d2887b',
@@ -1257,6 +1289,67 @@ function StudentProfileModal({ student, classId, language, onClose }: {
                   </div>
                 </div>
               )}
+
+              {/* AI Assessment */}
+              <div style={{ borderTop: '1px solid var(--line)', paddingTop: 16 }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+                  <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '0.06em', margin: 0 }}>
+                    {isKin ? 'Isuzuma rya AI' : 'AI Assessment'}
+                  </p>
+                  {!assessment && (
+                    <button
+                      onClick={handleGenerateAssessment}
+                      disabled={assessmentLoading || !profile}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: 6,
+                        padding: '5px 12px', borderRadius: 'var(--radius)',
+                        background: 'var(--surface)', border: '1px solid var(--line)',
+                        color: 'var(--text-2)', fontSize: 12.5, cursor: 'pointer',
+                        opacity: assessmentLoading ? 0.7 : 1,
+                      }}
+                    >
+                      {assessmentLoading
+                        ? <Loader size={12} style={{ animation: 'spin 1s linear infinite' }} />
+                        : <Sparkles size={12} />}
+                      {isKin ? 'Tanga isuzuma' : 'Generate assessment'}
+                    </button>
+                  )}
+                  {assessment && (
+                    <button
+                      onClick={() => { setAssessment(null); }}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-3)', fontSize: 12 }}
+                    >
+                      {isKin ? 'Subiramo' : 'Regenerate'}
+                    </button>
+                  )}
+                </div>
+
+                {assessmentError && (
+                  <p style={{ fontSize: 13, color: 'var(--text-3)', fontStyle: 'italic' }}>
+                    {isKin ? 'Habaye ikosa. Gerageza nanone.' : 'Could not generate assessment. Try again.'}
+                  </p>
+                )}
+
+                {assessment && (
+                  <div style={{
+                    padding: '14px 16px', borderRadius: 'var(--radius)',
+                    background: 'var(--surface)', border: '1px solid var(--line)',
+                    fontSize: 14, color: 'var(--text-2)', lineHeight: 1.65,
+                    whiteSpace: 'pre-wrap',
+                  }}>
+                    {assessment}
+                  </div>
+                )}
+
+                {!assessment && !assessmentError && (
+                  <p style={{ fontSize: 13, color: 'var(--text-3)', lineHeight: 1.55 }}>
+                    {isKin
+                      ? 'Kanda hejuru kugira ngo AI isuzume imyitwarire y\'uyu munyeshuri hifashishijwe amakuru yose.'
+                      : "Click above to have the AI synthesize this student's full learning profile into a teacher-readable assessment."}
+                  </p>
+                )}
+              </div>
+
             </div>
           )}
         </div>
@@ -1313,6 +1406,9 @@ export default function TeacherDashboard() {
   const [selectedRosterStudent, setSelectedRosterStudent] = useState<RosterStudent | null>(null);
   const [codeCopied, setCodeCopied] = useState(false);
   const [ratingsSummary, setRatingsSummary] = useState<ClassRatingsSummary | null>(null);
+  const [classSummary, setClassSummary] = useState<string | null>(null);
+  const [classSummaryLoading, setClassSummaryLoading] = useState(false);
+  const [classSummaryError, setClassSummaryError] = useState(false);
   const { profile } = useAuth();
 
   const loadData = async () => {
@@ -1373,6 +1469,37 @@ export default function TeacherDashboard() {
   const activeThisWeek = roster.filter(s => s.last_active && (Date.now() - new Date(s.last_active).getTime()) < 7 * 86400000).length;
   const classProgress = roster.length > 0 ? Math.round(roster.reduce((sum, s) => sum + s.progress_pct, 0) / roster.length) : 0;
   const fallingBehind = roster.filter(s => s.status === 'behind').length;
+
+  async function handleGenerateClassSummary() {
+    if (!roster.length || !selectedClass) return;
+    setClassSummaryLoading(true);
+    setClassSummaryError(false);
+    try {
+      const totalChallengesPassed = roster.reduce((s, r) => s + r.challenges_passed, 0);
+      const totalChallengesAttempted = roster.reduce((s, r) => s + r.challenges_attempted, 0);
+      const studentsOnTrack = roster.filter(r => r.status === 'on-track').length;
+      const studentsBehind = roster.filter(r => r.status === 'behind').length;
+      const studentsNeedHelp = roster.filter(r => r.status === 'needs-help').length;
+      const result = await generateClassSummary({
+        className: selectedClass.name,
+        studentCount: roster.length,
+        avgProgress: classProgress,
+        totalChallengesPassed,
+        totalChallengesAttempted,
+        studentsOnTrack,
+        studentsBehind,
+        studentsNeedHelp,
+        commonErrors: [],
+        avgInteractionsPerStudent: 0,
+        kinUsagePct: 0,
+      }, language);
+      setClassSummary(result);
+    } catch {
+      setClassSummaryError(true);
+    } finally {
+      setClassSummaryLoading(false);
+    }
+  }
   const needsAttention = [...roster]
     .filter(s => s.status !== 'on-track')
     .sort((a, b) => (a.status !== b.status ? (a.status === 'behind' ? -1 : 1) : a.progress_pct - b.progress_pct))
@@ -1627,6 +1754,58 @@ export default function TeacherDashboard() {
                     ))
                   )}
                 </section>
+
+                {/* AI CLASS SUMMARY */}
+                {roster.length > 0 && (
+                  <section className="card pad-lg rise-3">
+                    <div className="card-head" style={{ marginBottom: 12 }}>
+                      <h3 className="card-title">{isKin ? 'Isuzuma rya AI ry\'itorero' : 'AI Class Summary'}</h3>
+                      {classSummary ? (
+                        <button
+                          onClick={() => { setClassSummary(null); }}
+                          style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-3)', fontSize: 12 }}
+                        >
+                          {isKin ? 'Subiramo' : 'Refresh'}
+                        </button>
+                      ) : (
+                        <button
+                          onClick={handleGenerateClassSummary}
+                          disabled={classSummaryLoading}
+                          style={{
+                            display: 'flex', alignItems: 'center', gap: 5,
+                            padding: '4px 10px', borderRadius: 'var(--radius)',
+                            background: 'var(--surface)', border: '1px solid var(--line)',
+                            color: 'var(--text-2)', fontSize: 12, cursor: 'pointer',
+                            opacity: classSummaryLoading ? 0.7 : 1,
+                          }}
+                        >
+                          {classSummaryLoading
+                            ? <Loader size={11} style={{ animation: 'spin 1s linear infinite' }} />
+                            : <Sparkles size={11} />}
+                          {isKin ? 'Tanga' : 'Generate'}
+                        </button>
+                      )}
+                    </div>
+
+                    {classSummaryError && (
+                      <p className="text-sm" style={{ color: 'var(--text-3)' }}>
+                        {isKin ? 'Habaye ikosa. Gerageza nanone.' : 'Could not generate summary. Try again.'}
+                      </p>
+                    )}
+
+                    {classSummary ? (
+                      <p style={{ fontSize: 13.5, color: 'var(--text-2)', lineHeight: 1.65, whiteSpace: 'pre-wrap', margin: 0 }}>
+                        {classSummary}
+                      </p>
+                    ) : !classSummaryError && (
+                      <p className="text-sm" style={{ color: 'var(--text-3)' }}>
+                        {isKin
+                          ? 'Kanda "Tanga" kugira ngo AI isuzume abo muri itorero ryose.'
+                          : 'Click "Generate" to get an AI-written narrative of your entire class\'s current status.'}
+                      </p>
+                    )}
+                  </section>
+                )}
 
                 {/* PILOT FEEDBACK */}
                 {ratingsSummary !== null && (
