@@ -118,10 +118,11 @@ export async function translateToKinyarwanda(text: string): Promise<string> {
     body: JSON.stringify({ text, targetLanguage: 'KIN' }),
     signal: AbortSignal.timeout(30_000),
   });
-  if (!response.ok) throw new Error(`Translate API returned ${response.status}`);
+  // On any server error, fall back to original text so the UI never breaks
+  if (!response.ok) return text;
   const json = await response.json();
   if (typeof json.text === 'string' && json.text.trim()) return json.text;
-  throw new Error('Empty translation response');
+  return text;
 }
 
 export async function getLessonAIHelp(

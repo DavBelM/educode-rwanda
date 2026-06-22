@@ -67,14 +67,27 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { maxOutputTokens: 500, temperature: 0.1 },
+          generationConfig: { maxOutputTokens: 1500, temperature: 0.1 },
         }),
       }
     );
 
     const json = await response.json();
-    const translated = json.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!translated?.trim()) return res.status(502).json({ error: 'Empty response from Gemini' });
+
+    // Safety block or quota exhaustion — log and surface the reason
+    const candidate = json.candidates?.[0];
+    const finishReason = candidate?.finishReason;
+    if (finishReason === 'SAFETY' || finishReason === 'RECITATION') {
+      console.warn('[EduCode Translate] Gemini blocked response:', finishReason, JSON.stringify(json.promptFeedback ?? {}));
+      // Return the original text untranslated rather than failing hard
+      return res.status(200).json({ text, _blocked: true });
+    }
+
+    const translated = candidate?.content?.parts?.[0]?.text;
+    if (!translated?.trim()) {
+      console.error('[EduCode Translate] Empty Gemini response:', JSON.stringify(json).slice(0, 300));
+      return res.status(502).json({ error: 'Empty response from Gemini' });
+    }
     return res.status(200).json({ text: translated });
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
