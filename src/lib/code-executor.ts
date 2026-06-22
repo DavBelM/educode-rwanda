@@ -73,7 +73,10 @@ ${htmlCode}
   };
 
   try {
-    ${jsCode}
+    // new Function() parses code at runtime so SyntaxErrors are catchable,
+    // unlike inlined code which silently kills the entire script block on parse failure.
+    const __fn = new Function(${JSON.stringify(jsCode)});
+    __fn();
 
     window.parent.postMessage({
       output: __logs.join('\\n'),

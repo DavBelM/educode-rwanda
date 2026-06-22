@@ -83,8 +83,10 @@ export function runQuizTests(
       description: tc.description,
     })));
 
-    // Student code + test assertions run in the same <script> scope so
-    // const/let variables defined by the student are accessible to eval().
+    // Two-pass execution:
+    // Pass 1 — new Function() parses student code at runtime so SyntaxErrors are
+    //           catchable (inlined code kills the entire script block on parse failure).
+    // Pass 2 — inline student code so const/let stay in scope for assertion eval().
     iframe.srcdoc = `<!DOCTYPE html>
 <html>
 <head><meta charset="utf-8"></head>
@@ -116,6 +118,19 @@ ${htmlCode}
   console.warn = __log;
   console.error = __log;
 
+  // Pass 1: syntax check — new Function parses without running
+  try {
+    new Function(${JSON.stringify(jsCode)});
+  } catch (__se) {
+    __runtimeError = __se.toString();
+    while (__results.length < __testCases.length) {
+      __results.push({ passed: false, description: __testCases[__results.length].description });
+    }
+    window.parent.postMessage({ type: 'quiz_result', results: __results, output: '', runtimeError: __runtimeError }, '*');
+    return;
+  }
+
+  // Pass 2: safe to inline — syntax is valid; const/let stay in scope for assertions
   try {
     // ── student code starts ──
     ${jsCode}
