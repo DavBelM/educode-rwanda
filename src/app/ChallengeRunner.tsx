@@ -59,21 +59,32 @@ export default function ChallengeRunner({ language }: Props) {
   const { profile } = useAuth();
   const chatKey = `educode_chat_challenge_${profile?.id ?? 'anon'}_${setId ?? 'unknown'}`;
 
-  // ── Horizontal resize ───────────────────────────────────────────────────────
+  // ── Resize state ────────────────────────────────────────────────────────────
   const [editorPct, setEditorPct] = useState(60);
+  const [challengeCardH, setChallengeCardH] = useState(240);
   const isDraggingH = useRef(false);
+  const isDraggingV = useRef(false);
   const dragStartX = useRef(0);
   const dragStartPct = useRef(60);
+  const dragStartY = useRef(0);
+  const dragStartCardH = useRef(240);
 
   useEffect(() => {
     const onMove = (e: MouseEvent) => {
-      if (!isDraggingH.current) return;
-      const dx = e.clientX - dragStartX.current;
-      const newPct = Math.min(80, Math.max(30, dragStartPct.current + (dx / window.innerWidth) * 100));
-      setEditorPct(newPct);
+      if (isDraggingH.current) {
+        const dx = e.clientX - dragStartX.current;
+        const newPct = Math.min(80, Math.max(30, dragStartPct.current + (dx / window.innerWidth) * 100));
+        setEditorPct(newPct);
+      }
+      if (isDraggingV.current) {
+        const dy = e.clientY - dragStartY.current;
+        const newH = Math.min(500, Math.max(80, dragStartCardH.current + dy));
+        setChallengeCardH(newH);
+      }
     };
     const onUp = () => {
       isDraggingH.current = false;
+      isDraggingV.current = false;
       document.body.style.cursor = '';
       document.body.style.userSelect = '';
     };
@@ -90,6 +101,14 @@ export default function ChallengeRunner({ language }: Props) {
     dragStartX.current = e.clientX;
     dragStartPct.current = editorPct;
     document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+  };
+
+  const startVDrag = (e: React.MouseEvent) => {
+    isDraggingV.current = true;
+    dragStartY.current = e.clientY;
+    dragStartCardH.current = challengeCardH;
+    document.body.style.cursor = 'row-resize';
     document.body.style.userSelect = 'none';
   };
 
@@ -637,7 +656,7 @@ export default function ChallengeRunner({ language }: Props) {
           <div style={{
             display: rightTab === 'challenge' ? 'block' : 'none',
             padding: '16px', borderBottom: '1px solid var(--line)',
-            overflowY: 'auto', maxHeight: '55%', flexShrink: 0,
+            overflowY: 'auto', height: challengeCardH, flexShrink: 0,
           }}>
             {/* Type badge */}
             <div className="flex items-center gap-2 mb-3">
@@ -697,8 +716,10 @@ export default function ChallengeRunner({ language }: Props) {
             )}
           </div>
 
+          {rightTab === 'challenge' && <div className="ws-resizer-v" onMouseDown={startVDrag} />}
+
           {/* Test results panel — only visible on Challenge tab */}
-          <div style={{ display: rightTab === 'challenge' ? 'block' : 'none', flex: 1, overflowY: 'auto', padding: '12px 16px' }}>
+          <div style={{ display: rightTab === 'challenge' ? 'flex' : 'none', flex: 1, flexDirection: 'column', overflowY: 'auto', padding: '12px 16px' }}>
             <div className="flex items-center gap-2 mb-3">
               <span style={{ color: 'var(--text-3)', fontSize: 13, fontWeight: 600, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
                 {isKin ? 'Ibigeragezo' : 'Tests'}
