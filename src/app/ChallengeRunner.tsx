@@ -59,6 +59,40 @@ export default function ChallengeRunner({ language }: Props) {
   const { profile } = useAuth();
   const chatKey = `educode_chat_challenge_${profile?.id ?? 'anon'}_${setId ?? 'unknown'}`;
 
+  // ── Horizontal resize ───────────────────────────────────────────────────────
+  const [editorPct, setEditorPct] = useState(60);
+  const isDraggingH = useRef(false);
+  const dragStartX = useRef(0);
+  const dragStartPct = useRef(60);
+
+  useEffect(() => {
+    const onMove = (e: MouseEvent) => {
+      if (!isDraggingH.current) return;
+      const dx = e.clientX - dragStartX.current;
+      const newPct = Math.min(80, Math.max(30, dragStartPct.current + (dx / window.innerWidth) * 100));
+      setEditorPct(newPct);
+    };
+    const onUp = () => {
+      isDraggingH.current = false;
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+    return () => {
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+    };
+  }, []);
+
+  const startHDrag = (e: React.MouseEvent) => {
+    isDraggingH.current = true;
+    dragStartX.current = e.clientX;
+    dragStartPct.current = editorPct;
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+  };
+
   const [set, setSet] = useState<QuizSet | null>(null);
   const [challenges, setChallenges] = useState<QuizChallenge[]>([]);
   const [idx, setIdx] = useState(0);
@@ -415,7 +449,7 @@ export default function ChallengeRunner({ language }: Props) {
       <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
 
         {/* LEFT: Code editor */}
-        <div style={{ display: 'flex', flexDirection: 'column', flex: '0 0 60%', borderRight: '1px solid var(--line)', overflow: 'hidden' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', flex: `0 0 ${editorPct}%`, overflow: 'hidden' }}>
 
           {/* complete_code instruction banner */}
           {challenge.challenge_type === 'complete_code' && (
@@ -543,8 +577,10 @@ export default function ChallengeRunner({ language }: Props) {
           </div>
         </div>
 
+        <div className="ws-resizer-h" onMouseDown={startHDrag} />
+
         {/* RIGHT: Tabbed panel */}
-        <div style={{ flex: '0 0 40%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        <div style={{ flex: `0 0 ${100 - editorPct}%`, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
 
           {/* Tab bar */}
           <div style={{
