@@ -4,10 +4,16 @@ import { Client } from '@gradio/client';
 const HF_SPACE = process.env.HF_SPACE_URL ?? 'DavBelaa/educode-rwanda-mwarimu-v2';
 
 // The fine-tuned model produces a good assessment paragraph then derails into
-// coding mode (LoRA pull). We extract only the text before the first code block.
+// coding mode (LoRA pull). Two forms of derail:
+//   1. Reaches a code block → strip from first ```
+//   2. Starts a coding-exercise prompt (ends with ':') before the code block
+//      e.g. "What went wrong with this JavaScript code? Explain the bug..."
+//      Strip any trailing blank-line + prompt-line(s) ending with ':'
 function extractAssessment(raw: string): string {
   const codeBlockIdx = raw.indexOf('```');
-  const text = codeBlockIdx > 0 ? raw.slice(0, codeBlockIdx) : raw;
+  let text = codeBlockIdx > 0 ? raw.slice(0, codeBlockIdx) : raw;
+  // Repeatedly strip trailing (blank line + line ending with ':') until none left
+  text = text.replace(/(\n[ \t]*\n[^\n]*:\s*)+$/g, '');
   return text.trim();
 }
 
