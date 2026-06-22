@@ -85,7 +85,20 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
     );
 
-    const json = await geminiRes.json();
+    // v2026-06-22 — if you see this in logs, new code is running
+    const rawBody = await geminiRes.text();
+    let json: Record<string, unknown>;
+    try { json = JSON.parse(rawBody); } catch {
+      console.error('[EduCode Translate v2] Non-JSON from Gemini HTTP', geminiRes.status, ':', rawBody.slice(0, 200));
+      if (targetLanguage === 'EN') return res.status(200).json({ text });
+      return res.status(502).json({ error: `Gemini HTTP ${geminiRes.status}: non-JSON response` });
+    }
+
+    if (!geminiRes.ok) {
+      console.error('[EduCode Translate v2] Gemini HTTP error', geminiRes.status, ':', rawBody.slice(0, 300));
+      if (targetLanguage === 'EN') return res.status(200).json({ text });
+      return res.status(502).json({ error: `Gemini HTTP ${geminiRes.status}` });
+    }
 
     // Gemini-level API error (bad key, quota, invalid model, etc.)
     if (json.error) {

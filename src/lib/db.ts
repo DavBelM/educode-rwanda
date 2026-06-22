@@ -1155,6 +1155,7 @@ export interface RosterStudent {
   status: 'on-track' | 'behind' | 'needs-help';
   challenges_passed: number;
   challenges_attempted: number;
+  ai_interactions: number;
 }
 
 function usernameFromName(name: string): string {
@@ -1190,11 +1191,11 @@ export async function getClassRoster(classId: string): Promise<RosterStudent[]> 
         .in('lesson_id', allLessonIds)
     : { data: [] };
 
-  // Also fetch challenge attempts so we can show challenge progress + factor into last_active
-  const { data: challengeRows } = await supabase
-    .from('quiz_attempts')
-    .select('student_id, passed, completed_at')
-    .in('student_id', studentIds);
+  // Also fetch challenge attempts + AI interactions for full activity picture
+  const [{ data: challengeRows }, { data: interactionRows }] = await Promise.all([
+    supabase.from('quiz_attempts').select('student_id, passed, completed_at').in('student_id', studentIds),
+    supabase.from('ai_interactions').select('student_id, created_at').in('student_id', studentIds),
+  ]);
 
   return enrollments.map((e: { student_id: string; profiles: unknown }) => {
     const p = (Array.isArray(e.profiles) ? e.profiles[0] : e.profiles) as { full_name: string } | null;
@@ -1218,8 +1219,13 @@ export async function getClassRoster(classId: string): Promise<RosterStudent[]> 
       return !latest || r.completed_at > latest ? r.completed_at : latest;
     }, null);
 
-    // Use the most recent activity across lessons and challenges
-    const lastActive = [lessonLastActive, challengeLastActive].filter(Boolean).sort().pop() ?? null;
+    const myInteractions = (interactionRows ?? []).filter((r: { student_id: string }) => r.student_id === e.student_id);
+    const interactionLastActive = myInteractions.reduce<string | null>((latest, r: { created_at: string }) => {
+      return !latest || r.created_at > latest ? r.created_at : latest;
+    }, null);
+
+    // Use the most recent activity across lessons, challenges, AND Mwarimu conversations
+    const lastActive = [lessonLastActive, challengeLastActive, interactionLastActive].filter(Boolean).sort().pop() ?? null;
 
     const challengesPassed = myChallenges.filter((r: { passed: boolean }) => r.passed).length;
     const challengesAttempted = myChallenges.length;
@@ -1237,6 +1243,7 @@ export async function getClassRoster(classId: string): Promise<RosterStudent[]> 
       status,
       challenges_passed: challengesPassed,
       challenges_attempted: challengesAttempted,
+      ai_interactions: myInteractions.length,
     };
   }).sort((a, b) => b.progress_pct - a.progress_pct);
 }
