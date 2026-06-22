@@ -17,6 +17,7 @@ import ForgotPasswordPage from './ForgotPasswordPage';
 import ResetPasswordPage from './ResetPasswordPage';
 import MyResultsPage from './MyResultsPage';
 import OnboardingModal from './OnboardingModal';
+import EthicsModal from './EthicsModal';
 import SchoolAdminDashboard from './SchoolAdminDashboard';
 import SelfLearnerDashboard from './SelfLearnerDashboard';
 import ChallengePage from './ChallengePage';
@@ -80,15 +81,32 @@ function LessonRoute({ language }: { language: 'EN' | 'KIN' }) {
 export default function App() {
   const { user, profile, loading, isRecoveryMode } = useAuth();
   const navigate = useNavigate();
+  const [showEthics, setShowEthics] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [language, setLanguage] = useState<'EN' | 'KIN'>('EN');
 
   useEffect(() => {
     if (user && profile) {
-      const key = `educode_onboarded_${user.id}`;
-      if (!localStorage.getItem(key)) setShowOnboarding(true);
+      const isStudent = profile.user_type === 'student' || profile.user_type === 'self_learner';
+      const ethicsKey = `educode_ethics_agreed_${user.id}`;
+      const onboardKey = `educode_onboarded_${user.id}`;
+      const ethicsAgreed = !!localStorage.getItem(ethicsKey);
+      const onboarded = !!localStorage.getItem(onboardKey);
+
+      if (isStudent && !ethicsAgreed) {
+        setShowEthics(true);
+      } else if (!onboarded) {
+        setShowOnboarding(true);
+      }
     }
   }, [user, profile]);
+
+  const handleEthicsAgreed = () => {
+    if (user) localStorage.setItem(`educode_ethics_agreed_${user.id}`, '1');
+    setShowEthics(false);
+    const onboardKey = `educode_onboarded_${user.id}`;
+    if (!localStorage.getItem(onboardKey)) setShowOnboarding(true);
+  };
 
   const handleOnboardingDone = () => {
     if (user) localStorage.setItem(`educode_onboarded_${user.id}`, '1');
@@ -117,7 +135,11 @@ export default function App() {
 
   // ── Authenticated ──────────────────────────────────────────────────────────
   if (user && profile) {
-    const onboardingModal = showOnboarding ? (
+    const ethicsModal = showEthics ? (
+      <EthicsModal language={language} onAgree={handleEthicsAgreed} />
+    ) : null;
+
+    const onboardingModal = !showEthics && showOnboarding ? (
       <OnboardingModal
         userType={profile.user_type as 'student' | 'teacher' | 'self_learner'}
         userName={profile.full_name ?? user.email ?? 'User'}
@@ -138,6 +160,7 @@ export default function App() {
     if (profile.user_type === 'self_learner') {
       return (
         <>
+          {ethicsModal}
           {onboardingModal}
           <Routes>
             <Route path="/workspace" element={<WorkspaceRoute language={language} />} />
@@ -171,6 +194,7 @@ export default function App() {
     // Student
     return (
       <>
+        {ethicsModal}
         {onboardingModal}
         <Routes>
           <Route path="/workspace" element={<WorkspaceRoute language={language} />} />

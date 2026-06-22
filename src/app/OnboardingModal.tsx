@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { ArrowRight, X, Code2, BookOpen, Users, BarChart2, Megaphone, ClipboardList, CheckCircle } from 'lucide-react';
+import { ArrowRight, X, Code2, BookOpen, Users, BarChart2, Megaphone, ClipboardList, CheckCircle, Loader } from 'lucide-react';
+import { getClassWithInviteCode, joinClass } from '../lib/db';
 
 interface Props {
   userType: 'student' | 'teacher' | 'self_learner';
@@ -13,12 +14,19 @@ interface Step {
   title: string;
   description: string;
   tip?: string;
+  interactive?: 'join_class';
 }
 
 export default function OnboardingModal({ userType, userName, language, onDone }: Props) {
   const isKin = language === 'KIN';
   const [step, setStep] = useState(0);
   const firstName = userName.split(' ')[0];
+
+  // Join class state (used on interactive step)
+  const [code, setCode] = useState('');
+  const [joining, setJoining] = useState(false);
+  const [joinError, setJoinError] = useState('');
+  const [joined, setJoined] = useState(false);
 
   const iconBox = (icon: React.ReactNode) => (
     <div className="w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: 'var(--surface-2)', border: '1px solid var(--line)', color: 'var(--text)' }}>
@@ -74,17 +82,9 @@ export default function OnboardingModal({ userType, userName, language, onDone }
       icon: <div className="text-5xl">🎉</div>,
       title: isKin ? `Murakaza neza, ${firstName}!` : `Welcome, ${firstName}!`,
       description: isKin
-        ? 'Winjiye kuri EduCode Rwanda — ahantu ho kwiga JavaScript mu Kinyarwanda no mu Cyongereza. Dufashe.'
-        : "You've joined EduCode Rwanda — a place to learn JavaScript in Kinyarwanda and English. Let's get you started.",
+        ? 'Winjiye kuri EduCode Rwanda — ahantu ho kwiga JavaScript mu Kinyarwanda no mu Cyongereza.'
+        : "You've joined EduCode Rwanda — a place to learn JavaScript in Kinyarwanda and English.",
       tip: isKin ? 'Ibi bizafata iminota ibiri.' : "This will only take two minutes.",
-    },
-    {
-      icon: iconBox(<Users size={28} />),
-      title: isKin ? 'Injira mu ishuri ryawe' : 'Join Your Class',
-      description: isKin
-        ? 'Baza umwarimu wawe kode yo kwinjira mu ishuri. Kanda "Join Class" kuri dashboard kuzuzamo iyo kode.'
-        : 'Ask your teacher for the class invite code. Click "Join Class" on your dashboard and enter it.',
-      tip: isKin ? 'Urashobora kwinjira mu mashuri menshi.' : 'You can join multiple classes.',
     },
     {
       icon: iconBox(<BookOpen size={28} />),
@@ -110,12 +110,48 @@ export default function OnboardingModal({ userType, userName, language, onDone }
         : 'Click "My Results" to see all your grades and teacher feedback. Log in every day to build your streak.',
       tip: isKin ? 'Amanota menshi = urwego rwo hejuru mu ntonde.' : 'More marks = higher level on the leaderboard.',
     },
+    {
+      icon: <div className="text-5xl">🏫</div>,
+      title: isKin ? 'Injira mu Ishuri Ryawe' : 'Join Your Class',
+      description: isKin
+        ? 'Shyiramo kode wahawe n\'umwarimu wawe kugirango utangire kubona imikoro yawe.'
+        : "Enter the invite code your teacher shared with you to start receiving assignments.",
+      interactive: 'join_class',
+    },
   ];
 
   const steps = userType === 'teacher' ? teacherSteps : studentSteps;
   const current = steps[step];
   const isLast = step === steps.length - 1;
   const progress = ((step + 1) / steps.length) * 100;
+
+  const handleJoinClass = async () => {
+    if (code.trim().length < 4) return;
+    setJoining(true);
+    setJoinError('');
+
+    const { data: cls, error: lookupError } = await getClassWithInviteCode(code.trim());
+    if (lookupError || !cls) {
+      setJoinError(isKin ? 'Kode ntabwo ibonetse. Baza umwarimu wawe.' : 'Code not found. Check with your teacher.');
+      setJoining(false);
+      return;
+    }
+
+    const { error: err } = await joinClass(cls.id);
+    if (err === 'already_enrolled') {
+      setJoined(true);
+      setTimeout(onDone, 1200);
+      return;
+    }
+    if (err) {
+      setJoinError(err);
+      setJoining(false);
+      return;
+    }
+
+    setJoined(true);
+    setTimeout(onDone, 1200);
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4"
@@ -138,8 +174,8 @@ export default function OnboardingModal({ userType, userName, language, onDone }
           </button>
         </div>
 
-        {/* Content */}
-        <div className="px-8 py-8 text-center">
+        {/* Content — key={step} re-animates on each step change */}
+        <div key={step} className="px-8 py-8 text-center" style={{ animation: 'rise 0.28s ease both' }}>
           <div className="flex justify-center mb-6">{current.icon}</div>
 
           <h2 className="text-2xl font-bold mb-3" style={{ color: 'var(--text)', letterSpacing: '-0.01em' }}>
@@ -153,6 +189,64 @@ export default function OnboardingModal({ userType, userName, language, onDone }
             <div className="inline-flex items-center gap-2 px-4 py-2 text-xs font-medium"
               style={{ background: 'var(--surface-2)', border: '1px solid var(--line)', borderRadius: 'var(--radius)', color: 'var(--text-2)' }}>
               💡 {current.tip}
+            </div>
+          )}
+
+          {/* Interactive join class form on last student step */}
+          {current.interactive === 'join_class' && (
+            <div style={{ marginTop: 20, textAlign: 'left' }}>
+              {joined ? (
+                <div style={{
+                  display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10,
+                  padding: '20px 0', animation: 'rise 0.3s ease both',
+                }}>
+                  <div style={{
+                    width: 48, height: 48, borderRadius: '50%',
+                    background: 'var(--surface-2)', border: '1px solid var(--line)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>
+                    <CheckCircle size={22} style={{ color: 'var(--text)' }} />
+                  </div>
+                  <p style={{ fontSize: 14, color: 'var(--text)', fontWeight: 500 }}>
+                    {isKin ? 'Winjiye neza mu ishuri!' : "You've joined the class!"}
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <input
+                      type="text"
+                      value={code}
+                      onChange={e => setCode(e.target.value.toUpperCase())}
+                      onKeyDown={e => e.key === 'Enter' && handleJoinClass()}
+                      placeholder={isKin ? 'Shyiramo kode y\'ishuri...' : 'Enter class code...'}
+                      className="input"
+                      style={{ flex: 1, fontFamily: 'var(--mono)', letterSpacing: '0.08em', textTransform: 'uppercase' }}
+                      maxLength={10}
+                      autoFocus
+                    />
+                    <button
+                      onClick={handleJoinClass}
+                      disabled={joining || code.trim().length < 4}
+                      className="btn btn-primary"
+                      style={{ flexShrink: 0 }}
+                    >
+                      {joining
+                        ? <Loader size={15} className="animate-spin" />
+                        : <>{isKin ? 'Injira' : 'Join'} <ArrowRight size={14} /></>}
+                    </button>
+                  </div>
+                  {joinError && (
+                    <p style={{ marginTop: 8, fontSize: 12.5, color: 'var(--error)' }}>{joinError}</p>
+                  )}
+                  <button
+                    onClick={onDone}
+                    style={{ marginTop: 14, fontSize: 12.5, color: 'var(--text-3)', background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'block', width: '100%', textAlign: 'center' }}
+                  >
+                    {isKin ? 'Reka ubu, nzabikoreza nyuma →' : "Skip for now, I'll do this later →"}
+                  </button>
+                </>
+              )}
             </div>
           )}
         </div>
@@ -171,21 +265,25 @@ export default function OnboardingModal({ userType, userName, language, onDone }
           ))}
         </div>
 
-        {/* Actions */}
-        <div className="px-6 pb-6 flex gap-3">
-          {step > 0 && (
-            <button onClick={() => setStep(s => s - 1)} className="btn btn-secondary flex-1">
-              {isKin ? 'Subira inyuma' : 'Back'}
+        {/* Nav buttons — hidden on join class step (it has its own CTA) */}
+        {!current.interactive && (
+          <div className="px-6 pb-6 flex gap-3">
+            {step > 0 && (
+              <button onClick={() => setStep(s => s - 1)} className="btn btn-secondary flex-1">
+                {isKin ? 'Subira inyuma' : 'Back'}
+              </button>
+            )}
+            <button
+              onClick={() => isLast ? onDone() : setStep(s => s + 1)}
+              className="btn btn-primary flex-1">
+              {isLast
+                ? <>{isKin ? 'Tangira!' : "Let's go!"} <CheckCircle size={16} /></>
+                : <>{isKin ? 'Komeza' : 'Next'} <ArrowRight size={16} /></>}
             </button>
-          )}
-          <button
-            onClick={() => isLast ? onDone() : setStep(s => s + 1)}
-            className="btn btn-primary flex-1">
-            {isLast
-              ? <>{isKin ? 'Tangira!' : "Let's go!"} <CheckCircle size={16} /></>
-              : <>{isKin ? 'Komeza' : 'Next'} <ArrowRight size={16} /></>}
-          </button>
-        </div>
+          </div>
+        )}
+
+        {current.interactive && <div style={{ paddingBottom: 24 }} />}
       </div>
     </div>
   );
