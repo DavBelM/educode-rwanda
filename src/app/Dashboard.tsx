@@ -595,6 +595,30 @@ export default function Dashboard({ language, onStartCoding, onOpenAssignment, o
 
           </aside>
         </div>
+
+        {/* Pilot survey banner — at the bottom of page content */}
+        {!surveyDone && (
+          <div className="card" style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            flexWrap: 'wrap', gap: 12, padding: '16px 20px', marginTop: 8,
+          }}>
+            <div>
+              <p style={{ fontSize: 13.5, fontWeight: 500, color: 'var(--text)', marginBottom: 2 }}>
+                {isKinyarwanda ? 'Twereke ibitekerezo byawe kuri EduCode Rwanda' : 'Share your feedback on EduCode Rwanda'}
+              </p>
+              <p style={{ fontSize: 12, color: 'var(--text-3)' }}>
+                {isKinyarwanda ? 'Bihita — iminota 2 gusa' : 'Quick — takes about 2 minutes'}
+              </p>
+            </div>
+            <button
+              className="btn btn-primary"
+              style={{ flexShrink: 0, whiteSpace: 'nowrap' }}
+              onClick={() => setShowSurvey(true)}
+            >
+              {isKinyarwanda ? 'Tangira' : 'Start survey'} <ArrowRight size={14} />
+            </button>
+          </div>
+        )}
       </main>
 
       {/* Announcements modal */}
@@ -660,34 +684,6 @@ export default function Dashboard({ language, onStartCoding, onOpenAssignment, o
           language={language}
           onDone={() => { setShowSurvey(false); setSurveyDone(true); }}
         />
-      )}
-
-      {/* Pilot survey banner — shown once, disappears after submission */}
-      {!surveyDone && (
-        <div style={{
-          position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 40,
-          padding: '12px 20px',
-          background: 'var(--surface)',
-          borderTop: '1px solid var(--line)',
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16,
-          animation: 'rise 0.4s 0.5s ease both',
-        }}>
-          <div>
-            <p style={{ fontSize: 13.5, fontWeight: 500, color: 'var(--text)', marginBottom: 2 }}>
-              {isKinyarwanda ? '📋 Twereke ibitekerezo byawe kuri EduCode Rwanda' : '📋 Share your feedback on EduCode Rwanda'}
-            </p>
-            <p style={{ fontSize: 12, color: 'var(--text-3)' }}>
-              {isKinyarwanda ? 'Bihita — iminota 2 gusa' : 'Quick — takes about 2 minutes'}
-            </p>
-          </div>
-          <button
-            className="btn btn-primary"
-            style={{ flexShrink: 0, whiteSpace: 'nowrap' }}
-            onClick={() => setShowSurvey(true)}
-          >
-            {isKinyarwanda ? 'Tangira' : 'Start survey'} <ArrowRight size={14} />
-          </button>
-        </div>
       )}
     </div>
   );
