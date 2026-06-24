@@ -112,27 +112,55 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
   }
 
-  // ── Call HuggingFace Space ────────────────────────────────────────────────
+  // ── Try fine-tuned Space first ───────────────────────────────────────────
   try {
-    const client = await Client.connect(HF_SPACE);
-    const result = await client.predict('/chat', {
-      message: userMessage,
-    });
-
+    const client = await Client.connect(HF_SPACE, { hf_token: undefined });
+    const result = await client.predict('/chat', { message: userMessage });
     const text = (result.data as unknown[])?.[0];
-    if (typeof text !== 'string' || !text.trim()) {
-      return res.status(502).json({ error: 'Empty response from model' });
+    if (typeof text === 'string' && text.trim()) {
+      console.log('[Mwarimu] Served by fine-tuned Space');
+      return res.status(200).json({ text });
     }
+  } catch (err) {
+    console.warn('[Mwarimu] Space unavailable, falling back to Gemini:', err instanceof Error ? err.message : err);
+  }
 
+  // ── Gemini fallback ───────────────────────────────────────────────────────
+  if (!geminiKey) {
+    return res.status(502).json({ error: 'AI tutor is currently unavailable. Please try again in a moment.' });
+  }
+
+  try {
+    const SYSTEM = [
+      'You are Mwarimu, an AI coding tutor built into EduCode Rwanda, a JavaScript learning platform for Rwandan TVET students.',
+      'Help students understand JavaScript concepts and debug their code.',
+      'Be encouraging, clear, and concise. Use simple language suitable for beginners.',
+      'If the student writes in Kinyarwanda, respond in Kinyarwanda. Otherwise respond in English.',
+      'Never write complete solutions for them — guide them to find the answer themselves.',
+    ].join(' ');
+
+    const geminiRes = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          system_instruction: { parts: [{ text: SYSTEM }] },
+          contents: [{ role: 'user', parts: [{ text: userMessage }] }],
+          generationConfig: { maxOutputTokens: 512, temperature: 0.4 },
+        }),
+      }
+    );
+    const json = await geminiRes.json();
+    if (json.error) throw new Error(json.error.message ?? String(json.error.code));
+    const text = json.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!text?.trim()) throw new Error('Empty response from Gemini');
+    console.log('[Mwarimu] Served by Gemini fallback');
     return res.status(200).json({ text });
   } catch (err: unknown) {
-    const msg = err instanceof Error
-      ? err.message
-      : typeof err === 'object'
-        ? JSON.stringify(err)
-        : String(err);
-    console.error('[Mwarimu] Space error:', msg);
-    return res.status(502).json({ error: msg });
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error('[Mwarimu] Gemini fallback error:', msg);
+    return res.status(502).json({ error: 'AI tutor is currently unavailable. Please try again in a moment.' });
   }
 }
 
