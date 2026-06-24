@@ -88,7 +88,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   const ip = String(req.headers['x-forwarded-for'] ?? req.socket?.remoteAddress ?? 'unknown');
-  if (!checkRateLimit(ip, 15)) return res.status(429).json({ error: 'Too many requests. Please wait a moment.' });
+  if (!checkRateLimit(ip, 60)) return res.status(429).json({ error: 'Too many requests. Please wait a moment.' });
 
   const { message } = req.body ?? {};
   if (!message) return res.status(400).json({ error: 'message is required' });
@@ -134,7 +134,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   // ── Gemini fallback ───────────────────────────────────────────────────────
   if (!geminiKey) {
-    return res.status(502).json({ error: 'AI tutor is currently unavailable. Please try again in a moment.' });
+    return res.status(200).json({ text: "Mwarimu is a bit busy right now — he'll be back shortly! In the meantime, read the error message carefully and look at which line it points to." });
   }
 
   try {
@@ -159,6 +159,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
     );
     const json = await geminiRes.json();
+
+    // Gemini rate limit (free tier 15 RPM) — return a graceful message instead of 502
+    if (json.error?.status === 'RESOURCE_EXHAUSTED' || geminiRes.status === 429) {
+      console.warn('[Mwarimu] Gemini rate limited');
+      return res.status(200).json({ text: "Mwarimu is helping many students right now — please try again in a few seconds, or type your question in the chat box below!" });
+    }
+
     if (json.error) throw new Error(json.error.message ?? String(json.error.code));
     const text = json.candidates?.[0]?.content?.parts?.[0]?.text;
     if (!text?.trim()) throw new Error('Empty response from Gemini');
@@ -167,7 +174,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
     console.error('[Mwarimu] Gemini fallback error:', msg);
-    return res.status(502).json({ error: 'AI tutor is currently unavailable. Please try again in a moment.' });
+    return res.status(200).json({ text: "Mwarimu is a bit busy right now — he'll be back shortly! In the meantime, read the error message carefully and look at which line it points to." });
   }
 }
 
