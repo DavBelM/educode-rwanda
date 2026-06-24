@@ -88,7 +88,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   const ip = String(req.headers['x-forwarded-for'] ?? req.socket?.remoteAddress ?? 'unknown');
-  if (!checkRateLimit(ip, 5)) return res.status(429).json({ error: 'Too many requests. Please wait a moment.' });
+  if (!checkRateLimit(ip, 15)) return res.status(429).json({ error: 'Too many requests. Please wait a moment.' });
 
   const { message } = req.body ?? {};
   if (!message) return res.status(400).json({ error: 'message is required' });

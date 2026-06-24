@@ -86,9 +86,10 @@ export function MwarimuPanel({
     saveMsgs(chatKey, messages);
   }, [messages, chatKey]);
 
-  // Auto-feedback when student runs code with an error
+  // Auto-feedback when student runs code with an error (skip if already loading)
   useEffect(() => {
     if (runCount === 0 || examMode || !error) return;
+    if (loading) return;
     const question = `My code has an error: ${error}`;
     setLoading(true);
     getAIFeedback(code, error, language)
