@@ -465,7 +465,7 @@ export default function ChallengeRunner({ language }: Props) {
       </div>
 
       {/* Body */}
-      <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+      <div className="cr-layout" style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
 
         {/* LEFT: Code editor */}
         <div style={{ display: 'flex', flexDirection: 'column', flex: `0 0 ${editorPct}%`, overflow: 'hidden' }}>

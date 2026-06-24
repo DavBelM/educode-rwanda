@@ -377,7 +377,15 @@ html.ws-page, html.ws-page body { height: 100%; }
 .ws-page body { overflow: hidden; }
 
 .ws { height: calc(100vh - var(--nav-h)); display: flex; flex-direction: row; overflow: hidden; }
+/* Free-practice workspace: hide Mwarimu on mobile (no tab to show it) */
 @media (max-width: 880px) { .ws-resizer-h { display: none; } .ws-ai { display: none; } .ws-main { flex: 1 !important; } }
+/* Challenge runner: stack editor over tabs on mobile, keep Mwarimu accessible via tab */
+@media (max-width: 768px) {
+  .cr-layout { flex-direction: column !important; }
+  .cr-layout .ws-resizer-h { display: none !important; }
+  .cr-layout > div { flex: 0 0 50% !important; }
+  .cr-layout .ws-ai { display: flex !important; min-width: 0 !important; }
+}
 
 .ws-main { display: flex; flex-direction: column; min-width: 0; flex-shrink: 0; }
 .ws-resizer-h { width: 4px; flex-shrink: 0; cursor: col-resize; background: var(--line); transition: background 0.15s; }
@@ -419,7 +427,7 @@ html.ws-page, html.ws-page body { height: 100%; }
 .cl.out { color: var(--text); }
 .cl.error { color: var(--error); }
 
-.ws-ai { display: flex; flex-direction: column; min-width: 280px; flex: 1; background: var(--bg); }
+.ws-ai { display: flex; flex-direction: column; min-width: 280px; flex: 1; min-height: 0; overflow: hidden; background: var(--bg); }
 .ai-bar { display: flex; align-items: center; gap: 10px; padding: 0 16px; height: 54px; border-bottom: 1px solid var(--line); flex-shrink: 0; }
 .ai-id { display: flex; align-items: center; gap: 10px; }
 .ai-id .nm { font-size: 14px; font-weight: 500; }
