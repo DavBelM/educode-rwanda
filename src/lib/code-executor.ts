@@ -10,6 +10,10 @@ const TIMEOUT_MS = 5000;
 
 export function executeCode(jsCode: string, htmlCode = ''): Promise<ExecutionResult> {
   return new Promise((resolve) => {
+    // Unique ID so we can match this iframe's reply without relying on
+    // iframe.contentWindow (which Firefox returns null for sandboxed frames).
+    const msgId = `ec-${Date.now()}-${Math.random()}`;
+
     const iframe = document.createElement('iframe');
     iframe.style.display = 'none';
     iframe.setAttribute('sandbox', 'allow-scripts');
@@ -43,7 +47,7 @@ export function executeCode(jsCode: string, htmlCode = ''): Promise<ExecutionRes
     }, TIMEOUT_MS);
 
     const handleMessage = (event: MessageEvent) => {
-      if (event.source !== iframe.contentWindow) return;
+      if (event.data?.__msgId !== msgId) return;
       settle(event.data as ExecutionResult);
     };
 
@@ -79,6 +83,7 @@ ${htmlCode}
     __fn();
 
     window.parent.postMessage({
+      __msgId: ${JSON.stringify(msgId)},
       output: __logs.join('\\n'),
       error: null,
       errorType: null,
@@ -88,6 +93,7 @@ ${htmlCode}
 
   } catch (e) {
     window.parent.postMessage({
+      __msgId: ${JSON.stringify(msgId)},
       output: __logs.join('\\n'),
       error: e.toString(),
       errorType: e.name || 'Error',
