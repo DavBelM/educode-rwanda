@@ -119,6 +119,10 @@ export default function ChallengeRunner({ language }: Props) {
 
   const [jsCode, setJsCode] = useState('');
   const [htmlCode, setHtmlCode] = useState('');
+
+  // localStorage key scoped per user + set + challenge so refreshing keeps the draft
+  const codeDraftKey = (challengeId: string) =>
+    `educode_cr_${profile?.id ?? 'anon'}_${setId ?? ''}_${challengeId}`;
   const [results, setResults] = useState<TestResult[]>([]);
   const [output, setOutput] = useState('');
   const [runtimeError, setRuntimeError] = useState<string | null>(null);
@@ -185,8 +189,9 @@ export default function ChallengeRunner({ language }: Props) {
         .then(session => {
           if (session.data) sessionIdRef.current = session.data.id;
           if (chs.length > 0) {
-            setJsCode(chs[0].starter_js);
-            setHtmlCode(chs[0].starter_html);
+            const k = `educode_cr_${profile?.id ?? 'anon'}_${setId ?? ''}_${chs[0].id}`;
+            setJsCode(localStorage.getItem(k + '_js') ?? chs[0].starter_js);
+            setHtmlCode(localStorage.getItem(k + '_html') ?? chs[0].starter_html);
           }
           setPhase('running');
           setChallengeStartMs(Date.now());
@@ -196,9 +201,21 @@ export default function ChallengeRunner({ language }: Props) {
 
   const challenge = challenges[idx] ?? null;
 
+  // Auto-save code drafts so a refresh restores the student's work
+  useEffect(() => {
+    if (!challenge) return;
+    localStorage.setItem(codeDraftKey(challenge.id) + '_js', jsCode);
+  }, [jsCode, challenge?.id]);
+
+  useEffect(() => {
+    if (!challenge) return;
+    localStorage.setItem(codeDraftKey(challenge.id) + '_html', htmlCode);
+  }, [htmlCode, challenge?.id]);
+
   const resetForChallenge = useCallback((ch: QuizChallenge) => {
-    setJsCode(ch.starter_js);
-    setHtmlCode(ch.starter_html);
+    const k = codeDraftKey(ch.id);
+    setJsCode(localStorage.getItem(k + '_js') ?? ch.starter_js);
+    setHtmlCode(localStorage.getItem(k + '_html') ?? ch.starter_html);
     setResults([]);
     setOutput('');
     setRuntimeError(null);
@@ -253,6 +270,11 @@ export default function ChallengeRunner({ language }: Props) {
           xpEarned: xp,
         });
       }
+
+      // Clear the draft so next session starts from starter code
+      const k = codeDraftKey(challenge.id);
+      localStorage.removeItem(k + '_js');
+      localStorage.removeItem(k + '_html');
 
       setXpEarned(prev => prev + xp);
       setPassedCount(prev => prev + 1);
