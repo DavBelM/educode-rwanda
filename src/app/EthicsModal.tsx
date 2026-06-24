@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ShieldCheck } from 'lucide-react';
+import { ShieldCheck, BookOpen, Eye, Cpu, Users, Lock } from 'lucide-react';
 
 interface Props {
   language: 'EN' | 'KIN';
@@ -7,19 +7,27 @@ interface Props {
 }
 
 const RULES_EN = [
-  { icon: '📚', title: 'For learning only', body: 'This platform is here to help you build real JavaScript skills — use it honestly, not to find shortcuts.' },
-  { icon: '👁', title: 'Your teacher can see you', body: 'Your code, questions to Mwarimu, and progress are visible to your teacher. Work as if they are watching.' },
-  { icon: '🤖', title: 'The AI is your tutor, not your author', body: 'Mwarimu helps you understand errors and concepts. The thinking and typing must be yours.' },
-  { icon: '🤝', title: 'Be respectful', body: 'Treat your classmates, your teacher, and this platform with respect. No harmful content or abuse.' },
-  { icon: '🔒', title: 'Your data is protected', body: 'We only store what is needed for your learning. Your data is never sold or shared outside EduCode Rwanda.' },
+  { title: 'For learning only', body: 'This platform is here to help you build real JavaScript skills — use it honestly, not to find shortcuts.' },
+  { title: 'Your teacher can see you', body: 'Your code, questions to Mwarimu, and progress are visible to your teacher. Work as if they are watching.' },
+  { title: 'The AI is your tutor, not your author', body: 'Mwarimu helps you understand errors and concepts. The thinking and typing must be yours.' },
+  { title: 'Be respectful', body: 'Treat your classmates, your teacher, and this platform with respect. No harmful content or abuse.' },
+  { title: 'Your data is protected', body: 'We only store what is needed for your learning. Your data is never sold or shared outside EduCode Rwanda.' },
 ];
 
 const RULES_KIN = [
-  { icon: '📚', title: 'Bigirwa gusa', body: 'Iyi platform ifasha kwiga JavaScript mu buryo bwiza — yikoreshe neza, ntugerageze inzira ngufi.' },
-  { icon: '👁', title: 'Umwarimu arabireba', body: 'Code yawe, ibibazo wasabye Mwarimu, n\'iterambere ryawe bigaragarira umwarimu wawe.' },
-  { icon: '🤖', title: 'AI ni umwarimu wawe, si we ukora akazi', body: 'Mwarimu agufasha gusobanukirwa amakosa. Ugomba wowe gutekereza no kwandika code yawe.' },
-  { icon: '🤝', title: 'Bana neza', body: 'Ishyira abanyeshuri bawe, umwarimu wawe, n\'iyi platform mu mutima. Nta bibi cyangwa ivangura.' },
-  { icon: '🔒', title: 'Amakuru yawe arakingirwa', body: 'Tubika gusa ibikenewe mu kwiga kwawe. Amakuru yawe ntiyagurwa cyangwa ngo asangirwe hanze ya EduCode Rwanda.' },
+  { title: 'Bigirwa gusa', body: 'Iyi platform ifasha kwiga JavaScript mu buryo bwiza — yikoreshe neza, ntugerageze inzira ngufi.' },
+  { title: 'Umwarimu arabireba', body: 'Code yawe, ibibazo wasabye Mwarimu, n\'iterambere ryawe bigaragarira umwarimu wawe.' },
+  { title: 'AI ni umwarimu wawe, si we ukora akazi', body: 'Mwarimu agufasha gusobanukirwa amakosa. Ugomba wowe gutekereza no kwandika code yawe.' },
+  { title: 'Bana neza', body: 'Ishyira abanyeshuri bawe, umwarimu wawe, n\'iyi platform mu mutima. Nta bibi cyangwa ivangura.' },
+  { title: 'Amakuru yawe arakingirwa', body: 'Tubika gusa ibikenewe mu kwiga kwawe. Amakuru yawe ntiyagurwa cyangwa ngo asangirwe hanze ya EduCode Rwanda.' },
+];
+
+const RULE_ICONS = [
+  <BookOpen size={16} />,
+  <Eye size={16} />,
+  <Cpu size={16} />,
+  <Users size={16} />,
+  <Lock size={16} />,
 ];
 
 export default function EthicsModal({ language, onAgree }: Props) {
@@ -85,7 +93,14 @@ export default function EthicsModal({ language, onAgree }: Props) {
                 animation: `rise 0.38s ${0.25 + i * 0.07}s both`,
               }}
             >
-              <span style={{ fontSize: 18, flexShrink: 0, marginTop: 1 }}>{rule.icon}</span>
+              <div style={{
+                width: 30, height: 30, borderRadius: 8, flexShrink: 0,
+                background: 'var(--surface-2)', border: '1px solid var(--line)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: 'var(--text-2)', marginTop: 1,
+              }}>
+                {RULE_ICONS[i]}
+              </div>
               <div>
                 <div style={{ fontSize: 13.5, fontWeight: 500, color: 'var(--text)', marginBottom: 2 }}>{rule.title}</div>
                 <div style={{ fontSize: 12.5, color: 'var(--text-2)', lineHeight: 1.5 }}>{rule.body}</div>
