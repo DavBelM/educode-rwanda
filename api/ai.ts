@@ -112,11 +112,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
   }
 
-  // ── Try fine-tuned Space first ───────────────────────────────────────────
+  // ── Try fine-tuned Space first (25 s timeout so Gemini fallback has time) ─
   try {
-    const client = await Client.connect(HF_SPACE, { hf_token: undefined });
-    const result = await client.predict('/chat', { message: userMessage });
-    const text = (result.data as unknown[])?.[0];
+    const spaceResult = await Promise.race([
+      (async () => {
+        const client = await Client.connect(HF_SPACE);
+        return await client.predict('/chat', { message: userMessage });
+      })(),
+      new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error('Space timeout after 25 s')), 25_000)
+      ),
+    ]);
+    const text = (spaceResult.data as unknown[])?.[0];
     if (typeof text === 'string' && text.trim()) {
       console.log('[Mwarimu] Served by fine-tuned Space');
       return res.status(200).json({ text });
