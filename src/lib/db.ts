@@ -1692,3 +1692,30 @@ export async function requestAccountDeletion(): Promise<{ error: string | null }
   if (error) return { error: error.message };
   return { error: null };
 }
+
+// ── Pilot survey ──────────────────────────────────────────────────────────────
+
+export async function hasPilotSurveyResponse(): Promise<boolean> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return false;
+  const { data } = await supabase
+    .from('pilot_survey_responses')
+    .select('id')
+    .eq('student_id', user.id)
+    .maybeSingle();
+  return !!data;
+}
+
+export async function submitPilotSurvey(response: {
+  overall_rating: number | null;
+  helped_learning: number | null;
+  mwarimu_helpfulness: string | null;
+  language_preference: string | null;
+  ease_of_use: number | null;
+  liked_most: string;
+  would_change: string;
+}): Promise<void> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return;
+  await supabase.from('pilot_survey_responses').insert({ student_id: user.id, ...response });
+}

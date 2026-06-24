@@ -3,7 +3,8 @@ import { AppNav } from './components/AppNav';
 import { XPLeaderboard } from './components/XPLeaderboard';
 import { PeerActivityFeed } from './components/PeerActivityFeed';
 import { useAuth } from '../lib/auth';
-import { getStudentAssignments, getStudentClasses, getClassWithInviteCode, joinClass, getSubmittedAssignmentIds, getStudentGrades, recordDailyLogin, getStreak, getStudentAnnouncements, getNewGradeCount, getLessonProgress, type Assignment, type Announcement } from '../lib/db';
+import { getStudentAssignments, getStudentClasses, getClassWithInviteCode, joinClass, getSubmittedAssignmentIds, getStudentGrades, recordDailyLogin, getStreak, getStudentAnnouncements, getNewGradeCount, getLessonProgress, hasPilotSurveyResponse, type Assignment, type Announcement } from '../lib/db';
+import PilotSurvey from './PilotSurvey';
 import { getMwarimuWeekCount } from '../lib/quiz-db';
 import { Users, ArrowRight, Loader, X, Megaphone, Pin, Code2 } from 'lucide-react';
 import { usePageTitle } from '../hooks/usePageTitle';
@@ -129,10 +130,12 @@ export default function Dashboard({ language, onStartCoding, onOpenAssignment, o
   const [lessonProgress, setLessonProgress] = useState({ completed: 0, total: 0, pct: 0 });
   const [classId, setClassId] = useState<string | null>(null);
   const [mwarimuWeekCount, setMwarimuWeekCount] = useState(0);
+  const [surveyDone, setSurveyDone] = useState(true); // default true to avoid flash
+  const [showSurvey, setShowSurvey] = useState(false);
 
   const loadAssignments = async () => {
     setLoadingAssignments(true);
-    const [{ data: classes }, { data: asgns }, submitted, grades, currentStreak, { data: ann }, newGrades, lessonProg, weekCount] = await Promise.all([
+    const [{ data: classes }, { data: asgns }, submitted, grades, currentStreak, { data: ann }, newGrades, lessonProg, weekCount, alreadySurveyed] = await Promise.all([
       getStudentClasses(),
       getStudentAssignments(),
       getSubmittedAssignmentIds(),
@@ -142,7 +145,9 @@ export default function Dashboard({ language, onStartCoding, onOpenAssignment, o
       getNewGradeCount(),
       getLessonProgress(),
       getMwarimuWeekCount(),
+      hasPilotSurveyResponse(),
     ]);
+    setSurveyDone(alreadySurveyed);
     setNewGradeCount(newGrades);
     setLessonProgress(lessonProg);
     setAnnouncements(ann ?? []);
@@ -648,6 +653,41 @@ export default function Dashboard({ language, onStartCoding, onOpenAssignment, o
           onClose={() => setShowJoinModal(false)}
           onJoined={() => { setShowJoinModal(false); loadAssignments(); }}
         />
+      )}
+
+      {showSurvey && (
+        <PilotSurvey
+          language={language}
+          onDone={() => { setShowSurvey(false); setSurveyDone(true); }}
+        />
+      )}
+
+      {/* Pilot survey banner — shown once, disappears after submission */}
+      {!surveyDone && (
+        <div style={{
+          position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 40,
+          padding: '12px 20px',
+          background: 'var(--surface)',
+          borderTop: '1px solid var(--line)',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16,
+          animation: 'rise 0.4s 0.5s ease both',
+        }}>
+          <div>
+            <p style={{ fontSize: 13.5, fontWeight: 500, color: 'var(--text)', marginBottom: 2 }}>
+              {isKinyarwanda ? '📋 Twereke ibitekerezo byawe kuri EduCode Rwanda' : '📋 Share your feedback on EduCode Rwanda'}
+            </p>
+            <p style={{ fontSize: 12, color: 'var(--text-3)' }}>
+              {isKinyarwanda ? 'Bihita — iminota 2 gusa' : 'Quick — takes about 2 minutes'}
+            </p>
+          </div>
+          <button
+            className="btn btn-primary"
+            style={{ flexShrink: 0, whiteSpace: 'nowrap' }}
+            onClick={() => setShowSurvey(true)}
+          >
+            {isKinyarwanda ? 'Tangira' : 'Start survey'} <ArrowRight size={14} />
+          </button>
+        </div>
       )}
     </div>
   );
