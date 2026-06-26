@@ -117,33 +117,10 @@ function CodingLesson({ lesson, language, onComplete, completing, onCodeChange }
   const [solutionRevealed, setSolutionRevealed] = useState(false);
   const UNLOCK_AFTER = 3;
 
-  const [aiOpen, setAiOpen] = useState(false);
-  const [aiQuestion, setAiQuestion] = useState('');
-  const [aiMessages, setAiMessages] = useState<Array<{ role: 'user' | 'ai'; text: string }>>([]);
-  const [aiLoading, setAiLoading] = useState(false);
-  const chatEndRef = useRef<HTMLDivElement>(null);
-
   // Expose current code to parent (for rail chat context)
   useEffect(() => {
     onCodeChange?.(isHtmlExercise ? htmlCode : code);
   }, [code, htmlCode]);
-
-  const askAI = async () => {
-    const q = aiQuestion.trim();
-    if (!q || aiLoading) return;
-    setAiQuestion('');
-    setAiMessages(prev => [...prev, { role: 'user', text: q }]);
-    setAiLoading(true);
-    const answer = await getLessonAIHelp(
-      q,
-      isHtmlExercise ? htmlCode : code,
-      lesson.exercise_data?.instructions ?? '',
-      language
-    );
-    setAiMessages(prev => [...prev, { role: 'ai', text: answer }]);
-    setAiLoading(false);
-    setTimeout(() => chatEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 50);
-  };
 
   const run = useCallback(async () => {
     if (isHtmlExercise) {
@@ -400,82 +377,6 @@ function CodingLesson({ lesson, language, onComplete, completing, onCodeChange }
           </div>
         </div>
       )}
-
-      {/* Ask Mwarimu / AI Tutor */}
-      <div className="card" style={{ overflow: 'hidden' }}>
-        <button
-          onClick={() => setAiOpen(o => !o)}
-          style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', background: 'var(--surface)', border: 'none', cursor: 'pointer', textAlign: 'left' }}
-          onMouseEnter={e => (e.currentTarget.style.background = 'var(--surface-2)')}
-          onMouseLeave={e => (e.currentTarget.style.background = 'var(--surface)')}
-        >
-          <span className="ai-mwicon" style={{ width: 28, height: 28, borderRadius: 7, background: 'var(--surface-2)', display: 'grid', placeItems: 'center', fontFamily: 'var(--mono)', fontSize: 13, color: 'var(--text)', flexShrink: 0 }}>M</span>
-          <div style={{ flex: 1 }}>
-            <p style={{ fontSize: 13.5, fontWeight: 500, color: 'var(--text)', marginBottom: 2 }}>
-              {isKin ? 'Baza Mwarimu' : 'Ask Mwarimu'}
-            </p>
-            <p style={{ fontSize: 12, color: 'var(--text-3)' }}>
-              {isKin ? 'AI igufasha ariko ntiguha igisubizo cyose' : 'Guides you without giving away the answer'}
-            </p>
-          </div>
-          <span style={{ color: 'var(--text-3)', fontSize: 12 }}>{aiOpen ? '▲' : '▼'}</span>
-        </button>
-
-        {aiOpen && (
-          <div style={{ borderTop: '1px solid var(--line)', background: 'var(--bg)' }}>
-            <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: 12, maxHeight: 256, overflowY: 'auto' }}>
-              {aiMessages.length === 0 && (
-                <p style={{ fontSize: 12.5, textAlign: 'center', padding: '16px 0', color: 'var(--text-3)' }}>
-                  {isKin
-                    ? 'Baza ikibazo kijyanye na code yawe...'
-                    : 'Ask anything about your code or the lesson...'}
-                </p>
-              )}
-              {aiMessages.map((m, i) => (
-                <div key={i} style={{ display: 'flex', justifyContent: m.role === 'user' ? 'flex-end' : 'flex-start' }}>
-                  <div style={{
-                    maxWidth: '85%', padding: '8px 12px', borderRadius: 'var(--radius)', fontSize: 13.5, lineHeight: 1.55,
-                    background: m.role === 'user' ? 'var(--surface-2)' : 'var(--surface)',
-                    color: m.role === 'user' ? 'var(--text-2)' : 'var(--text)',
-                    border: '1px solid var(--line)',
-                  }}>
-                    {m.role === 'ai'
-                      ? <div className="bubble" style={{ background: 'none', border: 'none', padding: 0 }}><ReactMarkdown>{m.text}</ReactMarkdown></div>
-                      : m.text}
-                  </div>
-                </div>
-              ))}
-              {aiLoading && (
-                <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-                  <div style={{ padding: '8px 14px', borderRadius: 'var(--radius)', background: 'var(--surface)', border: '1px solid var(--line)' }}>
-                    <div className="typing-dots"><span /><span /><span /></div>
-                  </div>
-                </div>
-              )}
-              <div ref={chatEndRef} />
-            </div>
-
-            <div style={{ display: 'flex', gap: 8, padding: '12px 16px', borderTop: '1px solid var(--line)' }}>
-              <input
-                value={aiQuestion}
-                onChange={e => setAiQuestion(e.target.value)}
-                onKeyDown={e => e.key === 'Enter' && askAI()}
-                placeholder={isKin ? 'Andika ikibazo cyawe...' : 'Type your question...'}
-                className="input"
-                style={{ flex: 1, fontSize: 13.5 }}
-              />
-              <button
-                onClick={askAI}
-                disabled={!aiQuestion.trim() || aiLoading}
-                className="btn btn-secondary"
-                style={{ padding: '0 12px', display: 'flex', alignItems: 'center', opacity: (!aiQuestion.trim() || aiLoading) ? 0.4 : 1 }}
-              >
-                <Send size={14} />
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
 
       {/* Complete button */}
       {(() => {

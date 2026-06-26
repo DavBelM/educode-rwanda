@@ -156,6 +156,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           contents: [{ role: 'user', parts: [{ text: userMessage }] }],
           generationConfig: { maxOutputTokens: 512, temperature: 0.4 },
         }),
+        signal: AbortSignal.timeout(22_000),
       }
     );
     const json = await geminiRes.json();

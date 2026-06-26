@@ -334,7 +334,7 @@ footer.site-footer { border-top: 1px solid var(--line); margin-top: 40px; paddin
 .outline a.done .d { background: var(--text-2); border-color: var(--text-2); }
 .outline a.cur .d { background: var(--accent); border-color: var(--accent); }
 
-.reading { max-width: 72ch; }
+.reading { width: 100%; }
 .reading .leyebrow { color: var(--text-3); font-size: 13px; margin-bottom: 12px; }
 .reading h1 { font-size: clamp(26px, 2.6vw, 40px); letter-spacing: -0.035em; line-height: 1.1; margin-bottom: 10px; }
 .reading .meta { display: flex; gap: 14px; color: var(--text-3); font-size: 13px; margin-bottom: 32px; }
