@@ -143,7 +143,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       'Help students understand JavaScript concepts and debug their code.',
       'Be encouraging, clear, and concise. Use simple language suitable for beginners.',
       'If the student writes in Kinyarwanda, respond in Kinyarwanda. Otherwise respond in English.',
-      'Never write complete solutions for them — guide them to find the answer themselves.',
+      'CRITICAL RULE: Never write or reveal the complete working code solution.',
+      'If a student asks "how do I solve this", "what is the answer", or "show me the code", refuse to give the full solution.',
+      'Instead, give exactly 1 specific hint or ask 1 guiding question that helps the student figure it out themselves.',
+      'Students learn by doing — handing them the answer defeats the purpose of the exercise.',
     ].join(' ');
 
     const geminiRes = await fetch(

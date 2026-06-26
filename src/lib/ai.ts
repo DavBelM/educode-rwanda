@@ -161,9 +161,17 @@ export async function getLessonAIHelp(
         : `\n\nLesson instructions: ${instructions}`)
     : '';
 
+  // Embed the no-solution rule inside the user message so it applies to both
+  // the HuggingFace Space (where we can't set the system prompt) and Gemini.
+  const noSolveRule = !isGreeting
+    ? (language === 'KIN'
+        ? '\n\n[AMABWIRIZA: Ntumuphe igisubizo cyose cya code. Muhe gusa icyifuzo kimwe cyangwa ikibazo kimwe bifasha gutekereza. Ntandike code iriho igisubizo.]'
+        : '\n\n[TUTOR RULE: Do NOT write or reveal the complete working solution. Give only 1 hint or 1 guiding question to help the student think it through themselves. Never write the full answer code.]')
+    : '';
+
   const context = language === 'KIN'
-    ? `Umunyeshuri arabaza: ${question}${codeBlock}${instructionBlock}`
-    : `Student says: ${question}${codeBlock}${instructionBlock}`;
+    ? `Umunyeshuri arabaza: ${question}${codeBlock}${instructionBlock}${noSolveRule}`
+    : `Student says: ${question}${codeBlock}${instructionBlock}${noSolveRule}`;
 
   const base = language === 'KIN' ? SYSTEM_PROMPT_KIN : SYSTEM_PROMPT_EN;
   const tutorPrompt = base +

@@ -530,6 +530,23 @@ export default function LessonViewer({ lesson, courseTitle, allLessons, language
   const [railLoading, setRailLoading] = useState(false);
   const [railInput, setRailInput] = useState('');
   const railEndRef = useRef<HTMLDivElement>(null);
+  const [railWidth, setRailWidth] = useState(360);
+
+  const startRailResize = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    const startX = e.clientX;
+    const startW = railWidth;
+    const onMove = (mv: MouseEvent) => {
+      const dx = startX - mv.clientX; // drag left = wider rail
+      setRailWidth(Math.max(260, Math.min(620, startW + dx)));
+    };
+    const onUp = () => {
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+    };
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+  }, [railWidth]);
 
   useEffect(() => {
     railEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -632,7 +649,7 @@ export default function LessonViewer({ lesson, courseTitle, allLessons, language
         <i style={{ width: `${readPct}%` }} />
       </div>
 
-      <div className="lwrap">
+      <div className="lwrap" style={{ '--rail-w': `${railWidth}px` } as React.CSSProperties}>
         {/* LEFT OUTLINE */}
         <aside className="outline">
           <div className="ohead">{courseTitle}</div>
@@ -706,14 +723,31 @@ export default function LessonViewer({ lesson, courseTitle, allLessons, language
 
         {/* RIGHT RAIL */}
         <aside className="rail">
-          <div className="ask" style={{ display: 'flex', flexDirection: 'column', gap: 0, padding: 0, overflow: 'hidden' }}>
-            <div className="ah" style={{ padding: '12px 16px', borderBottom: '1px solid var(--line)', flexShrink: 0 }}>
+          {/* Drag handle — grab the left edge to resize the panel */}
+          <div className="rail-resizer" onMouseDown={startRailResize} title="Drag to resize" />
+
+          {/* Chat panel — fills viewport height minus nav + padding */}
+          <div style={{
+            display: 'flex', flexDirection: 'column',
+            height: 'calc(100vh - var(--nav-h) - 72px)',
+            border: '1px solid var(--line)', borderRadius: 'var(--radius)',
+            background: 'var(--bg)', overflow: 'hidden',
+          }}>
+            {/* Header */}
+            <div className="ah" style={{
+              display: 'flex', alignItems: 'center', gap: 9,
+              padding: '12px 16px', borderBottom: '1px solid var(--line)',
+              fontSize: 14, fontWeight: 500, flexShrink: 0,
+            }}>
               <span className="ai-mwicon">M</span>
               Mwarimu
             </div>
 
-            {/* Messages */}
-            <div style={{ flex: 1, overflowY: 'auto', padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: 10, minHeight: 120, maxHeight: 360 }}>
+            {/* Messages — scrollable, fills remaining height */}
+            <div style={{
+              flex: 1, minHeight: 0, overflowY: 'auto', overflowX: 'hidden',
+              padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: 10,
+            }}>
               {railMessages.length === 0 && !railLoading && (
                 <p style={{ fontSize: 12.5, color: 'var(--text-3)', textAlign: 'center', padding: '8px 0' }}>
                   {isKin ? "Ufite ikibazo? Baza Mwarimu." : "Have a question? Ask Mwarimu."}
@@ -722,13 +756,13 @@ export default function LessonViewer({ lesson, courseTitle, allLessons, language
               {railMessages.map((m, i) => (
                 <div key={i} style={{ display: 'flex', justifyContent: m.role === 'user' ? 'flex-end' : 'flex-start' }}>
                   <div style={{
-                    maxWidth: '90%', padding: '7px 11px', borderRadius: 'var(--radius)', fontSize: 13, lineHeight: 1.55,
+                    maxWidth: '94%', padding: '7px 11px', borderRadius: 'var(--radius)', fontSize: 13, lineHeight: 1.55,
                     background: m.role === 'user' ? 'var(--surface-2)' : 'var(--surface)',
                     color: m.role === 'user' ? 'var(--text-2)' : 'var(--text)',
                     border: '1px solid var(--line)',
                   }}>
                     {m.role === 'ai'
-                      ? <div className="bubble" style={{ background: 'none', border: 'none', padding: 0, fontSize: 13 }}><ReactMarkdown>{m.text}</ReactMarkdown></div>
+                      ? <div className="bubble rail-bubble" style={{ background: 'none', border: 'none', padding: 0, fontSize: 13 }}><ReactMarkdown>{m.text}</ReactMarkdown></div>
                       : m.text}
                   </div>
                 </div>
