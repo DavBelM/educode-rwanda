@@ -58,7 +58,7 @@
   --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
   --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
 
-  --maxw: 1440px;
+  --maxw: 1600px;
   --nav-h: 60px;
 }
 
@@ -137,7 +137,7 @@ img { display: block; max-width: 100%; }
 ::-webkit-scrollbar-thumb:hover { background: var(--text-3); background-clip: padding-box; border: 3px solid var(--bg); }
 
 /* ---- Layout helpers ---------------------------------------------------- */
-.wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 clamp(20px, 4vw, 60px); }
+.wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 clamp(20px, 4vw, 80px); }
 .wrap-narrow { max-width: 760px; margin: 0 auto; padding: 0 clamp(20px, 4vw, 48px); }
 .stack > * + * { margin-top: var(--gap, 16px); }
 .muted { color: var(--text-2); }

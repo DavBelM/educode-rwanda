@@ -128,7 +128,7 @@ export default function TheoreticalAssignment({ assignment, language, onBack }: 
       )}
 
       {/* Content */}
-      <main className="wrap page" style={{ maxWidth: '760px' }}>
+      <main className="wrap page" style={{ maxWidth: '920px' }}>
 
         {/* Header */}
         <div className="stack" style={{ ['--gap' as string]: '14px' }}>

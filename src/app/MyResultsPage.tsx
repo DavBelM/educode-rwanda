@@ -75,7 +75,7 @@ export default function MyResultsPage({ language }: Props) {
     <div className="min-h-screen" style={{ background: 'var(--bg)' }}>
       <AppNav />
 
-      <div className="wrap page stack" style={{ ['--gap' as string]: '24px', maxWidth: '760px' }}>
+      <div className="wrap page stack" style={{ ['--gap' as string]: '24px' }}>
 
         <h1 className="text-xl font-bold" style={{ color: 'var(--text)' }}>
           {isKin ? 'Amanota Yanjye' : 'My Results'}

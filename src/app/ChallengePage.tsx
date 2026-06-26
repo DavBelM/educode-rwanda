@@ -48,7 +48,7 @@ export default function ChallengePage({ language }: Props) {
     <div className="min-h-screen" style={{ background: 'var(--bg)' }}>
       <AppNav />
 
-      <div className="wrap page" style={{ maxWidth: '860px' }}>
+      <div className="wrap page">
 
         <div style={{ marginBottom: '32px' }}>
           <h1 className="text-xl font-bold" style={{ color: 'var(--text)', marginBottom: 6 }}>

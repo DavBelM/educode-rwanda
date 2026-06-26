@@ -210,6 +210,7 @@ footer.site-footer { border-top: 1px solid var(--line); margin-top: 40px; paddin
 .filters button.on { background: var(--surface); color: var(--text); border-color: var(--text-3); }
 
 .courses { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+@media (min-width: 1400px) { .courses { grid-template-columns: repeat(4, 1fr); } }
 .course { display: flex; flex-direction: column; }
 .course .ctop { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
 .course .cnum { font-family: var(--mono); font-size: 12px; color: var(--text-3); }
@@ -275,6 +276,7 @@ footer.site-footer { border-top: 1px solid var(--line); margin-top: 40px; paddin
 .welcome .sub { color: var(--text-2); margin-top: 6px; font-size: 15px; }
 
 .dash { display: grid; grid-template-columns: 1fr 360px; gap: 28px; align-items: start; }
+@media (min-width: 1400px) { .dash { grid-template-columns: 1fr 420px; gap: 40px; } }
 
 .continue { display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: center; }
 .continue .meta { color: var(--text-2); font-size: 13.5px; margin-bottom: 10px; }
@@ -318,7 +320,8 @@ footer.site-footer { border-top: 1px solid var(--line); margin-top: 40px; paddin
 .readprog { position: sticky; top: var(--nav-h); z-index: 30; height: 2px; background: transparent; }
 .readprog > i { display: block; height: 100%; background: var(--text-2); }
 
-.lwrap { display: grid; grid-template-columns: 248px minmax(0, 1fr) 256px; gap: 40px; max-width: 1240px; margin: 0 auto; padding: 32px 28px 100px; align-items: start; }
+.lwrap { display: grid; grid-template-columns: 248px minmax(0, 1fr) 256px; gap: 40px; max-width: 1420px; margin: 0 auto; padding: 32px 28px 100px; align-items: start; }
+@media (min-width: 1400px) { .lwrap { grid-template-columns: 280px minmax(0, 1fr) 288px; gap: 52px; } }
 
 .outline { position: sticky; top: calc(var(--nav-h) + 28px); }
 .outline .ohead { font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-3); margin-bottom: 14px; }
@@ -480,6 +483,7 @@ html.ws-page, html.ws-page body { height: 100%; }
 .stats .stat .sd.warn { color: var(--error); }
 
 .tgrid { display: grid; grid-template-columns: 1fr 332px; gap: 22px; align-items: start; }
+@media (min-width: 1400px) { .tgrid { grid-template-columns: 1fr 400px; gap: 32px; } }
 
 .roster { padding: 0; overflow: hidden; }
 .rhead { display: flex; align-items: center; justify-content: space-between; padding: 18px 22px; }
