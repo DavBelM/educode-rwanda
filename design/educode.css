@@ -161,7 +161,7 @@ img { display: block; max-width: 100%; }
 }
 .nav-inner {
   max-width: var(--maxw); margin: 0 auto; height: 100%;
-  padding: 0 clamp(20px, 4vw, 60px);
+  padding: 0 clamp(20px, 4vw, 80px);
   display: flex; align-items: center; gap: 28px;
 }
 .logo {
@@ -244,6 +244,10 @@ img { display: block; max-width: 100%; }
 }
 .card.pad-lg { padding: 30px; }
 .card.pad-sm { padding: 16px; }
+@media (min-width: 1400px) {
+  .card { padding: 28px; }
+  .card.pad-lg { padding: 36px; }
+}
 .card-link { display: block; color: inherit; transition: background .15s var(--ease), transform .15s var(--ease); }
 .card-link:hover { background: var(--surface-2); }
 .card-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
