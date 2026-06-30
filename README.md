@@ -12,7 +12,6 @@
 
 > **[https://youtu.be/1d04DAo71SI]**
 >
-> *(Upload to YouTube or Google Drive, then paste the link above before submitting.)*
 
 ---
 
