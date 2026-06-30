@@ -552,6 +552,8 @@ export default function LessonViewer({ lesson, courseTitle, allLessons, language
     railEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [railMessages, railLoading]);
 
+  const RAIL_BUSY_RE = /bit busy right now|he'll be back shortly/i;
+
   const askRail = async () => {
     const q = railInput.trim();
     if (!q || railLoading) return;
@@ -559,7 +561,13 @@ export default function LessonViewer({ lesson, courseTitle, allLessons, language
     setRailMessages(prev => [...prev, { role: 'user', text: q }]);
     setRailLoading(true);
     const answer = await getLessonAIHelp(q, codeCtxRef.current, instrCtx, language);
-    setRailMessages(prev => [...prev, { role: 'ai', text: answer }]);
+    setRailMessages(prev => {
+      const lastAiIdx = prev.reduce((acc, m, i) => m.role === 'ai' ? i : acc, -1);
+      if (lastAiIdx >= 0 && RAIL_BUSY_RE.test(prev[lastAiIdx].text)) {
+        return prev.map((m, i) => i === lastAiIdx ? { ...m, text: answer } : m);
+      }
+      return [...prev, { role: 'ai', text: answer }];
+    });
     setRailLoading(false);
   };
 
