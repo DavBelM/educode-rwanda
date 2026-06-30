@@ -149,7 +149,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return await client.predict('/chat', { message: userMessage });
       })(),
       new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error('Space timeout after 25 s')), 25_000)
+        setTimeout(() => reject(new Error('Space timeout after 50 s')), 50_000)
       ),
     ]);
     const text = (spaceResult.data as unknown[])?.[0];
@@ -190,7 +190,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           contents: [{ role: 'user', parts: [{ text: userMessage }] }],
           generationConfig: { maxOutputTokens: 512, temperature: 0.4 },
         }),
-        signal: AbortSignal.timeout(22_000),
+        signal: AbortSignal.timeout(8_000),
       }
     );
     const json = await geminiRes.json();
