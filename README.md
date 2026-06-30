@@ -10,7 +10,7 @@
 
 ## Demo Video
 
-> **[INSERT 5-MINUTE DEMO VIDEO LINK HERE]**
+> **[]**
 >
 > *(Upload to YouTube or Google Drive, then paste the link above before submitting.)*
 
