@@ -64,6 +64,35 @@ async function retrieveChunks(
   return res.json() as Promise<Chunk[]>;
 }
 
+// Instant rule-based hints for the most common JS errors — no AI needed.
+// Used as a last resort so students always get something useful.
+function ruleBasedHint(message: string): string | null {
+  const refMatch = message.match(/ReferenceError[:\s]+['"]?(\w+)['"]? is not defined/i);
+  if (refMatch) {
+    return `You used \`${refMatch[1]}\` but it hasn't been declared. Check for a typo — your variable might be spelled differently where you declared it. Make sure it's declared with \`let\`, \`const\`, or \`var\` before this line.`;
+  }
+  if (/SyntaxError.*string literal contains an unescaped line break/i.test(message)) {
+    return "Your string is missing a closing quote. Find the line with a `\"` or `'` that opens a string and make sure it closes on the same line.";
+  }
+  if (/TypeError.*invalid assignment to const/i.test(message)) {
+    return "You declared this variable with `const`, which means it can't be changed after it's set. Change `const` to `let` if you need to update its value later.";
+  }
+  if (/TypeError.*(\w+) is not a function/i.test(message)) {
+    const m = message.match(/TypeError.*?['"`]?(\w+)['"`]? is not a function/i);
+    return `\`${m?.[1] ?? 'That'}\` is not a function. Check the spelling — you might have a typo in the method name, or the value isn't what you expect it to be.`;
+  }
+  if (/SyntaxError.*unexpected (token|end of input)/i.test(message)) {
+    return "Syntax error — look for a missing bracket `}`, parenthesis `)`, or quote `\"'` near the line mentioned. Every opening bracket needs a closing one.";
+  }
+  if (/SyntaxError/i.test(message)) {
+    return "There's a syntax error in your code. Check for missing or extra brackets, quotes, or semicolons. The line number in the error message is a good place to start.";
+  }
+  if (/TypeError/i.test(message)) {
+    return "There's a type error — you're using a value in a way that doesn't match its type. Check that the variable has the value you expect before you use it.";
+  }
+  return null;
+}
+
 // RAG context is appended to the user message, not the system prompt.
 // The system prompt is locked inside the Space and never sent from here.
 function buildUserMessage(message: string, chunks: Chunk[]): string {
@@ -134,6 +163,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   // ── Gemini fallback ───────────────────────────────────────────────────────
   if (!geminiKey) {
+    const hint = ruleBasedHint(String(message));
+    if (hint) return res.status(200).json({ text: hint });
     return res.status(200).json({ text: "Mwarimu is a bit busy right now — he'll be back shortly! In the meantime, read the error message carefully and look at which line it points to." });
   }
 
@@ -178,6 +209,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
     console.error('[Mwarimu] Gemini fallback error:', msg);
+    const hint = ruleBasedHint(String(message));
+    if (hint) return res.status(200).json({ text: hint });
     return res.status(200).json({ text: "Mwarimu is a bit busy right now — he'll be back shortly! In the meantime, read the error message carefully and look at which line it points to." });
   }
 }
