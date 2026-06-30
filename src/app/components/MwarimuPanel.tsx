@@ -75,6 +75,8 @@ export function MwarimuPanel({
   const [loading, setLoading] = useState(false);
   const [input, setInput] = useState('');
   const feedRef = useRef<HTMLDivElement>(null);
+  const lastAutoErrorRef = useRef('');
+  const lastAutoTimeRef = useRef(0);
 
   // Scroll to bottom on new messages
   useEffect(() => {
@@ -86,15 +88,32 @@ export function MwarimuPanel({
     saveMsgs(chatKey, messages);
   }, [messages, chatKey]);
 
-  // Auto-feedback when student runs code with an error (skip if already loading)
+  // Replace last Mwarimu message if it was a busy/fallback message; otherwise append.
+  const BUSY_RE = /bit busy right now|he'll be back shortly/i;
+  function setMwMsg(response: string) {
+    setMessages(prev => {
+      const lastMwIdx = prev.reduce((acc, m, i) => m.role === 'mw' ? i : acc, -1);
+      if (lastMwIdx >= 0 && BUSY_RE.test(prev[lastMwIdx].text)) {
+        return prev.map((m, i) => i === lastMwIdx ? { ...m, text: response } : m);
+      }
+      return addMsg(prev, { role: 'mw', text: response });
+    });
+  }
+
+  // Auto-feedback when student runs code — only fire when the error actually changes.
   useEffect(() => {
     if (runCount === 0 || examMode || !error) return;
     if (loading) return;
+    const now = Date.now();
+    const errorChanged = error !== lastAutoErrorRef.current;
+    if (!errorChanged && now - lastAutoTimeRef.current < 30_000) return;
+    lastAutoErrorRef.current = error;
+    lastAutoTimeRef.current = now;
     const question = `My code has an error: ${error}`;
     setLoading(true);
     getAIFeedback(code, error, language)
       .then(response => {
-        setMessages(prev => addMsg(prev, { role: 'mw', text: response }));
+        setMwMsg(response);
         logAIInteraction({ question, response, language, sessionId, challengeId })
           .then(() => onInteractionLogged?.());
       })
@@ -139,12 +158,13 @@ export function MwarimuPanel({
       const response = await getMwarimuReply(wrappedQuestion, code, instructions, language);
       if (isKin) {
         const id = nextId;
-        setMessages(prev => addMsg(prev, { role: 'mw', text: response, translating: true }));
+        setMwMsg(response);
+        setMessages(prev => prev.map(m => m.id === id ? { ...m, translating: true } : m));
         translateToKinyarwanda(response)
           .then(textKin => setMessages(prev => prev.map(m => m.id === id ? { ...m, textKin, translating: false, translateFailed: false } : m)))
           .catch(() => setMessages(prev => prev.map(m => m.id === id ? { ...m, translating: false, translateFailed: true } : m)));
       } else {
-        setMessages(prev => addMsg(prev, { role: 'mw', text: response }));
+        setMwMsg(response);
       }
       logAIInteraction({ question, response, language, sessionId, challengeId })
         .then(() => onInteractionLogged?.());
