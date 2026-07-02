@@ -484,7 +484,7 @@ export async function getStudentResults(): Promise<StudentResult[]> {
   const [{ data: assignments }, { data: submissions }] = await Promise.all([
     supabase
       .from('assignments')
-      .select('id, title, title_kin, assignment_type, difficulty, total_marks, class_id, grades_released')
+      .select('id, title, title_kin, assignment_type, difficulty, total_marks, class_id')
       .in('class_id', classIds)
       .eq('is_published', true)
       .order('created_at', { ascending: false }),
@@ -499,9 +499,8 @@ export async function getStudentResults(): Promise<StudentResult[]> {
     subMap.set(s.assignment_id, { marks_earned: s.marks_earned, teacher_feedback: s.teacher_feedback, submitted_at: s.submitted_at });
   }
 
-  return (assignments ?? []).map((a: Pick<Assignment, 'id' | 'title' | 'title_kin' | 'assignment_type' | 'difficulty' | 'total_marks' | 'class_id'> & { grades_released?: boolean }) => {
+  return (assignments ?? []).map((a: Pick<Assignment, 'id' | 'title' | 'title_kin' | 'assignment_type' | 'difficulty' | 'total_marks' | 'class_id'>) => {
     const sub = subMap.get(a.id) ?? null;
-    const released = a.grades_released ?? false;
     return {
       assignment_id: a.id,
       title: a.title,
@@ -511,8 +510,8 @@ export async function getStudentResults(): Promise<StudentResult[]> {
       total_marks: a.total_marks,
       submitted: !!sub,
       submitted_at: sub?.submitted_at ?? null,
-      marks_earned: released ? (sub?.marks_earned ?? null) : null,
-      teacher_feedback: released ? (sub?.teacher_feedback ?? null) : null,
+      marks_earned: sub?.marks_earned ?? null,
+      teacher_feedback: sub?.teacher_feedback ?? null,
     };
   });
 }
