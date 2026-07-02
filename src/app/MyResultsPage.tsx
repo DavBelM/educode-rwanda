@@ -107,7 +107,7 @@ export default function MyResultsPage({ language }: Props) {
             </div>
           </div>
 
-          {totalPossible > 0 && (
+          {totalPossible > 0 && pct !== null && (
             <div className="mt-6">
               <div className="flex justify-between text-sm mb-2 dim">
                 <span>{isKin ? 'Amanota yose hamwe' : 'Overall score'}</span>
@@ -147,7 +147,9 @@ export default function MyResultsPage({ language }: Props) {
         ) : (
           <div className="stack" style={{ ['--gap' as string]: '16px' }}>
             {filtered.map(r => {
-              const scorePct = r.marks_earned !== null ? Math.round((r.marks_earned / r.total_marks) * 100) : null;
+              const scorePct = r.marks_earned !== null && r.total_marks > 0
+                ? Math.round((r.marks_earned / r.total_marks) * 100)
+                : null;
               const isNew = r.marks_earned !== null && !seenGrades.has(r.assignment_id);
 
               return (
@@ -200,11 +202,14 @@ export default function MyResultsPage({ language }: Props) {
                       ) : (
                         <div>
                           <p className="text-3xl font-bold" style={{ color: 'var(--text)' }}>
-                            {r.marks_earned}<span className="text-base font-medium dim">/{r.total_marks}</span>
+                            {r.marks_earned}
+                            {r.total_marks > 0 && <span className="text-base font-medium dim">/{r.total_marks}</span>}
                           </p>
-                          <p className="font-semibold" style={{ color: 'var(--text-2)', fontSize: '15px' }}>
-                            {scorePct}%
-                          </p>
+                          {scorePct !== null && (
+                            <p className="font-semibold" style={{ color: 'var(--text-2)', fontSize: '15px' }}>
+                              {scorePct}%
+                            </p>
+                          )}
                         </div>
                       )}
                     </div>
