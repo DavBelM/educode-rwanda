@@ -484,7 +484,7 @@ export async function getStudentResults(): Promise<StudentResult[]> {
   const [{ data: assignments }, { data: submissions }] = await Promise.all([
     supabase
       .from('assignments')
-      .select('id, title, title_kin, assignment_type, difficulty, total_marks, class_id')
+      .select('*')
       .in('class_id', classIds)
       .eq('is_published', true)
       .order('created_at', { ascending: false }),
