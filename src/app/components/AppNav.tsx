@@ -208,6 +208,36 @@ export function AppNav({ streak }: AppNavProps) {
       </div>
     </header>
 
+    {/* Mobile bottom navigation — visible on ≤900px */}
+    {!isTeacher && (
+      <nav className="mob-nav" aria-label="Mobile navigation">
+        <Link to="/" className={`mob-nav-item${isDashboardActive ? ' active' : ''}`}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+          </svg>
+          Dashboard
+        </Link>
+        <Link to="/courses" className={`mob-nav-item${isCoursesActive ? ' active' : ''}`}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+          </svg>
+          Courses
+        </Link>
+        <Link to="/workspace" className={`mob-nav-item${isWorkspaceActive ? ' active' : ''}`}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
+          </svg>
+          Code
+        </Link>
+        <Link to="/challenges" className={`mob-nav-item${isChallengesActive ? ' active' : ''}`}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/>
+          </svg>
+          Challenges
+        </Link>
+      </nav>
+    )}
+
     {/* Deletion confirmation modal */}
     {showDeleteConfirm && (
       <div className="fixed inset-0 z-[80] flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }}>

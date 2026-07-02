@@ -20,8 +20,8 @@
   --line-strong: #38352f;
 
   --text:    #ece9e2;       /* primary */
-  --text-2:  #9c988e;       /* muted / secondary */
-  --text-3:  #67645c;       /* dim / tertiary */
+  --text-2:  #a8a49a;       /* muted / secondary */
+  --text-3:  #7a776e;       /* dim / tertiary */
 
   /* The one accent — cream. */
   --cream:        #efe9dc;
@@ -73,8 +73,8 @@
   --line-strong: #cfcbbe;
 
   --text:    #1b1a16;
-  --text-2:  #6a675e;
-  --text-3:  #98948a;
+  --text-2:  #5e5b53;
+  --text-3:  #857f76;
 
   --cream:       #efe9dc;
   --accent:      #2a2722;
@@ -144,8 +144,8 @@ img { display: block; max-width: 100%; }
 .dim { color: var(--text-3); }
 .mono { font-family: var(--mono); }
 .eyebrow {
-  font-size: 12px; font-weight: 500; letter-spacing: 0.14em;
-  text-transform: uppercase; color: var(--text-3);
+  font-size: 12.5px; font-weight: 500; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--text-2);
 }
 
 /* ==========================================================================
@@ -258,9 +258,9 @@ img { display: block; max-width: 100%; }
    ========================================================================== */
 .pill {
   display: inline-flex; align-items: center; gap: 5px;
-  height: 22px; padding: 0 9px;
+  height: 24px; padding: 0 10px;
   border: 1px solid var(--line-strong); border-radius: var(--radius-pill);
-  font-size: 10.5px; font-weight: 500; letter-spacing: 0.07em; text-transform: uppercase;
+  font-size: 11.5px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase;
   color: var(--text-2);
   white-space: nowrap;
 }
@@ -280,8 +280,8 @@ img { display: block; max-width: 100%; }
    FORMS — labels above, thin border, generous padding, no fill.
    ========================================================================== */
 .field { display: flex; flex-direction: column; gap: 7px; }
-.label { font-size: 13px; font-weight: 500; color: var(--text); }
-.hint { font-size: 12.5px; color: var(--text-3); }
+.label { font-size: 13.5px; font-weight: 500; color: var(--text); }
+.hint { font-size: 13px; color: var(--text-2); }
 .input,
 .textarea,
 .select {
@@ -293,7 +293,7 @@ img { display: block; max-width: 100%; }
   font-family: inherit; font-size: 14.5px; color: var(--text);
   transition: border-color .15s var(--ease), box-shadow .15s var(--ease);
 }
-.input::placeholder, .textarea::placeholder { color: var(--text-3); }
+.input::placeholder, .textarea::placeholder { color: var(--text-2); opacity: 0.6; }
 .input:focus, .textarea:focus, .select:focus {
   outline: none; border-color: var(--text-2);
   box-shadow: 0 0 0 3px var(--accent-soft);
@@ -472,3 +472,42 @@ img { display: block; max-width: 100%; }
 @media (max-width: 620px) {
   .g-2, .g-3, .g-4 { grid-template-columns: 1fr; }
 }
+
+/* ==========================================================================
+   MOBILE BOTTOM NAV — shown only on small screens (≤ 900px)
+   ========================================================================== */
+.mob-nav {
+  display: none;
+}
+@media (max-width: 900px) {
+  .mob-nav {
+    display: flex;
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 50;
+    height: 60px;
+    background: color-mix(in srgb, var(--bg) 90%, transparent);
+    backdrop-filter: blur(16px) saturate(1.1);
+    -webkit-backdrop-filter: blur(16px) saturate(1.1);
+    border-top: 1px solid var(--line);
+    padding: 0 4px;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    align-items: stretch;
+  }
+  /* Push page content above the bottom nav */
+  .page { padding-bottom: 72px !important; }
+}
+.mob-nav-item {
+  flex: 1;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 4px;
+  color: var(--text-3);
+  font-size: 10px; font-weight: 500; letter-spacing: 0.04em;
+  text-decoration: none;
+  border-radius: var(--radius);
+  transition: color .15s var(--ease), background .15s var(--ease);
+  padding: 6px 4px;
+  text-transform: uppercase;
+}
+.mob-nav-item svg { width: 20px; height: 20px; flex-shrink: 0; }
+.mob-nav-item:hover { color: var(--text-2); background: var(--surface); }
+.mob-nav-item.active { color: var(--text); }
+.mob-nav-item.active svg { stroke: var(--text); }

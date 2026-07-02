@@ -325,9 +325,9 @@ footer.site-footer { border-top: 1px solid var(--line); margin-top: 40px; paddin
 @media (min-width: 1400px) { .lwrap { grid-template-columns: 210px minmax(0, 1fr) var(--rail-w, 420px); gap: clamp(18px, 2vw, 32px); } }
 
 .outline { position: sticky; top: calc(var(--nav-h) + 28px); }
-.outline .ohead { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-3); margin-bottom: 14px; }
-.outline .omod { font-size: 12.5px; font-weight: 500; margin-bottom: 12px; color: var(--text-2); }
-.outline a { display: flex; align-items: center; gap: 8px; padding: 6px 0; font-size: 12.5px; color: var(--text-3); cursor: pointer; }
+.outline .ohead { font-size: 11.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-2); margin-bottom: 14px; font-weight: 600; }
+.outline .omod { font-size: 13px; font-weight: 500; margin-bottom: 12px; color: var(--text); }
+.outline a { display: flex; align-items: center; gap: 8px; padding: 6px 0; font-size: 13px; color: var(--text-2); cursor: pointer; }
 .outline a:hover { color: var(--text); }
 .outline a.cur { color: var(--text); font-weight: 500; }
 .outline a .d { width: 6px; height: 6px; border-radius: 50%; border: 1px solid var(--text-3); flex-shrink: 0; }
@@ -335,9 +335,9 @@ footer.site-footer { border-top: 1px solid var(--line); margin-top: 40px; paddin
 .outline a.cur .d { background: var(--accent); border-color: var(--accent); }
 
 .reading { width: 100%; }
-.reading .leyebrow { color: var(--text-3); font-size: 14px; margin-bottom: 12px; }
+.reading .leyebrow { color: var(--text-2); font-size: 14px; margin-bottom: 12px; font-weight: 500; }
 .reading h1 { font-size: clamp(30px, 3vw, 48px); letter-spacing: -0.035em; line-height: 1.1; margin-bottom: 10px; }
-.reading .meta { display: flex; gap: 14px; color: var(--text-3); font-size: 14px; margin-bottom: 32px; }
+.reading .meta { display: flex; gap: 14px; color: var(--text-2); font-size: 14px; margin-bottom: 32px; }
 .reading h2 { font-size: clamp(21px, 2.1vw, 30px); letter-spacing: -0.02em; margin: clamp(28px, 3.5vw, 48px) 0 14px; }
 .reading p { font-size: clamp(16px, 1.2vw, 17.5px); line-height: 1.75; color: var(--text); margin-bottom: 18px; }
 .reading p.muted { color: var(--text-2); }
@@ -361,17 +361,17 @@ footer.site-footer { border-top: 1px solid var(--line); margin-top: 40px; paddin
 .lnav { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 48px; }
 .lnav a { border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 18px; transition: border-color .15s; cursor: pointer; }
 .lnav a:hover { border-color: var(--line-strong); }
-.lnav a .dir { font-size: 13px; color: var(--text-3); }
-.lnav a .ttl { font-size: 16px; font-weight: 500; margin-top: 4px; }
+.lnav a .dir { font-size: 13px; color: var(--text-2); }
+.lnav a .ttl { font-size: 16px; font-weight: 500; margin-top: 4px; color: var(--text); }
 .lnav a.next { text-align: right; }
 
 .rail { position: sticky; top: calc(var(--nav-h) + 28px); display: flex; flex-direction: column; gap: 18px; }
-.rail .toc .th { font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-3); margin-bottom: 12px; }
-.rail .toc a { display: block; padding: 6px 0 6px 12px; font-size: 13px; color: var(--text-3); border-left: 2px solid var(--line); }
+.rail .toc .th { font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-2); margin-bottom: 12px; font-weight: 600; }
+.rail .toc a { display: block; padding: 6px 0 6px 12px; font-size: 13.5px; color: var(--text-2); border-left: 2px solid var(--line); }
 .rail .toc a.on { color: var(--text); border-left-color: var(--text-2); }
 .rail .toc a:hover { color: var(--text); }
-.ask .ah { display: flex; align-items: center; gap: 9px; font-size: 14px; font-weight: 500; margin-bottom: 10px; }
-.ask p { font-size: 13px; color: var(--text-2); line-height: 1.55; margin-bottom: 14px; }
+.ask .ah { display: flex; align-items: center; gap: 9px; font-size: 14.5px; font-weight: 500; margin-bottom: 10px; }
+.ask p { font-size: 13.5px; color: var(--text-2); line-height: 1.6; margin-bottom: 14px; }
 
 /* Drag-to-resize handle on the left edge of the Mwarimu rail */
 .rail-resizer {
@@ -393,8 +393,58 @@ html.ws-page, html.ws-page body { height: 100%; }
 .ws-page body { overflow: hidden; }
 
 .ws { height: calc(100vh - var(--nav-h)); display: flex; flex-direction: row; overflow: hidden; }
-/* Free-practice workspace: hide Mwarimu on mobile (no tab to show it) */
-@media (max-width: 880px) { .ws-resizer-h { display: none; } .ws-ai { display: none; } .ws-main { flex: 1 !important; } }
+/* Free-practice workspace: hide Mwarimu on mobile, show via floating button */
+@media (max-width: 880px) {
+  .ws-resizer-h { display: none; }
+  .ws-main { flex: 1 !important; }
+
+  /* Mwarimu slides up as a bottom sheet when .mw-open is on .ws */
+  .ws .ws-ai {
+    display: none;
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 60;
+    height: 62vh; min-width: 0 !important; flex: none !important;
+    border-top: 1px solid var(--line-strong);
+    border-radius: 12px 12px 0 0;
+    background: var(--surface);
+    animation: sheet-up .28s cubic-bezier(.22,.61,.36,1) both;
+  }
+  .ws.mw-open .ws-ai { display: flex; }
+
+  /* Backdrop */
+  .mob-mw-backdrop {
+    position: fixed; inset: 0; z-index: 59;
+    background: rgba(0,0,0,.45);
+    backdrop-filter: blur(2px);
+    animation: fade-in .2s ease both;
+  }
+
+  /* Floating Mwarimu toggle button */
+  .mob-mw-btn {
+    position: fixed; bottom: 72px; right: 16px; z-index: 58;
+    display: inline-flex; align-items: center; gap: 8px;
+    height: 44px; padding: 0 16px;
+    background: var(--pri-bg); color: var(--pri-fg);
+    border: none; border-radius: 22px;
+    font-size: 14px; font-weight: 500; font-family: inherit;
+    box-shadow: 0 4px 16px rgba(0,0,0,.3);
+    cursor: pointer;
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .mob-mw-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,0,0,.35); }
+}
+
+/* Hidden on desktop */
+.mob-mw-btn { display: none; }
+.mob-mw-backdrop { display: none; }
+
+@keyframes sheet-up {
+  from { transform: translateY(100%); }
+  to   { transform: none; }
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
 /* Challenge runner: stack editor over tabs on mobile, keep Mwarimu accessible via tab */
 @media (max-width: 768px) {
   .cr-layout { flex-direction: column !important; }
@@ -540,6 +590,11 @@ td .when { color: var(--text-3); font-size: 13px; }
 @media (max-width: 920px) {
   .tgrid { grid-template-columns: 1fr; }
   .stats { grid-template-columns: repeat(2,1fr); }
+}
+@media (max-width: 480px) {
+  .stats { grid-template-columns: 1fr 1fr; }
+  .stats .stat { padding: 14px 16px; }
+  .stats .stat .sv { font-size: 22px; }
 }
 
 /* Privacy / legal pages */

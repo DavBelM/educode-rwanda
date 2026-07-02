@@ -10,7 +10,7 @@ import { submitCodingAssignment, type Assignment } from '../lib/db';
 import { useExamMode } from '../hooks/useExamMode';
 import { usePageTitle } from '../hooks/usePageTitle';
 import { useAuth } from '../lib/auth';
-import { Send, CheckCircle, Loader, AlertTriangle, Clock } from 'lucide-react';
+import { Send, CheckCircle, Loader, AlertTriangle, Clock, MessageCircle, X } from 'lucide-react';
 
 const DEFAULT_JS = `// Welcome to EduCode Rwanda!
 // Try manipulating the DOM elements in index.html
@@ -77,6 +77,7 @@ export default function CodingWorkspace({ assignment }: Props) {
   const [violationWarning, setViolationWarning] = useState('');
 
   // ── Resize state ─────────────────────────────────────────────────────────────
+  const [mwMobile, setMwMobile] = useState(false);
   const [editorPct, setEditorPct] = useState(62);
   const [consoleHeight, setConsoleHeight] = useState(180);
   const isDraggingH = useRef(false);
@@ -339,7 +340,7 @@ export default function CodingWorkspace({ assignment }: Props) {
         </div>
       )}
 
-      <div className="ws">
+      <div className={`ws${mwMobile ? ' mw-open' : ''}`}>
         {/* EDITOR SIDE */}
         <section
           className="ws-main"
@@ -423,6 +424,25 @@ export default function CodingWorkspace({ assignment }: Props) {
           xp={profile?.xp_points}
           onNewSession={handleNewSession}
         />
+
+        {/* Mobile: backdrop + floating toggle for Mwarimu */}
+        {mwMobile && (
+          <div
+            className="mob-mw-backdrop"
+            onClick={() => setMwMobile(false)}
+            aria-hidden="true"
+          />
+        )}
+        {!examMode && (
+          <button
+            className="mob-mw-btn"
+            onClick={() => setMwMobile(v => !v)}
+            aria-label={mwMobile ? 'Close Mwarimu' : 'Ask Mwarimu'}
+          >
+            {mwMobile ? <X size={20} /> : <MessageCircle size={20} />}
+            {!mwMobile && <span>Mwarimu</span>}
+          </button>
+        )}
       </div>
     </div>
   );
