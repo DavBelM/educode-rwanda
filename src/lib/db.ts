@@ -472,10 +472,21 @@ export async function getStudentResults(): Promise<StudentResult[]> {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return [];
 
+  // Must filter by enrolled class IDs — querying all assignments is blocked by RLS
+  const { data: enrollments } = await supabase
+    .from('class_enrollments')
+    .select('class_id')
+    .eq('student_id', user.id);
+
+  const classIds = (enrollments ?? []).map((e: { class_id: string }) => e.class_id);
+  if (classIds.length === 0) return [];
+
   const [{ data: assignments }, { data: submissions }] = await Promise.all([
     supabase
       .from('assignments')
-      .select('id, title, title_kin, assignment_type, difficulty, total_marks, class_id')
+      .select('id, title, title_kin, assignment_type, difficulty, total_marks, class_id, grades_released')
+      .in('class_id', classIds)
+      .eq('is_published', true)
       .order('created_at', { ascending: false }),
     supabase
       .from('student_submissions')
@@ -488,8 +499,9 @@ export async function getStudentResults(): Promise<StudentResult[]> {
     subMap.set(s.assignment_id, { marks_earned: s.marks_earned, teacher_feedback: s.teacher_feedback, submitted_at: s.submitted_at });
   }
 
-  return (assignments ?? []).map((a: Pick<Assignment, 'id' | 'title' | 'title_kin' | 'assignment_type' | 'difficulty' | 'total_marks' | 'class_id'>) => {
+  return (assignments ?? []).map((a: Pick<Assignment, 'id' | 'title' | 'title_kin' | 'assignment_type' | 'difficulty' | 'total_marks' | 'class_id'> & { grades_released?: boolean }) => {
     const sub = subMap.get(a.id) ?? null;
+    const released = a.grades_released ?? false;
     return {
       assignment_id: a.id,
       title: a.title,
@@ -499,8 +511,8 @@ export async function getStudentResults(): Promise<StudentResult[]> {
       total_marks: a.total_marks,
       submitted: !!sub,
       submitted_at: sub?.submitted_at ?? null,
-      marks_earned: sub?.marks_earned ?? null,
-      teacher_feedback: sub?.teacher_feedback ?? null,
+      marks_earned: released ? (sub?.marks_earned ?? null) : null,
+      teacher_feedback: released ? (sub?.teacher_feedback ?? null) : null,
     };
   });
 }

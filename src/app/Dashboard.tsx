@@ -380,7 +380,8 @@ export default function Dashboard({ language, onStartCoding, onOpenAssignment, o
                   <circle cx="46" cy="46" r="40" fill="none" stroke="var(--text-2)" strokeWidth="6"
                     strokeLinecap="round" strokeDasharray="251"
                     strokeDashoffset={251 - (251 * progressPct) / 100}
-                    transform="rotate(-90 46 46)"/>
+                    transform="rotate(-90 46 46)"
+                    className="ring-anim"/>
                   <text x="46" y="51" textAnchor="middle" fill="var(--text)" fontSize="20" fontWeight="600" fontFamily="var(--font)">{progressPct}%</text>
                 </svg>
               </div>
@@ -433,7 +434,7 @@ export default function Dashboard({ language, onStartCoding, onOpenAssignment, o
                   {assignments.map(a => {
                     const card = toCardAssignment(a);
                     return (
-                      <div key={a.id} className="arow" style={{ cursor: 'pointer' }} onClick={() => handleAssignmentClick(a)}>
+                      <div key={a.id} className="arow lift" style={{ cursor: 'pointer' }} onClick={() => handleAssignmentClick(a)}>
                         <div>
                           <div className="at">{card.title}</div>
                           <div className="ad">{card.description}</div>
@@ -513,7 +514,7 @@ export default function Dashboard({ language, onStartCoding, onOpenAssignment, o
             </section>
 
             {/* Challenge Mode card */}
-            <section className="card pad-lg rise-4">
+            <section className="card pad-lg lift rise-4">
               <div className="card-head">
                 <h3 className="card-title">{isKinyarwanda ? 'Imikino yo Gukora' : 'Challenge Mode'}</h3>
               </div>
@@ -536,8 +537,9 @@ export default function Dashboard({ language, onStartCoding, onOpenAssignment, o
                 </span>
               </div>
               <div className="ach-grid">
-                {badges.map(badge => (
-                  <div key={badge.id} className={`ach ${badge.earned ? 'un' : 'lock'}`} title={badge.name}>
+                {badges.map((badge, bi) => (
+                  <div key={badge.id} className={`ach ${badge.earned ? 'un' : 'lock'}`} title={badge.name}
+                    style={badge.earned ? { animationDelay: `${0.08 * bi}s` } : undefined}>
                     {badge.icon === 'flame' && (
                       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M12 3c1 3-1 5-1 5s4 1 4 5a4 4 0 0 1-8 .5C7 10 9 9 9 9s-1-4 3-6z"/>
@@ -570,7 +572,7 @@ export default function Dashboard({ language, onStartCoding, onOpenAssignment, o
             </section>
 
             {/* Practice card */}
-            <section className="card pad-lg rise-4">
+            <section className="card pad-lg lift rise-5">
               <div className="card-head">
                 <h3 className="card-title">{isKinyarwanda ? 'Imenyereze' : 'Free practice'}</h3>
               </div>
