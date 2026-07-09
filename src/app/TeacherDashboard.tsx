@@ -10,6 +10,7 @@ import {
   getClassAnalytics, getClassGradesExport, getClassRoster, getClassPendingReviewCount,
   createAnnouncement, getClassAnnouncements, deleteAnnouncement,
   getStudentAIProfile, getClassRatingsSummary,
+  saveMwarimuEvaluation, getMwarimuEvalSummary,
   type Class, type Assignment, type Question, type Submission, type Announcement, type ClassAnalytics, type RosterStudent, type StudentAIProfile, type ClassRatingsSummary
 } from '../lib/db';
 
@@ -1386,6 +1387,190 @@ function dueText(assignment: Assignment, isKin: boolean): string {
   return isKin ? `Bigomba kuba ${dateStr}` : `Due ${dateStr}`;
 }
 
+// ─── Mwarimu Accuracy Evaluation Modal ────────────────────────────────────────
+
+function MwarimuEvalModal({ onClose }: { onClose: () => void }) {
+  const [errorInput, setErrorInput] = useState('');
+  const [codeContext, setCodeContext] = useState('');
+  const [aiResponse, setAiResponse] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [rating, setRating] = useState<'accurate' | 'partially_accurate' | 'inaccurate' | null>(null);
+  const [notes, setNotes] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [saveError, setSaveError] = useState('');
+  const [summary, setSummary] = useState<{ total: number; accuracyPct: number | null } | null>(null);
+
+  useEffect(() => {
+    getMwarimuEvalSummary().then(s => setSummary({ total: s.total, accuracyPct: s.accuracyPct }));
+  }, [saved]);
+
+  const askMwarimu = async () => {
+    if (!errorInput.trim()) return;
+    setLoading(true);
+    setAiResponse('');
+    setRating(null);
+    setSaved(false);
+    try {
+      const message = codeContext.trim()
+        ? `Code:\n\`\`\`js\n${codeContext.trim()}\n\`\`\`\n\nError: ${errorInput.trim()}`
+        : `Error: ${errorInput.trim()}`;
+      const res = await fetch('/api/ai', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message }),
+        signal: AbortSignal.timeout(60_000),
+      });
+      const json = await res.json();
+      setAiResponse(json.text ?? 'No response returned.');
+    } catch {
+      setAiResponse('Request timed out or failed. Try again.');
+    }
+    setLoading(false);
+  };
+
+  const submitRating = async () => {
+    if (!rating || !aiResponse) return;
+    setSaving(true);
+    setSaveError('');
+    const { error } = await saveMwarimuEvaluation({
+      error_input: errorInput.trim(),
+      code_context: codeContext.trim(),
+      ai_response: aiResponse,
+      rating,
+      notes: notes.trim(),
+    });
+    if (error) { setSaveError(error); setSaving(false); return; }
+    setSaved(true);
+    setSaving(false);
+    setErrorInput('');
+    setCodeContext('');
+    setAiResponse('');
+    setRating(null);
+    setNotes('');
+  };
+
+  const ratingBtn = (value: 'accurate' | 'partially_accurate' | 'inaccurate', label: string, color: string) => (
+    <button
+      onClick={() => setRating(value)}
+      style={{
+        flex: 1, padding: '9px 8px', border: `1.5px solid`,
+        borderColor: rating === value ? color : 'var(--line)',
+        borderRadius: 6, background: rating === value ? color + '18' : 'transparent',
+        color: rating === value ? color : 'var(--text-2)',
+        fontSize: 12.5, fontWeight: 600, cursor: 'pointer', transition: 'all .15s',
+      }}
+    >{label}</button>
+  );
+
+  return (
+    <div className="fixed inset-0 z-[80] flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }}>
+      <div className="card pad-lg w-full" style={{ maxWidth: 520, maxHeight: '90vh', overflowY: 'auto' }}>
+
+        <div className="card-head" style={{ marginBottom: 16 }}>
+          <div>
+            <h2 className="card-title">Test Mwarimu Accuracy</h2>
+            {summary !== null && summary.total > 0 && (
+              <p style={{ fontSize: 12, color: 'var(--text-2)', marginTop: 3 }}>
+                {summary.total} evaluation{summary.total !== 1 ? 's' : ''} recorded
+                {summary.accuracyPct !== null && ` · ${summary.accuracyPct}% accuracy so far`}
+              </p>
+            )}
+          </div>
+          <button onClick={onClose} className="iconbtn" aria-label="Close"><X size={18} /></button>
+        </div>
+
+        {saved && (
+          <div style={{ background: 'var(--success-dim, #f0fdf4)', border: '1px solid var(--success, #22c55e)', borderRadius: 6, padding: '10px 13px', marginBottom: 14, fontSize: 13, color: 'var(--success, #16a34a)', fontWeight: 500 }}>
+            ✓ Rating saved. Enter another error to continue testing.
+          </div>
+        )}
+
+        <div className="stack" style={{ ['--gap' as string]: '14px' }}>
+          <div className="field">
+            <label className="label">Error message <span style={{ color: 'var(--error)' }}>*</span></label>
+            <textarea
+              className="input"
+              rows={2}
+              value={errorInput}
+              onChange={e => setErrorInput(e.target.value)}
+              placeholder="e.g. ReferenceError: x is not defined at line 5"
+              style={{ resize: 'vertical', fontFamily: 'var(--mono)', fontSize: 13 }}
+            />
+          </div>
+
+          <div className="field">
+            <label className="label">Code context <span style={{ fontSize: 11, color: 'var(--text-3)', fontWeight: 400 }}>(optional — paste the student's code)</span></label>
+            <textarea
+              className="input"
+              rows={4}
+              value={codeContext}
+              onChange={e => setCodeContext(e.target.value)}
+              placeholder="let x = 10&#10;console.log(y)"
+              style={{ resize: 'vertical', fontFamily: 'var(--mono)', fontSize: 12.5 }}
+            />
+          </div>
+
+          <button
+            className="btn"
+            onClick={askMwarimu}
+            disabled={loading || !errorInput.trim()}
+            style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center' }}
+          >
+            {loading ? <><Loader size={15} style={{ animation: 'spin 1s linear infinite' }} /> Asking Mwarimu…</> : <><Sparkles size={15} /> Get Mwarimu's Response</>}
+          </button>
+
+          {aiResponse && (
+            <>
+              <div style={{ background: 'var(--surface, var(--bg))', border: '1px solid var(--line)', borderRadius: 6, padding: '12px 14px' }}>
+                <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--text-3)', marginBottom: 8 }}>Mwarimu's response</p>
+                <p style={{ fontSize: 13.5, color: 'var(--text)', lineHeight: 1.65, whiteSpace: 'pre-wrap' }}>{aiResponse}</p>
+              </div>
+
+              <div className="field">
+                <label className="label">Rate this response</label>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  {ratingBtn('accurate', '✓ Accurate', '#16a34a')}
+                  {ratingBtn('partially_accurate', '~ Partial', '#b85a16')}
+                  {ratingBtn('inaccurate', '✗ Inaccurate', '#dc2626')}
+                </div>
+              </div>
+
+              {rating && (
+                <div className="field">
+                  <label className="label">Notes <span style={{ fontSize: 11, color: 'var(--text-3)', fontWeight: 400 }}>(optional)</span></label>
+                  <textarea
+                    className="input"
+                    rows={2}
+                    value={notes}
+                    onChange={e => setNotes(e.target.value)}
+                    placeholder="e.g. The hint was correct but too vague about which variable"
+                    style={{ resize: 'vertical', fontSize: 13 }}
+                  />
+                </div>
+              )}
+
+              {saveError && <p style={{ fontSize: 12.5, color: 'var(--error)' }}>{saveError}</p>}
+
+              <div style={{ display: 'flex', gap: 10 }}>
+                <button className="btn btn-secondary" style={{ flex: 1 }} onClick={onClose}>Done</button>
+                <button
+                  className="btn"
+                  style={{ flex: 1 }}
+                  onClick={submitRating}
+                  disabled={!rating || saving}
+                >
+                  {saving ? 'Saving…' : 'Save rating'}
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function TeacherDashboard() {
   usePageTitle('Teacher Dashboard · EduCode');
   const [language] = useState<'EN' | 'KIN'>('EN');
@@ -1409,6 +1594,7 @@ export default function TeacherDashboard() {
   const [classSummary, setClassSummary] = useState<string | null>(null);
   const [classSummaryLoading, setClassSummaryLoading] = useState(false);
   const [classSummaryError, setClassSummaryError] = useState(false);
+  const [showMwarimuEval, setShowMwarimuEval] = useState(false);
   const { profile } = useAuth();
 
   const loadData = async () => {
@@ -1815,6 +2001,19 @@ export default function TeacherDashboard() {
                   </section>
                 )}
 
+                {/* MWARIMU ACCURACY EVAL */}
+                <section className="card pad-lg rise-3">
+                  <div className="card-head" style={{ marginBottom: 12 }}>
+                    <h3 className="card-title">Mwarimu accuracy</h3>
+                    <button className="btn btn-tertiary sm" onClick={() => setShowMwarimuEval(true)} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                      <Sparkles size={13} /> Test Mwarimu
+                    </button>
+                  </div>
+                  <p style={{ fontSize: 12.5, color: 'var(--text-2)', lineHeight: 1.55 }}>
+                    Rate Mwarimu's responses on real JavaScript errors to measure feedback accuracy. Enter any error message and code, then mark the response as accurate, partial, or inaccurate.
+                  </p>
+                </section>
+
                 {/* PILOT FEEDBACK */}
                 {ratingsSummary !== null && (
                   <section className="card pad-lg rise-3">
@@ -1940,6 +2139,10 @@ export default function TeacherDashboard() {
           language={language}
           onClose={() => setSelectedRosterStudent(null)}
         />
+      )}
+
+      {showMwarimuEval && (
+        <MwarimuEvalModal onClose={() => setShowMwarimuEval(false)} />
       )}
     </div>
   );

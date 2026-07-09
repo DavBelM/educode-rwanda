@@ -16,6 +16,10 @@ translations_for_review.txt
 TeM_SWDJF301_JavaScript Fundamentals.pdf
 TeM_SWDWD301_Website Development.pdf
 
+# Capstone report documents (local only — personal/academic)
+docs/*.pdf
+docs/images/
+
 # ML data (large files — keep local)
 ml/data/processed/
 ml/data/kinyarwanda/

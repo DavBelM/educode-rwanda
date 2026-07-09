@@ -1730,3 +1730,57 @@ export async function submitPilotSurvey(response: {
   if (!user) return;
   await supabase.from('pilot_survey_responses').insert({ student_id: user.id, ...response });
 }
+
+// ─── Mwarimu accuracy evaluations (teacher) ───────────────────────────────────
+
+export interface MwarimuEvaluation {
+  id: string;
+  error_input: string;
+  code_context: string | null;
+  ai_response: string;
+  rating: 'accurate' | 'partially_accurate' | 'inaccurate';
+  notes: string | null;
+  created_at: string;
+}
+
+export async function saveMwarimuEvaluation(params: {
+  error_input: string;
+  code_context: string;
+  ai_response: string;
+  rating: 'accurate' | 'partially_accurate' | 'inaccurate';
+  notes: string;
+}): Promise<{ error: string | null }> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: 'Not authenticated' };
+  const { error } = await supabase.from('mwarimu_evaluations').insert({
+    teacher_id: user.id,
+    ...params,
+    code_context: params.code_context || null,
+    notes: params.notes || null,
+  });
+  return { error: error?.message ?? null };
+}
+
+export async function getMwarimuEvaluations(): Promise<MwarimuEvaluation[]> {
+  const { data } = await supabase
+    .from('mwarimu_evaluations')
+    .select('*')
+    .order('created_at', { ascending: false });
+  return data ?? [];
+}
+
+export async function getMwarimuEvalSummary(): Promise<{
+  total: number;
+  accurate: number;
+  partially: number;
+  inaccurate: number;
+  accuracyPct: number | null;
+}> {
+  const evals = await getMwarimuEvaluations();
+  const total = evals.length;
+  const accurate = evals.filter(e => e.rating === 'accurate').length;
+  const partially = evals.filter(e => e.rating === 'partially_accurate').length;
+  const inaccurate = evals.filter(e => e.rating === 'inaccurate').length;
+  const accuracyPct = total > 0 ? Math.round(((accurate + partially * 0.5) / total) * 100) : null;
+  return { total, accurate, partially, inaccurate, accuracyPct };
+}
