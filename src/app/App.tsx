@@ -13,6 +13,8 @@ import SchoolSignupPage from './SchoolSignupPage';
 import AboutPage from './AboutPage';
 import ContactPage from './ContactPage';
 import PrivacyPolicyPage from './PrivacyPolicyPage';
+import TermsPage from './TermsPage';
+import LegalLandingPage from './LegalLandingPage';
 import ForgotPasswordPage from './ForgotPasswordPage';
 import ResetPasswordPage from './ResetPasswordPage';
 import MyResultsPage from './MyResultsPage';
@@ -81,6 +83,18 @@ function LessonRoute({ language }: { language: 'EN' | 'KIN' }) {
 export default function App() {
   const { user, profile, loading, isRecoveryMode, signOut } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Legal pages are always public — bypass auth routing entirely
+  if (['/terms', '/privacy', '/legal'].includes(location.pathname)) {
+    return (
+      <Routes>
+        <Route path="/terms"   element={<TermsPage />} />
+        <Route path="/privacy" element={<PrivacyPolicyPage />} />
+        <Route path="/legal"   element={<LegalLandingPage />} />
+      </Routes>
+    );
+  }
   const [showEthics, setShowEthics] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [language, setLanguage] = useState<'EN' | 'KIN'>('EN');
@@ -269,6 +283,8 @@ export default function App() {
       <Route path="/about" element={<AboutPage />} />
       <Route path="/contact" element={<ContactPage />} />
       <Route path="/privacy" element={<PrivacyPolicyPage />} />
+      <Route path="/terms"   element={<TermsPage />} />
+      <Route path="/legal"   element={<LegalLandingPage />} />
       <Route path="*" element={<LandingPage onLogin={() => navigate('/login')} onSignup={() => navigate('/signup')} onSchoolSignup={() => navigate('/school-signup')} />} />
     </Routes>
   );

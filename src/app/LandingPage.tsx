@@ -287,6 +287,8 @@ export default function LandingPage({ onLogin, onSignup, onSchoolSignup }: Props
             <button style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'inherit', fontSize: 'inherit' }} onClick={onSignup}>Sign up</button>
             <a href="#platform">Platform</a>
             <a href="#teachers">For schools</a>
+            <a href="/terms">Terms</a>
+            <a href="/privacy">Privacy</a>
           </div>
         </div>
       </footer>

@@ -1,395 +1,251 @@
-import { useState } from 'react';
-import { Link } from 'react-router';
-import { Download, Shield, Lock, Eye, Database, Users, Cookie, FileText, Mail } from 'lucide-react';
-import { useTheme } from '../lib/theme';
-import { usePageTitle } from '../hooks/usePageTitle';
+import LegalLayout, { type LegalSection } from './LegalLayout';
+
+const sections: LegalSection[] = [
+  {
+    id: 'section-10',
+    heading: '10. Our commitment and the law that applies',
+    content: (
+      <>
+        <p style={{ marginBottom: 16 }}>
+          This policy explains what the platform collects, why, where it goes, how long it is kept,
+          and what rights the user has. It is written to meet the requirements of Law No. 058/2021
+          of 13/10/2021 relating to the protection of personal data and privacy (Republic of Rwanda,
+          2021), and it reflects the principles of the Rwanda National AI Policy (Government of
+          Rwanda, 2023) and the UNESCO Recommendation on the Ethics of Artificial Intelligence
+          (UNESCO, 2021).
+        </p>
+        <p>
+          This research received ethical clearance from the African Leadership University Research
+          Ethics Committee, dated 18 June 2026. Institutional permission for school deployment was
+          obtained from the Director of Studies at the participating school.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: 'section-11',
+    heading: '11. What the platform collects',
+    content: (
+      <>
+        <ul className="plain-list" style={{ marginBottom: 20 }}>
+          <li>
+            <strong>Account information:</strong> name, email address, the school the user belongs
+            to, and the user&rsquo;s role (student, self-learner, teacher, or school administrator).
+          </li>
+          <li>
+            <strong>Learning activity:</strong> code submitted in the workspace, error messages
+            produced by that code, assignment submissions, coding-challenge attempts and outcomes,
+            lesson and quiz progress, experience points, content ratings, and login dates.
+          </li>
+          <li>
+            <strong>Tutor interactions:</strong> the question or code sent to the Mwarimu tutor,
+            the feedback returned, the language used, the response latency, and any rating the user
+            gives that feedback.
+          </li>
+          <li>
+            <strong>Assessment integrity events, during timed assessments only:</strong> tab
+            switches, loss of window focus, exits from fullscreen, and paste events.
+          </li>
+          <li>
+            <strong>Survey responses,</strong> where the user chooses to complete the in-platform
+            feedback survey.
+          </li>
+        </ul>
+        <p>
+          The platform does not collect national identity numbers, telephone numbers, home addresses,
+          photographs, biometric data, or any special category of sensitive personal data. Research
+          survey responses collected for the study do not carry names; only the school and an age
+          range are recorded, so that a respondent cannot be re-identified from survey data.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: 'section-12',
+    heading: '12. Why the platform collects it',
+    content: (
+      <>
+        <p style={{ marginBottom: 16 }}>
+          Account information is used to authenticate the user and to place them in the correct
+          class and school. Learning activity is used to give the user feedback, to track their
+          progress, and to let their teacher see where they are struggling so that teaching time can
+          be directed where it is most needed. Tutor interactions are used to produce the feedback
+          itself and, in anonymised form, to study which errors Rwandan TVET learners make most
+          often and to improve the model. Assessment integrity events are used to make timed
+          assessments fair. Survey responses are used to evaluate whether the platform works.
+        </p>
+        <p>
+          The lawful basis for processing is the consent of the user, given at registration and, for
+          learners below the age of majority, arranged through the school as institutional
+          gatekeeper, together with the ethical clearance obtained before any data collection began.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: 'section-13',
+    heading: '13. Automated processing and the logic involved',
+    content: (
+      <>
+        <p style={{ marginBottom: 16 }}>
+          Law No. 058/2021 requires that a data subject be told when automated decision-making is
+          used and be given information about the logic involved. The platform therefore discloses
+          the following.
+        </p>
+        <p>
+          When a user asks the tutor for help, the question and the surrounding code are first used
+          to search a curriculum knowledge base, so that the answer is grounded in the material the
+          learner is actually studying. The question, together with the retrieved curriculum
+          material, is then sent to a language model that has been fine-tuned on JavaScript error
+          corrections, and that model produces a hint. If that model is unavailable, a
+          general-purpose model produces the hint instead. If neither is available, a simple
+          rule-based matcher recognises the error type and returns a standard explanation.
+          This process produces guidance only. It does not score the user, does not rank the user
+          against other users, and does not make any decision that affects the user&rsquo;s grades
+          or progression. Grading is performed by the teacher.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: 'section-14',
+    heading: '14. Who else processes the data, and where',
+    content: (
+      <>
+        <p style={{ marginBottom: 16 }}>
+          The platform is built on third-party services, and data is processed by them on the
+          developer&rsquo;s behalf:
+        </p>
+        <ul className="plain-list" style={{ marginBottom: 16 }}>
+          <li>
+            <strong>Supabase,</strong> which provides the database, user authentication, and the
+            search index used to ground tutor answers.
+          </li>
+          <li>
+            <strong>Vercel,</strong> which hosts the application and runs the function that
+            orchestrates tutor requests.
+          </li>
+          <li>
+            <strong>Hugging Face,</strong> which hosts the fine-tuned model that generates feedback.
+          </li>
+          <li>
+            <strong>Google,</strong> whose Gemini service provides the search embeddings, the
+            Kinyarwanda translation, and the fallback model when the primary model is unavailable.
+          </li>
+        </ul>
+        <p>
+          These services operate servers outside Rwanda. This means that when a user asks the tutor
+          for help, the code and error message they send are transmitted outside the country for
+          processing. Users should therefore not enter personal information about themselves or
+          anyone else into the code editor or the tutor. Data is not sold, and it is not shared with
+          advertisers.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: 'section-15',
+    heading: '15. Who can see the data inside the platform',
+    content: (
+      <p>
+        Access is restricted by role, and enforced in the database itself through row-level
+        security. A student sees only their own work. A teacher sees the work, progress, and error
+        patterns of the students in their own classes. A school administrator sees the teachers and
+        students of their own school. The developer can access data for the purpose of operating
+        the platform and conducting the research described here. No other party has access.
+      </p>
+    ),
+  },
+  {
+    id: 'section-16',
+    heading: '16. How long the data is kept',
+    content: (
+      <p>
+        Account data and learning activity are kept for as long as the account is active. Where a
+        school pilot has ended, identifiable pilot data is retained for no longer than twelve months
+        from the end of the pilot, after which it is either deleted or irreversibly anonymised so
+        that it can no longer be linked to an individual. Anonymised and aggregated records, which
+        cannot be traced back to a person, may be kept indefinitely for research into learner error
+        patterns and for improving the model. Assessment integrity events are kept only as long as
+        the associated assessment record.
+      </p>
+    ),
+  },
+  {
+    id: 'section-17',
+    heading: '17. How the data is protected',
+    content: (
+      <p>
+        Access to the platform requires authentication. Records are separated by user through
+        row-level security policies enforced in the database, so that one user cannot read another
+        user&rsquo;s records. Credentials for the third-party services are held on the server side
+        and are not exposed to the browser. Data is transmitted over encrypted connections.
+      </p>
+    ),
+  },
+  {
+    id: 'section-18',
+    heading: '18. The rights of the user',
+    content: (
+      <>
+        <p style={{ marginBottom: 16 }}>
+          Under Law No. 058/2021 the user has the right to be informed about how their data is
+          processed, to access their data, to have inaccurate data corrected, to have their data
+          erased, to withdraw consent at any time without that withdrawal affecting processing
+          already carried out lawfully, and to object to processing.
+        </p>
+        <p>
+          A user may exercise these rights by contacting the developer at{' '}
+          <a href="mailto:belamitali@gmail.com">belamitali@gmail.com</a>. Where the user is a
+          student below the age of majority, a request may be made directly by the student or
+          through their teacher or school, and the school is informed so that the student&rsquo;s
+          participation in class is not disrupted. Requests are answered within thirty days.
+        </p>
+      </>
+    ),
+  },
+  {
+    id: 'section-19',
+    heading: '19. Children and young learners',
+    content: (
+      <p>
+        The platform is used by secondary school students, many of whom are below the age of
+        majority. Participation is arranged through the school, which acts as the institutional
+        gatekeeper, and ethical clearance for the research was obtained before any data was
+        collected. Data collection is kept to the minimum needed for the platform to work: research
+        survey responses carry no names, and no sensitive personal data is collected. Monitoring
+        during assessment is disclosed to students in advance, is limited to timed assessments, and
+        is not used to observe learners outside those assessments.
+      </p>
+    ),
+  },
+  {
+    id: 'section-20',
+    heading: '20. Contact',
+    content: (
+      <p>
+        Questions about this policy, or requests concerning personal data, may be sent to Mitali
+        Bela at{' '}
+        <a href="mailto:belamitali@gmail.com">belamitali@gmail.com</a>. The supervisory authority
+        for data protection in Rwanda is the National Cyber Security Authority, to which a complaint
+        may be made.
+      </p>
+    ),
+  },
+];
 
 export default function PrivacyPolicyPage() {
-  usePageTitle('Privacy Policy · EduCode');
-  const { theme, toggleTheme } = useTheme();
-  const [language, setLanguage] = useState<'EN' | 'KIN'>('EN');
-  const [activeSection, setActiveSection] = useState('');
-
-  const isKin = language === 'KIN';
-
-  const sections = [
-    {
-      id: 'collection',
-      icon: Database,
-      title: isKin ? 'Amakuru Dukusanya' : 'Information We Collect',
-      content: (
-        <div className="stack" style={{ ['--gap' as string]: '14px' }}>
-          <p>
-            {isKin
-              ? 'Dukusanya amakuru akurikira kugirango dushobore gutanga serivisi zacu:'
-              : 'We collect the following information to provide our services:'}
-          </p>
-          <ul className="plain-list">
-            <li>
-              <strong>{isKin ? 'Amakuru y\'ikonti' : 'Account information'}:</strong>{' '}
-              {isKin
-                ? 'Amazina, i-meyili, telefoni (niba wayitanze)'
-                : 'Name, email, phone (if provided)'}
-            </li>
-            <li>
-              <strong>{isKin ? 'Imikoro ya code watanze' : 'Code submissions'}:</strong>{' '}
-              {isKin
-                ? 'Code utanga (zikoreshwa mu kwigisha AI no kuguha ibitekerezo)'
-                : 'Code you submit (for AI training and feedback)'}
-            </li>
-            <li>
-              <strong>{isKin ? 'Amakuru y\'imikoreshereze' : 'Usage data'}:</strong>{' '}
-              {isKin
-                ? 'Ibiranga platform ukoresha, igihe umazeho, n\'iterambere ryawe'
-                : 'Which features you use, time spent, and progress'}
-            </li>
-          </ul>
-          <div className="callout success">
-            <Shield size={18} />
-            <p>
-              <strong>{isKin ? 'Ntabwo tugurisha amakuru yawe' : 'We do NOT sell your data'}.</strong>{' '}
-              {isKin ? 'Na rimwe. Amakuru yawe ni ayawe.' : 'Never. Your data is yours.'}
-            </p>
-          </div>
-        </div>
-      )
-    },
-    {
-      id: 'usage',
-      icon: Eye,
-      title: isKin ? 'Uburyo dukoresha amakuru yawe' : 'How We Use Your Data',
-      content: (
-        <div className="stack" style={{ ['--gap' as string]: '14px' }}>
-          <p>{isKin ? 'Dukoresha amakuru yawe kugirango:' : 'We use your information to:'}</p>
-          <ul className="plain-list">
-            <li>
-              <strong>{isKin ? 'Duhe AI uburyo bwo kuguha ibitekerezo' : 'Provide AI feedback'}:</strong>{' '}
-              {isKin
-                ? 'AI yacu isuzuma code yawe ikaguha inama n\'ibisobanuro'
-                : 'Our AI analyzes your code and provides guidance'}
-            </li>
-            <li>
-              <strong>{isKin ? 'Kunoza iyi platform' : 'Improve the platform'}:</strong>{' '}
-              {isKin ? 'Gusobanukirwa aho abanyeshuri bagira imbogamizi' : 'Understand where students struggle'}
-            </li>
-            <li>
-              <strong>{isKin ? 'Kohereza amakuru mashya y\'ingenzi' : 'Send important updates'}:</strong>{' '}
-              {isKin ? 'Ibiranga platform bishya n\'amahirwe yo kwiga' : 'New features and training opportunities'}
-            </li>
-          </ul>
-          <p className="dim" style={{ fontSize: 14 }}>
-            {isKin
-              ? 'Urashobora guhagarika kwakira i-meyili z\'ubucuruzi igihe cyose.'
-              : 'You can opt out of marketing emails anytime.'}
-          </p>
-        </div>
-      )
-    },
-    {
-      id: 'storage',
-      icon: Lock,
-      title: isKin ? 'Kubika no kurinda amakuru' : 'Data Storage & Security',
-      content: (
-        <div className="stack" style={{ ['--gap' as string]: '14px' }}>
-          <p>{isKin ? 'Dufata umutekano w\'amakuru yawe nk\'ikintu cy\'ingenzi:' : 'We take your data security seriously:'}</p>
-          <ul className="plain-list">
-            <li>
-              <strong>{isKin ? 'Aho tubika amakuru hararinzwe cyane' : 'Encrypted storage'}:</strong>{' '}
-              {isKin ? 'Amakuru yawe yose afite uburinzi bukomeye (AES-256)' : 'All your data is encrypted (AES-256)'}
-            </li>
-            <li>
-              <strong>{isKin ? 'Seriveri zacu zifite ibyemezo by\'umutekano (SOC2)' : 'SOC2-certified infrastructure'}:</strong>{' '}
-              {isKin
-                ? 'Dukoresha Supabase ifite icyemezo cy\'umutekano cya SOC2 Type 2'
-                : 'We use Supabase infrastructure with SOC2 Type 2 security certification'}
-            </li>
-            <li>
-              <strong>{isKin ? 'Twandukura amakuru kenshi (Backups)' : 'Regular backups'}:</strong>{' '}
-              {isKin ? 'Twandukura amakuru buri munsi kugirango atazazima' : 'Daily backups to prevent data loss'}
-            </li>
-            <li>
-              <strong>{isKin ? 'Kugenzura abagerera ku makuru' : 'Access controls'}:</strong>{' '}
-              {isKin ? 'Abakozi babifitiye uruhushya gusa nibo bemerewe kureba amakuru' : 'Only authorized staff can access data'}
-            </li>
-          </ul>
-        </div>
-      )
-    },
-    {
-      id: 'rights',
-      icon: Users,
-      title: isKin ? 'Uburenganzira bwawe' : 'Your Rights',
-      content: (
-        <div className="stack" style={{ ['--gap' as string]: '14px' }}>
-          <p>{isKin ? 'Ufite uburenganzira bwo:' : 'You have the right to:'}</p>
-          <ul className="plain-list">
-            <li>
-              <strong>{isKin ? 'Kureba amakuru yawe' : 'Access your data'}:</strong>{' '}
-              {isKin ? 'Saba kopi y\'amakuru yawe yose igihe cyose' : 'Request a copy of all your data anytime'}
-            </li>
-            <li>
-              <strong>{isKin ? 'Gusiba konti yawe' : 'Delete your account'}:</strong>{' '}
-              {isKin ? 'Gusiba konti yawe hamwe n\'amakuru yose yerekeranye na yo' : 'Delete your account and all associated data'}
-            </li>
-            <li>
-              <strong>{isKin ? 'Kohereza amakuru yawe ahandi' : 'Export your data'}:</strong>{' '}
-              {isKin ? 'Kuramo amakuru yawe mu buryo bworoshye (JSON)' : 'Download your data in a portable format (JSON)'}
-            </li>
-            <li>
-              <strong>{isKin ? 'Gukosora amakuru yawe' : 'Correct your data'}:</strong>{' '}
-              {isKin ? 'Hindura amakuru atari yo' : 'Update incorrect information'}
-            </li>
-          </ul>
-          <div className="callout">
-            <p>
-              <strong>{isKin ? 'Kugirango ukoreshe uburenganzira bwawe:' : 'To exercise your rights:'}</strong>{' '}
-              {isKin ? 'Twandikire kuri privacy@educode.rw' : 'Email us at privacy@educode.rw'}
-            </p>
-          </div>
-        </div>
-      )
-    },
-    {
-      id: 'children',
-      icon: Shield,
-      title: isKin ? 'Abana n\'Ibanga' : "Children's Privacy",
-      content: (
-        <div className="stack" style={{ ['--gap' as string]: '14px' }}>
-          <p>{isKin ? 'Dufasha abanyeshuri bari munsi y\'imyaka 18:' : 'We serve students under 18:'}</p>
-          <ul className="plain-list">
-            <li>{isKin ? 'Abanyeshuri munsi y\'imyaka 18 bakeneye uruhushya rw\'ababyeyi cyangwa ababarera' : 'Students under 18 need parent/guardian consent'}</li>
-            <li>{isKin ? 'Amashuri afatwa nk\'abarezi b\'abanyeshuri bayo' : 'Schools act as guardians for their students'}</li>
-            <li>{isKin ? 'Ntidukusanya amakuru atari ngombwa ku bato' : "We don't collect unnecessary data from minors"}</li>
-            <li>{isKin ? 'Ababyeyi bashobora gusaba kureba cyangwa gusiba amakuru y\'umwana wabo' : 'Parents can request to view or delete child data'}</li>
-          </ul>
-        </div>
-      )
-    },
-    {
-      id: 'cookies',
-      icon: Cookie,
-      title: 'Cookies',
-      content: (
-        <div className="stack" style={{ ['--gap' as string]: '14px' }}>
-          <p>{isKin ? 'Dukoresha cookies kugirango:' : 'We use cookies to:'}</p>
-          <ul className="plain-list">
-            <li>
-              <strong>{isKin ? 'Twibuke ko winjiye' : 'Keep you logged in'}:</strong>{' '}
-              {isKin ? 'Nta kwiyandikisha buri gihe' : "You don't have to log in every time"}
-            </li>
-            <li>
-              <strong>{isKin ? 'Twibuke ururimi wahisemo' : 'Remember your language'}:</strong>{' '}
-              {isKin ? 'Icyongereza cyangwa Ikinyarwanda uhitamo' : 'English or Kinyarwanda preference'}
-            </li>
-            <li>
-              <strong>{isKin ? 'Gusobanukirwa uko platform ikoreshwa' : 'Understand usage'}:</strong>{' '}
-              {isKin ? 'Ibiranga platform bikora neza kurusha ibindi' : 'Which features work best'}
-            </li>
-          </ul>
-          <div className="callout warning">
-            <p>
-              {isKin
-                ? 'Ntabwo dukoresha cookies zigukurikirana ngo tuguhe amatangazo y\'ubucuruzi. Dukoresha gusa cookies z\'ingenzi.'
-                : 'We do NOT use tracking cookies for ads. Only essential cookies.'}
-            </p>
-          </div>
-          <p className="dim" style={{ fontSize: 14 }}>
-            {isKin
-              ? 'Urashobora kugenzura cookies muri browser yawe, ariko bishobora gutuma platform itakora neza.'
-              : 'You can manage cookies in your browser settings, but this may affect functionality.'}
-          </p>
-        </div>
-      )
-    },
-    {
-      id: 'changes',
-      icon: FileText,
-      title: isKin ? 'Impinduka kuri iyi politiki' : 'Changes to Policy',
-      content: (
-        <div className="stack" style={{ ['--gap' as string]: '14px' }}>
-          <p>{isKin ? 'Tushobora kuvugurura iyi politiki rimwe na rimwe:' : 'We may update this policy from time to time:'}</p>
-          <ul className="plain-list">
-            <li>{isKin ? 'Tuzakumenyesha ku email niba hari impinduka zikomeye' : "We'll notify you by email of major changes"}</li>
-            <li>{isKin ? 'Itariki "Last updated" izahinduka' : 'The "Last updated" date will change'}</li>
-            <li>{isKin ? 'Gukomeza kuyikoresha bivuze ko wemeye izo mpinduka' : 'Continued use means you accept changes'}</li>
-          </ul>
-          <p className="dim" style={{ fontSize: 14 }}>
-            {isKin
-              ? 'Niba utemeye impinduka, urashobora gusiba konti yawe.'
-              : "If you don't agree with changes, you can delete your account."}
-          </p>
-        </div>
-      )
-    },
-    {
-      id: 'contact',
-      icon: Mail,
-      title: isKin ? 'Twandikire' : 'Contact Us',
-      content: (
-        <div className="stack" style={{ ['--gap' as string]: '14px' }}>
-          <p>{isKin ? 'Niba ufite ibibazo ku banga cyangwa amakuru yawe:' : 'If you have questions about privacy or your data:'}</p>
-          <div className="card pad-lg">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="iconbtn" style={{ pointerEvents: 'none' }}>
-                <Mail size={16} />
-              </div>
-              <div>
-                <div className="font-semibold" style={{ color: 'var(--text)' }}>
-                  {isKin ? 'Itsinda rishinzwe ibanga' : 'Privacy Team'}
-                </div>
-                <a href="mailto:privacy@educode.rw" className="dim">privacy@educode.rw</a>
-              </div>
-            </div>
-            <p className="dim" style={{ fontSize: 14 }}>
-              {isKin ? 'Tuzakusubiza mu gihe cy\'iminsi 5 y\'akazi.' : "We'll respond within 5 business days."}
-            </p>
-          </div>
-        </div>
-      )
-    }
-  ];
-
   return (
-    <>
-      {/* NAV */}
-      <header className="nav">
-        <div className="nav-inner">
-          <Link className="logo" to="/"><span className="edu">EduCode</span></Link>
-          <nav className="nav-links nav-collapse" aria-label="Main">
-            <Link className="nav-link" to="/about">{isKin ? 'Abo turibo' : 'About'}</Link>
-            <Link className="nav-link" to="/contact">{isKin ? 'Twandikire' : 'Contact'}</Link>
-          </nav>
-          <div className="nav-right">
-            <div className="lang-toggle">
-              {(['EN', 'KIN'] as const).map(l => (
-                <button key={l} className={language === l ? 'on' : ''} onClick={() => setLanguage(l)}>{l}</button>
-              ))}
-            </div>
-            <button
-              className="iconbtn"
-              onClick={toggleTheme}
-              aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-              aria-pressed={theme === 'light'}
-            >
-              {theme === 'dark' ? (
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
-                </svg>
-              ) : (
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-                </svg>
-              )}
-            </button>
-            <Link className="btn btn-tertiary" to="/login">{isKin ? 'Kwinjira' : 'Log in'}</Link>
-            <Link className="btn btn-primary sm" to="/signup">{isKin ? 'Tangira' : 'Get started'}</Link>
-          </div>
-        </div>
-      </header>
-
-      <main className="wrap">
-        {/* HERO */}
-        <section className="hero">
-          <p className="eyebrow rise">{isKin ? 'Ibanga' : 'Legal'}</p>
-          <h1 className="rise-2">{isKin ? 'Politiki y\'ibanga' : 'Privacy policy'}</h1>
-          <p className="lede rise-3">
-            {isKin
-              ? 'Iyi politiki isobanura uburyo EduCode Rwanda ikusanya, ikoresha, kandi irinda amakuru yawe.'
-              : 'This policy explains how EduCode Rwanda collects, uses, and protects your information.'}
-          </p>
-          <p className="dim rise-3">
-            {isKin ? 'Yavuguruwe bwa nyuma:' : 'Last updated:'} <strong style={{ color: 'var(--text)' }}>April 6, 2026</strong>
-          </p>
-        </section>
-
-        {/* CONTENT */}
-        <section className="section">
-          <div className="privacy-layout">
-            {/* Table of contents */}
-            <aside className="privacy-toc">
-              <div className="card pad-sm" style={{ position: 'sticky', top: 90 }}>
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="font-bold" style={{ color: 'var(--text)', fontSize: 14 }}>
-                    {isKin ? 'Ibirimo' : 'Contents'}
-                  </h3>
-                  <button className="btn btn-tertiary sm">
-                    <Download size={14} />
-                    PDF
-                  </button>
-                </div>
-                <nav className="stack" style={{ ['--gap' as string]: '2px' }}>
-                  {sections.map((section, index) => (
-                    <a
-                      key={section.id}
-                      href={`#${section.id}`}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setActiveSection(section.id);
-                        document.getElementById(section.id)?.scrollIntoView({ behavior: 'smooth' });
-                      }}
-                      className={`toc-link${activeSection === section.id ? ' on' : ''}`}
-                    >
-                      <section.icon size={14} />
-                      <span>{index + 1}. {section.title}</span>
-                    </a>
-                  ))}
-                </nav>
-              </div>
-            </aside>
-
-            {/* Sections */}
-            <div className="stack" style={{ ['--gap' as string]: '40px' }}>
-              {sections.map((section, index) => (
-                <section key={section.id} id={section.id} style={{ scrollMarginTop: 90 }}>
-                  <div className="flex items-start gap-4 mb-4">
-                    <div className="iconbtn" style={{ pointerEvents: 'none', flexShrink: 0 }}>
-                      <section.icon size={16} />
-                    </div>
-                    <h2 style={{ fontSize: 22, fontWeight: 600, color: 'var(--text)', letterSpacing: '-0.01em' }}>
-                      {index + 1}. {section.title}
-                    </h2>
-                  </div>
-                  <div className="dim" style={{ fontSize: 15, lineHeight: 1.7, marginLeft: 48 }}>
-                    {section.content}
-                  </div>
-                </section>
-              ))}
-
-              {/* Footer note */}
-              <div className="cta-band">
-                <Shield size={28} style={{ marginBottom: 12 }} />
-                <h2>{isKin ? 'Dufata ibanga ryawe nka rishingiro' : 'We value your privacy'}</h2>
-                <p>
-                  {isKin
-                    ? 'Niba ufite ibibazo ku banga cyangwa amakuru yawe, twandikire ku privacy@educode.rw. Tuzakusubiza mu gihe cy\'iminsi 5 y\'akazi.'
-                    : "If you have questions about privacy or your data, email us at privacy@educode.rw. We'll respond within 5 business days."}
-                </p>
-                <div className="row" style={{ justifyContent: 'center' }}>
-                  <a href="mailto:privacy@educode.rw" className="btn btn-primary lg">
-                    <Mail size={16} />
-                    {isKin ? 'Twandikire itsinda rishinzwe ibanga' : 'Contact privacy team'}
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-      </main>
-
-      <footer className="site-footer">
-        <div className="wrap foot">
-          <div>
-            <div className="logo" style={{ marginBottom: 8 }}><span className="edu">EduCode</span></div>
-            <div>{isKin ? '© 2026 EduCode Rwanda. Byubatswe mu Rwanda n\'urukundo.' : '© 2026 EduCode Rwanda. Built with ❤️ in Rwanda.'}</div>
-          </div>
-          <div className="foot-links">
-            <Link to="/login">{isKin ? 'Kwinjira' : 'Log in'}</Link>
-            <Link to="/signup">{isKin ? 'Iyandikishe' : 'Sign up'}</Link>
-            <Link to="/about">{isKin ? 'Abo turibo' : 'About'}</Link>
-            <Link to="/contact">{isKin ? 'Twandikire' : 'Contact'}</Link>
-          </div>
-        </div>
-      </footer>
-    </>
+    <LegalLayout
+      pageTitle="Privacy Policy · EduCode Rwanda"
+      eyebrow="Legal"
+      title="Privacy Policy"
+      lede="This policy explains how EduCode Rwanda collects, uses, protects, and retains your personal data, and what rights you have under Rwandan law."
+      version="Version 1.0"
+      effective="1 June 2026"
+      lastReviewed="19 July 2026"
+      sections={sections}
+      crossLink={{ label: 'End-User Licence Agreement (Part A →)', to: '/terms' }}
+    />
   );
 }
