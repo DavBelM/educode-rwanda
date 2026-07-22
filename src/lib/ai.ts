@@ -143,11 +143,9 @@ export async function getLessonAIHelp(
   question: string,
   code: string,
   instructions: string,
-  language: 'EN' | 'KIN'
+  language: 'EN' | 'KIN',
+  lessonType: 'reading' | 'coding' | 'quiz' = 'coding'
 ): Promise<string> {
-  // Greetings and casual messages should not trigger code analysis.
-  // If the user is just chatting, omit the code and instruction context so the
-  // model doesn't treat the starter template as something that needs debugging.
   const isGreeting = /^(hi|hello|hey|thanks|thank you|ok|okay|good|great|bye|goodbye|yo|sup|what's up|salut|bonjour|muraho|mwaramutse)[\s!?.😊👋]*$/i.test(question.trim());
 
   const codeBlock = !isGreeting && code.trim()
@@ -161,23 +159,41 @@ export async function getLessonAIHelp(
         : `\n\nLesson instructions: ${instructions}`)
     : '';
 
-  // Embed the no-solution rule inside the user message so it applies to both
-  // the HuggingFace Space (where we can't set the system prompt) and Gemini.
-  const noSolveRule = !isGreeting
-    ? (language === 'KIN'
-        ? '\n\n[AMABWIRIZA: Ntumuphe igisubizo cyose cya code. Muhe gusa icyifuzo kimwe cyangwa ikibazo kimwe bifasha gutekereza. Ntandike code iriho igisubizo.]'
-        : '\n\n[TUTOR RULE: Do NOT write or reveal the complete working solution. Give only 1 hint or 1 guiding question to help the student think it through themselves. Never write the full answer code.]')
+  // Stage-aware constraint — reading gets no restriction, quiz forbids answer reveals,
+  // coding forbids giving the full solution.
+  const constraintRule = !isGreeting
+    ? lessonType === 'reading'
+      ? ''
+      : lessonType === 'quiz'
+      ? (language === 'KIN'
+          ? '\n\n[AMABWIRIZA: Ntugaragaze igisubizo cyiza cy\'ikibazo. Sobanura gusa icyo ikibazo kibazo.]'
+          : '\n\n[TUTOR RULE: Never reveal or hint at the correct quiz answer. Clarify what the question is asking only.]')
+      : (language === 'KIN'
+          ? '\n\n[AMABWIRIZA: Ntumuphe igisubizo cyose cya code. Muhe gusa icyifuzo kimwe cyangwa ikibazo kimwe bifasha gutekereza. Ntandike code iriho igisubizo.]'
+          : '\n\n[TUTOR RULE: Do NOT write or reveal the complete working solution. Give only 1 hint or 1 guiding question to help the student think it through themselves. Never write the full answer code.]')
     : '';
 
   const context = language === 'KIN'
-    ? `Umunyeshuri arabaza: ${question}${codeBlock}${instructionBlock}${noSolveRule}`
-    : `Student says: ${question}${codeBlock}${instructionBlock}${noSolveRule}`;
+    ? `Umunyeshuri arabaza: ${question}${codeBlock}${instructionBlock}${constraintRule}`
+    : `Student says: ${question}${codeBlock}${instructionBlock}${constraintRule}`;
+
+  const stageNote = {
+    reading: {
+      EN: ' The student is reading a lesson. Answer their concept questions fully and clearly — no coding exercise is involved.',
+      KIN: " Umunyeshuri asoma isomo. Subiza ibibazo bye ku mibiri y'amasomo neza kandi arangwa.",
+    },
+    coding: {
+      EN: ' The student is solving a coding exercise. Guide with hints only — do not write or reveal the solution.',
+      KIN: ' Umunyeshuri akora imyitozo ya code. Muhe gusa icyifuzo — ntandike igisubizo.',
+    },
+    quiz: {
+      EN: ' The student is on a quiz. Clarify what questions are asking only — never reveal or hint at the correct answer.',
+      KIN: ' Umunyeshuri akora ikibazo. Sobanura ibibazo gusa — ntugaragaze igisubizo cyiza.',
+    },
+  }[lessonType];
 
   const base = language === 'KIN' ? SYSTEM_PROMPT_KIN : SYSTEM_PROMPT_EN;
-  const tutorPrompt = base +
-    (language === 'KIN'
-      ? ' Umunyeshuri akora isomo. Musobanurire gusa, ntumuphe igisubizo cyose.'
-      : ' The student is working on a lesson. Guide with hints only — do not give the full solution.');
+  const tutorPrompt = base + (language === 'KIN' ? stageNote.KIN : stageNote.EN);
 
   try {
     return await callSpace(context, tutorPrompt);

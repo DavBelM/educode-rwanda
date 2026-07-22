@@ -94,9 +94,10 @@ function ReadingLesson({ lesson, language, onComplete, completing }: {
 
 // ─── Coding Lesson ────────────────────────────────────────────────────────────
 
-function CodingLesson({ lesson, language, onComplete, completing, onCodeChange }: {
+function CodingLesson({ lesson, language, onComplete, completing, onCodeChange, onRunResult }: {
   lesson: CourseLesson; language: 'EN' | 'KIN'; onComplete: (usedSolution?: boolean) => void; completing: boolean;
   onCodeChange?: (code: string) => void;
+  onRunResult?: (error: string | null, failedCount: number) => void;
 }) {
   const isKin = language === 'KIN';
   const isHtmlExercise = !lesson.exercise_data?.starter_code;
@@ -134,6 +135,7 @@ function CodingLesson({ lesson, language, onComplete, completing, onCodeChange }
       setOutput(out || '(no output)');
       setHasRun(true);
 
+      let failedN = 0;
       if (tests.length > 0) {
         const actualLines = (result.output ?? '').split('\n').map(l => l.trim());
         const results = tests.map((t, i) => {
@@ -150,12 +152,17 @@ function CodingLesson({ lesson, language, onComplete, completing, onCodeChange }
         });
         setTestResults(results);
         const allPassed = results.every(r => r.passed);
-        if (!allPassed || result.error) setFailedAttempts(n => n + 1);
+        if (!allPassed || result.error) {
+          setFailedAttempts(n => n + 1);
+          failedN = results.filter(r => !r.passed).length || (result.error ? 1 : 0);
+        }
       } else if (result.error) {
         setFailedAttempts(n => n + 1);
+        failedN = 1;
       }
 
       setRunning(false);
+      if (result.error || failedN > 0) onRunResult?.(result.error ?? null, failedN);
     }
   }, [code, htmlCode, isHtmlExercise, tests]);
 
@@ -526,11 +533,34 @@ export default function LessonViewer({ lesson, courseTitle, allLessons, language
   // ── Rail Mwarimu chat (works for all lesson types) ────────────────────────
   const codeCtxRef = useRef('');
   const instrCtx = lesson.exercise_data?.instructions ?? '';
-  const [railMessages, setRailMessages] = useState<Array<{ role: 'user' | 'ai'; text: string }>>([]);
+  const [railMessages, setRailMessages] = useState<Array<{ role: 'user' | 'ai'; text: string; auto?: boolean }>>([]);
   const [railLoading, setRailLoading] = useState(false);
   const [railInput, setRailInput] = useState('');
   const railEndRef = useRef<HTMLDivElement>(null);
   const [railWidth, setRailWidth] = useState(360);
+
+  // Feature 1 — proactive error hint
+  const railLoadingRef = useRef(false);
+  useEffect(() => { railLoadingRef.current = railLoading; }, [railLoading]);
+  const lastAutoRef = useRef(0);
+
+  const pushAutoHint = useCallback(async (error: string | null, failedCount: number) => {
+    if (railLoadingRef.current) return;
+    const now = Date.now();
+    if (now - lastAutoRef.current < 8000) return;
+    lastAutoRef.current = now;
+    const q = language === 'KIN'
+      ? (error ? `Namaze gukora code maze ibica iki ikosa: ${error}` : `Ibigerageza ${failedCount} byanze.`)
+      : (error ? `I ran my code and got this error: ${error}` : `${failedCount} test${failedCount > 1 ? 's' : ''} failed.`);
+    setRailLoading(true);
+    const answer = await getLessonAIHelp(q, codeCtxRef.current, instrCtx, language, 'coding');
+    setRailMessages(prev => [...prev, { role: 'ai', text: answer, auto: true }]);
+    setRailLoading(false);
+  }, [language, instrCtx]);
+
+  // Feature 3 — post-lesson reflection
+  const [reflection, setReflection] = useState<string | null>(null);
+  const [reflectionLoading, setReflectionLoading] = useState(false);
 
   const startRailResize = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
@@ -560,7 +590,7 @@ export default function LessonViewer({ lesson, courseTitle, allLessons, language
     setRailInput('');
     setRailMessages(prev => [...prev, { role: 'user', text: q }]);
     setRailLoading(true);
-    const answer = await getLessonAIHelp(q, codeCtxRef.current, instrCtx, language);
+    const answer = await getLessonAIHelp(q, codeCtxRef.current, instrCtx, language, lesson.lesson_type as 'reading' | 'coding' | 'quiz');
     setRailMessages(prev => {
       const lastAiIdx = prev.reduce((acc, m, i) => m.role === 'ai' ? i : acc, -1);
       if (lastAiIdx >= 0 && RAIL_BUSY_RE.test(prev[lastAiIdx].text)) {
@@ -592,7 +622,20 @@ export default function LessonViewer({ lesson, courseTitle, allLessons, language
     const { xpAwarded: earned } = await completeLesson(lesson.id, score, usedSolution ? 0 : undefined);
     setXpAwarded(earned);
     setCompleting(false);
-    setShowRating(true); // show survey before the done screen
+
+    // Feature 3 — fire reflection in background while rating modal is open
+    setReflectionLoading(true);
+    const reflCtx = lesson.lesson_type === 'reading'
+      ? (lesson.content ?? '').slice(0, 600)
+      : instrCtx;
+    const reflQ = language === 'KIN'
+      ? `Umunyeshuri arangije isomo: "${lesson.title}". Muhe amagambi 2 mafupi: igitekerezo cy'ingenzi gikwiye gutunga, n'ikintu kimwe gito azagerageza.`
+      : `The student just completed "${lesson.title}". Write 2 short sentences: the key concept to take away, and one small thing to try next.`;
+    getLessonAIHelp(reflQ, '', reflCtx, language, lesson.lesson_type as 'reading' | 'coding' | 'quiz')
+      .then(r => { setReflection(r); setReflectionLoading(false); })
+      .catch(() => setReflectionLoading(false));
+
+    setShowRating(true);
   };
 
   // Rating modal — appears right after completion, before the done screen
@@ -615,8 +658,8 @@ export default function LessonViewer({ lesson, courseTitle, allLessons, language
   // Completion screen
   if (done) {
     return (
-      <div style={{ minHeight: '100vh', background: 'var(--bg)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ textAlign: 'center', maxWidth: 340, padding: '0 24px' }}>
+      <div style={{ minHeight: '100vh', background: 'var(--bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px 16px' }}>
+        <div style={{ textAlign: 'center', maxWidth: 400, width: '100%' }}>
           <div style={{ width: 72, height: 72, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px', background: 'rgba(158,170,132,0.08)', border: '1px solid rgba(158,170,132,0.25)' }}>
             <CheckCircle size={32} style={{ color: '#9eaa84' }} />
           </div>
@@ -624,12 +667,28 @@ export default function LessonViewer({ lesson, courseTitle, allLessons, language
             {isKin ? 'Warangije Isomo!' : 'Lesson Complete!'}
           </h2>
           <p style={{ fontSize: 14, marginBottom: 16, color: 'var(--text-2)' }}>{lessonTitle}</p>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 32, color: xpAwarded > 0 ? '#cda86a' : 'var(--text-3)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 24, color: xpAwarded > 0 ? '#cda86a' : 'var(--text-3)' }}>
             <Zap size={18} fill={xpAwarded > 0 ? '#cda86a' : 'none'} />
             <span style={{ fontSize: 18, fontWeight: 600 }}>
               {xpAwarded > 0 ? `+${xpAwarded} XP` : isKin ? 'Nta XP (wakoresheje igisubizo)' : 'No XP (solution used)'}
             </span>
           </div>
+
+          {/* Feature 3 — Mwarimu reflection */}
+          {(reflection || reflectionLoading) && (
+            <div className="card" style={{ padding: '14px 16px', textAlign: 'left', marginBottom: 20 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+                <span className="ai-mwicon" style={{ fontSize: 11, width: 22, height: 22, minWidth: 22 }}>M</span>
+                <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--text)' }}>Mwarimu</span>
+              </div>
+              {reflectionLoading ? (
+                <div className="typing-dots"><span /><span /><span /></div>
+              ) : (
+                <p style={{ fontSize: 13.5, lineHeight: 1.65, color: 'var(--text-2)', margin: 0 }}>{reflection}</p>
+              )}
+            </div>
+          )}
+
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             {nextLesson && (
               <button onClick={() => onNextLesson(nextLesson)} className="btn btn-primary btn-block">
@@ -708,7 +767,7 @@ export default function LessonViewer({ lesson, courseTitle, allLessons, language
             <ReadingLesson lesson={lesson} language={language} onComplete={() => handleComplete()} completing={completing} />
           )}
           {lesson.lesson_type === 'coding' && (
-            <CodingLesson lesson={lesson} language={language} onComplete={(usedSolution) => handleComplete(undefined, usedSolution)} completing={completing} onCodeChange={c => { codeCtxRef.current = c; }} />
+            <CodingLesson lesson={lesson} language={language} onComplete={(usedSolution) => handleComplete(undefined, usedSolution)} completing={completing} onCodeChange={c => { codeCtxRef.current = c; }} onRunResult={pushAutoHint} />
           )}
           {lesson.lesson_type === 'quiz' && (
             <QuizLesson lesson={lesson} language={language} onComplete={(s) => handleComplete(s)} completing={completing} />
@@ -762,7 +821,12 @@ export default function LessonViewer({ lesson, courseTitle, allLessons, language
                 </p>
               )}
               {railMessages.map((m, i) => (
-                <div key={i} style={{ display: 'flex', justifyContent: m.role === 'user' ? 'flex-end' : 'flex-start' }}>
+                <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: m.role === 'user' ? 'flex-end' : 'flex-start' }}>
+                  {m.auto && (
+                    <p style={{ fontSize: 11, color: 'var(--text-3)', marginBottom: 4, paddingLeft: 2 }}>
+                      {isKin ? 'Mwarimu yabibonye' : 'Mwarimu noticed'}
+                    </p>
+                  )}
                   <div style={{
                     maxWidth: '94%', padding: '7px 11px', borderRadius: 'var(--radius)', fontSize: 13, lineHeight: 1.55,
                     background: m.role === 'user' ? 'var(--surface-2)' : 'var(--surface)',
