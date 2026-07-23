@@ -122,7 +122,8 @@ export function MwarimuPanel({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [runCount]);
 
-  // Translate untranslated Mwarimu messages when switching to KIN
+  // Translate untranslated Mwarimu messages when switching to KIN — one at a time
+  // to avoid bursting Gemini with simultaneous requests (causes 503s).
   useEffect(() => {
     if (language !== 'KIN') return;
     const untranslated = messages.filter(m => m.role === 'mw' && !m.textKin && !m.translating);
@@ -132,19 +133,22 @@ export function MwarimuPanel({
       untranslated.some(u => u.id === m.id) ? { ...m, translating: true } : m
     ));
 
-    untranslated.forEach(m => {
-      translateToKinyarwanda(m.text)
-        .then(textKin => {
+    (async () => {
+      for (let i = 0; i < untranslated.length; i++) {
+        const m = untranslated[i];
+        try {
+          const textKin = await translateToKinyarwanda(m.text);
           setMessages(prev => prev.map(msg =>
             msg.id === m.id ? { ...msg, textKin, translating: false, translateFailed: false } : msg
           ));
-        })
-        .catch(() => {
+        } catch {
           setMessages(prev => prev.map(msg =>
             msg.id === m.id ? { ...msg, translating: false, translateFailed: true } : msg
           ));
-        });
-    });
+        }
+        if (i < untranslated.length - 1) await new Promise(r => setTimeout(r, 350));
+      }
+    })();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [language]);
 
@@ -198,20 +202,21 @@ export function MwarimuPanel({
       if (m.translating) return <div className="typing-dots"><span /><span /><span /></div>;
       if (m.translateFailed) return (
         <div>
-          <p style={{ color: 'var(--text-3)', fontSize: 13, marginBottom: 6 }}>
-            Guhindura mu Kinyarwanda byanze. Gerageza nanone:
-          </p>
-          <button
-            style={{ fontSize: 12, background: 'none', border: '1px solid var(--line)', borderRadius: 6, padding: '3px 10px', cursor: 'pointer', color: 'var(--text-2)' }}
-            onClick={() => {
-              setMessages(prev => prev.map(msg => msg.id === m.id ? { ...msg, translating: true, translateFailed: false } : msg));
-              translateToKinyarwanda(m.text)
-                .then(textKin => setMessages(prev => prev.map(msg => msg.id === m.id ? { ...msg, textKin, translating: false, translateFailed: false } : msg)))
-                .catch(() => setMessages(prev => prev.map(msg => msg.id === m.id ? { ...msg, translating: false, translateFailed: true } : msg)));
-            }}
-          >
-            Gerageza nanone
-          </button>
+          <ReactMarkdown>{m.text}</ReactMarkdown>
+          <div style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ fontSize: 11, color: 'var(--text-3)', fontFamily: 'var(--mono)' }}>EN</span>
+            <button
+              style={{ fontSize: 11, background: 'none', border: '1px solid var(--line)', borderRadius: 4, padding: '2px 7px', cursor: 'pointer', color: 'var(--text-3)' }}
+              onClick={() => {
+                setMessages(prev => prev.map(msg => msg.id === m.id ? { ...msg, translating: true, translateFailed: false } : msg));
+                translateToKinyarwanda(m.text)
+                  .then(textKin => setMessages(prev => prev.map(msg => msg.id === m.id ? { ...msg, textKin, translating: false, translateFailed: false } : msg)))
+                  .catch(() => setMessages(prev => prev.map(msg => msg.id === m.id ? { ...msg, translating: false, translateFailed: true } : msg)));
+              }}
+            >
+              Hindura →
+            </button>
+          </div>
         </div>
       );
       if (m.textKin) return <ReactMarkdown>{m.textKin}</ReactMarkdown>;

@@ -210,15 +210,25 @@ export async function getLessonReflection(
   language: 'EN' | 'KIN'
 ): Promise<string> {
   const message = language === 'KIN'
-    ? `UMURIMO: Andika AMAGAMBI 2 GUSA kuri iri somo: "${lessonTitle}". Igice 1: igitekerezo cy'ingenzi umunyeshuri yize. Igice 2: ikintu kimwe gito cyo kugerageza nyuma. AMAGAMBI 2 GUSA. NTARENZA.`
-    : `TASK: Write EXACTLY 2 sentences about the lesson "${lessonTitle}". Sentence 1: the single key concept the student just practiced. Sentence 2: one small thing to try next on their own. EXACTLY 2 SENTENCES. NO MORE.`;
+    ? `UMURIMO: Andika AMAGAMBI 2 GUSA kuri iri somo: "${lessonTitle}". Igice 1: igitekerezo cy'ingenzi umunyeshuri yize. Igice 2: ikintu kimwe gito cyo kugerageza nyuma. Ntandike code. AMAGAMBI 2 GUSA.`
+    : `TASK: Write EXACTLY 2 plain sentences about the lesson "${lessonTitle}". Sentence 1: the key concept the student just practiced. Sentence 2: one small thing to try next. No code blocks. No lists. Plain prose only. 2 SENTENCES MAX.`;
 
+  // Truncate to first 2 sentences, skipping periods inside words like console.log()
   const truncate = (t: string): string => {
+    // Match sentence endings: period/!/? that is followed by a space or end-of-string,
+    // but NOT preceded by a word character run (avoids console.log, 2.0, etc.)
+    const re = /[^!?]*?(?:[A-Z][^.!?]*)?[^.!?]*[.!?](?=\s|$)/g;
     const parts: string[] = [];
-    const re = /[^.!?]*[.!?]+/g;
     let m: RegExpExecArray | null;
-    while ((m = re.exec(t)) !== null && parts.length < 2) parts.push(m[0]);
-    return parts.length >= 1 ? parts.join(' ').trim() : t.trim();
+    while ((m = re.exec(t)) !== null && parts.length < 2) {
+      const s = m[0].trim();
+      if (s.split(' ').length > 3) parts.push(s); // skip fragments shorter than 4 words
+    }
+    if (parts.length >= 1) return parts.join(' ').trim();
+    // fallback: cap at 280 chars, cut at last space
+    const capped = t.slice(0, 280);
+    const cut = capped.lastIndexOf(' ');
+    return (cut > 100 ? capped.slice(0, cut) : capped).trim();
   };
 
   try {

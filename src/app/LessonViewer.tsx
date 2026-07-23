@@ -678,7 +678,9 @@ export default function LessonViewer({ lesson, courseTitle, allLessons, language
               {reflectionLoading ? (
                 <div className="typing-dots"><span /><span /><span /></div>
               ) : (
-                <p style={{ fontSize: 13.5, lineHeight: 1.65, color: 'var(--text-2)', margin: 0 }}>{reflection}</p>
+                <div style={{ fontSize: 13.5, lineHeight: 1.65, color: 'var(--text-2)' }}>
+                  <ReactMarkdown>{reflection ?? ''}</ReactMarkdown>
+                </div>
               )}
             </div>
           )}
