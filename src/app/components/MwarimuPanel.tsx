@@ -122,11 +122,13 @@ export function MwarimuPanel({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [runCount]);
 
-  // Translate untranslated Mwarimu messages when switching to KIN — one at a time
-  // to avoid bursting Gemini with simultaneous requests (causes 503s).
+  // Translate untranslated Mwarimu messages when switching to KIN — one at a time,
+  // limited to the 3 most recent to avoid exhausting Gemini quota on long histories.
   useEffect(() => {
     if (language !== 'KIN') return;
-    const untranslated = messages.filter(m => m.role === 'mw' && !m.textKin && !m.translating);
+    const allUntranslated = messages.filter(m => m.role === 'mw' && !m.textKin && !m.translating);
+    // Only translate the 3 newest — older ones stay as EN with badge
+    const untranslated = allUntranslated.slice(-3);
     if (!untranslated.length) return;
 
     setMessages(prev => prev.map(m =>
@@ -160,16 +162,9 @@ export function MwarimuPanel({
       : `${ctx}${question}`;
     try {
       const response = await getMwarimuReply(wrappedQuestion, code, instructions, language);
-      if (isKin) {
-        const id = nextId;
-        setMwMsg(response);
-        setMessages(prev => prev.map(m => m.id === id ? { ...m, translating: true } : m));
-        translateToKinyarwanda(response)
-          .then(textKin => setMessages(prev => prev.map(m => m.id === id ? { ...m, textKin, translating: false, translateFailed: false } : m)))
-          .catch(() => setMessages(prev => prev.map(m => m.id === id ? { ...m, translating: false, translateFailed: true } : m)));
-      } else {
-        setMwMsg(response);
-      }
+      // Model responds in KIN directly when language=KIN — no translation step needed.
+      // Translation is only used for old EN messages when the user switches to KIN.
+      setMwMsg(response);
       logAIInteraction({ question, response, language, sessionId, challengeId })
         .then(() => onInteractionLogged?.());
     } catch {
