@@ -204,6 +204,33 @@ export async function getLessonAIHelp(
   }
 }
 
+// ── Post-lesson reflection (2 sentences, hard-truncated) ─────────────────────
+export async function getLessonReflection(
+  lessonTitle: string,
+  language: 'EN' | 'KIN'
+): Promise<string> {
+  const message = language === 'KIN'
+    ? `UMURIMO: Andika AMAGAMBI 2 GUSA kuri iri somo: "${lessonTitle}". Igice 1: igitekerezo cy'ingenzi umunyeshuri yize. Igice 2: ikintu kimwe gito cyo kugerageza nyuma. AMAGAMBI 2 GUSA. NTARENZA.`
+    : `TASK: Write EXACTLY 2 sentences about the lesson "${lessonTitle}". Sentence 1: the single key concept the student just practiced. Sentence 2: one small thing to try next on their own. EXACTLY 2 SENTENCES. NO MORE.`;
+
+  const truncate = (t: string): string => {
+    const parts: string[] = [];
+    const re = /[^.!?]*[.!?]+/g;
+    let m: RegExpExecArray | null;
+    while ((m = re.exec(t)) !== null && parts.length < 2) parts.push(m[0]);
+    return parts.length >= 1 ? parts.join(' ').trim() : t.trim();
+  };
+
+  try {
+    const text = await callSpace(message);
+    return truncate(text);
+  } catch {
+    return language === 'KIN'
+      ? `Warangije isomo "${lessonTitle}" neza. Gerageza gukora ibikorwa bishya ukoresha ibyo wize.`
+      : `You just practiced the key ideas in "${lessonTitle}". Try applying them to a small problem of your own.`;
+  }
+}
+
 // ── Mwarimu chat reply (Workspace AI panel) ───────────────────────────────────
 export async function getMwarimuReply(
   question: string,

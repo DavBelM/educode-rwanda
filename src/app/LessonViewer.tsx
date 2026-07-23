@@ -5,7 +5,7 @@ import { RatingModal } from './components/RatingModal';
 import { Play, CheckCircle, Loader, Zap, BookOpen, Code2, HelpCircle, Monitor, Send, ArrowLeft } from 'lucide-react';
 import { completeLesson, type CourseLesson } from '../lib/db';
 import { executeCode } from '../lib/code-executor';
-import { getLessonAIHelp } from '../lib/ai';
+import { getLessonAIHelp, getLessonReflection } from '../lib/ai';
 import CodeMirror from '@uiw/react-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { html } from '@codemirror/lang-html';
@@ -625,13 +625,7 @@ export default function LessonViewer({ lesson, courseTitle, allLessons, language
 
     // Feature 3 — fire reflection in background while rating modal is open
     setReflectionLoading(true);
-    const reflCtx = lesson.lesson_type === 'reading'
-      ? (lesson.content ?? '').slice(0, 600)
-      : instrCtx;
-    const reflQ = language === 'KIN'
-      ? `Umunyeshuri arangije isomo: "${lesson.title}". Muhe amagambi 2 mafupi: igitekerezo cy'ingenzi gikwiye gutunga, n'ikintu kimwe gito azagerageza.`
-      : `The student just completed "${lesson.title}". Write 2 short sentences: the key concept to take away, and one small thing to try next.`;
-    getLessonAIHelp(reflQ, '', reflCtx, language, lesson.lesson_type as 'reading' | 'coding' | 'quiz')
+    getLessonReflection(lesson.title, language)
       .then(r => { setReflection(r); setReflectionLoading(false); })
       .catch(() => setReflectionLoading(false));
 
