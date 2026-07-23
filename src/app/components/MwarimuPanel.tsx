@@ -203,20 +203,7 @@ export function MwarimuPanel({
       if (m.translateFailed) return (
         <div>
           <ReactMarkdown>{m.text}</ReactMarkdown>
-          <div style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: 8 }}>
-            <span style={{ fontSize: 11, color: 'var(--text-3)', fontFamily: 'var(--mono)' }}>EN</span>
-            <button
-              style={{ fontSize: 11, background: 'none', border: '1px solid var(--line)', borderRadius: 4, padding: '2px 7px', cursor: 'pointer', color: 'var(--text-3)' }}
-              onClick={() => {
-                setMessages(prev => prev.map(msg => msg.id === m.id ? { ...msg, translating: true, translateFailed: false } : msg));
-                translateToKinyarwanda(m.text)
-                  .then(textKin => setMessages(prev => prev.map(msg => msg.id === m.id ? { ...msg, textKin, translating: false, translateFailed: false } : msg)))
-                  .catch(() => setMessages(prev => prev.map(msg => msg.id === m.id ? { ...msg, translating: false, translateFailed: true } : msg)));
-              }}
-            >
-              Hindura →
-            </button>
-          </div>
+          <span style={{ fontSize: 10, color: 'var(--text-3)', fontFamily: 'var(--mono)', marginTop: 6, display: 'inline-block' }}>EN</span>
         </div>
       );
       if (m.textKin) return <ReactMarkdown>{m.textKin}</ReactMarkdown>;
@@ -225,6 +212,7 @@ export function MwarimuPanel({
   }
 
   const firstName = studentName?.split(' ')[0];
+  const hasFailedTranslations = messages.some(m => m.translateFailed);
   const emptyStateMsg = isKin
     ? `Tangiza kode yawe maze nzakwereka icyo nabonye${firstName ? `, ${firstName}` : ''}.`
     : `Run your code and I'll take a look${firstName ? `, ${firstName}` : ''}.`;
@@ -307,7 +295,11 @@ export function MwarimuPanel({
           </button>
         </div>
         <div className="compose-hint">
-          {isKin ? 'Kanda RW kugira ngo uhindukirire mu Kinyarwanda.' : 'Click RW to translate to Kinyarwanda.'}
+          {isKin
+            ? (hasFailedTranslations
+                ? 'Ibisubizo bishya bizasubizwa mu Kinyarwanda. Ibyashize ni ibyo mu Cyongereza.'
+                : 'Mwarimu azakusubiza mu Kinyarwanda.')
+            : 'Click RW to get responses in Kinyarwanda.'}
         </div>
       </div>
     </aside>
