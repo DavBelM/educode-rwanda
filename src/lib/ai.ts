@@ -61,11 +61,11 @@ export function warmUpSpace(): void {
 // ── Call our Vercel proxy → HuggingFace Space ─────────────────────────────────
 // systemPrompt is now built server-side with RAG context; the parameter is kept
 // for call-site compatibility but is no longer sent to the server.
-async function callSpace(message: string, _systemPrompt?: string, language?: 'EN' | 'KIN'): Promise<string> {
+async function callSpace(message: string, _systemPrompt?: string): Promise<string> {
   const response = await fetch('/api/ai', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ message, language }),
+    body: JSON.stringify({ message }),
     signal: AbortSignal.timeout(300_000),
   });
 
@@ -88,30 +88,33 @@ export async function getAIFeedback(
 
   let raw: string;
   try {
-    raw = await callSpace(question, SYSTEM_PROMPT_EN, language);
+    raw = await callSpace(question, SYSTEM_PROMPT_EN);
   } catch {
     await new Promise(r => setTimeout(r, 800));
     return getMockResponse(error, language);
   }
 
-  // Model always responds in Kinyarwanda — use Gemini to deliver correct language
-  if (language === 'EN') {
-    try {
-      const response = await fetch('/api/translate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: raw, targetLanguage: 'EN' }),
-        signal: AbortSignal.timeout(30_000),
-      });
-      const json = await response.json();
-      if (typeof json.text === 'string' && json.text.trim()) return json.text;
-    } catch { /* fall through to raw */ }
-  }
-
+  // Model responds in English — return directly for both EN and KIN modes.
+  // KIN translation is handled in the UI layer (MwarimuPanel) via translateToKinyarwanda.
   return raw;
 }
 
+// Simple hash for localStorage cache keys — keeps keys short
+function _strHash(s: string): string {
+  let h = 0;
+  for (let i = 0; i < Math.min(s.length, 600); i++) h = (Math.imul(31, h) + s.charCodeAt(i)) | 0;
+  return Math.abs(h).toString(36);
+}
+
 export async function translateToKinyarwanda(text: string): Promise<string> {
+  const cacheKey = `kin_${_strHash(text)}`;
+
+  // Return cached translation immediately (no Gemini call needed)
+  try {
+    const cached = localStorage.getItem(cacheKey);
+    if (cached) return cached;
+  } catch { /* ignore */ }
+
   const attempt = async () => {
     const response = await fetch('/api/translate', {
       method: 'POST',
@@ -128,13 +131,16 @@ export async function translateToKinyarwanda(text: string): Promise<string> {
   };
 
   try {
-    return await attempt();
+    const result = await attempt();
+    try { localStorage.setItem(cacheKey, result); } catch { /* storage full */ }
+    return result;
   } catch (err: unknown) {
     const e = err as { retryable?: boolean };
     if (e.retryable) {
-      // Wait 3s then retry once — handles transient Gemini 503 overload
       await new Promise(r => setTimeout(r, 3000));
-      return await attempt();
+      const result = await attempt();
+      try { localStorage.setItem(cacheKey, result); } catch { /* storage full */ }
+      return result;
     }
     throw err;
   }
@@ -197,7 +203,7 @@ export async function getLessonAIHelp(
   const tutorPrompt = base + (language === 'KIN' ? stageNote.KIN : stageNote.EN);
 
   try {
-    return await callSpace(context, tutorPrompt, language);
+    return await callSpace(context, tutorPrompt);
   } catch {
     await new Promise(r => setTimeout(r, 800));
     const pool = language === 'KIN' ? TUTOR_MOCK_KIN : TUTOR_MOCK_EN;
@@ -249,25 +255,9 @@ export async function getMwarimuReply(
   instructions: string,
   language: 'EN' | 'KIN'
 ): Promise<string> {
-  const raw = await getLessonAIHelp(question, code, instructions, language);
-
-  // Space fine-tuned model responds in KIN by default.
-  // For EN mode: translate KIN→EN via Gemini.
-  // For KIN mode: model is explicitly told to respond in KIN — return directly.
-  if (language === 'EN') {
-    try {
-      const response = await fetch('/api/translate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: raw, targetLanguage: 'EN' }),
-        signal: AbortSignal.timeout(30_000),
-      });
-      const json = await response.json();
-      if (typeof json.text === 'string' && json.text.trim()) return json.text;
-    } catch { /* fall through to raw */ }
-  }
-
-  return raw;
+  // Model always responds in English.
+  // KIN translation is handled in MwarimuPanel via translateToKinyarwanda.
+  return getLessonAIHelp(question, code, instructions, language);
 }
 
 // ── AI assessment (Gemini-powered, teacher-facing) ────────────────────────────

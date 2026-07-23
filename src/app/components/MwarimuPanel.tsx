@@ -100,6 +100,18 @@ export function MwarimuPanel({
     });
   }
 
+  // Translate a specific message by id (captures id before setMwMsg increments nextId)
+  function translateAfterSet(msgId: number, text: string) {
+    setMessages(prev => prev.map(m => m.id === msgId ? { ...m, translating: true } : m));
+    translateToKinyarwanda(text)
+      .then(textKin => setMessages(prev => prev.map(m =>
+        m.id === msgId ? { ...m, textKin, translating: false, translateFailed: false } : m
+      )))
+      .catch(() => setMessages(prev => prev.map(m =>
+        m.id === msgId ? { ...m, translating: false, translateFailed: true } : m
+      )));
+  }
+
   // Auto-feedback when student runs code — only fire when the error actually changes.
   useEffect(() => {
     if (runCount === 0 || examMode || !error) return;
@@ -113,7 +125,10 @@ export function MwarimuPanel({
     setLoading(true);
     getAIFeedback(code, error, language)
       .then(response => {
+        // Capture the id that addMsg will assign, then translate if in KIN mode
+        const msgId = nextId;
         setMwMsg(response);
+        if (isKin) translateAfterSet(msgId, response);
         logAIInteraction({ question, response, language, sessionId, challengeId })
           .then(() => onInteractionLogged?.());
       })
@@ -162,9 +177,10 @@ export function MwarimuPanel({
       : `${ctx}${question}`;
     try {
       const response = await getMwarimuReply(wrappedQuestion, code, instructions, language);
-      // Model responds in KIN directly when language=KIN — no translation step needed.
-      // Translation is only used for old EN messages when the user switches to KIN.
+      // Model returns English — translate to KIN in the UI if needed
+      const msgId = nextId;
       setMwMsg(response);
+      if (isKin) translateAfterSet(msgId, response);
       logAIInteraction({ question, response, language, sessionId, challengeId })
         .then(() => onInteractionLogged?.());
     } catch {

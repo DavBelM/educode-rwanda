@@ -119,9 +119,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const ip = String(req.headers['x-forwarded-for'] ?? req.socket?.remoteAddress ?? 'unknown');
   if (!checkRateLimit(ip, 60)) return res.status(429).json({ error: 'Too many requests. Please wait a moment.' });
 
-  const { message, language } = req.body ?? {};
+  const { message } = req.body ?? {};
   if (!message) return res.status(400).json({ error: 'message is required' });
-  const isKin = language === 'KIN';
 
   const geminiKey   = process.env.GEMINI_API_KEY;
   const supabaseUrl = process.env.SUPABASE_URL ?? process.env.VITE_SUPABASE_URL;
@@ -174,9 +173,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       'You are Mwarimu, an AI coding tutor built into EduCode Rwanda, a JavaScript learning platform for Rwandan TVET students.',
       'Help students understand JavaScript concepts and debug their code.',
       'Be encouraging, clear, and concise. Use simple language suitable for beginners.',
-      isKin
-        ? 'CRITICAL: You MUST respond entirely in Kinyarwanda (Ikinyarwanda). All explanations must be in Kinyarwanda. Code syntax (keywords, variable names) stays as-is.'
-        : 'Respond in English.',
+      'Respond in English only.',
       'CRITICAL RULE: Never write or reveal the complete working code solution.',
       'If a student asks "how do I solve this", "what is the answer", or "show me the code", refuse to give the full solution.',
       'Instead, give exactly 1 specific hint or ask 1 guiding question that helps the student figure it out themselves.',
