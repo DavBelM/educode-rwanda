@@ -7,9 +7,26 @@ export default async function handler(_req: VercelRequest, res: VercelResponse) 
     return res.status(200).json({ ok: false, error: 'GEMINI_API_KEY not set in Vercel env' });
   }
 
+  // Fetch the list of available models from Google
+  let availableModels: string[] = [];
+  try {
+    const modelsRes = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models?key=${geminiKey}&pageSize=50`,
+      { signal: AbortSignal.timeout(8_000) }
+    );
+    const modelsJson = await modelsRes.json();
+    if (Array.isArray(modelsJson.models)) {
+      availableModels = (modelsJson.models as { name: string }[])
+        .map(m => m.name.replace('models/', ''))
+        .filter(n => n.startsWith('gemini'));
+    }
+  } catch { /* ignore */ }
+
+  // Test the model currently in use
+  const MODEL = 'gemini-1.5-flash';
   try {
     const geminiRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${geminiKey}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -28,8 +45,10 @@ export default async function handler(_req: VercelRequest, res: VercelResponse) 
     if (!geminiRes.ok) {
       return res.status(200).json({
         ok: false,
+        modelTested: MODEL,
         httpStatus: geminiRes.status,
         error: json.error ?? rawBody.slice(0, 200),
+        availableModels,
       });
     }
 
@@ -38,14 +57,16 @@ export default async function handler(_req: VercelRequest, res: VercelResponse) 
 
     return res.status(200).json({
       ok: true,
-      httpStatus: geminiRes.status,
+      modelTested: MODEL,
       reply: text.trim(),
-      keyPrefix: geminiKey.slice(0, 6) + '…',
+      availableModels,
     });
   } catch (err: unknown) {
     return res.status(200).json({
       ok: false,
+      modelTested: MODEL,
       error: err instanceof Error ? err.message : String(err),
+      availableModels,
     });
   }
 }
