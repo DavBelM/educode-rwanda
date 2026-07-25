@@ -11,7 +11,7 @@ import { runQuizTests, type TestResult } from '../lib/quiz-executor';
 import {
   getSetChallenges, getQuizSets, startQuizSession, upsertQuizAttempt,
   completeQuizSession, markSetCompleted, awardXp, hasCompletedSet,
-  getOrCreateMyCodename, postPeerActivity,
+  getPassedChallengesForSet, getOrCreateMyCodename, postPeerActivity,
   type QuizSet, type QuizChallenge, type ErrorLogEntry,
 } from '../lib/quiz-db';
 import { getStudentClasses } from '../lib/db';
@@ -174,32 +174,44 @@ export default function ChallengeRunner({ language }: Props) {
 
   useEffect(() => {
     if (!setId) return;
-    Promise.all([
-      getQuizSets(),
-      getSetChallenges(setId),
-      getStudentClasses(),
-      getOrCreateMyCodename(),
-      hasCompletedSet(setId),
-    ]).then(([allSets, chs, { data: classes }, codename, alreadyDone]) => {
-      const found = allSets.find(s => s.id === setId) ?? null;
-      setSet(found);
+    (async () => {
+      const [allSets, chs, { data: classes }, codename, alreadyDone] = await Promise.all([
+        getQuizSets(),
+        getSetChallenges(setId),
+        getStudentClasses(),
+        getOrCreateMyCodename(),
+        hasCompletedSet(setId),
+      ]);
+
+      setSet(allSets.find(s => s.id === setId) ?? null);
       setChallenges(chs);
       classIdRef.current = classes?.[0]?.id ?? null;
       codenameRef.current = codename;
       alreadyCompletedRef.current = alreadyDone;
-      // Start session after we have class_id
-      return startQuizSession(setId, classIdRef.current ?? undefined)
-        .then(session => {
-          if (session.data) sessionIdRef.current = session.data.id;
-          if (chs.length > 0) {
-            const k = `educode_cr_${profile?.id ?? 'anon'}_${setId ?? ''}_${chs[0].id}`;
-            setJsCode(localStorage.getItem(k + '_js') ?? chs[0].starter_js);
-            setHtmlCode(localStorage.getItem(k + '_html') ?? chs[0].starter_html);
-          }
-          setPhase('running');
-          setChallengeStartMs(Date.now());
-        });
-    });
+
+      // Find which challenges this student already passed so we can resume mid-set
+      const { passedIds, totalXp } = await getPassedChallengesForSet(chs.map(c => c.id));
+      const passedSet = new Set(passedIds);
+      const resumeIdx = alreadyDone ? 0 : Math.max(0, chs.findIndex(ch => !passedSet.has(ch.id)));
+      // resumeIdx === -1 means all passed (set somehow incomplete) — fall back to 0
+
+      const session = await startQuizSession(setId, classIdRef.current ?? undefined);
+      if (session.data) sessionIdRef.current = session.data.id;
+
+      if (chs.length > 0) {
+        const startChallenge = chs[resumeIdx] ?? chs[0];
+        const k = `educode_cr_${profile?.id ?? 'anon'}_${setId ?? ''}_${startChallenge.id}`;
+        setJsCode(localStorage.getItem(k + '_js') ?? startChallenge.starter_js);
+        setHtmlCode(localStorage.getItem(k + '_html') ?? startChallenge.starter_html);
+        setIdx(resumeIdx);
+      }
+
+      // Restore progress from prior session(s) so XP and pass count are accurate
+      setPassedCount(alreadyDone ? 0 : passedIds.length);
+      setXpEarned(alreadyDone ? 0 : totalXp);
+      setPhase('running');
+      setChallengeStartMs(Date.now());
+    })();
   }, [setId]);
 
   const challenge = challenges[idx] ?? null;

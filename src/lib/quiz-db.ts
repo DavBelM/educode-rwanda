@@ -362,6 +362,37 @@ export async function logAIInteraction(params: {
 
 // ── Set completion helpers ────────────────────────────────────────────────────
 
+// Returns which challenge IDs the student has already passed (across all sessions)
+// and the total XP they earned on those challenges. Used to resume mid-set.
+export async function getPassedChallengesForSet(challengeIds: string[]): Promise<{
+  passedIds: string[];
+  totalXp: number;
+}> {
+  if (challengeIds.length === 0) return { passedIds: [], totalXp: 0 };
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { passedIds: [], totalXp: 0 };
+
+  const { data } = await supabase
+    .from('quiz_attempts')
+    .select('challenge_id, xp_earned')
+    .eq('student_id', user.id)
+    .eq('passed', true)
+    .in('challenge_id', challengeIds);
+
+  if (!data) return { passedIds: [], totalXp: 0 };
+
+  // Deduplicate by challenge_id — take the best XP if passed in multiple sessions
+  const bestXp = new Map<string, number>();
+  for (const row of data) {
+    const prev = bestXp.get(row.challenge_id) ?? 0;
+    bestXp.set(row.challenge_id, Math.max(prev, row.xp_earned ?? 0));
+  }
+  return {
+    passedIds: [...bestXp.keys()],
+    totalXp: [...bestXp.values()].reduce((s, x) => s + x, 0),
+  };
+}
+
 // Returns true if the student has already fully completed this set in a prior session.
 // Used to prevent XP farming when replaying a completed set.
 export async function hasCompletedSet(setId: string): Promise<boolean> {
