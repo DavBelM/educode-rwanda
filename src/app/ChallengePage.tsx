@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { Lock, ChevronRight } from 'lucide-react';
-import { getQuizSets, getStudentSetProgress, type QuizSet } from '../lib/quiz-db';
+import { getQuizSets, getStudentSetProgress, getStudentSetPassedCounts, type QuizSet } from '../lib/quiz-db';
 import { AppNav } from './components/AppNav';
 import { usePageTitle } from '../hooks/usePageTitle';
 
@@ -16,12 +16,14 @@ export default function ChallengePage({ language }: Props) {
 
   const [sets, setSets] = useState<QuizSet[]>([]);
   const [completed, setCompleted] = useState<Record<string, boolean>>({});
+  const [passedCounts, setPassedCounts] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    Promise.all([getQuizSets(), getStudentSetProgress()]).then(([s, p]) => {
+    Promise.all([getQuizSets(), getStudentSetProgress(), getStudentSetPassedCounts()]).then(([s, p, counts]) => {
       setSets(s);
       setCompleted(p);
+      setPassedCounts(counts);
       setLoading(false);
     });
   }, []);
@@ -65,6 +67,8 @@ export default function ChallengePage({ language }: Props) {
           {sets.map((set) => {
             const unlocked = isUnlocked(set);
             const done = !!completed[set.id];
+            const passed = passedCounts[set.id] ?? 0;
+            const inProgress = !done && passed > 0 && unlocked;
 
             return (
               <div
@@ -95,6 +99,11 @@ export default function ChallengePage({ language }: Props) {
                       {done && (
                         <span className="pill" style={{ fontSize: 12 }}>
                           {isKin ? 'Byarangiye' : 'Completed'}
+                        </span>
+                      )}
+                      {inProgress && (
+                        <span className="pill" style={{ fontSize: 12, opacity: 0.7 }}>
+                          {passed}/6 {isKin ? 'byaranguye' : 'done'}
                         </span>
                       )}
                     </div>

@@ -10,7 +10,7 @@ import { RatingModal } from './components/RatingModal';
 import { runQuizTests, type TestResult } from '../lib/quiz-executor';
 import {
   getSetChallenges, getQuizSets, startQuizSession, upsertQuizAttempt,
-  completeQuizSession, markSetCompleted, awardXp,
+  completeQuizSession, markSetCompleted, awardXp, hasCompletedSet,
   getOrCreateMyCodename, postPeerActivity,
   type QuizSet, type QuizChallenge, type ErrorLogEntry,
 } from '../lib/quiz-db';
@@ -148,6 +148,7 @@ export default function ChallengeRunner({ language }: Props) {
   const codenameRef = useRef<string | null>(null);
   const tabSwitchesRef = useRef(0);
   const [tabWarning, setTabWarning] = useState(false);
+  const alreadyCompletedRef = useRef(false);
 
   usePageTitle(set ? `${set.title} · EduCode` : 'Challenge · EduCode');
 
@@ -178,12 +179,14 @@ export default function ChallengeRunner({ language }: Props) {
       getSetChallenges(setId),
       getStudentClasses(),
       getOrCreateMyCodename(),
-    ]).then(([allSets, chs, { data: classes }, codename]) => {
+      hasCompletedSet(setId),
+    ]).then(([allSets, chs, { data: classes }, codename, alreadyDone]) => {
       const found = allSets.find(s => s.id === setId) ?? null;
       setSet(found);
       setChallenges(chs);
       classIdRef.current = classes?.[0]?.id ?? null;
       codenameRef.current = codename;
+      alreadyCompletedRef.current = alreadyDone;
       // Start session after we have class_id
       return startQuizSession(setId, classIdRef.current ?? undefined)
         .then(session => {
@@ -304,9 +307,10 @@ export default function ChallengeRunner({ language }: Props) {
     return xp;
   };
 
-  const handleNext = async () => {
-    // Post peer activity for completed challenge
-    if (challenge && classIdRef.current && codenameRef.current) {
+  // Shared advance logic for both passing (fromSkip=false) and skipping (fromSkip=true).
+  // Skipped challenges don't post peer activity and don't count toward passedCount.
+  const advance = async (fromSkip = false) => {
+    if (!fromSkip && challenge && classIdRef.current && codenameRef.current) {
       postPeerActivity(
         classIdRef.current, codenameRef.current,
         'challenge_completed', challenge.title,
@@ -318,17 +322,20 @@ export default function ChallengeRunner({ language }: Props) {
       const total = xpEarned;
       if (sessionIdRef.current && set) {
         await completeQuizSession(sessionIdRef.current, total, passedCount, challenges.length);
-        if (passedCount === challenges.length) {
+        // Complete the set if student passed ≥80% of challenges (e.g. 5 of 6)
+        if (passedCount >= Math.ceil(challenges.length * 0.8)) {
           await markSetCompleted(set.id, total);
-          // Post set completion to peer feed
-          if (classIdRef.current && codenameRef.current) {
+          if (!fromSkip && classIdRef.current && codenameRef.current) {
             postPeerActivity(
               classIdRef.current, codenameRef.current,
               'set_completed', set.title,
             );
           }
         }
-        await awardXp(total);
+        // Only award XP if this is the student's first time completing this set
+        if (!alreadyCompletedRef.current) {
+          await awardXp(total);
+        }
       }
       setPhase('complete');
       setShowRating(true);
@@ -338,6 +345,9 @@ export default function ChallengeRunner({ language }: Props) {
       setPhase('running');
     }
   };
+
+  const handleNext = () => advance(false);
+  const handleSkip = () => advance(true);
 
   const handleRestart = () => {
     if (challenges.length === 0) return;
@@ -731,7 +741,9 @@ export default function ChallengeRunner({ language }: Props) {
                     onClick={() => { setShowHint(true); setHintUsed(true); }}
                   >
                     <Lightbulb size={13} />
-                    {isKin ? 'Reba ikimenyetso (XP iza guke)' : 'Show hint (costs a little XP)'}
+                    {isKin
+                      ? `Reba ikimenyetso (−${Math.round(challenge.xp_reward * 0.25)} XP)`
+                      : `Show hint (−${Math.round(challenge.xp_reward * 0.25)} XP)`}
                   </button>
                 )}
               </div>
@@ -815,6 +827,25 @@ export default function ChallengeRunner({ language }: Props) {
                   >
                     <Bot size={14} />
                     {isKin ? 'Ntibishoboka? Baza Mwarimu' : 'Stuck? Ask Mwarimu'}
+                  </button>
+                )}
+
+                {results.some(r => !r.passed) && attemptCount >= 5 && (
+                  <button
+                    onClick={handleSkip}
+                    style={{
+                      marginTop: 8, width: '100%',
+                      padding: '8px 14px',
+                      background: 'none',
+                      border: '1px solid var(--line)',
+                      borderRadius: 'var(--radius)',
+                      cursor: 'pointer',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                      fontSize: 13, color: 'var(--text-3)',
+                    }}
+                  >
+                    <ChevronRight size={14} />
+                    {isKin ? 'Reka ukomeze (ntabwo bizakubara)' : 'Skip and move on — no credit'}
                   </button>
                 )}
               </div>

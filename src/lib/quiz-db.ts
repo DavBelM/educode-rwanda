@@ -360,6 +360,50 @@ export async function logAIInteraction(params: {
   });
 }
 
+// ── Set completion helpers ────────────────────────────────────────────────────
+
+// Returns true if the student has already fully completed this set in a prior session.
+// Used to prevent XP farming when replaying a completed set.
+export async function hasCompletedSet(setId: string): Promise<boolean> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return false;
+  const { data } = await supabase
+    .from('quiz_set_progress')
+    .select('set_id')
+    .eq('student_id', user.id)
+    .eq('set_id', setId)
+    .maybeSingle();
+  return !!data;
+}
+
+// Returns a map of setId → number of unique challenges the student has passed.
+// Used to show "3/6" progress on the set list for in-progress sets.
+export async function getStudentSetPassedCounts(): Promise<Record<string, number>> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return {};
+
+  const { data } = await supabase
+    .from('quiz_attempts')
+    .select('challenge_id, quiz_challenges!inner(set_id)')
+    .eq('student_id', user.id)
+    .eq('passed', true);
+
+  if (!data) return {};
+
+  const passedBySet: Record<string, Set<string>> = {};
+  for (const row of data) {
+    const ch = Array.isArray(row.quiz_challenges) ? row.quiz_challenges[0] : row.quiz_challenges;
+    const setId = (ch as { set_id: string } | null)?.set_id;
+    if (setId) {
+      passedBySet[setId] ??= new Set();
+      passedBySet[setId].add(row.challenge_id);
+    }
+  }
+  return Object.fromEntries(
+    Object.entries(passedBySet).map(([setId, chs]) => [setId, chs.size])
+  );
+}
+
 // ── Pilot survey / ratings ────────────────────────────────────────────────────
 
 export async function submitRating(params: {
