@@ -146,6 +146,24 @@ export async function translateToKinyarwanda(text: string): Promise<string> {
   }
 }
 
+// Translates KIN → EN so the model (trained on English) understands the question.
+// Falls through with the original text on any error — never blocks the response.
+async function translateToEnglish(text: string): Promise<string> {
+  try {
+    const response = await fetch('/api/translate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text, targetLanguage: 'EN' }),
+      signal: AbortSignal.timeout(8_000),
+    });
+    if (!response.ok) return text;
+    const json = await response.json();
+    return (typeof json.text === 'string' && json.text.trim()) ? json.text : text;
+  } catch {
+    return text;
+  }
+}
+
 export async function getLessonAIHelp(
   question: string,
   code: string,
@@ -154,6 +172,13 @@ export async function getLessonAIHelp(
   lessonType: 'reading' | 'coding' | 'quiz' = 'coding'
 ): Promise<string> {
   const isGreeting = /^(hi|hello|hey|thanks|thank you|ok|okay|good|great|bye|goodbye|yo|sup|what's up|salut|bonjour|muraho|mwaramutse)[\s!?.😊👋]*$/i.test(question.trim());
+
+  // If the student typed in KIN, translate their question to English before sending to the
+  // model. The model is trained on English; the response comes back in English and is
+  // translated to KIN in the UI layer as usual. Falls through with original text on error.
+  const modelQuestion = (language === 'KIN' && !isGreeting)
+    ? await translateToEnglish(question)
+    : question;
 
   const codeBlock = !isGreeting && code.trim()
     ? (language === 'KIN'
@@ -181,8 +206,8 @@ export async function getLessonAIHelp(
     : '';
 
   const context = language === 'KIN'
-    ? `Umunyeshuri arabaza: ${question}${codeBlock}${instructionBlock}${constraintRule}`
-    : `Student says: ${question}${codeBlock}${instructionBlock}${constraintRule}`;
+    ? `Umunyeshuri arabaza: ${modelQuestion}${codeBlock}${instructionBlock}${constraintRule}`
+    : `Student says: ${modelQuestion}${codeBlock}${instructionBlock}${constraintRule}`;
 
   const stageNote = {
     reading: {
