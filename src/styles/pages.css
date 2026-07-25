@@ -425,6 +425,7 @@ html.ws-page, html.ws-page body { height: 100%; }
 /* Hidden on desktop — must come before the mobile media query so mobile can override */
 .mob-mw-btn { display: none; }
 .mob-mw-backdrop { display: none; }
+.sheet-handle { display: none; }
 
 /* Free-practice workspace: hide Mwarimu on mobile, show via floating button */
 @media (max-width: 880px) {
@@ -442,6 +443,25 @@ html.ws-page, html.ws-page body { height: 100%; }
     animation: sheet-up .28s cubic-bezier(.22,.61,.36,1) both;
   }
   .ws.mw-open .ws-ai { display: flex; }
+
+  /* Drag-to-resize pill at top of Mwarimu bottom sheet */
+  .sheet-handle {
+    display: block;
+    width: 100%;
+    padding: 10px 0 6px;
+    flex-shrink: 0;
+    cursor: row-resize;
+    touch-action: none;
+  }
+  .sheet-handle::before {
+    content: '';
+    display: block;
+    width: 36px; height: 4px;
+    background: var(--line-strong);
+    border-radius: 2px;
+    margin: 0 auto;
+    opacity: 0.6;
+  }
 
   /* Backdrop */
   .mob-mw-backdrop {

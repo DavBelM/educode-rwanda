@@ -228,8 +228,34 @@ export function MwarimuPanel({
     ? `Tangiza kode yawe maze nzakwereka icyo nabonye${firstName ? `, ${firstName}` : ''}.`
     : `Run your code and I'll take a look${firstName ? `, ${firstName}` : ''}.`;
 
+  // Mobile bottom-sheet drag-to-resize
+  const asideRef = useRef<HTMLElement>(null);
+  const dragOriginY = useRef(0);
+  const dragOriginH = useRef(0);
+
+  const onHandleTouchStart = (e: React.TouchEvent) => {
+    dragOriginY.current = e.touches[0].clientY;
+    dragOriginH.current = asideRef.current?.offsetHeight ?? 0;
+  };
+
+  const onHandleTouchMove = (e: React.TouchEvent) => {
+    e.preventDefault();
+    const dy = dragOriginY.current - e.touches[0].clientY;
+    const newH = Math.min(
+      Math.round(window.innerHeight * 0.88),
+      Math.max(160, dragOriginH.current + dy),
+    );
+    if (asideRef.current) asideRef.current.style.height = `${newH}px`;
+  };
+
   return (
-    <aside className="ws-ai">
+    <aside className="ws-ai" ref={asideRef}>
+      {/* Touch-drag handle — only visible as mobile bottom-sheet pill */}
+      <div
+        className="sheet-handle"
+        onTouchStart={onHandleTouchStart}
+        onTouchMove={onHandleTouchMove}
+      />
       <div className="ai-bar">
         <div className="ai-id">
           <span className="ai-mwicon">M</span>
