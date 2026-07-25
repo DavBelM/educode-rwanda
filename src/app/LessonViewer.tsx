@@ -2,7 +2,7 @@ import { AppNav } from './components/AppNav';
 import { useState, useCallback, useRef, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { RatingModal } from './components/RatingModal';
-import { Play, CheckCircle, Loader, Zap, BookOpen, Code2, HelpCircle, Monitor, Send, ArrowLeft } from 'lucide-react';
+import { Play, CheckCircle, Loader, Zap, BookOpen, Code2, HelpCircle, Monitor, Send, ArrowLeft, MessageCircle, X } from 'lucide-react';
 import { completeLesson, type CourseLesson } from '../lib/db';
 import { executeCode } from '../lib/code-executor';
 import { getLessonAIHelp, getLessonReflection } from '../lib/ai';
@@ -536,6 +536,7 @@ export default function LessonViewer({ lesson, courseTitle, allLessons, language
   const [railMessages, setRailMessages] = useState<Array<{ role: 'user' | 'ai'; text: string; auto?: boolean }>>([]);
   const [railLoading, setRailLoading] = useState(false);
   const [railInput, setRailInput] = useState('');
+  const [mwMobile, setMwMobile] = useState(false);
   const railEndRef = useRef<HTMLDivElement>(null);
   const [railWidth, setRailWidth] = useState(360);
 
@@ -785,7 +786,7 @@ export default function LessonViewer({ lesson, courseTitle, allLessons, language
         </main>
 
         {/* RIGHT RAIL */}
-        <aside className="rail">
+        <aside className={`rail${mwMobile ? ' lw-mw-open' : ''}`}>
           {/* Drag handle — grab the left edge to resize the panel */}
           <div className="rail-resizer" onMouseDown={startRailResize} title="Drag to resize" />
 
@@ -867,6 +868,23 @@ export default function LessonViewer({ lesson, courseTitle, allLessons, language
           </div>
         </aside>
       </div>
+
+      {/* Mobile Mwarimu floating button (shown at ≤820px via CSS) */}
+      {mwMobile && (
+        <div
+          className="mob-mw-backdrop"
+          onClick={() => setMwMobile(false)}
+          aria-hidden="true"
+        />
+      )}
+      <button
+        className="mob-mw-btn"
+        onClick={() => setMwMobile(v => !v)}
+        aria-label={mwMobile ? 'Close Mwarimu' : 'Open Mwarimu'}
+      >
+        {mwMobile ? <X size={20} /> : <MessageCircle size={20} />}
+        {!mwMobile && <span>{language === 'KIN' ? 'Baza Mwarimu' : 'Ask Mwarimu'}</span>}
+      </button>
     </div>
   );
 }
