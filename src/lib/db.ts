@@ -1546,6 +1546,19 @@ export async function getSchoolAnnouncements(schoolId: string): Promise<SchoolAn
   return data ?? [];
 }
 
+export async function getSchoolAnnouncementsForTeacher(): Promise<SchoolAnnouncement[]> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return [];
+  const { data: prof } = await supabase.from('profiles').select('school_id').eq('id', user.id).single();
+  if (!prof?.school_id) return [];
+  const { data } = await supabase.from('school_announcements').select('*')
+    .eq('school_id', prof.school_id)
+    .order('pinned', { ascending: false })
+    .order('created_at', { ascending: false })
+    .limit(5);
+  return data ?? [];
+}
+
 export async function deleteSchoolAnnouncement(id: string): Promise<{ error: string | null }> {
   const { data: ann } = await supabase.from('school_announcements').select('school_id').eq('id', id).single();
   if (!ann) return { error: 'Not found' };

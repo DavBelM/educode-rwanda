@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router';
-import { School, Users, Target, CheckCircle2, ArrowRight, Mail, Phone, ChevronDown, Lock } from 'lucide-react';
+import { Globe, Zap, BookOpen, CheckCircle2, ArrowRight, Mail, Phone, ChevronDown, Lock } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { createSchool, linkProfileToSchool } from '../lib/db';
 import { useTheme } from '../lib/theme';
@@ -138,9 +138,9 @@ export default function SchoolSignupPage() {
               : 'Join 50+ schools using AI-powered coding education.'}
           </p>
           <div className="hero-meta rise-4">
-            <div className="m"><b><School size={16} style={{ marginBottom: -2 }} /> 50+</b><span>{isKin ? 'Amashuri' : 'Schools'}</span></div>
-            <div className="m"><b><Users size={16} style={{ marginBottom: -2 }} /> 5,000+</b><span>{isKin ? 'Abanyeshuri' : 'Students'}</span></div>
-            <div className="m"><b><Target size={16} style={{ marginBottom: -2 }} /> 95%</b><span>{isKin ? 'Igipimo cy\'ubutsinda' : 'Success rate'}</span></div>
+            <div className="m"><b><Zap size={16} style={{ marginBottom: -2 }} /> {isKin ? 'Gufashwa na AI' : 'AI-Powered'}</b><span>{isKin ? 'Mwarimu wa AI buri gihe' : 'Mwarimu tutor built-in'}</span></div>
+            <div className="m"><b><Globe size={16} style={{ marginBottom: -2 }} /> {isKin ? 'Indimi 2' : 'Bilingual'}</b><span>{isKin ? 'Ikinyarwanda na Cyongereza' : 'Kinyarwanda + English'}</span></div>
+            <div className="m"><b><BookOpen size={16} style={{ marginBottom: -2 }} /> TVET</b><span>{isKin ? 'Gukurikirana mfashanyigisho ya REB' : 'Built for Rwanda\'s curriculum'}</span></div>
           </div>
         </section>
 

@@ -72,8 +72,12 @@ export default function SelfLearnerDashboard({ language, onStartCoding, onOpenCo
   const quickActions = [
     {
       icon: <Zap size={18} />,
-      title: isKin ? 'Komeza Kwiga' : 'Continue Learning',
-      sub: isKin ? 'Komeza aho wari ugeze' : 'Pick up where you left off',
+      title: totalCompleted === 0 && !loading
+        ? (isKin ? 'Tangira Kwiga' : 'Start Learning')
+        : (isKin ? 'Komeza Kwiga' : 'Continue Learning'),
+      sub: totalCompleted === 0 && !loading
+        ? (isKin ? 'Tangira isomo rya mbere' : 'Begin your first lesson')
+        : (isKin ? 'Komeza aho wari ugeze' : 'Pick up where you left off'),
       onClick: handleContinue,
       loading: resumeLoading,
       primary: true,
@@ -113,14 +117,20 @@ export default function SelfLearnerDashboard({ language, onStartCoding, onOpenCo
         <div className="welcome rise">
           <div>
             <h1>
-              {isKin ? `Ikaze nanone, ${firstName}! 👋` : `Welcome back, ${firstName}! 👋`}
+              {totalCompleted === 0 && !loading
+                ? (isKin ? `Ikaze, ${firstName}! 👋` : `Welcome, ${firstName}! 👋`)
+                : (isKin ? `Ikaze nanone, ${firstName}! 👋` : `Welcome back, ${firstName}! 👋`)}
             </h1>
             <p className="sub">
-              {isKin ? 'Komeza wigire. Buri somo rishya ryongera ubumenyi bwawe.' : 'Keep learning. Every lesson adds to your skills.'}
+              {totalCompleted === 0 && !loading
+                ? (isKin ? 'Tangira isomo rya mbere. Ntuhinde umutwe — AI izakuyobora.' : 'Start your first lesson. No pressure — your AI tutor will guide you.')
+                : (isKin ? 'Komeza wigire. Buri somo rishya ryongera ubumenyi bwawe.' : 'Keep learning. Every lesson adds to your skills.')}
             </p>
           </div>
           <button className="btn btn-primary" onClick={onContinueLearning}>
-            {isKin ? 'Komeza isomo' : 'Continue lesson'}
+            {totalCompleted === 0 && !loading
+              ? (isKin ? 'Tangira isomo' : 'Start learning')
+              : (isKin ? 'Komeza isomo' : 'Continue lesson')}
           </button>
         </div>
 

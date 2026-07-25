@@ -11,7 +11,8 @@ import {
   createAnnouncement, getClassAnnouncements, deleteAnnouncement,
   getStudentAIProfile, getClassRatingsSummary,
   saveMwarimuEvaluation, getMwarimuEvalSummary,
-  type Class, type Assignment, type Question, type Submission, type Announcement, type ClassAnalytics, type RosterStudent, type StudentAIProfile, type ClassRatingsSummary
+  getSchoolAnnouncementsForTeacher,
+  type Class, type Assignment, type Question, type Submission, type Announcement, type ClassAnalytics, type RosterStudent, type StudentAIProfile, type ClassRatingsSummary, type SchoolAnnouncement
 } from '../lib/db';
 
 // ─── Create Class Modal ────────────────────────────────────────────────────────
@@ -1595,10 +1596,25 @@ export default function TeacherDashboard() {
   const [classSummaryLoading, setClassSummaryLoading] = useState(false);
   const [classSummaryError, setClassSummaryError] = useState(false);
   const [showMwarimuEval, setShowMwarimuEval] = useState(false);
+  const [schoolAnnouncements, setSchoolAnnouncements] = useState<SchoolAnnouncement[]>([]);
+  const [dismissedAnnIds, setDismissedAnnIds] = useState<Set<string>>(() => {
+    try { return new Set(JSON.parse(localStorage.getItem('educode_dismissed_school_anns') ?? '[]')); }
+    catch { return new Set(); }
+  });
   const { profile } = useAuth();
+
+  const dismissSchoolAnn = (id: string) => {
+    setDismissedAnnIds(prev => {
+      const next = new Set(prev);
+      next.add(id);
+      localStorage.setItem('educode_dismissed_school_anns', JSON.stringify([...next]));
+      return next;
+    });
+  };
 
   const loadData = async () => {
     setLoadingData(true);
+    getSchoolAnnouncementsForTeacher().then(setSchoolAnnouncements);
     const { data: classData } = await getTeacherClasses();
 
     // Load student counts + assignment counts for each class in parallel
@@ -1711,9 +1727,35 @@ export default function TeacherDashboard() {
     URL.revokeObjectURL(url);
   };
 
+  const visibleSchoolAnns = schoolAnnouncements.filter(a => !dismissedAnnIds.has(a.id));
+
   return (
     <div className="min-h-screen" style={{ background: 'var(--bg)' }}>
       <AppNav />
+
+      {/* School admin announcements banner */}
+      {visibleSchoolAnns.length > 0 && (
+        <div style={{ background: 'var(--surface-2)', borderBottom: '1px solid var(--line)' }}>
+          <div className="wrap" style={{ padding: '0 var(--wrap-px)' }}>
+            {visibleSchoolAnns.map(ann => (
+              <div key={ann.id} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, padding: '10px 0', borderBottom: '1px solid var(--line)' }}>
+                <Megaphone size={15} style={{ color: 'var(--text-2)', flexShrink: 0, marginTop: 2 }} />
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)', marginRight: 8 }}>{ann.title}</span>
+                  <span style={{ fontSize: 13, color: 'var(--text-2)' }}>{ann.body}</span>
+                </div>
+                <button
+                  onClick={() => dismissSchoolAnn(ann.id)}
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-3)', padding: 2, flexShrink: 0 }}
+                  aria-label="Dismiss"
+                >
+                  <X size={14} />
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="wrap page">
         {loadingData ? (
