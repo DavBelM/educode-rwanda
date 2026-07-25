@@ -421,6 +421,11 @@ html.ws-page, html.ws-page body { height: 100%; }
 .ws-page body { overflow: hidden; }
 
 .ws { height: calc(100vh - var(--nav-h)); display: flex; flex-direction: row; overflow: hidden; }
+
+/* Hidden on desktop — must come before the mobile media query so mobile can override */
+.mob-mw-btn { display: none; }
+.mob-mw-backdrop { display: none; }
+
 /* Free-practice workspace: hide Mwarimu on mobile, show via floating button */
 @media (max-width: 880px) {
   .ws-resizer-h { display: none; }
@@ -460,10 +465,6 @@ html.ws-page, html.ws-page body { height: 100%; }
   }
   .mob-mw-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,0,0,.35); }
 }
-
-/* Hidden on desktop */
-.mob-mw-btn { display: none; }
-.mob-mw-backdrop { display: none; }
 
 /* On mobile, the 60px bottom nav overlaps the workspace — shrink it */
 @media (max-width: 900px) {
