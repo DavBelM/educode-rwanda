@@ -107,7 +107,7 @@ function _strHash(s: string): string {
 }
 
 export async function translateToKinyarwanda(text: string): Promise<string> {
-  const cacheKey = `kin_${_strHash(text)}`;
+  const cacheKey = `kin2_${_strHash(text)}`;
 
   // Return cached translation immediately (no Gemini call needed)
   try {

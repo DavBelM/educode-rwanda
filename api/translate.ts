@@ -80,7 +80,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { maxOutputTokens: 1500, temperature: 0.1 },
+          generationConfig: { maxOutputTokens: 4096, temperature: 0.1 },
         }),
       }
     );
@@ -129,6 +129,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     if (finishReason === 'SAFETY' || finishReason === 'RECITATION') {
       console.warn('[EduCode Translate] Content blocked:', finishReason);
       return res.status(200).json({ text, _blocked: true });
+    }
+    // Translation was cut off mid-sentence — return 502 so client retries rather than caching garbage
+    if (finishReason === 'MAX_TOKENS') {
+      console.error('[EduCode Translate] Hit MAX_TOKENS limit — response truncated, not caching');
+      return res.status(502).json({ error: 'Translation truncated (MAX_TOKENS). Increase maxOutputTokens.' });
     }
 
     const translated = candidate?.content?.parts?.[0]?.text;
