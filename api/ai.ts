@@ -154,8 +154,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     ]);
     const text = (spaceResult.data as unknown[])?.[0];
     if (typeof text === 'string' && text.trim()) {
-      console.log('[Mwarimu] Served by fine-tuned Space');
-      return res.status(200).json({ text });
+      const t = text.trim();
+      // Reject mid-sentence truncations caused by the Space hitting its max_new_tokens limit.
+      // A complete response always ends with sentence punctuation, a closing backtick, or a code fence.
+      const looksComplete = /[.!?`]$/.test(t) || t.endsWith('```');
+      if (looksComplete) {
+        console.log('[Mwarimu] Served by fine-tuned Space');
+        return res.status(200).json({ text });
+      }
+      console.warn(`[Mwarimu] Space response truncated (${t.length} chars, ends "…${t.slice(-25)}"), falling back to Gemini`);
     }
   } catch (err) {
     console.warn('[Mwarimu] Space unavailable, falling back to Gemini:', err instanceof Error ? err.message : err);
@@ -188,7 +195,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         body: JSON.stringify({
           system_instruction: { parts: [{ text: SYSTEM }] },
           contents: [{ role: 'user', parts: [{ text: userMessage }] }],
-          generationConfig: { maxOutputTokens: 512, temperature: 0.4 },
+          generationConfig: { maxOutputTokens: 800, temperature: 0.4 },
         }),
         signal: AbortSignal.timeout(8_000),
       }
