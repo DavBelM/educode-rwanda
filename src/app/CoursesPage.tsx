@@ -202,10 +202,12 @@ function CourseDetail({ course, language, onBack, onOpenLesson }: {
           <p className="lede">{courseDesc}</p>
           <div className="chead-actions">
             <button className="btn btn-primary" onClick={() => {
-              const next = allLessons.find(l => !completedIds.has(l.id));
+              const next = allLessons.find(l => !completedIds.has(l.id)) ?? allLessons[0];
               if (next) onOpenLesson(next, allLessons);
             }}>
-              {isKin ? 'Subira aho wahagaritse' : 'Resume · Continue'}
+              {completedCount > 0 && completedCount >= totalLessons
+                ? (isKin ? 'Subiramo kuva hasi' : 'Review from start')
+                : (isKin ? 'Subira aho wahagaritse' : 'Resume · Continue')}
             </button>
           </div>
           <div className="chead-meta">
