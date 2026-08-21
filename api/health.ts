@@ -23,7 +23,7 @@ export default async function handler(_req: VercelRequest, res: VercelResponse) 
   } catch { /* ignore */ }
 
   // Test the model currently in use
-  const MODEL = 'gemini-2.5-flash';
+  const MODEL = 'gemini-3.7-flash';
   try {
     const geminiRes = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${geminiKey}`,

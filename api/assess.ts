@@ -1,25 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { Client } from '@gradio/client';
 
-const HF_SPACE = process.env.HF_SPACE_URL ?? 'DavBelaa/educode-rwanda-mwarimu-v2';
-
-// The fine-tuned model produces a good assessment paragraph then derails.
-// Three forms of derail we strip:
-//   1. Reaches a code block → strip from first ```
-//   2. Starts a coding-exercise prompt before a code block (line ending with ':')
-//   3. Adds an imperative directive sentence at the end
-//      e.g. "Continue providing clear examples and gentle feedback."
-const IMPERATIVE_PREFIX = /^(Continue|Provide|Give|Encourage|Help|Consider|Make|Try|Use|Focus|Ensure|Support|Review|Offer|Add|Include|Allow|Create|Monitor)\b/i;
-
-function extractAssessment(raw: string): string {
-  const codeBlockIdx = raw.indexOf('```');
-  let text = codeBlockIdx > 0 ? raw.slice(0, codeBlockIdx) : raw;
-  // Strip trailing blank-line + prompt-line(s) ending with ':'
-  text = text.replace(/(\n[ \t]*\n[^\n]*:\s*)+$/g, '');
-  // Strip trailing imperative directive sentences (directed at the teacher, not about the student)
-  text = text.replace(/\s+(?:Continue|Provide|Give|Encourage|Help|Consider|Make|Try|Use|Focus|Ensure|Support|Review|Offer|Add|Include|Allow|Create|Monitor)\b[^.!?]*[.!?]\s*$/gi, '');
-  return text.trim();
-}
+const GEMINI_MODEL = 'gemini-3.7-flash';
 
 function buildStudentPromptEN(d: StudentData): string {
   const errorSummary = d.topErrors.length > 0
@@ -66,30 +47,17 @@ function buildClassPromptEN(d: ClassData): string {
   ].join('\n');
 }
 
-async function callFineTunedModel(prompt: string): Promise<string | null> {
-  try {
-    const client = await Client.connect(HF_SPACE);
-    const result = await client.predict('/chat', { message: prompt });
-    const raw = (result.data as unknown[])?.[0];
-    if (typeof raw !== 'string' || !raw.trim()) return null;
-    const extracted = extractAssessment(raw);
-    // Must be at least 60 chars — otherwise the model just gave a one-liner or derailed immediately
-    return extracted.length >= 60 ? extracted : null;
-  } catch {
-    return null;
-  }
-}
-
 async function callGemini(prompt: string, apiKey: string): Promise<string> {
   const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+    `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${apiKey}`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { maxOutputTokens: 600, temperature: 0.4 },
+        generationConfig: { maxOutputTokens: 800, temperature: 0.4 },
       }),
+      signal: AbortSignal.timeout(15_000),
     }
   );
   const json = await response.json();
@@ -139,43 +107,27 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(400).json({ error: 'type must be "student" or "class"' });
   }
 
-  let assessment: string | null = null;
-  let source: 'model' | 'gemini' = 'model';
-
-  // Always try our fine-tuned model first for EN — it demonstrated it can do this
-  if (!isKin) {
-    assessment = await callFineTunedModel(prompt);
-    if (assessment) {
-      console.log(`[EduCode Assess] Used fine-tuned model (${assessment.length} chars)`);
-    }
+  if (!apiKey) {
+    return res.status(500).json({ error: 'GEMINI_API_KEY not configured' });
   }
 
-  // Fall back to Gemini: for KIN, or if model returned nothing usable
-  if (!assessment) {
-    if (!apiKey) {
-      return res.status(500).json({ error: isKin ? 'GEMINI_API_KEY required for Kinyarwanda assessments' : 'Both model and Gemini unavailable' });
-    }
-    source = 'gemini';
-    try {
-      // For KIN: build a Kinyarwanda-specific prompt
-      const kinPrompt = isKin ? [
-        'Uri umufasha w\'uburezi w\'AI. Gufasha umwarimu w\'ishuri rya TVET mu Rwanda.',
-        'Andika imirongo 3-4 isuzuma ry\'umunyeshuri ukurikije amakuru akurikira.',
-        'Isuzuma rigomba: ibyo asobanukirwa, ikibazo akunda guhurana nacyo, uburyo yitabiriye, inama ku mwarimu.',
-        '',
-        prompt,
-      ].join('\n') : prompt;
+  try {
+    const finalPrompt = isKin ? [
+      'Uri umufasha w\'uburezi w\'AI. Gufasha umwarimu w\'ishuri rya TVET mu Rwanda.',
+      'Andika imirongo 3-4 isuzuma ry\'umunyeshuri ukurikije amakuru akurikira.',
+      'Isuzuma rigomba: ibyo asobanukirwa, ikibazo akunda guhurana nacyo, uburyo yitabiriye, inama ku mwarimu.',
+      '',
+      prompt,
+    ].join('\n') : prompt;
 
-      assessment = await callGemini(kinPrompt, apiKey);
-      console.log(`[EduCode Assess] Used Gemini fallback (${assessment.length} chars)`);
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : String(err);
-      console.error('[EduCode Assess] Gemini error:', msg);
-      return res.status(502).json({ error: msg });
-    }
+    const assessment = await callGemini(finalPrompt, apiKey);
+    console.log(`[EduCode Assess] Gemini primary (${assessment.length} chars)`);
+    return res.status(200).json({ assessment, source: 'gemini' });
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error('[EduCode Assess] Gemini error:', msg);
+    return res.status(502).json({ error: msg });
   }
-
-  return res.status(200).json({ assessment, source });
 }
 
-export const config = { maxDuration: 300 };
+export const config = { maxDuration: 30 };
