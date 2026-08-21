@@ -4,6 +4,7 @@ import ReactMarkdown from 'react-markdown';
 import { RatingModal } from './components/RatingModal';
 import { Play, CheckCircle, Loader, Zap, BookOpen, Code2, HelpCircle, Monitor, Send, ArrowLeft, MessageCircle, X } from 'lucide-react';
 import { completeLesson, type CourseLesson } from '../lib/db';
+import { emitEvent } from '../lib/events';
 import { executeCode } from '../lib/code-executor';
 import { getLessonAIHelp, getLessonReflection } from '../lib/ai';
 import CodeMirror from '@uiw/react-codemirror';
@@ -117,6 +118,12 @@ function CodingLesson({ lesson, language, onComplete, completing, onCodeChange, 
   const [showSolutionWarning, setShowSolutionWarning] = useState(false);
   const [solutionRevealed, setSolutionRevealed] = useState(false);
   const UNLOCK_AFTER = 3;
+
+  // Emit lesson_start when the student opens a lesson
+  useEffect(() => {
+    emitEvent({ event_type: 'lesson_start', entity_type: 'lesson', entity_id: lesson.id, outcome: 'start', language_mode: language.toLowerCase() as 'en' | 'kin' });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lesson.id]);
 
   // Expose current code to parent (for rail chat context)
   useEffect(() => {

@@ -160,7 +160,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const looksComplete = /[.!?`]$/.test(t) || t.endsWith('```');
       if (looksComplete) {
         console.log('[Mwarimu] Served by fine-tuned Space');
-        return res.status(200).json({ text });
+        return res.status(200).json({ text, source: 'space' });
       }
       console.warn(`[Mwarimu] Space response truncated (${t.length} chars, ends "…${t.slice(-25)}"), falling back to Gemini`);
     }
@@ -171,8 +171,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   // ── Gemini fallback ───────────────────────────────────────────────────────
   if (!geminiKey) {
     const hint = ruleBasedHint(String(message));
-    if (hint) return res.status(200).json({ text: hint });
-    return res.status(200).json({ text: "Mwarimu is a bit busy right now — he'll be back shortly! In the meantime, read the error message carefully and look at which line it points to." });
+    if (hint) return res.status(200).json({ text: hint, source: 'rule' });
+    return res.status(200).json({ text: "Mwarimu is a bit busy right now — he'll be back shortly! In the meantime, read the error message carefully and look at which line it points to.", source: 'fallback' });
   }
 
   try {
@@ -212,13 +212,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const text = json.candidates?.[0]?.content?.parts?.[0]?.text;
     if (!text?.trim()) throw new Error('Empty response from Gemini');
     console.log('[Mwarimu] Served by Gemini fallback');
-    return res.status(200).json({ text });
+    return res.status(200).json({ text, source: 'gemini' });
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
     console.error('[Mwarimu] Gemini fallback error:', msg);
     const hint = ruleBasedHint(String(message));
-    if (hint) return res.status(200).json({ text: hint });
-    return res.status(200).json({ text: "Mwarimu is a bit busy right now — he'll be back shortly! In the meantime, read the error message carefully and look at which line it points to." });
+    if (hint) return res.status(200).json({ text: hint, source: 'rule' });
+    return res.status(200).json({ text: "Mwarimu is a bit busy right now — he'll be back shortly! In the meantime, read the error message carefully and look at which line it points to.", source: 'fallback' });
   }
 }
 

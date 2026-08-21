@@ -1,4 +1,5 @@
 import { supabase } from './supabase';
+import { emitEvent } from './events';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -294,6 +295,7 @@ export async function submitCodingAssignment(params: {
     if (error.code === '23505') return { error: 'already_submitted' };
     return { error: error.message };
   }
+  emitEvent({ event_type: 'assessment_submit', entity_type: 'assessment', entity_id: params.assignmentId, outcome: 'submit', metadata: { assignment_type: 'coding' } });
   return { error: null };
 }
 
@@ -318,6 +320,7 @@ export async function submitTheoreticalAssignment(params: {
     });
 
   if (error) return { error: error.message };
+  emitEvent({ event_type: 'assessment_submit', entity_type: 'assessment', entity_id: params.assignmentId, outcome: 'submit', metadata: { assignment_type: 'theoretical' } });
   return { error: null };
 }
 
@@ -845,6 +848,7 @@ export async function completeLesson(
     });
 
   if (error) return { error: error.message, xpAwarded: 0 };
+  emitEvent({ event_type: 'lesson_complete', entity_type: 'lesson', entity_id: lessonId, outcome: 'complete', score: score ?? undefined });
 
   // Award XP only on first completion; xpOverride=0 means solution was used
   if (!alreadyCompleted && xpOverride !== 0) {
@@ -893,6 +897,7 @@ export async function recordDailyLogin(): Promise<void> {
   if (!user) return;
   const today = new Date().toISOString().split('T')[0];
   await supabase.from('daily_logins').upsert({ student_id: user.id, login_date: today });
+  emitEvent({ event_type: 'login', outcome: 'start' });
 }
 
 export async function getStreak(): Promise<number> {

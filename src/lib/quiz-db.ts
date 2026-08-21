@@ -1,4 +1,5 @@
 import { supabase } from './supabase';
+import { emitEvent } from './events';
 
 // ── Codename pool ─────────────────────────────────────────────────────────────
 const ANIMALS = [
@@ -106,6 +107,7 @@ export async function startQuizSession(
     .single();
 
   if (error) return { data: null, error: error.message };
+  emitEvent({ event_type: 'session_start', entity_type: 'session', entity_id: (data as QuizSession).id, outcome: 'start', class_id: classId ?? null });
   return { data: data as QuizSession, error: null };
 }
 
@@ -140,6 +142,14 @@ export async function upsertQuizAttempt(params: {
     }, { onConflict: 'session_id,challenge_id' });
 
   if (error) return { error: error.message };
+  emitEvent({
+    event_type:     'challenge_attempt',
+    entity_type:    'challenge',
+    entity_id:      params.challengeId,
+    outcome:        params.passed ? 'pass' : 'fail',
+    attempt_number: params.attemptsCount,
+    metadata:       { hint_used: params.hintUsed, time_taken_seconds: params.timeTakenSeconds },
+  });
   return { error: null };
 }
 
@@ -160,6 +170,7 @@ export async function completeQuizSession(
     .eq('id', sessionId);
 
   if (error) return { error: error.message };
+  emitEvent({ event_type: 'session_end', entity_type: 'session', entity_id: sessionId, outcome: 'complete', score: challengesPassed > 0 ? Math.round((challengesPassed / Math.max(challengesAttempted, 1)) * 100) : undefined });
   return { error: null };
 }
 

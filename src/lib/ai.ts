@@ -1,4 +1,6 @@
 
+import { emitEvent } from './events';
+
 const SYSTEM_PROMPT_EN =
   'You are EduCode AI, a coding tutor for Rwandan TVET students. ' +
   'You MUST respond in English only. Do not use Kinyarwanda. ' +
@@ -61,7 +63,7 @@ export function warmUpSpace(): void {
 // ── Call our Vercel proxy → HuggingFace Space ─────────────────────────────────
 // systemPrompt is now built server-side with RAG context; the parameter is kept
 // for call-site compatibility but is no longer sent to the server.
-async function callSpace(message: string, _systemPrompt?: string): Promise<string> {
+async function callSpace(message: string, _systemPrompt?: string): Promise<{ text: string; source: string }> {
   const response = await fetch('/api/ai', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -71,7 +73,7 @@ async function callSpace(message: string, _systemPrompt?: string): Promise<strin
 
   if (!response.ok) throw new Error(`API returned ${response.status}`);
   const json = await response.json();
-  if (typeof json.text === 'string' && json.text.trim()) return json.text;
+  if (typeof json.text === 'string' && json.text.trim()) return { text: json.text, source: json.source ?? 'space' };
   throw new Error('Empty response from model');
 }
 
@@ -86,17 +88,15 @@ export async function getAIFeedback(
     ? `This code has an error. Explain what is wrong and how to fix it:\n\`\`\`javascript\n${code}\n\`\`\`\nError: ${error}`
     : `Review this code and suggest any improvements:\n\`\`\`javascript\n${code}\n\`\`\``;
 
-  let raw: string;
   try {
-    raw = await callSpace(question, SYSTEM_PROMPT_EN);
+    const { text, source } = await callSpace(question, SYSTEM_PROMPT_EN);
+    emitEvent({ event_type: 'ai_question_asked', entity_type: 'ai_chat', outcome: 'complete', language_mode: language.toLowerCase() as 'en' | 'kin', metadata: { answered_by: source } });
+    // Model responds in English — KIN translation is handled in the UI layer (MwarimuPanel).
+    return text;
   } catch {
     await new Promise(r => setTimeout(r, 800));
     return getMockResponse(error, language);
   }
-
-  // Model responds in English — return directly for both EN and KIN modes.
-  // KIN translation is handled in the UI layer (MwarimuPanel) via translateToKinyarwanda.
-  return raw;
 }
 
 // Simple hash for localStorage cache keys — keeps keys short
@@ -228,7 +228,9 @@ export async function getLessonAIHelp(
   const tutorPrompt = base + (language === 'KIN' ? stageNote.KIN : stageNote.EN);
 
   try {
-    return await callSpace(context, tutorPrompt);
+    const { text, source } = await callSpace(context, tutorPrompt);
+    emitEvent({ event_type: 'ai_question_asked', entity_type: 'ai_chat', outcome: 'complete', language_mode: language.toLowerCase() as 'en' | 'kin', metadata: { answered_by: source, lesson_type: lessonType } });
+    return text;
   } catch {
     await new Promise(r => setTimeout(r, 800));
     const pool = language === 'KIN' ? TUTOR_MOCK_KIN : TUTOR_MOCK_EN;
@@ -264,7 +266,7 @@ export async function getLessonReflection(
   };
 
   try {
-    const text = await callSpace(message);
+    const { text } = await callSpace(message);
     return truncate(text);
   } catch {
     return language === 'KIN'
