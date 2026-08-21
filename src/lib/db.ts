@@ -1802,3 +1802,59 @@ export async function getMwarimuEvalSummary(): Promise<{
   const accuracyPct = total > 0 ? Math.round(((accurate + partially * 0.5) / total) * 100) : null;
   return { total, accurate, partially, inaccurate, accuracyPct };
 }
+
+// ── Brief 3: learning_events dashboard RPCs ───────────────────────────────────
+
+export interface LiveSignal {
+  student_id:       string;
+  last_event_at:    string;
+  lesson_count:     number;
+  challenge_passes: number;
+  challenge_fails:  number;
+  ai_questions:     number;
+  is_stuck:         boolean;
+}
+
+export async function getClassLiveSignals(classId: string, cohortTag?: string): Promise<LiveSignal[]> {
+  const params: Record<string, unknown> = { p_class_id: classId };
+  if (cohortTag) params.p_cohort_tag = cohortTag;
+  const { data, error } = await supabase.rpc('get_class_live_signals', params);
+  if (error) { console.error('[getClassLiveSignals]', error.message); return []; }
+  return (data ?? []) as LiveSignal[];
+}
+
+export interface EventRow {
+  id:               string;
+  created_at:       string;
+  event_type:       string;
+  entity_type:      string | null;
+  outcome:          string | null;
+  attempt_number:   number | null;
+  score:            number | null;
+  competency_code:  string | null;
+  language_mode:    string;
+}
+
+export async function getStudentEventTimeline(studentId: string, classId: string): Promise<EventRow[]> {
+  const { data, error } = await supabase.rpc('get_student_event_timeline', {
+    p_student_id: studentId,
+    p_class_id:   classId,
+  });
+  if (error) { console.error('[getStudentEventTimeline]', error.message); return []; }
+  return (data ?? []) as EventRow[];
+}
+
+export interface CompetencyRow {
+  competency_code: string;
+  attempt_count:   number;
+  pass_count:      number;
+  pass_rate:       number;
+}
+
+export async function getCompetencySummary(classId: string, cohortTag?: string): Promise<CompetencyRow[]> {
+  const params: Record<string, unknown> = { p_class_id: classId };
+  if (cohortTag) params.p_cohort_tag = cohortTag;
+  const { data, error } = await supabase.rpc('get_competency_summary', params);
+  if (error) { console.error('[getCompetencySummary]', error.message); return []; }
+  return (data ?? []) as CompetencyRow[];
+}

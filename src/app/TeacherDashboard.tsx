@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Users, Plus, Check, X, ChevronDown, BookOpen, Code2, Loader, Megaphone, Pin, Trash2, BarChart2, AlertCircle, Download, Sparkles } from 'lucide-react';
+import { Users, Plus, Check, X, ChevronDown, BookOpen, Code2, Loader, Megaphone, Pin, Trash2, BarChart2, AlertCircle, Download, Sparkles, Activity, AlertTriangle } from 'lucide-react';
 import { generateStudentAssessment, generateClassSummary } from '../lib/ai';
 import { AppNav } from './components/AppNav';
 import { usePageTitle } from '../hooks/usePageTitle';
@@ -12,7 +12,9 @@ import {
   getStudentAIProfile, getClassRatingsSummary,
   saveMwarimuEvaluation, getMwarimuEvalSummary,
   getSchoolAnnouncementsForTeacher,
-  type Class, type Assignment, type Question, type Submission, type Announcement, type ClassAnalytics, type RosterStudent, type StudentAIProfile, type ClassRatingsSummary, type SchoolAnnouncement
+  getClassLiveSignals, getStudentEventTimeline, getCompetencySummary,
+  type Class, type Assignment, type Question, type Submission, type Announcement, type ClassAnalytics, type RosterStudent, type StudentAIProfile, type ClassRatingsSummary, type SchoolAnnouncement,
+  type LiveSignal, type EventRow, type CompetencyRow
 } from '../lib/db';
 
 // ─── Create Class Modal ────────────────────────────────────────────────────────
@@ -1124,11 +1126,14 @@ function StudentProfileModal({ student, classId, language, onClose }: {
   onClose: () => void;
 }) {
   const isKin = language === 'KIN';
+  const [modalTab, setModalTab] = useState<'profile' | 'timeline'>('profile');
   const [profile, setProfile] = useState<StudentAIProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [assessment, setAssessment] = useState<string | null>(null);
   const [assessmentLoading, setAssessmentLoading] = useState(false);
   const [assessmentError, setAssessmentError] = useState(false);
+  const [timeline, setTimeline] = useState<EventRow[]>([]);
+  const [timelineLoading, setTimelineLoading] = useState(false);
 
   useEffect(() => {
     getStudentAIProfile(student.student_id, classId).then(p => {
@@ -1136,6 +1141,15 @@ function StudentProfileModal({ student, classId, language, onClose }: {
       setLoading(false);
     });
   }, [student.student_id, classId]);
+
+  useEffect(() => {
+    if (modalTab !== 'timeline' || timeline.length > 0) return;
+    setTimelineLoading(true);
+    getStudentEventTimeline(student.student_id, classId).then(rows => {
+      setTimeline(rows);
+      setTimelineLoading(false);
+    });
+  }, [modalTab, student.student_id, classId, timeline.length]);
 
   async function handleGenerateAssessment() {
     if (!profile) return;
@@ -1190,8 +1204,75 @@ function StudentProfileModal({ student, classId, language, onClose }: {
           <button onClick={onClose} className="iconbtn"><X size={18} /></button>
         </div>
 
+        {/* Tab bar */}
+        <div style={{ display: 'flex', borderBottom: '1px solid var(--line)', padding: '0 20px' }}>
+          {(['profile', 'timeline'] as const).map(t => (
+            <button
+              key={t}
+              onClick={() => setModalTab(t)}
+              style={{
+                padding: '10px 14px 9px',
+                fontSize: 13,
+                fontWeight: modalTab === t ? 600 : 400,
+                color: modalTab === t ? 'var(--text)' : 'var(--text-3)',
+                background: 'none',
+                border: 'none',
+                borderBottom: modalTab === t ? '2px solid var(--accent)' : '2px solid transparent',
+                cursor: 'pointer',
+                marginBottom: -1,
+              }}
+            >
+              {t === 'profile' ? (isKin ? 'Umwirondoro' : 'AI Profile') : (isKin ? 'Ibikorwa' : 'Timeline')}
+            </button>
+          ))}
+        </div>
+
         <div style={{ padding: '20px' }}>
-          {loading ? (
+          {modalTab === 'timeline' ? (
+            timelineLoading ? (
+              <div style={{ display: 'flex', justifyContent: 'center', padding: '32px 0' }}>
+                <Loader size={22} style={{ animation: 'spin 1s linear infinite', color: 'var(--text-3)' }} />
+              </div>
+            ) : timeline.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '32px 0', color: 'var(--text-3)' }}>
+                <Activity size={28} style={{ margin: '0 auto 12px', opacity: 0.4 }} />
+                <p style={{ fontSize: 14 }}>
+                  {isKin ? 'Nta bikorwa byabonetse.' : 'No activity recorded yet.'}
+                </p>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                {timeline.map(ev => {
+                  const outcomeDot = ev.outcome === 'pass' ? '#4ade80'
+                    : ev.outcome === 'fail' ? '#f87171'
+                    : ev.outcome === 'complete' ? '#60a5fa'
+                    : 'var(--text-3)';
+                  const label = ev.event_type.replace(/_/g, ' ');
+                  return (
+                    <div key={ev.id} style={{ display: 'flex', gap: 10, alignItems: 'flex-start', padding: '7px 0', borderBottom: '1px solid var(--line)' }}>
+                      <div style={{ width: 8, height: 8, borderRadius: '50%', background: outcomeDot, marginTop: 5, flexShrink: 0 }} />
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: 13, color: 'var(--text)', fontWeight: 500 }}>
+                          {label}
+                          {ev.entity_type && <span style={{ color: 'var(--text-3)', fontWeight: 400 }}> · {ev.entity_type}</span>}
+                          {ev.outcome && <span style={{ color: outcomeDot, fontWeight: 600 }}> {ev.outcome}</span>}
+                          {ev.attempt_number != null && ev.attempt_number > 1 && (
+                            <span style={{ color: 'var(--text-3)', fontSize: 11 }}> (attempt {ev.attempt_number})</span>
+                          )}
+                        </div>
+                        {ev.competency_code && (
+                          <div style={{ fontSize: 11, color: 'var(--text-3)' }}>{ev.competency_code}</div>
+                        )}
+                      </div>
+                      <div style={{ fontSize: 11, color: 'var(--text-3)', flexShrink: 0 }}>
+                        {formatRelativeTime(ev.created_at, isKin)}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )
+          ) : loading ? (
             <div style={{ display: 'flex', justifyContent: 'center', padding: '32px 0' }}>
               <Loader size={22} style={{ animation: 'spin 1s linear infinite', color: 'var(--text-3)' }} />
             </div>
@@ -1360,7 +1441,12 @@ function StudentProfileModal({ student, classId, language, onClose }: {
   );
 }
 
-function StatusPill({ status, isKin }: { status: RosterStudent['status']; isKin: boolean }) {
+function StatusPill({ status, isKin, isStuck }: { status: RosterStudent['status']; isKin: boolean; isStuck?: boolean }) {
+  if (isStuck) return (
+    <span className="pill" style={{ background: 'rgba(251,146,60,0.12)', border: '1px solid rgba(251,146,60,0.35)', color: '#f97316', display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+      <AlertTriangle size={11} />{isKin ? 'Arananiwe' : 'Stuck'}
+    </span>
+  );
   if (status === 'on-track') return <span className="pill solid"><span className="dot" />{isKin ? 'Biri neza' : 'On track'}</span>;
   if (status === 'behind') return <span className="pill error">{isKin ? 'Birasubira inyuma' : 'Behind'}</span>;
   return <span className="pill"><span className="dot" />{isKin ? 'Akeneye ubufasha' : 'Needs help'}</span>;
@@ -1376,6 +1462,37 @@ function attentionNote(s: RosterStudent, isKin: boolean): string {
   return isKin
     ? `Ageze kuri ${s.progress_pct}% muri "${s.current_module}" — yakwifuza kuganirwaho.`
     : `At ${s.progress_pct}% in "${s.current_module}" — may need a check-in.`;
+}
+
+function CompetencyPanel({ rows, isKin }: { rows: CompetencyRow[]; isKin: boolean }) {
+  if (rows.length === 0) return (
+    <p style={{ fontSize: 13, color: 'var(--text-3)' }}>
+      {isKin ? 'Nta makuru y\'ubushobozi abonetse.' : 'No competency data yet — will populate once students start lessons.'}
+    </p>
+  );
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      {rows.map(r => (
+        <div key={r.competency_code}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
+            <span style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--text-2)', fontFamily: 'var(--mono)' }}>{r.competency_code}</span>
+            <span style={{ fontSize: 12, color: 'var(--text-3)', fontVariantNumeric: 'tabular-nums' }}>
+              {r.pass_count}/{r.attempt_count} · {r.pass_rate}%
+            </span>
+          </div>
+          <div style={{ height: 5, borderRadius: 99, background: 'var(--surface-2)', overflow: 'hidden' }}>
+            <div style={{
+              height: '100%',
+              width: `${r.pass_rate}%`,
+              background: r.pass_rate >= 70 ? 'var(--success, #4ade80)' : r.pass_rate >= 40 ? '#facc15' : '#f87171',
+              borderRadius: 99,
+              transition: 'width 0.4s ease',
+            }} />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
 }
 
 function dueText(assignment: Assignment, isKin: boolean): string {
@@ -1591,6 +1708,9 @@ export default function TeacherDashboard() {
   const [pendingReview, setPendingReview] = useState(0);
   const [selectedRosterStudent, setSelectedRosterStudent] = useState<RosterStudent | null>(null);
   const [codeCopied, setCodeCopied] = useState(false);
+  const [cohortTag, setCohortTag] = useState('intango_t1_2026');
+  const [liveSignals, setLiveSignals] = useState<LiveSignal[]>([]);
+  const [competency, setCompetency] = useState<CompetencyRow[]>([]);
   const [ratingsSummary, setRatingsSummary] = useState<ClassRatingsSummary | null>(null);
   const [classSummary, setClassSummary] = useState<string | null>(null);
   const [classSummaryLoading, setClassSummaryLoading] = useState(false);
@@ -1633,16 +1753,20 @@ export default function TeacherDashboard() {
       setSelectedClassId(targetId);
       const { data: aData } = await getClassAssignments(targetId);
       setAssignments(aData);
-      const [counts, rosterData, pending, ratings] = await Promise.all([
+      const [counts, rosterData, pending, ratings, signals, comp] = await Promise.all([
         getAssignmentSubmissionCounts(aData.map(a => a.id)),
         getClassRoster(targetId),
         getClassPendingReviewCount(targetId),
         getClassRatingsSummary(targetId),
+        getClassLiveSignals(targetId, cohortTag || undefined),
+        getCompetencySummary(targetId, cohortTag || undefined),
       ]);
       setSubmissionCounts(counts);
       setRoster(rosterData);
       setPendingReview(pending);
       setRatingsSummary(ratings);
+      setLiveSignals(signals);
+      setCompetency(comp);
     }
 
     setLoadingData(false);
@@ -1652,18 +1776,28 @@ export default function TeacherDashboard() {
 
   useEffect(() => {
     if (!selectedClassId) return;
+    getClassLiveSignals(selectedClassId, cohortTag || undefined).then(setLiveSignals);
+    getCompetencySummary(selectedClassId, cohortTag || undefined).then(setCompetency);
+  }, [cohortTag, selectedClassId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (!selectedClassId) return;
     getClassAssignments(selectedClassId).then(async ({ data }) => {
       setAssignments(data);
-      const [counts, rosterData, pending, ratings] = await Promise.all([
+      const [counts, rosterData, pending, ratings, signals, comp] = await Promise.all([
         getAssignmentSubmissionCounts(data.map(a => a.id)),
         getClassRoster(selectedClassId),
         getClassPendingReviewCount(selectedClassId),
         getClassRatingsSummary(selectedClassId),
+        getClassLiveSignals(selectedClassId, cohortTag || undefined),
+        getCompetencySummary(selectedClassId, cohortTag || undefined),
       ]);
       setSubmissionCounts(counts);
       setRoster(rosterData);
       setPendingReview(pending);
       setRatingsSummary(ratings);
+      setLiveSignals(signals);
+      setCompetency(comp);
     });
   }, [selectedClassId]);
 
@@ -1671,6 +1805,19 @@ export default function TeacherDashboard() {
   const activeThisWeek = roster.filter(s => s.last_active && (Date.now() - new Date(s.last_active).getTime()) < 7 * 86400000).length;
   const classProgress = roster.length > 0 ? Math.round(roster.reduce((sum, s) => sum + s.progress_pct, 0) / roster.length) : 0;
   const fallingBehind = roster.filter(s => s.status === 'behind').length;
+
+  const signalMap = new Map(liveSignals.map(s => [s.student_id, s]));
+  const stuckCount = liveSignals.filter(s => s.is_stuck).length;
+
+  // Sort roster: Stuck → Inactive (7+ days) → everything else
+  const sortedRoster = [...roster].sort((a, b) => {
+    const aStuck = signalMap.get(a.student_id)?.is_stuck ?? false;
+    const bStuck = signalMap.get(b.student_id)?.is_stuck ?? false;
+    const aInactive = a.last_active ? (Date.now() - new Date(a.last_active).getTime()) > 7 * 86400000 : true;
+    const bInactive = b.last_active ? (Date.now() - new Date(b.last_active).getTime()) > 7 * 86400000 : true;
+    const score = (stuck: boolean, inactive: boolean) => stuck ? 0 : inactive ? 1 : 2;
+    return score(aStuck, aInactive) - score(bStuck, bInactive);
+  });
 
   async function handleGenerateClassSummary() {
     if (!roster.length || !selectedClass) return;
@@ -1706,6 +1853,31 @@ export default function TeacherDashboard() {
     .filter(s => s.status !== 'on-track')
     .sort((a, b) => (a.status !== b.status ? (a.status === 'behind' ? -1 : 1) : a.progress_pct - b.progress_pct))
     .slice(0, 3);
+
+  const handleExportEvents = () => {
+    const header = ['Name', 'Username', 'Last Event At', 'Lesson Completions', 'Challenge Passes', 'Challenge Fails', 'AI Questions', 'Stuck'];
+    const rows = sortedRoster.map(s => {
+      const sig = signalMap.get(s.student_id);
+      return [
+        `"${s.full_name}"`,
+        s.username,
+        sig?.last_event_at ? new Date(sig.last_event_at).toLocaleString() : 'No events',
+        sig?.lesson_count ?? 0,
+        sig?.challenge_passes ?? 0,
+        sig?.challenge_fails ?? 0,
+        sig?.ai_questions ?? 0,
+        sig?.is_stuck ? 'yes' : 'no',
+      ];
+    });
+    const csv = [header.join(','), ...rows.map(r => r.join(','))].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${(selectedClass?.name ?? 'class').replace(/\s+/g, '_')}_events_${cohortTag || 'all'}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   const handleExportRoster = () => {
     const header = ['Name', 'Username', 'Progress %', 'Current Module', 'Last Active', 'Status'];
@@ -1797,6 +1969,12 @@ export default function TeacherDashboard() {
                     ))}
                   </select>
                 </div>
+                <div className="classsel">
+                  <select value={cohortTag} onChange={e => setCohortTag(e.target.value)} title="Filter by cohort">
+                    <option value="">All cohorts</option>
+                    <option value="intango_t1_2026">intango_t1_2026</option>
+                  </select>
+                </div>
                 <button className="btn btn-secondary sm" onClick={() => setShowCreateClass(true)} title={isKin ? 'Ishuri rishya' : 'New class'}>
                   <Plus size={14} />
                 </button>
@@ -1857,6 +2035,11 @@ export default function TeacherDashboard() {
                 <div className="sv">{fallingBehind}</div>
                 <div className="sd warn">{isKin ? 'nta gikorwa mu minsi 5+' : 'no activity in 5+ days'}</div>
               </div>
+              <div className="stat">
+                <div className="sl">{isKin ? 'Barananiwe' : 'Stuck'}</div>
+                <div className="sv" style={{ color: stuckCount > 0 ? '#f97316' : 'var(--text)' }}>{stuckCount}</div>
+                <div className="sd warn">{isKin ? 'barakosa inshuro 3+ nta gutsinda' : '3+ fails, no pass on same exercise'}</div>
+              </div>
             </div>
 
             <div className="tgrid">
@@ -1867,7 +2050,10 @@ export default function TeacherDashboard() {
                   <div className="row" style={{ gap: '8px' }}>
                     <span className="pill"><span className="dot" />{roster.length} {isKin ? 'abanyeshuri' : 'students'}</span>
                     <button className="btn btn-tertiary sm" onClick={handleExportRoster} disabled={roster.length === 0}>
-                      {isKin ? 'Pakurura' : 'Export'}
+                      {isKin ? 'Pakurura' : 'Roster CSV'}
+                    </button>
+                    <button className="btn btn-tertiary sm" onClick={handleExportEvents} disabled={liveSignals.length === 0} title={isKin ? 'Pakurura ibikorwa' : 'Export events CSV'}>
+                      <Download size={13} style={{ marginRight: 4 }} />{isKin ? 'Ibikorwa' : 'Events CSV'}
                     </button>
                   </div>
                 </div>
@@ -1893,7 +2079,7 @@ export default function TeacherDashboard() {
                         </tr>
                       </thead>
                       <tbody>
-                        {roster.map(s => (
+                        {sortedRoster.map(s => (
                           <tr
                             key={s.student_id}
                             onClick={() => setSelectedRosterStudent(s)}
@@ -1930,7 +2116,7 @@ export default function TeacherDashboard() {
                             </td>
                             <td className="td-roster-opt td-module" title={s.current_module}>{s.current_module}</td>
                             <td><span className="when">{formatRelativeTime(s.last_active, isKin)}</span></td>
-                            <td><StatusPill status={s.status} isKin={isKin} /></td>
+                            <td><StatusPill status={s.status} isKin={isKin} isStuck={signalMap.get(s.student_id)?.is_stuck} /></td>
                           </tr>
                         ))}
                       </tbody>
@@ -2120,6 +2306,18 @@ export default function TeacherDashboard() {
                     )}
                   </section>
                 )}
+
+                {/* COMPETENCY */}
+                <section className="card pad-lg rise-3">
+                  <div className="card-head" style={{ marginBottom: 14 }}>
+                    <h3 className="card-title" style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+                      <Activity size={14} style={{ color: 'var(--text-3)' }} />
+                      {isKin ? 'Ubushobozi' : 'Competency'}
+                    </h3>
+                    {cohortTag && <span className="pill" style={{ fontSize: 11 }}>{cohortTag}</span>}
+                  </div>
+                  <CompetencyPanel rows={competency} isKin={isKin} />
+                </section>
               </aside>
             </div>
           </>
