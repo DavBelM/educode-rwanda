@@ -34,7 +34,7 @@ export default async function handler(_req: VercelRequest, res: VercelResponse) 
           contents: [{ parts: [{ text: 'Reply with exactly: OK' }] }],
           generationConfig: { maxOutputTokens: 10, temperature: 0 },
         }),
-        signal: AbortSignal.timeout(10_000),
+        signal: AbortSignal.timeout(25_000),
       }
     );
 
