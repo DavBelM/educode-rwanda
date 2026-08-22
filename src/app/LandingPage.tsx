@@ -9,10 +9,100 @@ interface Props {
   onSchoolSignup?: () => void;
 }
 
-export default function LandingPage({ onLogin, onSignup, onSchoolSignup }: Props) {
+function LeadModal({ onClose }: { onClose: () => void }) {
+  const [schoolName, setSchoolName] = useState('');
+  const [contactName, setContactName] = useState('');
+  const [role, setRole] = useState('');
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [done, setDone] = useState(false);
+  const [error, setError] = useState('');
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!email.trim() && !phone.trim()) { setError('Please provide an email or phone number.'); return; }
+    setLoading(true);
+    setError('');
+    const res = await fetch('/api/submit-lead', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ school_name: schoolName, contact_name: contactName, role, email, phone, message }),
+    });
+    const json = await res.json();
+    if (!res.ok) { setError(json.error ?? 'Something went wrong. Please try again.'); setLoading(false); return; }
+    setDone(true);
+    setLoading(false);
+  }
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16, background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }}>
+      <div className="card pad-lg" style={{ width: '100%', maxWidth: 460, maxHeight: '90vh', overflowY: 'auto' }}>
+        {done ? (
+          <div style={{ textAlign: 'center', padding: '24px 0' }}>
+            <div style={{ fontSize: 40, marginBottom: 16 }}>✅</div>
+            <h2 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text)', marginBottom: 10 }}>We received your enquiry</h2>
+            <p style={{ fontSize: 14, color: 'var(--text-2)', lineHeight: 1.6 }}>
+              We will be in touch within 48 hours. In the meantime, feel free to email <strong>belamitali@gmail.com</strong> directly.
+            </p>
+            <button className="btn btn-secondary" style={{ marginTop: 20 }} onClick={onClose}>Close</button>
+          </div>
+        ) : (
+          <>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20 }}>
+              <div>
+                <h2 style={{ fontSize: 18, fontWeight: 700, color: 'var(--text)' }}>Contact us for schools</h2>
+                <p style={{ fontSize: 13, color: 'var(--text-2)', marginTop: 4 }}>Tell us about your school and we will be in touch.</p>
+              </div>
+              <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-3)', fontSize: 20, lineHeight: 1 }}>×</button>
+            </div>
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              <div className="field">
+                <label className="label">School name *</label>
+                <input type="text" className="input" value={schoolName} onChange={e => setSchoolName(e.target.value)} placeholder="e.g. IPRC Kigali" required />
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                <div className="field">
+                  <label className="label">Your name *</label>
+                  <input type="text" className="input" value={contactName} onChange={e => setContactName(e.target.value)} placeholder="e.g. Diane Uwase" required />
+                </div>
+                <div className="field">
+                  <label className="label">Your role</label>
+                  <input type="text" className="input" value={role} onChange={e => setRole(e.target.value)} placeholder="e.g. Head teacher" />
+                </div>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                <div className="field">
+                  <label className="label">Email</label>
+                  <input type="email" className="input" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@school.rw" />
+                </div>
+                <div className="field">
+                  <label className="label">Phone</label>
+                  <input type="tel" className="input" value={phone} onChange={e => setPhone(e.target.value)} placeholder="+250 7xx xxx xxx" />
+                </div>
+              </div>
+              <div className="field">
+                <label className="label">Message (optional)</label>
+                <textarea className="input" style={{ minHeight: 80, resize: 'vertical' }} value={message} onChange={e => setMessage(e.target.value)} placeholder="How many students? Any questions?" />
+              </div>
+              {error && <p style={{ fontSize: 13, color: 'var(--error)' }}>{error}</p>}
+              <button type="submit" className="btn btn-primary" disabled={!schoolName.trim() || !contactName.trim() || loading}>
+                {loading ? 'Sending…' : 'Send enquiry'}
+              </button>
+            </form>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default function LandingPage({ onLogin, onSignup }: Props) {
   usePageTitle('EduCode Rwanda — Learn to Code');
   const { theme, toggleTheme } = useTheme();
   const [aiLang, setAiLang] = useState<'EN' | 'RW'>('EN');
+  const [showLeadModal, setShowLeadModal] = useState(false);
 
   useEffect(() => {
     const els = document.querySelectorAll('.reveal');
@@ -270,11 +360,13 @@ export default function LandingPage({ onLogin, onSignup, onSchoolSignup }: Props
             </p>
             <div className="row" style={{ justifyContent: 'center', gap: 12 }}>
               <button className="btn btn-primary lg" onClick={onSignup}>See the student view</button>
-              <button className="btn btn-secondary lg" onClick={onSchoolSignup}>Contact us for schools</button>
+              <button className="btn btn-secondary lg" onClick={() => setShowLeadModal(true)}>Contact us for schools</button>
             </div>
           </div>
         </section>
       </main>
+
+      {showLeadModal && <LeadModal onClose={() => setShowLeadModal(false)} />}
 
       <footer className="site-footer">
         <div className="wrap foot">

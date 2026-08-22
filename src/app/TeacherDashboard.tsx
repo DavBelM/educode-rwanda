@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Users, Plus, Check, X, ChevronDown, BookOpen, Code2, Loader, Megaphone, Pin, Trash2, BarChart2, AlertCircle, Download, Sparkles, Activity, AlertTriangle } from 'lucide-react';
+import { Users, Plus, Check, X, ChevronDown, BookOpen, Code2, Loader, Megaphone, Pin, Trash2, BarChart2, AlertCircle, Download, Sparkles, Activity, AlertTriangle, UserPlus } from 'lucide-react';
+import { supabase } from '../lib/supabase';
 import { generateStudentAssessment, generateClassSummary } from '../lib/ai';
 import { AppNav } from './components/AppNav';
 import { usePageTitle } from '../hooks/usePageTitle';
@@ -27,13 +28,18 @@ function CreateClassModal({ language, onClose, onCreate }: {
   const isKin = language === 'KIN';
   const [name, setName] = useState('');
   const [subject, setSubject] = useState('JavaScript');
+  const [level, setLevel] = useState('');
+  const [cohortTag, setCohortTagLocal] = useState('intango_t1_2026');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   const handleCreate = async () => {
     if (!name.trim()) return;
     setLoading(true);
-    const { data, error } = await createClass(name.trim(), subject);
+    const { data, error } = await createClass(name.trim(), subject, {
+      level: level.trim() || undefined,
+      cohort_tag: cohortTag.trim() || undefined,
+    });
     if (error) { setError(error); setLoading(false); return; }
     onCreate(data!);
   };
@@ -50,28 +56,52 @@ function CreateClassModal({ language, onClose, onCreate }: {
 
         <div className="stack" style={{ ['--gap' as string]: '16px' }}>
           <div className="field">
-            <label className="label">{isKin ? 'Izina ry’Ishuri' : 'Class Name'}</label>
+            <label className="label">{isKin ? "Izina ry'Ishuri" : 'Class Name'}</label>
             <input
               type="text"
               value={name}
               onChange={e => setName(e.target.value)}
               placeholder={isKin ? 'Urugero: JS Level 3 - IPRC Kigali' : 'e.g. JS Level 3 - IPRC Kigali'}
               className="input"
+              autoFocus
             />
           </div>
 
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <div className="field">
+              <label className="label">{isKin ? 'Isomo' : 'Subject'}</label>
+              <select value={subject} onChange={e => setSubject(e.target.value)} className="select">
+                <option value="JavaScript">JavaScript</option>
+                <option value="HTML & CSS">HTML &amp; CSS</option>
+                <option value="Python">Python</option>
+                <option value="Web Development">Web Development</option>
+              </select>
+            </div>
+            <div className="field">
+              <label className="label">{isKin ? 'Urwego' : 'Level'}</label>
+              <input
+                type="text"
+                value={level}
+                onChange={e => setLevel(e.target.value)}
+                placeholder="e.g. Level 3"
+                className="input"
+              />
+            </div>
+          </div>
+
           <div className="field">
-            <label className="label">{isKin ? 'Isomo' : 'Subject'}</label>
-            <select
-              value={subject}
-              onChange={e => setSubject(e.target.value)}
-              className="select"
-            >
-              <option value="JavaScript">JavaScript</option>
-              <option value="HTML & CSS">HTML &amp; CSS</option>
-              <option value="Python">Python</option>
-              <option value="Web Development">Web Development</option>
-            </select>
+            <label className="label">Cohort tag</label>
+            <input
+              type="text"
+              value={cohortTag}
+              onChange={e => setCohortTagLocal(e.target.value)}
+              placeholder="e.g. intango_t1_2026"
+              className="input"
+              style={{ fontFamily: 'var(--mono)', fontSize: 13 }}
+            />
+            <p style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 4 }}>
+              Tags all events from students in this class. Use the same tag across all classes in a cohort.
+            </p>
           </div>
 
           {error && (
@@ -172,11 +202,11 @@ function CreateAssignmentModal({ language, classes, onClose, onCreate }: {
         {step === 'type' ? (
           <>
             <p className="muted text-sm mb-5">
-              {isKin ? 'Hitamo ubwoko bw’umukoro:' : 'Choose the type of assignment:'}
+              {isKin ? "Hitamo ubwoko bw'umukoro:" : 'Choose the type of assignment:'}
             </p>
             <div className="grid grid-cols-2 gap-4 mb-6">
               {([
-                { value: 'theoretical', icon: <BookOpen size={28} />, label: isKin ? 'Ibibazo by’inyandiko' : 'Theoretical', desc: isKin ? 'Ibibazo by’inyandiko abanyeshuri basubiza mu magambo' : 'Written questions students answer in text' },
+                { value: 'theoretical', icon: <BookOpen size={28} />, label: isKin ? "Ibibazo by'inyandiko" : 'Theoretical', desc: isKin ? "Ibibazo by'inyandiko abanyeshuri basubiza mu magambo" : 'Written questions students answer in text' },
                 { value: 'coding', icon: <Code2 size={28} />, label: isKin ? 'Umukoro wa code' : 'Coding', desc: isKin ? 'Abanyeshuri bandika kandi bagatangiza (run) code ya JavaScript' : 'Students write and run JavaScript code' },
               ] as const).map(type => (
                 <button
@@ -283,7 +313,7 @@ function CreateAssignmentModal({ language, classes, onClose, onCreate }: {
             {/* Difficulty + Due date row */}
             <div className="grid grid-cols-2 gap-3">
               <div className="field">
-                <label className="label">{isKin ? 'Urwego rw’ingorabahizi' : 'Difficulty'}</label>
+                <label className="label">{isKin ? "Urwego rw'ingorabahizi" : 'Difficulty'}</label>
                 <select
                   value={difficulty}
                   onChange={e => setDifficulty(e.target.value as typeof difficulty)}
@@ -308,7 +338,7 @@ function CreateAssignmentModal({ language, classes, onClose, onCreate }: {
 
             {/* Weight % */}
             <div className="field">
-              <label className="label">{isKin ? 'Uburemere bw’amanota (%)' : 'Grade Weight (%)'}</label>
+              <label className="label">{isKin ? "Uburemere bw'amanota (%)" : 'Grade Weight (%)'}</label>
               <div className="row">
                 <input
                   type="number"
@@ -332,7 +362,7 @@ function CreateAssignmentModal({ language, classes, onClose, onCreate }: {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-semibold" style={{ color: examMode ? 'var(--error)' : 'var(--text)' }}>
-                    {isKin ? '🔒 Uburyo bw’Ikizamini (Exam Mode)' : '🔒 Exam Mode'}
+                    {isKin ? "🔒 Uburyo bw'Ikizamini (Exam Mode)" : '🔒 Exam Mode'}
                   </p>
                   <p className="text-xs mt-0.5 dim">
                     {isKin ? 'Gufunga screen, gukurikirana niba bahinduye paji, no kohereza mu buryo bwikora igihe cyangiye' : 'Fullscreen lock, tab-switch tracking, auto-submit on timeout'}
@@ -1689,6 +1719,129 @@ function MwarimuEvalModal({ onClose }: { onClose: () => void }) {
   );
 }
 
+// ─── Add Students Modal ───────────────────────────────────────────────────────
+
+function AddStudentsModal({ cls, language, onClose }: { cls: Class; language: 'EN' | 'KIN'; onClose: () => void }) {
+  const isKin = language === 'KIN';
+  const [namesInput, setNamesInput] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [results, setResults] = useState<Array<{ name: string; login_email: string; initial_password: string; error?: string }> | null>(null);
+  const [error, setError] = useState('');
+
+  async function handleCreate() {
+    const names = namesInput.split('\n').map(n => n.trim()).filter(n => n.length >= 2);
+    if (names.length === 0) return;
+    setLoading(true);
+    setError('');
+    const { data: { session } } = await supabase.auth.getSession();
+    const res = await fetch('/api/create-roster', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session?.access_token ?? ''}` },
+      body: JSON.stringify({ class_id: cls.id, students: names.map(name => ({ name })) }),
+    });
+    const json = await res.json();
+    if (!res.ok) { setError(json.error ?? 'Failed to create accounts'); setLoading(false); return; }
+    setResults(json.results);
+    setLoading(false);
+  }
+
+  function handleDownload() {
+    if (!results) return;
+    const header = 'Name,Login Email,Initial Password,Status\n';
+    const rows = results.map(r => `"${r.name}","${r.login_email}","${r.initial_password}","${r.error ?? 'OK'}"`).join('\n');
+    const blob = new Blob([header + rows], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${cls.name.replace(/\s+/g, '_')}_credentials.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }}>
+      <div className="card pad-lg w-full max-w-lg" style={{ maxHeight: '90vh', overflowY: 'auto' }}>
+        <div className="card-head">
+          <h2 className="card-title">{isKin ? 'Ongeraho abanyeshuri' : 'Add students'}</h2>
+          <button onClick={onClose} className="iconbtn"><X size={18} /></button>
+        </div>
+
+        {!results ? (
+          <>
+            <p className="text-sm" style={{ color: 'var(--text-2)', marginTop: 12, marginBottom: 16, lineHeight: 1.6 }}>
+              {isKin
+                ? "Andika amazina y'abanyeshuri, umwe ku murongo. Konti zizashyirwaho. Buri munyeshuri azashyira password ye bwa mbere akinjira."
+                : "Enter student names, one per line. Accounts will be created automatically. Each student sets their own password on first login."}
+            </p>
+            <div className="field">
+              <label className="label">{isKin ? "Amazina y'abanyeshuri" : 'Student names'}</label>
+              <textarea
+                className="input"
+                style={{ minHeight: 180, fontFamily: 'var(--mono)', fontSize: 13, resize: 'vertical' }}
+                value={namesInput}
+                onChange={e => setNamesInput(e.target.value)}
+                placeholder={'Jean Dupont\nMarie Uwase\nAlice Nzeyimana'}
+              />
+            </div>
+            {error && <p style={{ fontSize: 13, color: 'var(--error)', marginTop: 8 }}>{error}</p>}
+            <div className="row" style={{ gap: 12, marginTop: 20 }}>
+              <button className="btn btn-secondary" style={{ flex: 1 }} onClick={onClose}>{isKin ? 'Reka' : 'Cancel'}</button>
+              <button className="btn btn-primary" style={{ flex: 2 }} onClick={handleCreate} disabled={loading || !namesInput.trim()}>
+                {loading ? <Loader size={16} className="animate-spin" /> : (isKin ? 'Kora konti' : 'Create accounts')}
+              </button>
+            </div>
+          </>
+        ) : (
+          <>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '16px 0 12px' }}>
+              <p style={{ fontSize: 13, fontWeight: 600, color: results.every(r => !r.error) ? 'var(--success, #22c55e)' : 'var(--text-2)' }}>
+                {results.filter(r => !r.error).length} / {results.length} {isKin ? 'barakozwe neza' : 'created'}
+              </p>
+              <button className="btn btn-tertiary sm" onClick={handleDownload} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                <Download size={13} />{isKin ? 'Pakurura CSV' : 'Download CSV'}
+              </button>
+            </div>
+            <div style={{ border: '1px solid var(--line)', borderRadius: 'var(--radius)', overflow: 'hidden', fontSize: 12 }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr style={{ background: 'var(--surface-2)', textAlign: 'left' }}>
+                    <th style={{ padding: '8px 10px', fontWeight: 600 }}>{isKin ? 'Izina' : 'Name'}</th>
+                    <th style={{ padding: '8px 10px', fontWeight: 600 }}>{isKin ? 'Email yo kwinjira' : 'Login email'}</th>
+                    <th style={{ padding: '8px 10px', fontWeight: 600 }}>{isKin ? 'Password ya mbere' : 'Password'}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {results.map((r, i) => (
+                    <tr key={i} style={{ borderTop: '1px solid var(--line)', background: r.error ? 'var(--error-dim)' : undefined }}>
+                      <td style={{ padding: '8px 10px', color: 'var(--text)' }}>{r.name}</td>
+                      <td style={{ padding: '8px 10px', fontFamily: 'var(--mono)', color: r.error ? 'var(--error)' : 'var(--text-2)', fontSize: 11.5 }}>
+                        {r.error ? r.error : r.login_email}
+                      </td>
+                      <td style={{ padding: '8px 10px', fontFamily: 'var(--mono)', color: 'var(--text-2)', letterSpacing: '0.05em' }}>
+                        {r.error ? '—' : r.initial_password}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p className="text-sm" style={{ color: 'var(--text-3)', marginTop: 10, lineHeight: 1.5 }}>
+              {isKin
+                ? 'Sohora CSV maze ugabane abanyeshuri. Bazashyira password yabo bwa mbere bakinjira.'
+                : 'Download the CSV and hand out credentials. Students will be prompted to set their own password on first login.'}
+            </p>
+            <button className="btn btn-secondary" style={{ width: '100%', marginTop: 14 }} onClick={onClose}>
+              {isKin ? 'Gufunga' : 'Done'}
+            </button>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── Main Dashboard ───────────────────────────────────────────────────────────
+
 export default function TeacherDashboard() {
   usePageTitle('Teacher Dashboard · EduCode');
   const [language] = useState<'EN' | 'KIN'>('EN');
@@ -1700,6 +1853,7 @@ export default function TeacherDashboard() {
   const [loadingData, setLoadingData] = useState(true);
   const [showCreateClass, setShowCreateClass] = useState(false);
   const [showCreateAssignment, setShowCreateAssignment] = useState(false);
+  const [showAddStudents, setShowAddStudents] = useState(false);
   const [selectedClassId, setSelectedClassId] = useState<string | null>(null);
   const [viewingAssignment, setViewingAssignment] = useState<Assignment | null>(null);
   const [announcementsClass, setAnnouncementsClass] = useState<Class | null>(null);
@@ -2049,6 +2203,9 @@ export default function TeacherDashboard() {
                   <h3 className="card-title">{isKin ? "Abanyeshuri b'ishuri" : 'Class roster'}</h3>
                   <div className="row" style={{ gap: '8px' }}>
                     <span className="pill"><span className="dot" />{roster.length} {isKin ? 'abanyeshuri' : 'students'}</span>
+                    <button className="btn btn-secondary sm" onClick={() => setShowAddStudents(true)} title={isKin ? 'Ongeraho abanyeshuri' : 'Add students'} style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                      <UserPlus size={13} />{isKin ? 'Ongeraho' : 'Add students'}
+                    </button>
                     <button className="btn btn-tertiary sm" onClick={handleExportRoster} disabled={roster.length === 0}>
                       {isKin ? 'Pakurura' : 'Roster CSV'}
                     </button>
@@ -2383,6 +2540,14 @@ export default function TeacherDashboard() {
 
       {showMwarimuEval && (
         <MwarimuEvalModal onClose={() => setShowMwarimuEval(false)} />
+      )}
+
+      {showAddStudents && selectedClass && (
+        <AddStudentsModal
+          cls={selectedClass}
+          language={language}
+          onClose={() => { setShowAddStudents(false); loadData(); }}
+        />
       )}
     </div>
   );

@@ -21,7 +21,9 @@ import MyResultsPage from './MyResultsPage';
 import OnboardingModal from './OnboardingModal';
 import EthicsModal from './EthicsModal';
 import SchoolAdminDashboard from './SchoolAdminDashboard';
+import SuperAdminDashboard from './SuperAdminDashboard';
 import SelfLearnerDashboard from './SelfLearnerDashboard';
+import SetPasswordPage from './SetPasswordPage';
 import ChallengePage from './ChallengePage';
 import ChallengeRunner from './ChallengeRunner';
 import { useAuth } from '../lib/auth';
@@ -173,6 +175,11 @@ export default function App() {
 
   // ── Authenticated ──────────────────────────────────────────────────────────
   if (user && profile) {
+    // Pre-created student accounts must set their own password before accessing the app.
+    if (user.user_metadata?.needs_password_change) {
+      return <SetPasswordPage onDone={() => {}} />;
+    }
+
     const ethicsModal = showEthics ? (
       <EthicsModal language={language} onAgree={handleEthicsAgreed} />
     ) : null;
@@ -186,6 +193,7 @@ export default function App() {
       />
     ) : null;
 
+    if (profile.user_type === 'super_admin') return <SuperAdminDashboard />;
     if (profile.user_type === 'school_admin') return <SchoolAdminDashboard />;
     if (profile.user_type === 'teacher') return <>{<TeacherDashboard />}{onboardingModal}</>;
 

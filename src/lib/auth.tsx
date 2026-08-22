@@ -6,7 +6,7 @@ interface Profile {
   id: string;
   full_name: string;
   email: string;
-  user_type: 'student' | 'teacher' | 'self_learner' | 'school_admin';
+  user_type: 'student' | 'teacher' | 'self_learner' | 'school_admin' | 'super_admin';
   preferred_language: 'en' | 'kin' | 'both';
   xp_points: number;
   streak_days: number;
@@ -30,7 +30,7 @@ interface SignUpParams {
   email: string;
   password: string;
   fullName: string;
-  userType: 'student' | 'teacher' | 'self_learner' | 'school_admin';
+  userType: 'student' | 'teacher' | 'self_learner' | 'school_admin' | 'super_admin';
   preferredLanguage: 'en' | 'kin' | 'both';
 }
 

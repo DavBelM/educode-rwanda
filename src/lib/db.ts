@@ -9,6 +9,9 @@ export interface Class {
   subject: string;
   invite_code: string;
   teacher_id: string;
+  school_id: string | null;
+  level: string | null;
+  cohort_tag: string | null;
   created_at: string;
 }
 
@@ -81,9 +84,18 @@ function generateInviteCode(): string {
   return Array.from({ length: 6 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
 }
 
-export async function createClass(name: string, subject: string): Promise<{ data: Class | null; error: string | null }> {
+export async function createClass(
+  name: string,
+  subject: string,
+  opts?: { level?: string; cohort_tag?: string }
+): Promise<{ data: Class | null; error: string | null }> {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { data: null, error: 'Not authenticated' };
+
+  // Resolve teacher's school_id so the class inherits it
+  const { data: teacherProfile } = await supabase
+    .from('profiles').select('school_id').eq('id', user.id).single();
+  const school_id = teacherProfile?.school_id ?? null;
 
   // Generate a unique invite code — retry if collision (extremely unlikely)
   let invite_code = generateInviteCode();
@@ -96,7 +108,12 @@ export async function createClass(name: string, subject: string): Promise<{ data
 
   const { data, error } = await supabase
     .from('classes')
-    .insert({ name, subject, teacher_id: user.id, invite_code })
+    .insert({
+      name, subject, teacher_id: user.id, invite_code,
+      school_id,
+      level:      opts?.level      ?? null,
+      cohort_tag: opts?.cohort_tag ?? null,
+    })
     .select()
     .single();
 

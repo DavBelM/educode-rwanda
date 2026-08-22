@@ -1,8 +1,8 @@
 import { supabase } from './supabase';
 
 // ── Cohort tag ────────────────────────────────────────────────────────────────
-// Update this before each new cohort's first login so every event from this
-// group is permanently sliceable in exports and reports.
+// Fallback used only when no class is present (self-learner sessions).
+// For class students the cohort_tag is read from classes.cohort_tag at emit time.
 export const COHORT_TAG = 'intango_t1_2026';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -13,6 +13,7 @@ export type LearningEventType =
   | 'exercise_attempt'
   | 'challenge_attempt'
   | 'assessment_submit'
+  | 'submission_graded'
   | 'ai_question_asked'
   | 'session_start' | 'session_end';
 
@@ -36,6 +37,7 @@ export interface EmitParams {
 
 let _cachedSchoolId: string | null | undefined = undefined;
 const _competencyCache = new Map<string, string | null>();
+const _cohortTagCache  = new Map<string, string | null>(); // class_id → cohort_tag
 
 async function resolveSchoolId(userId: string): Promise<string | null> {
   if (_cachedSchoolId !== undefined) return _cachedSchoolId;
@@ -46,6 +48,14 @@ async function resolveSchoolId(userId: string): Promise<string | null> {
     .single();
   _cachedSchoolId = data?.school_id ?? null;
   return _cachedSchoolId;
+}
+
+async function resolveCohortTag(classId: string): Promise<string | null> {
+  if (_cohortTagCache.has(classId)) return _cohortTagCache.get(classId)!;
+  const { data } = await supabase.from('classes').select('cohort_tag').eq('id', classId).single();
+  const tag = (data?.cohort_tag as string | null) ?? null;
+  _cohortTagCache.set(classId, tag);
+  return tag;
 }
 
 async function resolveCompetencyCode(lessonId: string): Promise<string | null> {
@@ -76,6 +86,12 @@ async function _emit(params: EmitParams): Promise<void> {
     ? params.school_id
     : await resolveSchoolId(user.id);
 
+  // Resolve cohort_tag from the class when available; fall back to the constant
+  // for self-learner sessions that have no class_id.
+  const cohort_tag = params.class_id
+    ? (await resolveCohortTag(params.class_id)) ?? COHORT_TAG
+    : COHORT_TAG;
+
   let competency_code: string | null = null;
   if (params.entity_type === 'lesson' && params.entity_id) {
     competency_code = await resolveCompetencyCode(params.entity_id);
@@ -85,7 +101,7 @@ async function _emit(params: EmitParams): Promise<void> {
     student_id:      user.id,
     class_id:        params.class_id  ?? null,
     school_id,
-    cohort_tag:      COHORT_TAG,
+    cohort_tag,
     event_type:      params.event_type,
     entity_type:     params.entity_type    ?? null,
     entity_id:       params.entity_id      ?? null,
