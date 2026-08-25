@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Users, Plus, Check, X, ChevronDown, BookOpen, Code2, Loader, Megaphone, Pin, Trash2, BarChart2, AlertCircle, Download, Sparkles, Activity, AlertTriangle, UserPlus } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Users, Plus, Check, X, ChevronDown, BookOpen, Code2, Loader, Megaphone, Pin, Trash2, BarChart2, AlertCircle, Download, Sparkles, Activity, AlertTriangle, UserPlus, Table2, Eye, EyeOff, ClipboardCheck } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { generateStudentAssessment, generateClassSummary } from '../lib/ai';
 import { AppNav } from './components/AppNav';
@@ -14,8 +14,11 @@ import {
   saveMwarimuEvaluation, getMwarimuEvalSummary,
   getSchoolAnnouncementsForTeacher,
   getClassLiveSignals, getStudentEventTimeline, getCompetencySummary,
+  getGradeBook, toggleAssignmentPublished,
+  saveAttendance, getAttendanceSessions, getSessionAttendance,
   type Class, type Assignment, type Question, type Submission, type Announcement, type ClassAnalytics, type RosterStudent, type StudentAIProfile, type ClassRatingsSummary, type SchoolAnnouncement,
-  type LiveSignal, type EventRow, type CompetencyRow
+  type LiveSignal, type EventRow, type CompetencyRow, type GradeBook,
+  type AttendanceStatus, type AttendanceSessionSummary, type AttendanceStudentRecord,
 } from '../lib/db';
 
 // ─── Create Class Modal ────────────────────────────────────────────────────────
@@ -152,6 +155,7 @@ function CreateAssignmentModal({ language, classes, onClose, onCreate }: {
   const [durationMinutes, setDurationMinutes] = useState(30);
   const [weightPct, setWeightPct] = useState(100);
   const [questions, setQuestions] = useState<Question[]>([{ id: '1', text: '', text_kin: '' }]);
+  const [publishNow, setPublishNow] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -184,6 +188,7 @@ function CreateAssignmentModal({ language, classes, onClose, onCreate }: {
       examMode,
       durationMinutes: examMode ? durationMinutes : undefined,
       weightPct,
+      isPublished: publishNow,
     });
     if (error) { setError(error); setLoading(false); return; }
     onCreate();
@@ -443,6 +448,24 @@ function CreateAssignmentModal({ language, classes, onClose, onCreate }: {
               </p>
             )}
 
+            {/* Publish toggle */}
+            <div
+              style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px', borderRadius: 'var(--radius)', background: publishNow ? 'var(--accent-soft)' : 'var(--surface-2)', border: `1px solid ${publishNow ? 'var(--accent)' : 'var(--line)'}`, cursor: 'pointer' }}
+              onClick={() => setPublishNow(p => !p)}
+            >
+              <div style={{ width: 36, height: 20, borderRadius: 10, background: publishNow ? 'var(--accent)' : 'var(--line)', position: 'relative', transition: 'background 0.2s', flexShrink: 0 }}>
+                <div style={{ width: 16, height: 16, borderRadius: '50%', background: '#fff', position: 'absolute', top: 2, left: publishNow ? 18 : 2, transition: 'left 0.2s', boxShadow: '0 1px 3px rgba(0,0,0,0.2)' }} />
+              </div>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>
+                  {publishNow ? (isKin ? 'Tangaza ubu — abanyeshuri bazabona' : 'Publish immediately — students will see this now') : (isKin ? 'Bika nk\'icyitegererezo — ntabanyeshuri bazabona' : 'Save as draft — students won\'t see this yet')}
+                </div>
+                <div style={{ fontSize: 11.5, color: 'var(--text-3)', marginTop: 2 }}>
+                  {isKin ? 'Ushobora guhindura ibi nyuma' : 'You can publish or unpublish anytime from the assignment list'}
+                </div>
+              </div>
+            </div>
+
             <div className="row" style={{ gap: '12px', paddingTop: '8px' }}>
               <button onClick={() => setStep('type')} className="btn btn-secondary" style={{ flex: 1 }}>
                 {isKin ? 'Subira Inyuma' : 'Back'}
@@ -453,7 +476,7 @@ function CreateAssignmentModal({ language, classes, onClose, onCreate }: {
                 className="btn btn-primary"
                 style={{ flex: 1 }}
               >
-                {loading ? <Loader size={16} className="animate-spin" /> : (isKin ? 'Tangaza' : 'Publish')}
+                {loading ? <Loader size={16} className="animate-spin" /> : publishNow ? (isKin ? 'Tangaza' : 'Publish') : (isKin ? 'Bika' : 'Save Draft')}
               </button>
             </div>
           </div>
@@ -477,6 +500,8 @@ function AnnouncementsModal({ cls, language, onClose }: {
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
   const [pinned, setPinned] = useState(false);
+  const [resourceUrl, setResourceUrl] = useState('');
+  const [resourceLabel, setResourceLabel] = useState('');
   const [posting, setPosting] = useState(false);
   const [postError, setPostError] = useState('');
   const [deleting, setDeleting] = useState<string | null>(null);
@@ -494,9 +519,9 @@ function AnnouncementsModal({ cls, language, onClose }: {
     if (!title.trim() || !body.trim()) return;
     setPosting(true);
     setPostError('');
-    const { error } = await createAnnouncement({ classId: cls.id, title: title.trim(), body: body.trim(), pinned });
+    const { error } = await createAnnouncement({ classId: cls.id, title: title.trim(), body: body.trim(), pinned, resourceUrl, resourceLabel });
     if (error) { setPostError(error); setPosting(false); return; }
-    setTitle(''); setBody(''); setPinned(false);
+    setTitle(''); setBody(''); setPinned(false); setResourceUrl(''); setResourceLabel('');
     setTab('list');
     setLoading(true);
     load();
@@ -589,6 +614,19 @@ function AnnouncementsModal({ cls, language, onClose }: {
                       </button>
                     </div>
                     <p className="text-xs leading-relaxed mb-2" style={{ color: 'var(--text-2)', whiteSpace: 'pre-wrap' }}>{a.body}</p>
+                    {a.resource_url && (
+                      <a
+                        href={a.resource_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2"
+                        style={{ marginBottom: 8, padding: '8px 12px', borderRadius: 'var(--radius-sm)', background: 'var(--surface)', border: '1px solid var(--line)', color: 'var(--text)', fontSize: 12, fontWeight: 600, textDecoration: 'none', display: 'flex' }}
+                      >
+                        <BookOpen size={12} style={{ flexShrink: 0 }} />
+                        {a.resource_label || a.resource_url}
+                        <span style={{ marginLeft: 'auto', color: 'var(--text-3)', fontSize: 10 }}>↗</span>
+                      </a>
+                    )}
                     <p className="text-xs dim">
                       {new Date(a.created_at).toLocaleString()}
                     </p>
@@ -617,6 +655,28 @@ function AnnouncementsModal({ cls, language, onClose }: {
                   placeholder={isKin ? 'Andika ubutumwa bwawe hano...' : 'Write your message here...'}
                   className="textarea"
                 />
+              </div>
+              {/* Resource attachment */}
+              <div style={{ borderRadius: 'var(--radius)', border: '1px solid var(--line)', padding: '14px', background: 'var(--surface-2)' }}>
+                <p className="text-xs font-semibold mb-3" style={{ color: 'var(--text-2)' }}>
+                  {isKin ? 'Ifite aho ihurira? (bitagenzuwe)' : 'Attach a resource link (optional)'}
+                </p>
+                <div className="stack" style={{ ['--gap' as string]: '10px' }}>
+                  <input
+                    type="url"
+                    value={resourceUrl}
+                    onChange={e => setResourceUrl(e.target.value)}
+                    className="input"
+                    placeholder="https://..."
+                  />
+                  <input
+                    type="text"
+                    value={resourceLabel}
+                    onChange={e => setResourceLabel(e.target.value)}
+                    className="input"
+                    placeholder={isKin ? 'Izina (urugero: Agakuru k\'isomo)' : 'Link label (e.g. Lesson slides)'}
+                  />
+                </div>
               </div>
               <label className="flex items-center gap-2.5 cursor-pointer select-none">
                 <input
@@ -1840,6 +1900,467 @@ function AddStudentsModal({ cls, language, onClose }: { cls: Class; language: 'E
   );
 }
 
+// ─── Grade Book Modal ─────────────────────────────────────────────────────────
+
+function GradeBookModal({ classId, className, onClose, onViewSubmission }: {
+  classId: string;
+  className: string;
+  onClose: () => void;
+  onViewSubmission: (assignment: Assignment) => void;
+}) {
+  const [book, setBook] = useState<GradeBook | null>(null);
+  const [loading, setLoading] = useState(true);
+  const tableRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    getGradeBook(classId).then(b => { setBook(b); setLoading(false); });
+  }, [classId]);
+
+  const handleExportCSV = () => {
+    if (!book) return;
+    const header = ['Student', ...book.assignments.map(a => `"${a.title} (${a.total_marks})"`).join(',')];
+    const rows = book.students.map(s => {
+      const cells = book.assignments.map(a => {
+        const c = book.cells[s.student_id]?.[a.id];
+        if (!c?.submitted) return 'NS';
+        if (!c.graded) return 'SUB';
+        return String(c.marks_earned ?? '');
+      });
+      return [`"${s.full_name}"`, ...cells].join(',');
+    });
+    const csv = [header.join(','), ...rows].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${className.replace(/\s+/g, '_')}_gradebook.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const classAvg = (assignmentId: string): string => {
+    if (!book) return '—';
+    const graded = book.students
+      .map(s => book.cells[s.student_id]?.[assignmentId])
+      .filter(c => c?.graded && c.marks_earned !== null);
+    if (graded.length === 0) return '—';
+    const avg = graded.reduce((sum, c) => sum + (c!.marks_earned ?? 0), 0) / graded.length;
+    return avg.toFixed(1);
+  };
+
+  const submissionRate = (assignmentId: string): number => {
+    if (!book || book.students.length === 0) return 0;
+    const submitted = book.students.filter(s => book.cells[s.student_id]?.[assignmentId]?.submitted).length;
+    return Math.round((submitted / book.students.length) * 100);
+  };
+
+  const totalPct = (studentId: string): string => {
+    if (!book) return '—';
+    let earned = 0, possible = 0;
+    for (const a of book.assignments) {
+      if (!a.grades_released) continue;
+      const c = book.cells[studentId]?.[a.id];
+      if (c?.graded && c.marks_earned !== null) {
+        earned += c.marks_earned;
+        possible += a.total_marks;
+      }
+    }
+    if (possible === 0) return '—';
+    return `${Math.round((earned / possible) * 100)}%`;
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(4px)' }}>
+      <div className="card" style={{ width: '96vw', maxWidth: 1100, maxHeight: '90vh', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        {/* Header */}
+        <div className="card-head" style={{ padding: '16px 20px', borderBottom: '1px solid var(--line)', flexShrink: 0 }}>
+          <div>
+            <h2 className="card-title" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Table2 size={16} style={{ color: 'var(--text-3)' }} />
+              Grade Book — {className}
+            </h2>
+            <p style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 3 }}>
+              NS = Not submitted · SUB = Submitted, awaiting grade · grey = grades not yet released to students
+            </p>
+          </div>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+            <button className="btn btn-secondary sm" onClick={handleExportCSV} disabled={!book}>
+              <Download size={13} style={{ marginRight: 4 }} />Export CSV
+            </button>
+            <button onClick={onClose} className="iconbtn" aria-label="Close"><X size={18} /></button>
+          </div>
+        </div>
+
+        {/* Table */}
+        <div ref={tableRef} style={{ overflow: 'auto', flex: 1 }}>
+          {loading ? (
+            <div style={{ display: 'flex', justifyContent: 'center', padding: 48 }}>
+              <Loader size={22} className="animate-spin" style={{ color: 'var(--text-3)' }} />
+            </div>
+          ) : !book || book.students.length === 0 ? (
+            <div style={{ padding: 48, textAlign: 'center', color: 'var(--text-2)', fontSize: 14 }}>
+              No students enrolled in this class yet.
+            </div>
+          ) : (
+            <table style={{ borderCollapse: 'collapse', width: '100%', fontSize: 12.5 }}>
+              <thead>
+                <tr style={{ background: 'var(--surface-2)', position: 'sticky', top: 0, zIndex: 2 }}>
+                  <th style={{ padding: '10px 14px', textAlign: 'left', fontWeight: 600, minWidth: 160, position: 'sticky', left: 0, background: 'var(--surface-2)', borderRight: '1px solid var(--line)' }}>
+                    Student
+                  </th>
+                  {book.assignments.map(a => (
+                    <th
+                      key={a.id}
+                      style={{ padding: '8px 12px', textAlign: 'center', fontWeight: 600, minWidth: 110, borderLeft: '1px solid var(--line)', cursor: 'pointer' }}
+                      title={`Click to view submissions for "${a.title}"`}
+                      onClick={() => onViewSubmission(a as unknown as Assignment)}
+                    >
+                      <div style={{ fontSize: 11.5, color: 'var(--text)', lineHeight: 1.3, marginBottom: 2 }}>{a.title}</div>
+                      <div style={{ fontSize: 10.5, color: 'var(--text-3)', fontWeight: 400 }}>/{a.total_marks} pts</div>
+                      {!a.grades_released && (
+                        <div style={{ fontSize: 10, color: 'var(--text-3)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2, marginTop: 2 }}>
+                          <EyeOff size={9} />unreleased
+                        </div>
+                      )}
+                    </th>
+                  ))}
+                  <th style={{ padding: '8px 12px', textAlign: 'center', fontWeight: 600, minWidth: 80, borderLeft: '2px solid var(--line)', background: 'var(--surface-2)' }}>
+                    Total %
+                  </th>
+                </tr>
+                {/* Class averages row */}
+                <tr style={{ background: 'var(--surface)', borderBottom: '2px solid var(--line)' }}>
+                  <td style={{ padding: '6px 14px', fontSize: 11, color: 'var(--text-3)', fontStyle: 'italic', position: 'sticky', left: 0, background: 'var(--surface)', borderRight: '1px solid var(--line)' }}>
+                    Class avg / submission rate
+                  </td>
+                  {book.assignments.map(a => (
+                    <td key={a.id} style={{ padding: '6px 12px', textAlign: 'center', borderLeft: '1px solid var(--line)' }}>
+                      <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-2)', fontVariantNumeric: 'tabular-nums' }}>{classAvg(a.id)}</div>
+                      <div style={{ fontSize: 10.5, color: submissionRate(a.id) < 60 ? 'var(--error, #ef4444)' : 'var(--text-3)' }}>
+                        {submissionRate(a.id)}% submitted
+                      </div>
+                    </td>
+                  ))}
+                  <td style={{ borderLeft: '2px solid var(--line)' }} />
+                </tr>
+              </thead>
+              <tbody>
+                {book.students.map((s, i) => (
+                  <tr key={s.student_id} style={{ borderBottom: '1px solid var(--line)', background: i % 2 === 0 ? 'transparent' : 'var(--surface)' }}>
+                    <td style={{ padding: '8px 14px', position: 'sticky', left: 0, background: i % 2 === 0 ? 'var(--bg)' : 'var(--surface)', borderRight: '1px solid var(--line)', zIndex: 1 }}>
+                      <div style={{ fontWeight: 500, color: 'var(--text)', fontSize: 13 }}>{s.full_name}</div>
+                      <div style={{ fontSize: 11, color: 'var(--text-3)' }}>{s.username}</div>
+                    </td>
+                    {book.assignments.map(a => {
+                      const c = book.cells[s.student_id]?.[a.id];
+                      const bg = !c?.submitted
+                        ? 'var(--error-dim, rgba(239,68,68,0.08))'
+                        : !c.graded
+                        ? 'var(--warning-dim, rgba(251,191,36,0.12))'
+                        : 'transparent';
+                      const textColor = !c?.submitted
+                        ? 'var(--error, #ef4444)'
+                        : !c.graded
+                        ? '#b45309'
+                        : a.grades_released
+                        ? 'var(--text)'
+                        : 'var(--text-3)';
+                      return (
+                        <td
+                          key={a.id}
+                          style={{ padding: '8px 12px', textAlign: 'center', borderLeft: '1px solid var(--line)', background: bg, fontVariantNumeric: 'tabular-nums' }}
+                        >
+                          {!c?.submitted ? (
+                            <span style={{ fontSize: 11, color: textColor, fontWeight: 500 }}>NS</span>
+                          ) : !c.graded ? (
+                            <span style={{ fontSize: 11, color: textColor }}>SUB</span>
+                          ) : (
+                            <span style={{ fontSize: 13, fontWeight: 600, color: textColor }}>
+                              {c.marks_earned ?? 0}/{a.total_marks}
+                            </span>
+                          )}
+                        </td>
+                      );
+                    })}
+                    <td style={{ padding: '8px 12px', textAlign: 'center', borderLeft: '2px solid var(--line)', fontWeight: 600, color: 'var(--text-2)', fontVariantNumeric: 'tabular-nums' }}>
+                      {totalPct(s.student_id)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Attendance Modal ─────────────────────────────────────────────────────────
+
+const STATUS_LABELS: Record<AttendanceStatus, { short: string; color: string; bg: string }> = {
+  present: { short: 'P', color: '#16a34a', bg: '#dcfce7' },
+  late:    { short: 'L', color: '#d97706', bg: '#fef3c7' },
+  absent:  { short: 'A', color: '#dc2626', bg: '#fee2e2' },
+  excused: { short: 'E', color: '#7c3aed', bg: '#ede9fe' },
+};
+
+function AttendanceModal({ cls, language, onClose }: {
+  cls: Class;
+  language: 'EN' | 'KIN';
+  onClose: () => void;
+}) {
+  const isKin = language === 'KIN';
+  const [tab, setTab] = useState<'take' | 'history'>('take');
+  const [date, setDate] = useState(() => new Date().toISOString().split('T')[0]);
+  const [topic, setTopic] = useState('');
+  const [roster, setRoster] = useState<{ studentId: string; name: string; status: AttendanceStatus }[]>([]);
+  const [sessions, setSessions] = useState<AttendanceSessionSummary[]>([]);
+  const [historyDetail, setHistoryDetail] = useState<{ session: AttendanceSessionSummary; records: AttendanceStudentRecord[] } | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [loadingRoster, setLoadingRoster] = useState(true);
+
+  useEffect(() => {
+    // Load roster
+    import('../lib/db').then(({ getClassRoster }) => {
+      getClassRoster(cls.id).then(students => {
+        setRoster(students.map(s => ({ studentId: s.student_id, name: s.full_name, status: 'present' })));
+        setLoadingRoster(false);
+      });
+    });
+    // Load past sessions
+    getAttendanceSessions(cls.id).then(setSessions);
+  }, [cls.id]);
+
+  function setStatus(studentId: string, status: AttendanceStatus) {
+    setRoster(prev => prev.map(r => r.studentId === studentId ? { ...r, status } : r));
+  }
+
+  function markAll(status: AttendanceStatus) {
+    setRoster(prev => prev.map(r => ({ ...r, status })));
+  }
+
+  async function handleSave() {
+    setSaving(true);
+    const { error } = await saveAttendance(
+      cls.id, date, topic.trim() || null,
+      roster.map(r => ({ studentId: r.studentId, status: r.status }))
+    );
+    setSaving(false);
+    if (!error) {
+      setSaved(true);
+      getAttendanceSessions(cls.id).then(setSessions);
+      setTimeout(() => setSaved(false), 2500);
+    }
+  }
+
+  async function loadHistory(session: AttendanceSessionSummary) {
+    const records = await getSessionAttendance(session.id);
+    setHistoryDetail({ session, records });
+  }
+
+  const presentCount = roster.filter(r => r.status === 'present').length;
+  const lateCount    = roster.filter(r => r.status === 'late').length;
+
+  return (
+    <div className="modal-backdrop" onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
+      <div className="modal-box" style={{ maxWidth: 600, maxHeight: '90vh', display: 'flex', flexDirection: 'column' }}>
+        {/* Header */}
+        <div className="flex items-center justify-between mb-4" style={{ flexShrink: 0 }}>
+          <div>
+            <h2 className="font-bold" style={{ color: 'var(--text)', fontSize: '17px' }}>
+              {isKin ? 'Kwandika Ibyicaro' : 'Attendance Register'}
+            </h2>
+            <p className="dim" style={{ fontSize: '13px' }}>{cls.name}</p>
+          </div>
+          <button onClick={onClose} className="btn btn-ghost sm"><X size={16} /></button>
+        </div>
+
+        {/* Tabs */}
+        <div className="tabs" style={{ marginBottom: 16, flexShrink: 0, padding: 0, background: 'transparent' }}>
+          <button onClick={() => setTab('take')} className={`tab${tab === 'take' ? ' on' : ''}`}>
+            <ClipboardCheck size={14} />
+            {isKin ? 'Andika uyu munsi' : 'Take attendance'}
+          </button>
+          <button onClick={() => setTab('history')} className={`tab${tab === 'history' ? ' on' : ''}`}>
+            <BarChart2 size={14} />
+            {isKin ? 'Amateka' : 'History'}
+            {sessions.length > 0 && <span className="pill" style={{ marginLeft: 4, fontSize: 11 }}>{sessions.length}</span>}
+          </button>
+        </div>
+
+        {/* ── Take Attendance tab ── */}
+        {tab === 'take' && (
+          <div style={{ overflow: 'auto', flex: 1, display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <div className="grid grid-cols-2 gap-3">
+              <label>
+                <span className="dim" style={{ fontSize: 12, display: 'block', marginBottom: 4 }}>
+                  {isKin ? 'Itariki' : 'Date'}
+                </span>
+                <input type="date" value={date} onChange={e => setDate(e.target.value)}
+                  className="form-input" style={{ width: '100%' }} />
+              </label>
+              <label>
+                <span className="dim" style={{ fontSize: 12, display: 'block', marginBottom: 4 }}>
+                  {isKin ? 'Insanganyamatsiko (bitagenzuwe)' : 'Topic (optional)'}
+                </span>
+                <input type="text" value={topic} onChange={e => setTopic(e.target.value)}
+                  className="form-input" style={{ width: '100%' }}
+                  placeholder={isKin ? 'Urugero: HTML Basics' : 'e.g. HTML Basics'} />
+              </label>
+            </div>
+
+            {/* Quick mark all */}
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="dim" style={{ fontSize: 12 }}>{isKin ? 'Sobanuza bose nka:' : 'Mark all as:'}</span>
+              {(['present', 'absent', 'late', 'excused'] as AttendanceStatus[]).map(s => (
+                <button key={s} onClick={() => markAll(s)} className="pill" style={{ cursor: 'pointer', fontSize: 12, background: STATUS_LABELS[s].bg, color: STATUS_LABELS[s].color, border: 'none' }}>
+                  {isKin
+                    ? { present: 'Bahari', absent: 'Batagaragaye', late: 'Baje guhera', excused: 'Baretse' }[s]
+                    : { present: 'Present', absent: 'Absent', late: 'Late', excused: 'Excused' }[s]
+                  }
+                </button>
+              ))}
+            </div>
+
+            {/* Roster */}
+            {loadingRoster ? (
+              <div className="flex justify-center py-8"><div className="w-6 h-6 border-2 rounded-full animate-spin" style={{ borderColor: 'var(--line-strong)', borderTopColor: 'var(--text-2)' }} /></div>
+            ) : roster.length === 0 ? (
+              <p className="dim text-sm text-center py-6">{isKin ? 'Nta banyeshuri' : 'No students enrolled'}</p>
+            ) : (
+              <div style={{ border: '1px solid var(--line)', borderRadius: 'var(--radius)', overflow: 'hidden' }}>
+                {roster.map((s, i) => (
+                  <div key={s.studentId} className="flex items-center justify-between gap-3"
+                    style={{ padding: '10px 14px', borderBottom: i < roster.length - 1 ? '1px solid var(--line)' : 'none' }}>
+                    <div className="flex items-center gap-2 min-w-0">
+                      <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0"
+                        style={{ background: 'var(--surface-2)', color: 'var(--text)' }}>
+                        {s.name.charAt(0).toUpperCase()}
+                      </div>
+                      <span style={{ fontSize: 14, color: 'var(--text)', truncate: true }}>{s.name}</span>
+                    </div>
+                    <div className="flex gap-1.5 shrink-0">
+                      {(['present', 'late', 'absent', 'excused'] as AttendanceStatus[]).map(status => {
+                        const lbl = STATUS_LABELS[status];
+                        const active = s.status === status;
+                        return (
+                          <button key={status} onClick={() => setStatus(s.studentId, status)}
+                            style={{
+                              width: 32, height: 32, borderRadius: 8, fontSize: 12, fontWeight: 700,
+                              cursor: 'pointer', border: active ? `2px solid ${lbl.color}` : '2px solid transparent',
+                              background: active ? lbl.bg : 'var(--surface-2)', color: active ? lbl.color : 'var(--text-3)',
+                              transition: 'all 0.12s',
+                            }}>
+                            {lbl.short}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Summary + Save */}
+            <div className="flex items-center justify-between gap-4" style={{ flexShrink: 0 }}>
+              <div className="flex gap-3 text-sm">
+                {(['present', 'late', 'absent', 'excused'] as AttendanceStatus[]).map(s => (
+                  <span key={s} style={{ color: STATUS_LABELS[s].color, fontWeight: 600 }}>
+                    {roster.filter(r => r.status === s).length} {STATUS_LABELS[s].short}
+                  </span>
+                ))}
+              </div>
+              <button onClick={handleSave} disabled={saving || roster.length === 0} className="btn btn-primary">
+                {saving ? <Loader size={14} className="animate-spin" /> : saved ? <><Check size={14} /> {isKin ? 'Byabitswe' : 'Saved!'}</> : isKin ? 'Bika' : 'Save'}
+              </button>
+            </div>
+
+            {roster.length > 0 && (
+              <p className="dim text-center" style={{ fontSize: 12 }}>
+                {isKin
+                  ? `${presentCount + lateCount} / ${roster.length} bahari`
+                  : `${presentCount + lateCount} / ${roster.length} present or late`}
+              </p>
+            )}
+          </div>
+        )}
+
+        {/* ── History tab ── */}
+        {tab === 'history' && (
+          <div style={{ overflow: 'auto', flex: 1 }}>
+            {historyDetail ? (
+              <div>
+                <button onClick={() => setHistoryDetail(null)} className="btn btn-ghost sm" style={{ marginBottom: 12 }}>
+                  ← {isKin ? 'Subira inyuma' : 'Back'}
+                </button>
+                <div className="flex items-center gap-3 mb-4">
+                  <h3 style={{ fontWeight: 700, color: 'var(--text)' }}>
+                    {new Date(historyDetail.session.session_date).toLocaleDateString(isKin ? 'fr-RW' : 'en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                  </h3>
+                  {historyDetail.session.topic && <span className="pill">{historyDetail.session.topic}</span>}
+                </div>
+                <div style={{ border: '1px solid var(--line)', borderRadius: 'var(--radius)', overflow: 'hidden' }}>
+                  {historyDetail.records.map((r, i) => {
+                    const lbl = STATUS_LABELS[r.status];
+                    return (
+                      <div key={r.student_id} className="flex items-center justify-between gap-3"
+                        style={{ padding: '10px 14px', borderBottom: i < historyDetail.records.length - 1 ? '1px solid var(--line)' : 'none' }}>
+                        <span style={{ fontSize: 14, color: 'var(--text)' }}>{r.full_name}</span>
+                        <span style={{ fontWeight: 700, fontSize: 13, color: lbl.color, background: lbl.bg, padding: '2px 10px', borderRadius: 6 }}>
+                          {{ present: 'Present', late: 'Late', absent: 'Absent', excused: 'Excused' }[r.status]}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ) : sessions.length === 0 ? (
+              <div className="text-center py-12">
+                <ClipboardCheck size={32} style={{ margin: '0 auto 12px', color: 'var(--text-3)' }} />
+                <p className="dim text-sm">{isKin ? 'Nta makuru y\'ibyicaro arahari' : 'No attendance records yet'}</p>
+              </div>
+            ) : (
+              <div style={{ border: '1px solid var(--line)', borderRadius: 'var(--radius)', overflow: 'hidden' }}>
+                {sessions.map((s, i) => {
+                  const rate = s.total > 0 ? Math.round(((s.present + s.late) / s.total) * 100) : 0;
+                  return (
+                    <button key={s.id} onClick={() => loadHistory(s)} className="flex items-center gap-4 w-full text-left"
+                      style={{ padding: '12px 16px', borderBottom: i < sessions.length - 1 ? '1px solid var(--line)' : 'none', background: 'none', cursor: 'pointer', transition: 'background 0.1s' }}
+                      onMouseEnter={e => (e.currentTarget.style.background = 'var(--surface-2)')}
+                      onMouseLeave={e => (e.currentTarget.style.background = 'none')}>
+                      <div className="flex-1 min-w-0">
+                        <p style={{ fontWeight: 600, fontSize: 14, color: 'var(--text)' }}>
+                          {new Date(s.session_date).toLocaleDateString(isKin ? 'fr-RW' : 'en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+                          {s.topic && <span className="dim font-normal" style={{ marginLeft: 8 }}>· {s.topic}</span>}
+                        </p>
+                        <div className="flex gap-3 mt-1" style={{ fontSize: 12 }}>
+                          <span style={{ color: STATUS_LABELS.present.color }}>{s.present}P</span>
+                          <span style={{ color: STATUS_LABELS.late.color }}>{s.late}L</span>
+                          <span style={{ color: STATUS_LABELS.absent.color }}>{s.absent}A</span>
+                          {s.excused > 0 && <span style={{ color: STATUS_LABELS.excused.color }}>{s.excused}E</span>}
+                        </div>
+                      </div>
+                      <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                        <span style={{ fontWeight: 700, fontSize: 15, color: rate >= 80 ? '#16a34a' : rate >= 60 ? '#d97706' : '#dc2626' }}>
+                          {rate}%
+                        </span>
+                        <p className="dim" style={{ fontSize: 11 }}>{isKin ? 'Bahari' : 'attendance'}</p>
+                      </div>
+                      <ChevronDown size={14} style={{ color: 'var(--text-3)', transform: 'rotate(-90deg)' }} />
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ─── Main Dashboard ───────────────────────────────────────────────────────────
 
 export default function TeacherDashboard() {
@@ -1870,6 +2391,8 @@ export default function TeacherDashboard() {
   const [classSummaryLoading, setClassSummaryLoading] = useState(false);
   const [classSummaryError, setClassSummaryError] = useState(false);
   const [showMwarimuEval, setShowMwarimuEval] = useState(false);
+  const [showGradeBook, setShowGradeBook] = useState(false);
+  const [attendanceClass, setAttendanceClass] = useState<Class | null>(null);
   const [schoolAnnouncements, setSchoolAnnouncements] = useState<SchoolAnnouncement[]>([]);
   const [dismissedAnnIds, setDismissedAnnIds] = useState<Set<string>>(() => {
     try { return new Set(JSON.parse(localStorage.getItem('educode_dismissed_school_anns') ?? '[]')); }
@@ -2053,6 +2576,73 @@ export default function TeacherDashboard() {
     URL.revokeObjectURL(url);
   };
 
+  const handlePrintReport = () => {
+    if (!selectedClass || roster.length === 0) return;
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    const statusColor: Record<string, string> = { 'on-track': '#16a34a', 'behind': '#d97706', 'needs-help': '#dc2626' };
+    const statusLabel: Record<string, string> = { 'on-track': 'On Track', 'behind': 'Behind', 'needs-help': 'Needs Help' };
+    const rows = roster.map(s => `
+      <tr>
+        <td>${s.full_name}</td>
+        <td>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div style="flex:1;background:#e5e7eb;border-radius:4px;height:8px">
+              <div style="width:${s.progress_pct}%;background:#3b82f6;border-radius:4px;height:8px"></div>
+            </div>
+            <span style="font-weight:600;color:#1f2937;min-width:36px">${s.progress_pct}%</span>
+          </div>
+        </td>
+        <td>${s.challenges_passed} / ${s.challenges_attempted}</td>
+        <td style="color:${statusColor[s.status] ?? '#6b7280'};font-weight:600">${statusLabel[s.status] ?? s.status}</td>
+        <td style="color:#6b7280">${s.last_active ? new Date(s.last_active).toLocaleDateString() : 'Never'}</td>
+      </tr>
+    `).join('');
+    const html = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Progress Report — ${selectedClass.name}</title>
+<style>
+  body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; padding: 32px; color: #111; background: #fff; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  .meta { color: #6b7280; font-size: 13px; margin-bottom: 24px; }
+  .badge { display: inline-block; background: #dbeafe; color: #1d4ed8; border-radius: 6px; padding: 2px 10px; font-size: 12px; font-weight: 600; margin-right: 8px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; padding: 8px 12px; background: #f9fafb; border-bottom: 2px solid #e5e7eb; font-weight: 600; color: #374151; }
+  td { padding: 10px 12px; border-bottom: 1px solid #f3f4f6; vertical-align: middle; }
+  tr:hover td { background: #f9fafb; }
+  .footer { margin-top: 32px; color: #9ca3af; font-size: 12px; border-top: 1px solid #e5e7eb; padding-top: 12px; }
+  @media print { body { padding: 16px; } }
+</style>
+</head>
+<body>
+<h1>Class Progress Report</h1>
+<div class="meta">
+  <span class="badge">${selectedClass.name}</span>
+  <span class="badge">${selectedClass.subject ?? ''}</span>
+  Generated: ${dateStr} &nbsp;·&nbsp; ${roster.length} students
+</div>
+<table>
+  <thead>
+    <tr>
+      <th>Student</th>
+      <th>Course Progress</th>
+      <th>Challenges (P/A)</th>
+      <th>Status</th>
+      <th>Last Active</th>
+    </tr>
+  </thead>
+  <tbody>${rows}</tbody>
+</table>
+<div class="footer">EduCode Rwanda · RTB TVET Digital Learning Platform · ${dateStr}</div>
+<script>window.onload = () => { window.print(); }</script>
+</body>
+</html>`;
+    const win = window.open('', '_blank');
+    if (win) { win.document.write(html); win.document.close(); }
+  };
+
   const visibleSchoolAnns = schoolAnnouncements.filter(a => !dismissedAnnIds.has(a.id));
 
   return (
@@ -2138,6 +2728,12 @@ export default function TeacherDashboard() {
                 <button className="btn btn-secondary sm" onClick={() => selectedClass && setAnalyticsClass(selectedClass)} title={isKin ? 'Isesengura' : 'Analytics'}>
                   <BarChart2 size={14} />
                 </button>
+                <button className="btn btn-secondary sm" onClick={() => setShowGradeBook(true)} title={isKin ? 'Ibitabo by\'amanota' : 'Grade Book'}>
+                  <Table2 size={14} />
+                </button>
+                <button className="btn btn-secondary sm" onClick={() => selectedClass && setAttendanceClass(selectedClass)} title={isKin ? 'Kwandika ibyicaro' : 'Attendance'}>
+                  <ClipboardCheck size={14} />
+                </button>
                 <button className="btn btn-primary" onClick={() => setShowCreateAssignment(true)}>
                   {isKin ? 'Umukoro mushya' : 'New assignment'}
                 </button>
@@ -2211,6 +2807,9 @@ export default function TeacherDashboard() {
                     </button>
                     <button className="btn btn-tertiary sm" onClick={handleExportEvents} disabled={liveSignals.length === 0} title={isKin ? 'Pakurura ibikorwa' : 'Export events CSV'}>
                       <Download size={13} style={{ marginRight: 4 }} />{isKin ? 'Ibikorwa' : 'Events CSV'}
+                    </button>
+                    <button className="btn btn-tertiary sm" onClick={handlePrintReport} disabled={roster.length === 0} title={isKin ? 'Shyira hanze raporo' : 'Print progress report'}>
+                      <Download size={13} style={{ marginRight: 4 }} />{isKin ? 'Raporo' : 'Print Report'}
                     </button>
                   </div>
                 </div>
@@ -2318,17 +2917,39 @@ export default function TeacherDashboard() {
                       {isKin ? 'Nta mukoro urahari muri iri shuri' : 'No assignments in this class yet'}
                     </p>
                   ) : (
-                    assignments.slice(0, 4).map(a => (
-                      <div className="asg" key={a.id} onClick={() => setViewingAssignment(a)} style={{ cursor: 'pointer' }}>
-                        <div>
-                          <div className="at">{isKin && a.title_kin ? a.title_kin : a.title}</div>
+                    assignments.map(a => (
+                      <div className="asg" key={a.id} onClick={() => setViewingAssignment(a)} style={{ cursor: 'pointer', opacity: a.is_published ? 1 : 0.7 }}>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div className="at" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                            {isKin && a.title_kin ? a.title_kin : a.title}
+                            {!a.is_published && (
+                              <span style={{ fontSize: 10, fontWeight: 600, padding: '1px 6px', borderRadius: 99, background: 'var(--surface-2)', border: '1px solid var(--line)', color: 'var(--text-3)' }}>
+                                DRAFT
+                              </span>
+                            )}
+                          </div>
                           <div className="ad">{dueText(a, isKin)}</div>
                         </div>
-                        {a.grades_released ? (
-                          <span className="pill solid"><span className="dot" />{isKin ? 'Byasuzumwe' : 'Graded'}</span>
-                        ) : (
-                          <span className="pill">{submissionCounts[a.id] ?? 0} / {roster.length} {isKin ? 'batanze' : 'in'}</span>
-                        )}
+                        <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexShrink: 0 }}>
+                          <button
+                            className="btn btn-tertiary sm"
+                            style={{ fontSize: 11, padding: '3px 8px', display: 'flex', alignItems: 'center', gap: 4 }}
+                            title={a.is_published ? 'Unpublish (hide from students)' : 'Publish to students'}
+                            onClick={async (e) => {
+                              e.stopPropagation();
+                              await toggleAssignmentPublished(a.id, !a.is_published);
+                              loadData();
+                            }}
+                          >
+                            {a.is_published ? <EyeOff size={11} /> : <Eye size={11} />}
+                            {a.is_published ? (isKin ? 'Hisha' : 'Unpublish') : (isKin ? 'Tangaza' : 'Publish')}
+                          </button>
+                          {a.grades_released ? (
+                            <span className="pill solid"><span className="dot" />{isKin ? 'Byasuzumwe' : 'Graded'}</span>
+                          ) : a.is_published ? (
+                            <span className="pill">{submissionCounts[a.id] ?? 0} / {roster.length} {isKin ? 'batanze' : 'in'}</span>
+                          ) : null}
+                        </div>
                       </div>
                     ))
                   )}
@@ -2540,6 +3161,26 @@ export default function TeacherDashboard() {
 
       {showMwarimuEval && (
         <MwarimuEvalModal onClose={() => setShowMwarimuEval(false)} />
+      )}
+
+      {showGradeBook && selectedClassId && selectedClass && (
+        <GradeBookModal
+          classId={selectedClassId}
+          className={selectedClass.name}
+          onClose={() => setShowGradeBook(false)}
+          onViewSubmission={(a) => {
+            setShowGradeBook(false);
+            setViewingAssignment(a);
+          }}
+        />
+      )}
+
+      {attendanceClass && (
+        <AttendanceModal
+          cls={attendanceClass}
+          language={language}
+          onClose={() => setAttendanceClass(null)}
+        />
       )}
 
       {showAddStudents && selectedClass && (

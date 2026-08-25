@@ -1,17 +1,186 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { useAuth } from '../../lib/auth';
 import { useTheme } from '../../lib/theme';
-import { requestAccountDeletion } from '../../lib/db';
+import { requestAccountDeletion, getStudentNotifications, markAssignmentsSeen, markGradesSeen, markAnnouncementsSeen, getStudentAssignments, getStudentGrades, getStudentAnnouncements, type StudentNotifications } from '../../lib/db';
 
 interface AppNavProps {
   /** Current streak count. Shown when > 0; hidden when undefined or 0. */
   streak?: number;
 }
 
+// ─── Notification Bell ────────────────────────────────────────────────────────
+
+function NotificationBell({ userId }: { userId: string }) {
+  const [counts, setCounts] = useState<StudentNotifications | null>(null);
+  const [open, setOpen] = useState(false);
+  const [detail, setDetail] = useState<{
+    assignments: Array<{ id: string; title: string; due_date: string | null }>;
+    grades: Array<{ assignment_id: string; title: string; marks_earned: number; total_marks: number }>;
+    announcements: Array<{ id: string; title: string; body: string }>;
+  } | null>(null);
+  const ref = useRef<HTMLDivElement>(null);
+
+  const load = async () => {
+    const n = await getStudentNotifications();
+    setCounts(n);
+  };
+
+  useEffect(() => { load(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (!open) return;
+    const fetchDetail = async () => {
+      const [{ data: asgns }, grades, { data: anns }] = await Promise.all([
+        getStudentAssignments(),
+        getStudentGrades(),
+        getStudentAnnouncements(),
+      ]);
+      const seenAssignments: string[] = JSON.parse(localStorage.getItem(`educode_seen_assignments_${userId}`) ?? '[]');
+      const seenGrades: string[] = JSON.parse(localStorage.getItem(`educode_seen_grades_${userId}`) ?? '[]');
+      const seenAnnouncements: string[] = JSON.parse(localStorage.getItem(`educode_seen_announcements_${userId}`) ?? '[]');
+
+      const newAsgns = (asgns ?? []).filter((a: { id: string }) => !seenAssignments.includes(a.id));
+      const newGrades = grades.filter(g => g.marks_earned !== null && !seenGrades.includes(g.assignment_id));
+      const newAnns = (anns ?? []).filter(a => !seenAnnouncements.includes(a.id));
+
+      setDetail({
+        assignments: newAsgns.map((a: { id: string; title: string; due_date: string | null }) => ({ id: a.id, title: a.title, due_date: a.due_date ?? null })),
+        grades: newGrades.map(g => ({ assignment_id: g.assignment_id, title: '', marks_earned: g.marks_earned!, total_marks: g.total_marks })),
+        announcements: newAnns.map(a => ({ id: a.id, title: a.title, body: a.body })),
+      });
+    };
+    fetchDetail();
+  }, [open, userId]);
+
+  const handleOpen = () => {
+    setOpen(o => !o);
+  };
+
+  const handleMarkAllRead = () => {
+    if (!detail) return;
+    markAssignmentsSeen(detail.assignments.map(a => a.id), userId);
+    markGradesSeen(detail.grades.map(g => g.assignment_id), userId);
+    markAnnouncementsSeen(detail.announcements.map(a => a.id), userId);
+    setCounts({ newAssignments: 0, newGrades: 0, newAnnouncements: 0 });
+    setOpen(false);
+  };
+
+  useEffect(() => {
+    if (!open) return;
+    const handleClick = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [open]);
+
+  const total = (counts?.newAssignments ?? 0) + (counts?.newGrades ?? 0) + (counts?.newAnnouncements ?? 0);
+
+  return (
+    <div ref={ref} style={{ position: 'relative' }}>
+      <button
+        className="iconbtn"
+        onClick={handleOpen}
+        aria-label={`Notifications${total > 0 ? ` (${total} new)` : ''}`}
+        style={{ position: 'relative' }}
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+          <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+        </svg>
+        {total > 0 && (
+          <span style={{
+            position: 'absolute', top: 3, right: 3, width: 8, height: 8,
+            background: 'var(--error, #ef4444)', borderRadius: '50%', display: 'block',
+            boxShadow: '0 0 0 2px var(--bg)'
+          }} />
+        )}
+      </button>
+
+      {open && (
+        <div style={{
+          position: 'absolute', top: 'calc(100% + 10px)', right: 0, zIndex: 100,
+          background: 'var(--card)', border: '1px solid var(--line)', borderRadius: 'var(--radius)',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.18)', width: 320, maxHeight: 420, overflowY: 'auto',
+          animation: 'rise 0.2s ease both'
+        }}>
+          <div style={{ padding: '12px 14px', borderBottom: '1px solid var(--line)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>Notifications</span>
+            {total > 0 && (
+              <button
+                onClick={handleMarkAllRead}
+                style={{ fontSize: 11.5, color: 'var(--accent)', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 500 }}
+              >
+                Mark all read
+              </button>
+            )}
+          </div>
+
+          {total === 0 ? (
+            <div style={{ padding: '24px 14px', textAlign: 'center', color: 'var(--text-3)', fontSize: 13 }}>
+              All caught up!
+            </div>
+          ) : (
+            <div>
+              {(counts?.newGrades ?? 0) > 0 && (
+                <div style={{ padding: '10px 14px', borderBottom: '1px solid var(--line)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ fontSize: 14 }}>✅</span>
+                    <div>
+                      <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--text)' }}>
+                        {counts!.newGrades} grade{counts!.newGrades > 1 ? 's' : ''} returned
+                      </div>
+                      <div style={{ fontSize: 11.5, color: 'var(--text-3)' }}>Your teacher has released marks</div>
+                    </div>
+                  </div>
+                </div>
+              )}
+              {(counts?.newAssignments ?? 0) > 0 && (
+                <div style={{ padding: '10px 14px', borderBottom: '1px solid var(--line)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ fontSize: 14 }}>📋</span>
+                    <div>
+                      <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--text)' }}>
+                        {counts!.newAssignments} new assignment{counts!.newAssignments > 1 ? 's' : ''}
+                      </div>
+                      <div style={{ fontSize: 11.5, color: 'var(--text-3)' }}>Posted by your teacher</div>
+                    </div>
+                  </div>
+                </div>
+              )}
+              {(counts?.newAnnouncements ?? 0) > 0 && (
+                <div style={{ padding: '10px 14px', borderBottom: '1px solid var(--line)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <span style={{ fontSize: 14 }}>📢</span>
+                    <div>
+                      <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--text)' }}>
+                        {counts!.newAnnouncements} new announcement{counts!.newAnnouncements > 1 ? 's' : ''}
+                      </div>
+                      <div style={{ fontSize: 11.5, color: 'var(--text-3)' }}>From your class</div>
+                    </div>
+                  </div>
+                </div>
+              )}
+              <div style={{ padding: '8px 14px' }}>
+                <button
+                  onClick={handleMarkAllRead}
+                  style={{ width: '100%', padding: '8px', borderRadius: 'var(--radius)', background: 'var(--surface-2)', border: '1px solid var(--line)', color: 'var(--text-2)', fontSize: 12.5, cursor: 'pointer', fontWeight: 500 }}
+                >
+                  Dismiss all
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function AppNav({ streak }: AppNavProps) {
-  const { profile, signOut } = useAuth();
+  const { profile, user, signOut } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { pathname } = useLocation();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -105,6 +274,11 @@ export function AppNav({ streak }: AppNavProps) {
               </svg>
               <b>{streak}</b>
             </span>
+          )}
+
+          {/* Notification bell — students only */}
+          {isStudent && user && (
+            <NotificationBell userId={user.id} />
           )}
 
           {/* Theme toggle */}

@@ -3,10 +3,10 @@ import { AppNav } from './components/AppNav';
 import { XPLeaderboard } from './components/XPLeaderboard';
 import { PeerActivityFeed } from './components/PeerActivityFeed';
 import { useAuth } from '../lib/auth';
-import { getStudentAssignments, getStudentClasses, getClassWithInviteCode, joinClass, getSubmittedAssignmentIds, getStudentGrades, recordDailyLogin, getStreak, getStudentAnnouncements, getNewGradeCount, getLessonProgress, hasPilotSurveyResponse, type Assignment, type Announcement } from '../lib/db';
+import { getStudentAssignments, getStudentClasses, getClassWithInviteCode, joinClass, getSubmittedAssignmentIds, getStudentGrades, recordDailyLogin, getStreak, getStudentAnnouncements, getNewGradeCount, getLessonProgress, hasPilotSurveyResponse, getStudentAttendanceForClass, type Assignment, type Announcement } from '../lib/db';
 import PilotSurvey from './PilotSurvey';
 import { getMwarimuWeekCount } from '../lib/quiz-db';
-import { Users, ArrowRight, Loader, X, Megaphone, Pin, Code2 } from 'lucide-react';
+import { Users, ArrowRight, Loader, X, Megaphone, Pin, Code2, AlertTriangle, Check } from 'lucide-react';
 import { usePageTitle } from '../hooks/usePageTitle';
 
 interface Props {
@@ -130,6 +130,7 @@ export default function Dashboard({ language, onStartCoding, onOpenAssignment, o
   const [lessonProgress, setLessonProgress] = useState({ completed: 0, total: 0, pct: 0 });
   const [classId, setClassId] = useState<string | null>(null);
   const [mwarimuWeekCount, setMwarimuWeekCount] = useState(0);
+  const [attendancePct, setAttendancePct] = useState<number | null>(null);
   const [surveyDone, setSurveyDone] = useState(true); // default true to avoid flash
   const [showSurvey, setShowSurvey] = useState(false);
 
@@ -153,7 +154,11 @@ export default function Dashboard({ language, onStartCoding, onOpenAssignment, o
     setAnnouncements(ann ?? []);
     setStreak(currentStreak);
     setHasClass(classes.length > 0);
-    setClassId(classes[0]?.id ?? null);
+    const firstClassId = classes[0]?.id ?? null;
+    setClassId(firstClassId);
+    if (firstClassId) {
+      getStudentAttendanceForClass(firstClassId).then(a => setAttendancePct(a.total > 0 ? a.pct : null));
+    }
     setMwarimuWeekCount(weekCount);
     setAssignments(asgns);
     setSubmittedIds(submitted);
@@ -431,19 +436,64 @@ export default function Dashboard({ language, onStartCoding, onOpenAssignment, o
                 </div>
               ) : (
                 <div className="alist">
-                  {assignments.map(a => {
+                  {[...assignments].sort((a, b) => {
+                    // Sort: overdue not submitted → due soon → submitted/returned → no date
+                    const aOver = !submittedIds.has(a.id) && !!a.due_date && new Date(a.due_date) < new Date();
+                    const bOver = !submittedIds.has(b.id) && !!b.due_date && new Date(b.due_date) < new Date();
+                    if (aOver && !bOver) return -1;
+                    if (!aOver && bOver) return 1;
+                    const aDate = a.due_date ? new Date(a.due_date).getTime() : Infinity;
+                    const bDate = b.due_date ? new Date(b.due_date).getTime() : Infinity;
+                    return aDate - bDate;
+                  }).map(a => {
                     const card = toCardAssignment(a);
+                    const hasGrade = !!gradeMap[a.id];
+                    const hasFeedback = !!feedbackMap[a.id];
+                    const isOverdue = card.dueStatus === 'overdue';
+                    const isDueToday = !submittedIds.has(a.id) && a.due_date && (() => {
+                      const d = new Date(a.due_date!); const n = new Date();
+                      return d.getFullYear() === n.getFullYear() && d.getMonth() === n.getMonth() && d.getDate() === n.getDate();
+                    })();
+
                     return (
-                      <div key={a.id} className="arow lift" style={{ cursor: 'pointer' }} onClick={() => handleAssignmentClick(a)}>
-                        <div>
-                          <div className="at">{card.title}</div>
-                          <div className="ad">{card.description}</div>
+                      <div
+                        key={a.id}
+                        className="arow lift"
+                        style={{
+                          cursor: 'pointer',
+                          borderLeft: isOverdue ? '3px solid var(--error, #ef4444)' : isDueToday ? '3px solid #f59e0b' : hasGrade ? '3px solid #22c55e' : '3px solid transparent'
+                        }}
+                        onClick={() => handleAssignmentClick(a)}
+                      >
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <div className="at" style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                            {card.title}
+                            {isOverdue && <AlertTriangle size={13} style={{ color: 'var(--error, #ef4444)', flexShrink: 0 }} />}
+                            {isDueToday && !isOverdue && <span style={{ fontSize: 10, fontWeight: 700, color: '#f59e0b', padding: '1px 5px', background: 'rgba(245,158,11,0.12)', borderRadius: 99 }}>TODAY</span>}
+                          </div>
+                          {hasFeedback && (
+                            <div style={{ fontSize: 11.5, color: '#16a34a', marginTop: 3, display: 'flex', alignItems: 'center', gap: 4 }}>
+                              <Check size={11} />
+                              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 260 }}>
+                                {feedbackMap[a.id]}
+                              </span>
+                            </div>
+                          )}
+                          {!hasFeedback && card.description && (
+                            <div className="ad" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 260 }}>{card.description}</div>
+                          )}
                         </div>
-                        <div className="right">
-                          <span className={`pill${card.dueStatus === 'overdue' ? ' error' : card.dueStatus === 'submitted' ? ' solid' : ''}`}>
-                            {card.dueStatus === 'submitted' && <span className="dot"></span>}
-                            {card.dueText}
-                          </span>
+                        <div className="right" style={{ flexShrink: 0 }}>
+                          {hasGrade ? (
+                            <span className="pill solid" style={{ background: '#22c55e', color: '#fff', border: 'none' }}>
+                              {gradeMap[a.id]}
+                            </span>
+                          ) : (
+                            <span className={`pill${isOverdue ? ' error' : card.dueStatus === 'submitted' ? ' solid' : ''}`}>
+                              {card.dueStatus === 'submitted' && <span className="dot" />}
+                              {card.dueText}
+                            </span>
+                          )}
                           <button className="btn btn-secondary sm" onClick={e => { e.stopPropagation(); handleAssignmentClick(a); }}>
                             {card.dueStatus === 'submitted' ? (isKinyarwanda ? 'Reba' : 'Review') : (isKinyarwanda ? 'Fungura' : 'Open')}
                           </button>
@@ -509,7 +559,7 @@ export default function Dashboard({ language, onStartCoding, onOpenAssignment, o
                 <div className="stat"><b>{streak}</b><span>{isKinyarwanda ? 'Iminsi ikurikirana' : 'Day streak'}</span></div>
                 <div className="stat"><b>{lessonProgress.completed}</b><span>{isKinyarwanda ? 'Amasomo yarangiye' : 'Lessons done'}</span></div>
                 <div className="stat"><b>{totalPossible > 0 ? Math.round((totalEarned / totalPossible) * 100) : 0}%</b><span>{isKinyarwanda ? 'Amanota y\'averaze' : 'Avg. score'}</span></div>
-                <div className="stat"><b>{mwarimuWeekCount}</b><span>{isKinyarwanda ? 'Ibibazo bya Mwarimu' : 'Mwarimu asks'}</span></div>
+                <div className="stat"><b>{attendancePct !== null ? `${attendancePct}%` : '—'}</b><span>{isKinyarwanda ? 'Ibyicaro' : 'Attendance'}</span></div>
               </div>
             </section>
 
@@ -662,7 +712,18 @@ export default function Dashboard({ language, onStartCoding, onOpenAssignment, o
                         <p style={{ fontWeight: 500, color: 'var(--text)', fontSize: 15, flex: 1 }}>{a.title}</p>
                         {cls && <span className="pill" style={{ flexShrink: 0 }}>{cls}</span>}
                       </div>
-                      <p style={{ color: 'var(--text-2)', fontSize: 14, lineHeight: 1.55, whiteSpace: 'pre-wrap', marginBottom: 8 }}>{a.body}</p>
+                      <p style={{ color: 'var(--text-2)', fontSize: 14, lineHeight: 1.55, whiteSpace: 'pre-wrap', marginBottom: a.resource_url ? 10 : 8 }}>{a.body}</p>
+                      {a.resource_url && (
+                        <a
+                          href={a.resource_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', borderRadius: 'var(--radius-sm)', background: 'var(--surface)', border: '1px solid var(--line)', color: 'var(--text)', fontSize: 13, fontWeight: 600, textDecoration: 'none', marginBottom: 8 }}
+                        >
+                          <ArrowRight size={13} style={{ flexShrink: 0 }} />
+                          {a.resource_label || a.resource_url}
+                        </a>
+                      )}
                       <p style={{ color: 'var(--text-3)', fontSize: 12 }}>{new Date(a.created_at).toLocaleString()}</p>
                     </div>
                   );

@@ -26,6 +26,7 @@ import SelfLearnerDashboard from './SelfLearnerDashboard';
 import SetPasswordPage from './SetPasswordPage';
 import ChallengePage from './ChallengePage';
 import ChallengeRunner from './ChallengeRunner';
+import JoinPage from './JoinPage';
 import { useAuth } from '../lib/auth';
 import { getResumeLesson, type Assignment, type CourseLesson } from '../lib/db';
 
@@ -87,10 +88,11 @@ export default function App() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Legal pages are always public — bypass auth routing entirely
-  if (['/terms', '/privacy', '/legal'].includes(location.pathname)) {
+  // These pages are always public — bypass auth routing entirely
+  if (['/terms', '/privacy', '/legal', '/join'].includes(location.pathname)) {
     return (
       <Routes>
+        <Route path="/join"    element={<JoinPage />} />
         <Route path="/terms"   element={<TermsPage />} />
         <Route path="/privacy" element={<PrivacyPolicyPage />} />
         <Route path="/legal"   element={<LegalLandingPage />} />
@@ -177,7 +179,7 @@ export default function App() {
   if (user && profile) {
     // Pre-created student accounts must set their own password before accessing the app.
     if (user.user_metadata?.needs_password_change) {
-      return <SetPasswordPage onDone={() => {}} />;
+      return <SetPasswordPage onDone={() => window.location.href = '/'} />;
     }
 
     const ethicsModal = showEthics ? (
@@ -284,6 +286,7 @@ export default function App() {
   // ── Public ─────────────────────────────────────────────────────────────────
   return (
     <Routes>
+      <Route path="/join" element={<JoinPage />} />
       <Route path="/login" element={<LoginPage onSuccess={() => {}} onSignupClick={() => navigate('/signup')} onForgotPassword={() => navigate('/forgot-password')} />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage onBack={() => navigate('/login')} />} />
       <Route path="/signup" element={<SignupPage onSuccess={() => navigate('/login')} onLoginClick={() => navigate('/login')} />} />

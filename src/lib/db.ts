@@ -212,6 +212,7 @@ export async function createAssignment(params: {
   examMode?: boolean;
   durationMinutes?: number;
   weightPct?: number;
+  isPublished?: boolean;
 }): Promise<{ data: Assignment | null; error: string | null }> {
   const authError = await assertTeacherOwnsClass(params.classId);
   if (authError) return { data: null, error: authError };
@@ -234,7 +235,7 @@ export async function createAssignment(params: {
       exam_mode: params.examMode ?? false,
       duration_minutes: params.durationMinutes ?? null,
       weight_pct: params.weightPct ?? 100,
-      is_published: true,
+      is_published: params.isPublished ?? true,
     })
     .select()
     .single();
@@ -454,25 +455,30 @@ export async function gradeSubmission(submissionId: string, marksEarned: number,
   return { error: null };
 }
 
-// Returns each assignment's grade for the current student
+// Returns each assignment's grade for the current student — only where grades_released = true
 export async function getStudentGrades(): Promise<StudentGrade[]> {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return [];
 
   const { data } = await supabase
     .from('student_submissions')
-    .select('assignment_id, marks_earned, teacher_feedback, assignments(total_marks)')
+    .select('assignment_id, marks_earned, teacher_feedback, assignments(total_marks, grades_released)')
     .eq('student_id', user.id);
 
-  return (data ?? []).map((row: { assignment_id: string; marks_earned: number | null; teacher_feedback: string | null; assignments: unknown }) => {
-    const asgn = (Array.isArray(row.assignments) ? row.assignments[0] : row.assignments) as { total_marks: number } | null;
-    return {
-      assignment_id: row.assignment_id,
-      marks_earned: row.marks_earned,
-      teacher_feedback: row.teacher_feedback ?? null,
-      total_marks: asgn?.total_marks ?? 10,
-    };
-  });
+  return (data ?? [])
+    .filter((row: { assignments: unknown }) => {
+      const asgn = (Array.isArray(row.assignments) ? row.assignments[0] : row.assignments) as { grades_released: boolean } | null;
+      return asgn?.grades_released === true;
+    })
+    .map((row: { assignment_id: string; marks_earned: number | null; teacher_feedback: string | null; assignments: unknown }) => {
+      const asgn = (Array.isArray(row.assignments) ? row.assignments[0] : row.assignments) as { total_marks: number } | null;
+      return {
+        assignment_id: row.assignment_id,
+        marks_earned: row.marks_earned,
+        teacher_feedback: row.teacher_feedback ?? null,
+        total_marks: asgn?.total_marks ?? 10,
+      };
+    });
 }
 
 export interface StudentResult {
@@ -482,17 +488,18 @@ export interface StudentResult {
   assignment_type: 'coding' | 'theoretical';
   difficulty: string;
   total_marks: number;
+  due_date: string | null;
+  grades_released: boolean;
   submitted: boolean;
   submitted_at: string | null;
-  marks_earned: number | null;
-  teacher_feedback: string | null;
+  marks_earned: number | null;   // null until grades_released = true
+  teacher_feedback: string | null; // null until grades_released = true
 }
 
 export async function getStudentResults(): Promise<StudentResult[]> {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return [];
 
-  // Must filter by enrolled class IDs — querying all assignments is blocked by RLS
   const { data: enrollments } = await supabase
     .from('class_enrollments')
     .select('class_id')
@@ -507,7 +514,7 @@ export async function getStudentResults(): Promise<StudentResult[]> {
       .select('*')
       .in('class_id', classIds)
       .eq('is_published', true)
-      .order('created_at', { ascending: false }),
+      .order('due_date', { ascending: true, nullsFirst: false }),
     supabase
       .from('student_submissions')
       .select('assignment_id, marks_earned, teacher_feedback, submitted_at')
@@ -519,8 +526,9 @@ export async function getStudentResults(): Promise<StudentResult[]> {
     subMap.set(s.assignment_id, { marks_earned: s.marks_earned, teacher_feedback: s.teacher_feedback, submitted_at: s.submitted_at });
   }
 
-  return (assignments ?? []).map((a: Pick<Assignment, 'id' | 'title' | 'title_kin' | 'assignment_type' | 'difficulty' | 'total_marks' | 'class_id'>) => {
+  return (assignments ?? []).map((a: Assignment) => {
     const sub = subMap.get(a.id) ?? null;
+    const gradesVisible = a.grades_released;
     return {
       assignment_id: a.id,
       title: a.title,
@@ -528,12 +536,34 @@ export async function getStudentResults(): Promise<StudentResult[]> {
       assignment_type: a.assignment_type,
       difficulty: a.difficulty,
       total_marks: a.total_marks,
+      due_date: a.due_date ?? null,
+      grades_released: gradesVisible,
       submitted: !!sub,
       submitted_at: sub?.submitted_at ?? null,
-      marks_earned: sub?.marks_earned ?? null,
-      teacher_feedback: sub?.teacher_feedback ?? null,
+      marks_earned: gradesVisible ? (sub?.marks_earned ?? null) : null,
+      teacher_feedback: gradesVisible ? (sub?.teacher_feedback ?? null) : null,
     };
   });
+}
+
+// Count of assignments where grades were released and student hasn't acknowledged them
+export async function getNewGradeCount(): Promise<number> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return 0;
+
+  const seen: string[] = JSON.parse(localStorage.getItem(`educode_seen_grades_${user.id}`) ?? '[]');
+
+  const { data } = await supabase
+    .from('student_submissions')
+    .select('assignment_id, assignments(grades_released)')
+    .eq('student_id', user.id)
+    .not('marks_earned', 'is', null);
+
+  const newGrades = (data ?? []).filter((s: { assignment_id: string; assignments: unknown }) => {
+    const asgn = (Array.isArray(s.assignments) ? s.assignments[0] : s.assignments) as { grades_released: boolean } | null;
+    return asgn?.grades_released === true && !seen.includes(s.assignment_id);
+  });
+  return newGrades.length;
 }
 
 export async function releaseGrades(assignmentId: string): Promise<{ error: string | null }> {
@@ -546,22 +576,6 @@ export async function releaseGrades(assignmentId: string): Promise<{ error: stri
     .eq('id', assignmentId);
   if (error) return { error: error.message };
   return { error: null };
-}
-
-export async function getNewGradeCount(): Promise<number> {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return 0;
-
-  const seen: string[] = JSON.parse(localStorage.getItem(`educode_seen_grades_${user.id}`) ?? '[]');
-
-  const { data } = await supabase
-    .from('student_submissions')
-    .select('assignment_id')
-    .eq('student_id', user.id)
-    .not('marks_earned', 'is', null);
-
-  const newGrades = (data ?? []).filter((s: { assignment_id: string }) => !seen.includes(s.assignment_id));
-  return newGrades.length;
 }
 
 // ─── Self-Learner ─────────────────────────────────────────────────────────────
@@ -759,6 +773,8 @@ export interface Announcement {
   body: string;
   pinned: boolean;
   created_at: string;
+  resource_url: string | null;
+  resource_label: string | null;
   classes?: { name: string };
 }
 
@@ -767,6 +783,8 @@ export async function createAnnouncement(params: {
   title: string;
   body: string;
   pinned?: boolean;
+  resourceUrl?: string;
+  resourceLabel?: string;
 }): Promise<{ data: Announcement | null; error: string | null }> {
   const authError = await assertTeacherOwnsClass(params.classId);
   if (authError) return { data: null, error: authError };
@@ -780,6 +798,8 @@ export async function createAnnouncement(params: {
       title: params.title,
       body: params.body,
       pinned: params.pinned ?? false,
+      resource_url: params.resourceUrl?.trim() || null,
+      resource_label: params.resourceLabel?.trim() || null,
     })
     .select()
     .single();
@@ -1874,4 +1894,289 @@ export async function getCompetencySummary(classId: string, cohortTag?: string):
   const { data, error } = await supabase.rpc('get_competency_summary', params);
   if (error) { console.error('[getCompetencySummary]', error.message); return []; }
   return (data ?? []) as CompetencyRow[];
+}
+
+// ─── Grade Book ────────────────────────────────────────────────────────────────
+
+export interface GradeBookStudent {
+  student_id: string;
+  full_name: string;
+  username: string;
+}
+
+export interface GradeBookCell {
+  submitted: boolean;
+  marks_earned: number | null;
+  graded: boolean;
+}
+
+export interface GradeBook {
+  assignments: Array<{ id: string; title: string; total_marks: number; grades_released: boolean; due_date: string | null; assignment_type: 'coding' | 'theoretical' }>;
+  students: GradeBookStudent[];
+  cells: Record<string, Record<string, GradeBookCell>>; // cells[student_id][assignment_id]
+}
+
+export async function getGradeBook(classId: string): Promise<GradeBook> {
+  const { error: authError } = await assertTeacherOwnsClass(classId);
+  if (authError) return { assignments: [], students: [], cells: {} };
+
+  const [{ data: assignments }, { data: enrollments }, { data: submissions }] = await Promise.all([
+    supabase
+      .from('assignments')
+      .select('id, title, total_marks, grades_released, due_date, assignment_type')
+      .eq('class_id', classId)
+      .order('created_at', { ascending: true }),
+    supabase
+      .from('class_enrollments')
+      .select('student_id, profiles(id, full_name, email)')
+      .eq('class_id', classId),
+    supabase
+      .from('student_submissions')
+      .select('student_id, assignment_id, marks_earned, submitted_at')
+      .in('assignment_id', []),  // replaced below
+  ]);
+
+  const asgns = (assignments ?? []) as Array<{ id: string; title: string; total_marks: number; grades_released: boolean; due_date: string | null; assignment_type: 'coding' | 'theoretical' }>;
+  const assignmentIds = asgns.map(a => a.id);
+
+  let subs: Array<{ student_id: string; assignment_id: string; marks_earned: number | null; submitted_at: string }> = [];
+  if (assignmentIds.length > 0) {
+    const { data: subsData } = await supabase
+      .from('student_submissions')
+      .select('student_id, assignment_id, marks_earned, submitted_at')
+      .in('assignment_id', assignmentIds);
+    subs = (subsData ?? []) as typeof subs;
+  }
+
+  const students: GradeBookStudent[] = (enrollments ?? []).map((e: { student_id: string; profiles: unknown }) => {
+    const p = (Array.isArray(e.profiles) ? e.profiles[0] : e.profiles) as { id: string; full_name: string; email: string } | null;
+    const username = p?.email?.split('@')[0] ?? '';
+    return { student_id: e.student_id, full_name: p?.full_name ?? 'Unknown', username };
+  }).sort((a, b) => a.full_name.localeCompare(b.full_name));
+
+  const cells: Record<string, Record<string, GradeBookCell>> = {};
+  for (const s of students) {
+    cells[s.student_id] = {};
+    for (const a of asgns) {
+      cells[s.student_id][a.id] = { submitted: false, marks_earned: null, graded: false };
+    }
+  }
+  for (const sub of subs) {
+    if (cells[sub.student_id]?.[sub.assignment_id]) {
+      cells[sub.student_id][sub.assignment_id] = {
+        submitted: true,
+        marks_earned: sub.marks_earned,
+        graded: sub.marks_earned !== null,
+      };
+    }
+  }
+
+  return { assignments: asgns, students, cells };
+}
+
+// ─── Student Notifications ────────────────────────────────────────────────────
+
+export interface StudentNotifications {
+  newAssignments: number;
+  newGrades: number;
+  newAnnouncements: number;
+}
+
+export async function getStudentNotifications(): Promise<StudentNotifications> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { newAssignments: 0, newGrades: 0, newAnnouncements: 0 };
+
+  const seenAssignments: string[] = JSON.parse(localStorage.getItem(`educode_seen_assignments_${user.id}`) ?? '[]');
+  const seenGrades: string[] = JSON.parse(localStorage.getItem(`educode_seen_grades_${user.id}`) ?? '[]');
+  const seenAnnouncements: string[] = JSON.parse(localStorage.getItem(`educode_seen_announcements_${user.id}`) ?? '[]');
+
+  const { data: enrollments } = await supabase
+    .from('class_enrollments')
+    .select('class_id, joined_at')
+    .eq('student_id', user.id);
+
+  const classIds = (enrollments ?? []).map((e: { class_id: string }) => e.class_id);
+  if (classIds.length === 0) return { newAssignments: 0, newGrades: 0, newAnnouncements: 0 };
+
+  const [{ data: assignments }, { data: submissions }, { data: announcements }] = await Promise.all([
+    supabase
+      .from('assignments')
+      .select('id, created_at')
+      .in('class_id', classIds)
+      .eq('is_published', true),
+    supabase
+      .from('student_submissions')
+      .select('assignment_id, marks_earned, assignments(grades_released)')
+      .eq('student_id', user.id)
+      .not('marks_earned', 'is', null),
+    supabase
+      .from('announcements')
+      .select('id')
+      .in('class_id', classIds),
+  ]);
+
+  const newAssignments = (assignments ?? []).filter((a: { id: string }) => !seenAssignments.includes(a.id)).length;
+  const newGrades = (submissions ?? []).filter((s: { assignment_id: string; assignments: unknown }) => {
+    const asgn = (Array.isArray(s.assignments) ? s.assignments[0] : s.assignments) as { grades_released: boolean } | null;
+    return asgn?.grades_released === true && !seenGrades.includes(s.assignment_id);
+  }).length;
+  const newAnnouncements = (announcements ?? []).filter((a: { id: string }) => !seenAnnouncements.includes(a.id)).length;
+
+  return { newAssignments, newGrades, newAnnouncements };
+}
+
+export function markAssignmentsSeen(ids: string[], userId: string) {
+  const seen: string[] = JSON.parse(localStorage.getItem(`educode_seen_assignments_${userId}`) ?? '[]');
+  const merged = [...new Set([...seen, ...ids])];
+  localStorage.setItem(`educode_seen_assignments_${userId}`, JSON.stringify(merged));
+}
+
+export function markGradesSeen(ids: string[], userId: string) {
+  const seen: string[] = JSON.parse(localStorage.getItem(`educode_seen_grades_${userId}`) ?? '[]');
+  const merged = [...new Set([...seen, ...ids])];
+  localStorage.setItem(`educode_seen_grades_${userId}`, JSON.stringify(merged));
+}
+
+export function markAnnouncementsSeen(ids: string[], userId: string) {
+  const seen: string[] = JSON.parse(localStorage.getItem(`educode_seen_announcements_${userId}`) ?? '[]');
+  const merged = [...new Set([...seen, ...ids])];
+  localStorage.setItem(`educode_seen_announcements_${userId}`, JSON.stringify(merged));
+}
+
+// ─── Assignment publish toggle ────────────────────────────────────────────────
+
+export async function toggleAssignmentPublished(assignmentId: string, publish: boolean): Promise<{ error: string | null }> {
+  const { error: authError } = await assertTeacherOwnsAssignment(assignmentId);
+  if (authError) return { error: authError };
+
+  const { error } = await supabase
+    .from('assignments')
+    .update({ is_published: publish })
+    .eq('id', assignmentId);
+  if (error) return { error: error.message };
+  return { error: null };
+}
+
+// ─── Attendance ───────────────────────────────────────────────────────────────
+
+export type AttendanceStatus = 'present' | 'absent' | 'late' | 'excused';
+
+export interface AttendanceSessionSummary {
+  id: string;
+  session_date: string;
+  topic: string | null;
+  present: number;
+  absent: number;
+  late: number;
+  excused: number;
+  total: number;
+}
+
+export interface AttendanceStudentRecord {
+  student_id: string;
+  full_name: string;
+  status: AttendanceStatus;
+  note: string | null;
+}
+
+export async function saveAttendance(
+  classId: string,
+  date: string,
+  topic: string | null,
+  records: { studentId: string; status: AttendanceStatus; note?: string }[]
+): Promise<{ error: string | null; sessionId: string | null }> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: 'Not authenticated', sessionId: null };
+
+  // Upsert the session (unique per class+date)
+  const { data: session, error: se } = await supabase
+    .from('attendance_sessions')
+    .upsert({ class_id: classId, session_date: date, topic, teacher_id: user.id }, { onConflict: 'class_id,session_date' })
+    .select('id')
+    .single();
+  if (se || !session) return { error: se?.message ?? 'Could not create session', sessionId: null };
+
+  const upsertRows = records.map(r => ({
+    session_id: session.id,
+    student_id: r.studentId,
+    status: r.status,
+    note: r.note ?? null,
+  }));
+
+  const { error: re } = await supabase
+    .from('attendance_records')
+    .upsert(upsertRows, { onConflict: 'session_id,student_id' });
+  if (re) return { error: re.message, sessionId: session.id };
+
+  return { error: null, sessionId: session.id };
+}
+
+export async function getAttendanceSessions(classId: string): Promise<AttendanceSessionSummary[]> {
+  const { data: sessions } = await supabase
+    .from('attendance_sessions')
+    .select('id, session_date, topic')
+    .eq('class_id', classId)
+    .order('session_date', { ascending: false });
+  if (!sessions?.length) return [];
+
+  const sessionIds = sessions.map((s: { id: string }) => s.id);
+  const { data: records } = await supabase
+    .from('attendance_records')
+    .select('session_id, status')
+    .in('session_id', sessionIds);
+
+  return sessions.map((s: { id: string; session_date: string; topic: string | null }) => {
+    const recs = (records ?? []).filter((r: { session_id: string }) => r.session_id === s.id);
+    const count = (status: string) => recs.filter((r: { status: string }) => r.status === status).length;
+    return {
+      id: s.id,
+      session_date: s.session_date,
+      topic: s.topic,
+      present: count('present'),
+      absent: count('absent'),
+      late: count('late'),
+      excused: count('excused'),
+      total: recs.length,
+    };
+  });
+}
+
+export async function getSessionAttendance(sessionId: string): Promise<AttendanceStudentRecord[]> {
+  const { data } = await supabase
+    .from('attendance_records')
+    .select('student_id, status, note, profiles(full_name)')
+    .eq('session_id', sessionId);
+  if (!data) return [];
+  return data.map((r: { student_id: string; status: AttendanceStatus; note: string | null; profiles: unknown }) => {
+    const p = (Array.isArray(r.profiles) ? r.profiles[0] : r.profiles) as { full_name: string } | null;
+    return { student_id: r.student_id, full_name: p?.full_name ?? 'Student', status: r.status, note: r.note };
+  });
+}
+
+export async function getStudentAttendanceForClass(classId: string): Promise<{ present: number; absent: number; late: number; excused: number; total: number; pct: number }> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { present: 0, absent: 0, late: 0, excused: 0, total: 0, pct: 0 };
+
+  const { data: sessions } = await supabase
+    .from('attendance_sessions')
+    .select('id')
+    .eq('class_id', classId);
+  if (!sessions?.length) return { present: 0, absent: 0, late: 0, excused: 0, total: 0, pct: 0 };
+
+  const sessionIds = sessions.map((s: { id: string }) => s.id);
+  const { data: records } = await supabase
+    .from('attendance_records')
+    .select('status')
+    .in('session_id', sessionIds)
+    .eq('student_id', user.id);
+
+  const recs = records ?? [];
+  const count = (status: string) => recs.filter((r: { status: string }) => r.status === status).length;
+  const present = count('present');
+  const late = count('late');
+  const absent = count('absent');
+  const excused = count('excused');
+  const total = recs.length;
+  const pct = total > 0 ? Math.round(((present + late) / total) * 100) : 0;
+  return { present, absent, late, excused, total, pct };
 }
