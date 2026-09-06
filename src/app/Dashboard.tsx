@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { AppNav } from './components/AppNav';
 import { XPLeaderboard } from './components/XPLeaderboard';
 import { PeerActivityFeed } from './components/PeerActivityFeed';
@@ -6,7 +6,8 @@ import { useAuth } from '../lib/auth';
 import { getStudentAssignments, getStudentClasses, getClassWithInviteCode, joinClass, getSubmittedAssignmentIds, getStudentGrades, recordDailyLogin, getStreak, getStudentAnnouncements, getNewGradeCount, getLessonProgress, hasPilotSurveyResponse, getStudentAttendanceForClass, type Assignment, type Announcement } from '../lib/db';
 import PilotSurvey from './PilotSurvey';
 import { getMwarimuWeekCount } from '../lib/quiz-db';
-import { Users, ArrowRight, Loader, X, Megaphone, Pin, Code2, AlertTriangle, Check } from 'lucide-react';
+import { getLessonAIHelp, translateToKinyarwanda } from '../lib/ai';
+import { Users, ArrowRight, Loader, X, Megaphone, Pin, Code2, AlertTriangle, Check, MessageCircle, Send } from 'lucide-react';
 import { usePageTitle } from '../hooks/usePageTitle';
 
 interface Props {
@@ -18,6 +19,153 @@ interface Props {
   onOpenResults?: () => void;
   onContinueLearning?: () => void;
   onOpenChallenges?: () => void;
+}
+
+// ─── Floating Mwarimu Chat ─────────────────────────────────────────────────────
+
+type ChatMsg = { role: 'user' | 'ai'; text: string };
+
+function MwarimuFloat({ language, studentName }: { language: 'EN' | 'KIN'; studentName: string }) {
+  const isKin = language === 'KIN';
+  const [open, setOpen] = useState(false);
+  const [messages, setMessages] = useState<ChatMsg[]>([]);
+  const [input, setInput] = useState('');
+  const [loading, setLoading] = useState(false);
+  const endRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => { endRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages, loading]);
+  useEffect(() => { if (open) { setTimeout(() => inputRef.current?.focus(), 120); } }, [open]);
+
+  const greeting: ChatMsg = {
+    role: 'ai',
+    text: isKin
+      ? `Muraho ${studentName.split(' ')[0]}! Ndi Mwarimu, umufasha wawe mu gukora code. Ufite ikibazo cyose ku JavaScript, imishinga, cyangwa amasomo? Baza!`
+      : `Hi ${studentName.split(' ')[0]}! I'm Mwarimu, your coding assistant. Got a question about JavaScript, your assignments, or any concept? Just ask!`,
+  };
+
+  const visibleMessages = messages.length === 0 ? [greeting] : messages;
+
+  const send = async () => {
+    const q = input.trim();
+    if (!q || loading) return;
+    setInput('');
+    const userMsg: ChatMsg = { role: 'user', text: q };
+    setMessages(prev => (prev.length === 0 ? [greeting, userMsg] : [...prev, userMsg]));
+    setLoading(true);
+    const raw = await getLessonAIHelp(q, '', '', language, 'reading');
+    let finalText = raw;
+    if (isKin) {
+      try { finalText = await translateToKinyarwanda(raw); } catch { /* keep EN */ }
+    }
+    setMessages(prev => [...prev, { role: 'ai', text: finalText }]);
+    setLoading(false);
+  };
+
+  return (
+    <>
+      {/* Floating button */}
+      <button
+        onClick={() => setOpen(o => !o)}
+        aria-label="Ask Mwarimu"
+        style={{
+          position: 'fixed', bottom: 28, right: 28, zIndex: 200,
+          width: 56, height: 56, borderRadius: '50%',
+          background: 'var(--text)', color: 'var(--bg)',
+          border: 'none', cursor: 'pointer',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
+          transition: 'transform 0.2s, box-shadow 0.2s',
+        }}
+        onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.08)'; }}
+        onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; }}
+      >
+        {open ? <X size={20} /> : <MessageCircle size={22} />}
+      </button>
+
+      {/* Chat panel */}
+      {open && (
+        <div style={{
+          position: 'fixed', bottom: 96, right: 28, zIndex: 199,
+          width: 'min(380px, calc(100vw - 40px))',
+          height: 'min(520px, calc(100vh - 140px))',
+          display: 'flex', flexDirection: 'column',
+          borderRadius: 'var(--radius)', overflow: 'hidden',
+          background: 'var(--surface)', border: '1px solid var(--line)',
+          boxShadow: '0 8px 40px rgba(0,0,0,0.25)',
+        }}>
+          {/* Header */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '14px 16px', borderBottom: '1px solid var(--line)', background: 'var(--surface-2)' }}>
+            <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'var(--text)', color: 'var(--bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 700, flexShrink: 0 }}>M</div>
+            <div>
+              <p style={{ fontWeight: 700, fontSize: 14, color: 'var(--text)', lineHeight: 1.2 }}>Mwarimu</p>
+              <p style={{ fontSize: 11, color: 'var(--text-3)' }}>{isKin ? 'Umufasha w\'AI wa Coding' : 'AI Coding Tutor'}</p>
+            </div>
+          </div>
+
+          {/* Messages */}
+          <div style={{ flex: 1, overflowY: 'auto', padding: '16px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {visibleMessages.map((m, i) => (
+              <div key={i} style={{ display: 'flex', justifyContent: m.role === 'user' ? 'flex-end' : 'flex-start' }}>
+                <div style={{
+                  maxWidth: '85%', padding: '10px 14px', fontSize: 13.5, lineHeight: 1.6,
+                  borderRadius: m.role === 'user' ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
+                  background: m.role === 'user' ? 'var(--text)' : 'var(--surface-2)',
+                  color: m.role === 'user' ? 'var(--bg)' : 'var(--text)',
+                  border: m.role === 'ai' ? '1px solid var(--line)' : 'none',
+                  whiteSpace: 'pre-wrap',
+                }}>
+                  {m.text}
+                </div>
+              </div>
+            ))}
+            {loading && (
+              <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+                <div style={{ padding: '10px 14px', borderRadius: '18px 18px 18px 4px', background: 'var(--surface-2)', border: '1px solid var(--line)', display: 'flex', gap: 4, alignItems: 'center' }}>
+                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--text-3)', animation: 'pulse 1s ease-in-out 0s infinite' }} />
+                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--text-3)', animation: 'pulse 1s ease-in-out 0.2s infinite' }} />
+                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--text-3)', animation: 'pulse 1s ease-in-out 0.4s infinite' }} />
+                </div>
+              </div>
+            )}
+            <div ref={endRef} />
+          </div>
+
+          {/* Input */}
+          <div style={{ padding: '12px 14px', borderTop: '1px solid var(--line)', display: 'flex', gap: 8, background: 'var(--surface)' }}>
+            <input
+              ref={inputRef}
+              type="text"
+              value={input}
+              onChange={e => setInput(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && !e.shiftKey && send()}
+              placeholder={isKin ? 'Baza ikibazo...' : 'Ask a question...'}
+              style={{
+                flex: 1, padding: '9px 13px', fontSize: 13.5,
+                background: 'var(--bg)', color: 'var(--text)',
+                border: '1px solid var(--line)', borderRadius: 'var(--radius-sm)',
+                outline: 'none',
+              }}
+            />
+            <button
+              onClick={send}
+              disabled={!input.trim() || loading}
+              style={{
+                width: 38, height: 38, borderRadius: 'var(--radius-sm)',
+                background: input.trim() && !loading ? 'var(--text)' : 'var(--surface-2)',
+                color: input.trim() && !loading ? 'var(--bg)' : 'var(--text-3)',
+                border: 'none', cursor: input.trim() && !loading ? 'pointer' : 'default',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                flexShrink: 0, transition: 'background 0.15s',
+              }}
+            >
+              <Send size={15} />
+            </button>
+          </div>
+        </div>
+      )}
+    </>
+  );
 }
 
 // ─── Join Class Modal ──────────────────────────────────────────────────────────
@@ -748,6 +896,8 @@ export default function Dashboard({ language, onStartCoding, onOpenAssignment, o
           onDone={() => { setShowSurvey(false); setSurveyDone(true); }}
         />
       )}
+
+      <MwarimuFloat language={language} studentName={studentName} />
     </div>
   );
 }

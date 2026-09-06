@@ -2788,3 +2788,225 @@ Project_Name_Deliverables/
 - Always keep your original editable file (PSD, AI) — you will need it for revisions
 - Compress images for web — a 5MB photo on a webpage is unacceptable; aim for under 200KB',
 NULL, 'reading', 1, 10);
+
+-- ============================================================
+-- INTERACTIVE LESSONS — Coding Exercises & Quizzes
+-- ============================================================
+
+-- ─── SWDVC301: Version Control — quizzes and coding exercises ────────────────
+
+-- Module 1: Setup Repository — Quiz
+INSERT INTO course_lessons (module_id, title, title_kin, lesson_type, order_index, xp_reward, exercise_data) VALUES
+('cc000001-0000-0000-0000-000000000000',
+'Git Basics Quiz',
+'Ikibazo: Ibintu bya Mbere bya Git',
+'quiz', 2, 15,
+'{"questions": [
+  {"id":"vc1","text":"What command initialises a new Git repository in a folder?","options":["git start","git init","git create","git new"],"correct":1},
+  {"id":"vc2","text":"Which command shows the current state of your working directory and staging area?","options":["git log","git diff","git status","git check"],"correct":2},
+  {"id":"vc3","text":"What is the staging area (also called the index) used for?","options":["Storing the final version of files","Preparing selected changes before a commit","Connecting to GitHub","Showing previous commits"],"correct":1},
+  {"id":"vc4","text":"Which command adds ALL changed files to the staging area?","options":["git add file.txt","git add --all","git stage all","git commit -a"],"correct":1},
+  {"id":"vc5","text":"In a distributed VCS like Git, where is the full project history stored?","options":["Only on the central server","Only on the team lead machine","On every developer machine","In the cloud only"],"correct":2}
+]}');
+
+-- Module 1: Setup Repository — Coding (JS context: commit message formatter)
+INSERT INTO course_lessons (module_id, title, title_kin, lesson_type, order_index, xp_reward, exercise_data) VALUES
+('cc000001-0000-0000-0000-000000000000',
+'Format a Commit Message',
+'Igenamiterere rya Ubutumwa bw''Ikora',
+'coding', 3, 20,
+'{"instructions":"A good commit message follows this pattern:\n  <type>: <short description>\n\nTypes: feat, fix, docs, style, refactor\n\nWrite a function called formatCommit(type, description) that returns the full commit message string.\n\nExample: formatCommit(''feat'', ''add login page'') → ''feat: add login page''\n\nThen call it and use console.log() to print the result.",
+"starter_code":"function formatCommit(type, description) {\n  // Your code here\n}\n\nconsole.log(formatCommit(''feat'', ''add login page''));",
+"solution":"function formatCommit(type, description) {\n  return type + '': '' + description;\n}\n\nconsole.log(formatCommit(''feat'', ''add login page''));",
+"hints":["Use the + operator to join strings","The pattern is: type, then colon and space, then description","Return the combined string from the function"],
+"tests":[{"description":"formatCommit(''feat'', ''add login page'') prints the correct message","expectedOutput":"feat: add login page"}]}');
+
+-- Module 2: Manipulate Files — Quiz
+INSERT INTO course_lessons (module_id, title, title_kin, lesson_type, order_index, xp_reward, exercise_data) VALUES
+('cc000002-0000-0000-0000-000000000000',
+'File Tracking Quiz',
+'Ikibazo: Gukurikirana Dosiye',
+'quiz', 2, 15,
+'{"questions": [
+  {"id":"vf1","text":"What does ''git add README.md'' do?","options":["Creates a new file called README.md","Deletes README.md from the repository","Stages README.md so it will be included in the next commit","Commits README.md immediately"],"correct":2},
+  {"id":"vf2","text":"What is a .gitignore file used for?","options":["Listing contributors to a project","Telling Git which files to ignore and not track","Storing your Git password","Writing commit messages"],"correct":1},
+  {"id":"vf3","text":"After running ''git commit -m \"fix bug\"'', where is the change saved?","options":["Only on the staging area","In the local repository history","Directly on GitHub","In a temporary file"],"correct":1},
+  {"id":"vf4","text":"Which command shows all the commits made on the current branch?","options":["git status","git diff","git log","git history"],"correct":2}
+]}');
+
+-- Module 2: Manipulate Files — Coding (list changed files simulation)
+INSERT INTO course_lessons (module_id, title, title_kin, lesson_type, order_index, xp_reward, exercise_data) VALUES
+('cc000002-0000-0000-0000-000000000000',
+'Simulate git status Output',
+'Guhuza imiterere ya git status',
+'coding', 3, 20,
+'{"instructions":"When you run ''git status'', Git lists modified, new, and deleted files.\n\nYou have an array of changed files:\n  const changes = [''modified: index.html'', ''new file: style.css'', ''deleted: old.js'']\n\nWrite code that loops through this array and prints each item on its own line using console.log().",
+"starter_code":"const changes = [''modified: index.html'', ''new file: style.css'', ''deleted: old.js''];\n\n// Loop through changes and print each one\n",
+"solution":"const changes = [''modified: index.html'', ''new file: style.css'', ''deleted: old.js''];\n\nfor (let i = 0; i < changes.length; i++) {\n  console.log(changes[i]);\n}",
+"hints":["Use a for loop to go through the array","Access each item with changes[i]","console.log() each item inside the loop"],
+"tests":[
+  {"description":"Prints the first change","expectedOutput":"modified: index.html"},
+  {"description":"Prints the second change","expectedOutput":"new file: style.css"},
+  {"description":"Prints the third change","expectedOutput":"deleted: old.js"}
+]}');
+
+-- Module 3: Ship Code — Quiz
+INSERT INTO course_lessons (module_id, title, title_kin, lesson_type, order_index, xp_reward, exercise_data) VALUES
+('cc000003-0000-0000-0000-000000000000',
+'Branching and Pull Requests Quiz',
+'Ikibazo: Amashami na Pull Requests',
+'quiz', 2, 15,
+'{"questions": [
+  {"id":"vs1","text":"What does ''git push origin main'' do?","options":["Downloads changes from GitHub","Uploads your local commits to GitHub","Creates a new branch called main","Deletes the main branch"],"correct":1},
+  {"id":"vs2","text":"What is a branch in Git?","options":["A copy of a file","A separate line of development that does not affect the main code","A type of commit message","A remote server"],"correct":1},
+  {"id":"vs3","text":"What is a Pull Request (PR)?","options":["A request to download new code","A request to merge your branch into another branch, usually reviewed by teammates","A way to delete old branches","A Git command"],"correct":1},
+  {"id":"vs4","text":"Which command creates a new branch AND switches to it in one step?","options":["git branch new-feature","git checkout new-feature","git checkout -b new-feature","git switch --create new-feature"],"correct":2},
+  {"id":"vs5","text":"What should you do before pushing code to a shared repository?","options":["Delete all comments","Run git push --force","Pull the latest changes first with git pull","Change all file names"],"correct":2}
+]}');
+
+-- Module 3: Ship Code — Coding (build a changelog summary)
+INSERT INTO course_lessons (module_id, title, title_kin, lesson_type, order_index, xp_reward, exercise_data) VALUES
+('cc000003-0000-0000-0000-000000000000',
+'Build a Changelog Entry',
+'Gukora Urutonde rw''Impinduka',
+'coding', 3, 25,
+'{"instructions":"A changelog documents what changed in each release.\n\nWrite a function called makeChangelog(version, changes) where:\n- version is a string like ''v1.2.0''\n- changes is an array of strings\n\nThe function should print:\n  Release v1.2.0\n  - fix login bug\n  - add dark mode\n  (one dash + space before each change)\n\nExample call:\n  makeChangelog(''v1.2.0'', [''fix login bug'', ''add dark mode''])",
+"starter_code":"function makeChangelog(version, changes) {\n  // Print the release header\n  \n  // Loop through changes and print each with ''- '' prefix\n  \n}\n\nmakeChangelog(''v1.2.0'', [''fix login bug'', ''add dark mode'']);",
+"solution":"function makeChangelog(version, changes) {\n  console.log(''Release '' + version);\n  for (let i = 0; i < changes.length; i++) {\n    console.log(''- '' + changes[i]);\n  }\n}\n\nmakeChangelog(''v1.2.0'', [''fix login bug'', ''add dark mode'']);",
+"hints":["Print the header first: console.log(''Release '' + version)","Then loop through the changes array","Prefix each change with ''- '' using string concatenation"],
+"tests":[
+  {"description":"Prints the release header","expectedOutput":"Release v1.2.0"},
+  {"description":"Prints the first change with dash","expectedOutput":"- fix login bug"},
+  {"description":"Prints the second change with dash","expectedOutput":"- add dark mode"}
+]}');
+
+-- ─── SWDVF301: Vue.JS — quizzes and HTML exercises ──────────────────────────
+
+-- Module 1: Set Up Environment — Quiz
+INSERT INTO course_lessons (module_id, title, title_kin, lesson_type, order_index, xp_reward, exercise_data) VALUES
+('ff000001-0000-0000-0000-000000000000',
+'Vue.js Concepts Quiz',
+'Ikibazo: Ibitekerezo bya Vue.js',
+'quiz', 2, 15,
+'{"questions": [
+  {"id":"vj1","text":"What does Vue.js primarily help you build?","options":["Mobile apps only","Interactive user interfaces for the web","Database schemas","Server-side APIs"],"correct":1},
+  {"id":"vj2","text":"What does the v-bind directive do in Vue?","options":["Creates a new Vue component","Loops through an array","Dynamically binds a value to an HTML attribute","Listens for click events"],"correct":2},
+  {"id":"vj3","text":"In a Vue component, where do you put the reactive data?","options":["In the template section","In the style section","In the data() function","In the methods object"],"correct":2},
+  {"id":"vj4","text":"What does v-if do?","options":["Loops through a list","Conditionally renders an element based on a boolean value","Binds a CSS class","Handles form submission"],"correct":1},
+  {"id":"vj5","text":"What is the Vue CLI used for?","options":["Styling components","Running SQL queries","Scaffolding and managing Vue projects from the command line","Translating text"],"correct":2}
+]}');
+
+-- Module 2: Apply Vue Framework — HTML Exercise
+INSERT INTO course_lessons (module_id, title, title_kin, lesson_type, order_index, xp_reward, exercise_data) VALUES
+('ff000002-0000-0000-0000-000000000000',
+'Your First Vue Template',
+'Icyitegererezo cya Vue cy''Mbere',
+'coding', 2, 25,
+'{"instructions":"Build a simple Vue.js page that displays a greeting.\n\nUsing the Vue CDN (already included in the starter), create an app with:\n- A ''message'' data property set to ''Hello from Vue!''\n- A heading <h1> that displays the message using Vue template syntax {{ }}\n- A paragraph that shows how many characters are in the message using a computed property or inline expression\n\nThe page should display:\n  Hello from Vue!\n  Characters: 16",
+"starter_code":"<!DOCTYPE html>\n<html>\n<head>\n  <title>My Vue App</title>\n  <script src=\"https://unpkg.com/vue@3/dist/vue.global.js\"></script>\n</head>\n<body>\n  <div id=\"app\">\n    <!-- Display message here -->\n    <!-- Display character count here -->\n  </div>\n\n  <script>\n    const { createApp } = Vue;\n    createApp({\n      data() {\n        return {\n          // Add your data here\n        };\n      }\n    }).mount(''#app'');\n  </script>\n</body>\n</html>",
+"hints":["Add message: ''Hello from Vue!'' inside the data() return object","Use {{ message }} in the template to display the data property","For character count, use {{ message.length }} inside the template"]}');
+
+-- Module 2: Apply Vue Framework — Quiz
+INSERT INTO course_lessons (module_id, title, title_kin, lesson_type, order_index, xp_reward, exercise_data) VALUES
+('ff000002-0000-0000-0000-000000000000',
+'v-for and v-on Quiz',
+'Ikibazo: v-for na v-on',
+'quiz', 3, 15,
+'{"questions": [
+  {"id":"vf1","text":"What does v-for=\"item in items\" do in Vue?","options":["Filters items from an array","Renders one element for each item in the array","Creates a form with items","Imports items from another file"],"correct":1},
+  {"id":"vf2","text":"How do you listen for a button click in Vue?","options":["v-click=\"handler\"","@click=\"handler\" or v-on:click=\"handler\"","onclick=\"handler\"","v-event:click=\"handler\""],"correct":1},
+  {"id":"vf3","text":"What is two-way data binding in Vue?","options":["Connecting two separate Vue apps","When changes in the input automatically update the data AND the view updates when data changes","Binding two CSS classes at once","Loading data from two APIs"],"correct":1},
+  {"id":"vf4","text":"Which directive creates two-way data binding on a form input?","options":["v-bind","v-model","v-sync","v-two"],"correct":1}
+]}');
+
+-- Module 4: Develop the Game — Coding (counter app with JS)
+INSERT INTO course_lessons (module_id, title, title_kin, lesson_type, order_index, xp_reward, exercise_data) VALUES
+('ff000004-0000-0000-0000-000000000000',
+'Game Score Counter',
+'Gutunga Amanota y''Umukino',
+'coding', 1, 25,
+'{"instructions":"Before building a Vue game, let''s practise the core logic in plain JavaScript.\n\nWrite a score tracker that:\n1. Starts with score = 0\n2. Has a function addPoints(n) that adds n to score\n3. Has a function resetScore() that sets score back to 0\n4. Calls addPoints(10) three times, then prints the score\n5. Calls resetScore(), then prints the score again\n\nExpected output:\n  Score: 30\n  Score: 0",
+"starter_code":"let score = 0;\n\nfunction addPoints(n) {\n  // Add n to score\n}\n\nfunction resetScore() {\n  // Reset score to 0\n}\n\n// Call addPoints three times with 10\n\nconsole.log(''Score: '' + score);\n\n// Reset and print again\n",
+"solution":"let score = 0;\n\nfunction addPoints(n) {\n  score = score + n;\n}\n\nfunction resetScore() {\n  score = 0;\n}\n\naddPoints(10);\naddPoints(10);\naddPoints(10);\nconsole.log(''Score: '' + score);\n\nresetScore();\nconsole.log(''Score: '' + score);",
+"hints":["Inside addPoints, write: score = score + n","Inside resetScore, write: score = 0","Call addPoints(10) three times before the first console.log"],
+"tests":[
+  {"description":"Score after three +10 additions","expectedOutput":"Score: 30"},
+  {"description":"Score after reset","expectedOutput":"Score: 0"}
+]}');
+
+-- ─── SWDPR301: Requirements — quizzes ────────────────────────────────────────
+
+INSERT INTO course_lessons (module_id, title, title_kin, lesson_type, order_index, xp_reward, exercise_data) VALUES
+('dd000001-0000-0000-0000-000000000000',
+'Customer Needs Quiz',
+'Ikibazo: Ibisabwa n''Umukiriya',
+'quiz', 2, 15,
+'{"questions": [
+  {"id":"pr1","text":"What is the main goal of requirements analysis?","options":["To design the database","To understand what the client needs before building anything","To write all the code","To test the finished product"],"correct":1},
+  {"id":"pr2","text":"What is a stakeholder?","options":["Only the client who pays","Anyone who is affected by or has an interest in the project","The lead programmer only","A type of server"],"correct":1},
+  {"id":"pr3","text":"What technique involves asking stakeholders open-ended questions to gather requirements?","options":["Observation","Survey","Interview","Prototype"],"correct":2},
+  {"id":"pr4","text":"Functional requirements describe what?","options":["How fast the system must be","The visual design","What the system should DO — the features and behaviour","The hardware the system runs on"],"correct":2}
+]}');
+
+INSERT INTO course_lessons (module_id, title, title_kin, lesson_type, order_index, xp_reward, exercise_data) VALUES
+('dd000002-0000-0000-0000-000000000000',
+'User Stories Quiz',
+'Ikibazo: Inzira z''Abakoresha',
+'quiz', 2, 15,
+'{"questions": [
+  {"id":"us1","text":"A user story follows the format: ''As a [role], I want [goal] so that [reason]''. What does the ''role'' represent?","options":["The developer","The type of user who needs this feature","The project manager","The database table"],"correct":1},
+  {"id":"us2","text":"What are acceptance criteria?","options":["The budget for the project","Conditions that must be met for a user story to be considered complete","A type of programming language","The list of team members"],"correct":1},
+  {"id":"us3","text":"What is the MoSCoW method used for?","options":["Writing code comments","Prioritising requirements into Must-have, Should-have, Could-have, Won''t-have","Planning team meetings","Designing database schemas"],"correct":1},
+  {"id":"us4","text":"Which document collects all the requirements agreed upon between the client and the development team?","options":["README file","Software Requirements Specification (SRS)","Changelog","Gitignore file"],"correct":1}
+]}');
+
+INSERT INTO course_lessons (module_id, title, title_kin, lesson_type, order_index, xp_reward, exercise_data) VALUES
+('dd000003-0000-0000-0000-000000000000',
+'Functional vs Non-Functional Requirements Quiz',
+'Ikibazo: Ibisabwa Bikorana n''Ibitabikorana',
+'quiz', 2, 15,
+'{"questions": [
+  {"id":"fn1","text":"Which of these is a functional requirement?","options":["The system must load in under 2 seconds","Users can register with an email and password","The site must be available 99.9% of the time","The app must work on iOS and Android"],"correct":1},
+  {"id":"fn2","text":"Which of these is a non-functional requirement?","options":["The user can search for products","Admins can delete accounts","The system must handle 1000 simultaneous users","Teachers can post announcements"],"correct":2},
+  {"id":"fn3","text":"What does system scalability mean?","options":["The ability to change the UI colour","The system''s ability to handle growing amounts of work by adding resources","The number of lines of code","How fast the team can write features"],"correct":1},
+  {"id":"fn4","text":"Why is it important to validate requirements with the client?","options":["To increase the project cost","To make the project last longer","To confirm you understood what they need before spending time building it","To avoid writing documentation"],"correct":2}
+]}');
+
+-- ─── SWDUX301: UI/UX Design — quizzes ────────────────────────────────────────
+
+INSERT INTO course_lessons (module_id, title, title_kin, lesson_type, order_index, xp_reward, exercise_data) VALUES
+('ee000001-0000-0000-0000-000000000000',
+'UX Research Methods Quiz',
+'Ikibazo: Uburyo bwo Gushakisha UX',
+'quiz', 2, 15,
+'{"questions": [
+  {"id":"ux1","text":"What does UX stand for?","options":["User Execution","User Experience","Universal XML","Unique Extension"],"correct":1},
+  {"id":"ux2","text":"What is a pain point in UX design?","options":["A bug in the code","A frustrating problem or difficulty a user experiences while trying to complete a task","A type of button","A slow server"],"correct":1},
+  {"id":"ux3","text":"What is usability testing?","options":["Testing the server performance","Watching real users attempt to complete tasks with your design to identify problems","Running automated code tests","Checking the colour contrast of a design"],"correct":1},
+  {"id":"ux4","text":"What does accessibility mean in UI design?","options":["Making the app only available to admins","Ensuring the product can be used by people with a wide range of abilities and disabilities","Making it load faster","Adding more features"],"correct":1}
+]}');
+
+INSERT INTO course_lessons (module_id, title, title_kin, lesson_type, order_index, xp_reward, exercise_data) VALUES
+('ee000002-0000-0000-0000-000000000000',
+'User Personas Quiz',
+'Ikibazo: Imiterere y''Abakoresha',
+'quiz', 2, 15,
+'{"questions": [
+  {"id":"up1","text":"What is a user persona?","options":["A fake user account for testing","A fictional representation of your typical user, based on research, that guides design decisions","A list of all registered users","A UI component"],"correct":1},
+  {"id":"up2","text":"What information is typically included in a persona?","options":["Only the user''s name","Name, age, goals, frustrations, and daily context","Only the user''s email","The user''s password"],"correct":1},
+  {"id":"up3","text":"Why are personas useful in design?","options":["They replace user testing entirely","They help the team make design decisions based on real user needs rather than assumptions","They generate code automatically","They replace the requirements document"],"correct":1},
+  {"id":"up4","text":"What is a user journey map?","options":["A map showing the user''s physical location","A visual story of all the steps a user goes through to complete a goal with your product","A type of sitemap","A database diagram"],"correct":1}
+]}');
+
+INSERT INTO course_lessons (module_id, title, title_kin, lesson_type, order_index, xp_reward, exercise_data) VALUES
+('ee000003-0000-0000-0000-000000000000',
+'Wireframes and Prototypes Quiz',
+'Ikibazo: Wireframes na Prototypes',
+'quiz', 2, 15,
+'{"questions": [
+  {"id":"wp1","text":"What is a wireframe?","options":["A finished design with colours and images","A low-fidelity, simplified sketch showing the layout and structure of a screen without visual styling","A type of CSS grid","A 3D model of the interface"],"correct":1},
+  {"id":"wp2","text":"What is the main advantage of low-fidelity prototyping early in design?","options":["It looks professional immediately","It is cheap and fast to create and easy to change before investing in detailed design","It automatically generates code","It replaces user testing"],"correct":1},
+  {"id":"wp3","text":"In Figma, what are frames used for?","options":["Storing images","Representing screen sizes (like a phone or desktop) as containers for your design","Writing CSS code","Managing team permissions"],"correct":1},
+  {"id":"wp4","text":"What is a high-fidelity prototype?","options":["A rough sketch on paper","A detailed, interactive design that closely resembles the final product","A list of features","A database model"],"correct":1}
+]}');
+
