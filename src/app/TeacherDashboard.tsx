@@ -1861,8 +1861,8 @@ function AddStudentsModal({ cls, language, onClose }: { cls: Class; language: 'E
                 <Download size={13} />{isKin ? 'Pakurura CSV' : 'Download CSV'}
               </button>
             </div>
-            <div style={{ border: '1px solid var(--line)', borderRadius: 'var(--radius)', overflow: 'hidden', fontSize: 12 }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <div className="tbl-scroll" style={{ border: '1px solid var(--line)', borderRadius: 'var(--radius)', overflow: 'hidden', fontSize: 12 }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: 420 }}>
                 <thead>
                   <tr style={{ background: 'var(--surface-2)', textAlign: 'left' }}>
                     <th style={{ padding: '8px 10px', fontWeight: 600 }}>{isKin ? 'Izina' : 'Name'}</th>

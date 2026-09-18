@@ -131,7 +131,7 @@ export default function LandingPage({ onLogin, onSignup }: Props) {
         <div className="nav-inner">
           <a className="logo" href="/"><span className="edu">EduCode</span><span style={{ fontSize: 11, color: 'var(--text-3)', marginLeft: 6, fontWeight: 500 }}>Rwanda</span></a>
 
-          <nav className="nav-links nav-collapse" aria-label="Main">
+          <nav className={`nav-links nav-collapse${mobileNav ? ' nav-open' : ''}`} aria-label="Main" onClick={() => setMobileNav(false)}>
             <a className="nav-link" href="#for-schools">For schools</a>
             <a className="nav-link" href="#curriculum">Curriculum</a>
             <a className="nav-link" href="#how-it-works">How it works</a>
@@ -139,7 +139,7 @@ export default function LandingPage({ onLogin, onSignup }: Props) {
           </nav>
 
           {/* Mobile nav toggle */}
-          <button className="iconbtn" style={{ display: 'none' }} id="nav-toggle" onClick={() => setMobileNav(o => !o)} aria-label="Menu">
+          <button className="iconbtn nav-toggle-btn" onClick={() => setMobileNav(o => !o)} aria-label="Menu">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" width="20" height="20">
               {mobileNav ? <path d="M18 6 6 18M6 6l12 12"/> : <path d="M4 6h16M4 12h16M4 18h16"/>}
             </svg>

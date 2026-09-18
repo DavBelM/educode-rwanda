@@ -68,32 +68,14 @@ function MwarimuFloat({ language, studentName }: { language: 'EN' | 'KIN'; stude
       <button
         onClick={() => setOpen(o => !o)}
         aria-label="Ask Mwarimu"
-        style={{
-          position: 'fixed', bottom: 28, right: 28, zIndex: 200,
-          width: 56, height: 56, borderRadius: '50%',
-          background: 'var(--text)', color: 'var(--bg)',
-          border: 'none', cursor: 'pointer',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
-          transition: 'transform 0.2s, box-shadow 0.2s',
-        }}
-        onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.08)'; }}
-        onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; }}
+        className="mwarimu-fab"
       >
         {open ? <X size={20} /> : <MessageCircle size={22} />}
       </button>
 
       {/* Chat panel */}
       {open && (
-        <div style={{
-          position: 'fixed', bottom: 96, right: 28, zIndex: 199,
-          width: 'min(380px, calc(100vw - 40px))',
-          height: 'min(520px, calc(100vh - 140px))',
-          display: 'flex', flexDirection: 'column',
-          borderRadius: 'var(--radius)', overflow: 'hidden',
-          background: 'var(--surface)', border: '1px solid var(--line)',
-          boxShadow: '0 8px 40px rgba(0,0,0,0.25)',
-        }}>
+        <div className="mwarimu-panel">
           {/* Header */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '14px 16px', borderBottom: '1px solid var(--line)', background: 'var(--surface-2)' }}>
             <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'var(--text)', color: 'var(--bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 700, flexShrink: 0 }}>M</div>
