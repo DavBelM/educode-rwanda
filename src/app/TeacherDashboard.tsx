@@ -20,6 +20,10 @@ import {
   type LiveSignal, type EventRow, type CompetencyRow, type GradeBook,
   type AttendanceStatus, type AttendanceSessionSummary, type AttendanceStudentRecord,
 } from '../lib/db';
+import {
+  getStudentChallengeAttempts, saveStudentAssessment, getStudentAssessmentHistory,
+  type TeacherStudentChallengeRow, type AssessmentRecord,
+} from '../lib/quiz-db';
 
 // ─── Create Class Modal ────────────────────────────────────────────────────────
 
@@ -1209,21 +1213,28 @@ function formatRelativeTime(iso: string | null, isKin: boolean): string {
 
 // ── Student AI Profile Modal ──────────────────────────────────────────────────
 
-function StudentProfileModal({ student, classId, language, onClose }: {
+function StudentProfileModal({ student, classId, language, teacherId, onClose }: {
   student: RosterStudent;
   classId: string;
   language: 'EN' | 'KIN';
+  teacherId: string;
   onClose: () => void;
 }) {
   const isKin = language === 'KIN';
-  const [modalTab, setModalTab] = useState<'profile' | 'timeline'>('profile');
+  const [modalTab, setModalTab] = useState<'profile' | 'challenges' | 'history' | 'timeline'>('profile');
   const [profile, setProfile] = useState<StudentAIProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [assessment, setAssessment] = useState<string | null>(null);
   const [assessmentLoading, setAssessmentLoading] = useState(false);
   const [assessmentError, setAssessmentError] = useState(false);
+  const [assessmentSaved, setAssessmentSaved] = useState(false);
   const [timeline, setTimeline] = useState<EventRow[]>([]);
   const [timelineLoading, setTimelineLoading] = useState(false);
+  const [challenges, setChallenges] = useState<TeacherStudentChallengeRow[]>([]);
+  const [challengesLoading, setChallengesLoading] = useState(false);
+  const [challengeExpanded, setChallengeExpanded] = useState<string | null>(null);
+  const [assessHistory, setAssessHistory] = useState<AssessmentRecord[]>([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
 
   useEffect(() => {
     getStudentAIProfile(student.student_id, classId).then(p => {
@@ -1241,10 +1252,29 @@ function StudentProfileModal({ student, classId, language, onClose }: {
     });
   }, [modalTab, student.student_id, classId, timeline.length]);
 
+  useEffect(() => {
+    if (modalTab !== 'challenges' || challenges.length > 0) return;
+    setChallengesLoading(true);
+    getStudentChallengeAttempts(student.student_id).then(rows => {
+      setChallenges(rows);
+      setChallengesLoading(false);
+    });
+  }, [modalTab, student.student_id, challenges.length]);
+
+  useEffect(() => {
+    if (modalTab !== 'history' || assessHistory.length > 0) return;
+    setHistoryLoading(true);
+    getStudentAssessmentHistory(student.student_id).then(rows => {
+      setAssessHistory(rows);
+      setHistoryLoading(false);
+    });
+  }, [modalTab, student.student_id, assessHistory.length]);
+
   async function handleGenerateAssessment() {
     if (!profile) return;
     setAssessmentLoading(true);
     setAssessmentError(false);
+    setAssessmentSaved(false);
     try {
       const result = await generateStudentAssessment({
         name: student.full_name,
@@ -1262,6 +1292,21 @@ function StudentProfileModal({ student, classId, language, onClose }: {
         languageSplit: profile.languageSplit,
       }, language);
       setAssessment(result);
+      // Save to DB for history
+      await saveStudentAssessment({
+        studentId: student.student_id,
+        teacherId,
+        classId,
+        assessment: result,
+        metadata: {
+          progress_pct: student.progress_pct,
+          challenges_passed: student.challenges_passed,
+          status: student.status,
+        },
+      });
+      setAssessmentSaved(true);
+      // Refresh history if tab is open
+      setAssessHistory([]);
     } catch {
       setAssessmentError(true);
     } finally {
@@ -1295,29 +1340,122 @@ function StudentProfileModal({ student, classId, language, onClose }: {
         </div>
 
         {/* Tab bar */}
-        <div style={{ display: 'flex', borderBottom: '1px solid var(--line)', padding: '0 20px' }}>
-          {(['profile', 'timeline'] as const).map(t => (
+        <div style={{ display: 'flex', borderBottom: '1px solid var(--line)', padding: '0 20px', overflowX: 'auto' }}>
+          {([
+            { id: 'profile', en: 'AI Profile', kin: 'Umwirondoro' },
+            { id: 'challenges', en: 'Challenges', kin: 'Challenges' },
+            { id: 'history', en: 'Assess History', kin: 'Amateka' },
+            { id: 'timeline', en: 'Timeline', kin: 'Ibikorwa' },
+          ] as const).map(t => (
             <button
-              key={t}
-              onClick={() => setModalTab(t)}
+              key={t.id}
+              onClick={() => setModalTab(t.id)}
               style={{
-                padding: '10px 14px 9px',
-                fontSize: 13,
-                fontWeight: modalTab === t ? 600 : 400,
-                color: modalTab === t ? 'var(--text)' : 'var(--text-3)',
+                padding: '10px 12px 9px',
+                fontSize: 12.5,
+                fontWeight: modalTab === t.id ? 600 : 400,
+                color: modalTab === t.id ? 'var(--text)' : 'var(--text-3)',
                 background: 'none',
                 border: 'none',
-                borderBottom: modalTab === t ? '2px solid var(--accent)' : '2px solid transparent',
+                borderBottom: modalTab === t.id ? '2px solid var(--accent)' : '2px solid transparent',
                 cursor: 'pointer',
                 marginBottom: -1,
+                whiteSpace: 'nowrap',
               }}
             >
-              {t === 'profile' ? (isKin ? 'Umwirondoro' : 'AI Profile') : (isKin ? 'Ibikorwa' : 'Timeline')}
+              {isKin ? t.kin : t.en}
             </button>
           ))}
         </div>
 
         <div style={{ padding: '20px' }}>
+          {/* ── Challenges tab ── */}
+          {modalTab === 'challenges' && (
+            challengesLoading ? (
+              <div style={{ display: 'flex', justifyContent: 'center', padding: '32px 0' }}>
+                <Loader size={22} style={{ animation: 'spin 1s linear infinite', color: 'var(--text-3)' }} />
+              </div>
+            ) : challenges.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '32px 0', color: 'var(--text-3)' }}>
+                <Code2 size={28} style={{ margin: '0 auto 12px', opacity: 0.4 }} />
+                <p style={{ fontSize: 14 }}>
+                  {isKin ? 'Nta challenge yakozwe.' : 'No challenge attempts recorded.'}
+                </p>
+                <p style={{ fontSize: 12, marginTop: 6, opacity: 0.7 }}>
+                  {isKin ? 'Niba challenges ziriho, reba niba RLS yo mu database ihinduwe.' : 'If challenges exist, ensure the schema-v2-patches.sql has been applied in Supabase.'}
+                </p>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <p style={{ fontSize: 12, color: 'var(--text-3)', marginBottom: 4 }}>
+                  {challenges.filter(c => c.passed).length}/{challenges.length} {isKin ? 'challenges zaranguye' : 'challenges passed'}
+                </p>
+                {challenges.map(ch => {
+                  const exp = challengeExpanded === ch.challenge_id;
+                  return (
+                    <div key={ch.challenge_id} style={{ border: '1px solid var(--line)', borderRadius: 'var(--radius)', overflow: 'hidden' }}>
+                      <button
+                        onClick={() => setChallengeExpanded(exp ? null : ch.challenge_id)}
+                        style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', background: 'var(--surface)', border: 'none', cursor: 'pointer', textAlign: 'left' }}
+                      >
+                        <span style={{ fontSize: 13, color: ch.passed ? '#4ade80' : '#f87171', fontWeight: 700 }}>
+                          {ch.passed ? '✓' : '✗'}
+                        </span>
+                        <span style={{ flex: 1, fontSize: 13, fontWeight: 500, color: 'var(--text)' }}>{ch.challenge_title}</span>
+                        <span style={{ fontSize: 11, color: 'var(--text-3)' }}>L{ch.set_level} · {ch.attempts_count} att.</span>
+                        {ch.hint_used && <span style={{ fontSize: 10, color: '#cda86a', fontWeight: 600 }}>HINT</span>}
+                        <ChevronDown size={13} style={{ color: 'var(--text-3)', transform: exp ? 'rotate(180deg)' : 'none' }} />
+                      </button>
+                      {exp && ch.final_code && (
+                        <div style={{ borderTop: '1px solid var(--line)', background: 'var(--surface-2)' }}>
+                          <div style={{ display: 'flex', gap: 16, padding: '8px 14px', fontSize: 11, color: 'var(--text-3)', borderBottom: '1px solid var(--line)' }}>
+                            <span>Set: {ch.set_title}</span>
+                            <span>Time: {ch.time_taken_seconds != null ? `${Math.round(ch.time_taken_seconds / 60)}m ${ch.time_taken_seconds % 60}s` : '—'}</span>
+                            {ch.completed_at && <span>{new Date(ch.completed_at).toLocaleDateString()}</span>}
+                          </div>
+                          <pre style={{ margin: 0, padding: '12px 14px', fontSize: 11, fontFamily: 'var(--mono)', color: 'var(--text-2)', overflowX: 'auto', maxHeight: 200, lineHeight: 1.6 }}>
+                            {ch.final_code}
+                          </pre>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )
+          )}
+
+          {/* ── Assessment history tab ── */}
+          {modalTab === 'history' && (
+            historyLoading ? (
+              <div style={{ display: 'flex', justifyContent: 'center', padding: '32px 0' }}>
+                <Loader size={22} style={{ animation: 'spin 1s linear infinite', color: 'var(--text-3)' }} />
+              </div>
+            ) : assessHistory.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '32px 0', color: 'var(--text-3)' }}>
+                <Sparkles size={28} style={{ margin: '0 auto 12px', opacity: 0.4 }} />
+                <p style={{ fontSize: 14 }}>
+                  {isKin ? 'Nta isuzuma ryabitswe.' : 'No saved assessments yet.'}
+                </p>
+                <p style={{ fontSize: 12, marginTop: 6 }}>
+                  {isKin ? 'Kanda "Kora isuzuma" mu tab ya AI Profile.' : 'Generate one from the AI Profile tab — it saves automatically.'}
+                </p>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                {assessHistory.map(a => (
+                  <div key={a.id} style={{ border: '1px solid var(--line)', borderRadius: 'var(--radius)', padding: '12px 16px' }}>
+                    <p style={{ fontSize: 11, color: 'var(--text-3)', marginBottom: 8 }}>
+                      {new Date(a.created_at).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                    </p>
+                    <p style={{ fontSize: 13.5, color: 'var(--text-2)', lineHeight: 1.65 }}>{a.assessment}</p>
+                  </div>
+                ))}
+              </div>
+            )
+          )}
+
+          {/* ── Timeline tab ── */}
           {modalTab === 'timeline' ? (
             timelineLoading ? (
               <div style={{ display: 'flex', justifyContent: 'center', padding: '32px 0' }}>
@@ -1362,7 +1500,7 @@ function StudentProfileModal({ student, classId, language, onClose }: {
                 })}
               </div>
             )
-          ) : loading ? (
+          ) : modalTab === 'profile' && loading ? (
             <div style={{ display: 'flex', justifyContent: 'center', padding: '32px 0' }}>
               <Loader size={22} style={{ animation: 'spin 1s linear infinite', color: 'var(--text-3)' }} />
             </div>
@@ -1504,13 +1642,20 @@ function StudentProfileModal({ student, classId, language, onClose }: {
                 )}
 
                 {assessment && (
-                  <div style={{
-                    padding: '14px 16px', borderRadius: 'var(--radius)',
-                    background: 'var(--surface)', border: '1px solid var(--line)',
-                    fontSize: 14, color: 'var(--text-2)', lineHeight: 1.65,
-                    whiteSpace: 'pre-wrap',
-                  }}>
-                    {assessment}
+                  <div>
+                    <div style={{
+                      padding: '14px 16px', borderRadius: 'var(--radius)',
+                      background: 'var(--surface)', border: '1px solid var(--line)',
+                      fontSize: 14, color: 'var(--text-2)', lineHeight: 1.65,
+                      whiteSpace: 'pre-wrap', marginBottom: 8,
+                    }}>
+                      {assessment}
+                    </div>
+                    {assessmentSaved && (
+                      <p style={{ fontSize: 11, color: '#9eaa84', display: 'flex', alignItems: 'center', gap: 4 }}>
+                        <Check size={11} /> {isKin ? 'Ibyabitswe mu mateka' : 'Saved to assessment history'}
+                      </p>
+                    )}
                   </div>
                 )}
 
@@ -3155,6 +3300,7 @@ export default function TeacherDashboard() {
           student={selectedRosterStudent}
           classId={selectedClassId}
           language={language}
+          teacherId={profile?.id ?? ''}
           onClose={() => setSelectedRosterStudent(null)}
         />
       )}

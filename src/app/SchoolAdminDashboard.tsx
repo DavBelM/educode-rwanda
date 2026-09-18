@@ -1,15 +1,51 @@
 import { AppNav } from './components/AppNav';
 import { useState, useEffect } from 'react';
-import { Users, BookOpen, BarChart2, Megaphone, X, Plus, Trash2, Pin, AlertCircle, Loader, Mail, MapPin, Copy, Check, UserMinus, UserPlus, Clock } from 'lucide-react';
+import { Users, BookOpen, BarChart2, Megaphone, X, Plus, Trash2, Pin, AlertCircle, Loader, Mail, MapPin, Copy, Check, UserMinus, UserPlus, Clock, TrendingUp } from 'lucide-react';
 import {
   getMySchool, getSchoolOverview, getSchoolTeachers, getSchoolStudents,
   addTeacherToSchool, removeTeacherFromSchool,
   createSchoolAnnouncement, getSchoolAnnouncements, deleteSchoolAnnouncement,
-  type School, type SchoolOverview, type SchoolTeacher, type SchoolStudent, type SchoolAnnouncement,
+  getSchoolClassAnalytics,
+  type School, type SchoolOverview, type SchoolTeacher, type SchoolStudent, type SchoolAnnouncement, type ClassAnalyticsSummary,
 } from '../lib/db';
 import { usePageTitle } from '../hooks/usePageTitle';
 
-type Tab = 'overview' | 'teachers' | 'students' | 'engagement' | 'announcements';
+type Tab = 'overview' | 'teachers' | 'students' | 'engagement' | 'analytics' | 'announcements';
+
+// ── Inline progress bar ────────────────────────────────────────────────────────
+function ProgressBar({ pct, color = '#9eaa84', label }: { pct: number | null; color?: string; label?: string }) {
+  const v = Math.min(100, Math.max(0, pct ?? 0));
+  return (
+    <div>
+      {label && <p style={{ fontSize: 11, color: 'var(--text-3)', marginBottom: 4, fontWeight: 500 }}>{label}</p>}
+      <div style={{ height: 6, borderRadius: 99, background: 'var(--surface-2)', overflow: 'hidden' }}>
+        <div style={{ height: '100%', width: `${v}%`, borderRadius: 99, background: color, transition: 'width 0.4s ease' }} />
+      </div>
+      <p style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 3, textAlign: 'right' }}>
+        {pct === null ? '—' : `${pct}%`}
+      </p>
+    </div>
+  );
+}
+
+// ── Inline mini donut SVG ──────────────────────────────────────────────────────
+function DonutChart({ pct, color = '#9eaa84', size = 52 }: { pct: number | null; color?: string; size?: number }) {
+  const v = Math.min(100, Math.max(0, pct ?? 0));
+  const r = (size - 8) / 2;
+  const circ = 2 * Math.PI * r;
+  const dash = (v / 100) * circ;
+  return (
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--surface-2)" strokeWidth={5} />
+      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={color} strokeWidth={5}
+        strokeDasharray={`${dash} ${circ - dash}`} strokeLinecap="round"
+        transform={`rotate(-90 ${size / 2} ${size / 2})`} />
+      <text x={size / 2} y={size / 2 + 4} textAnchor="middle" fontSize={10} fontWeight="700" fill="var(--text)">
+        {pct === null ? '—' : `${pct}%`}
+      </text>
+    </svg>
+  );
+}
 
 // ─── Engagement badge ──────────────────────────────────────────────────────────
 function EngagementBadge({ days }: { days: number }) {
@@ -168,6 +204,8 @@ export default function SchoolAdminDashboard() {
   const [teachers, setTeachers] = useState<SchoolTeacher[]>([]);
   const [students, setStudents] = useState<SchoolStudent[]>([]);
   const [announcements, setAnnouncements] = useState<SchoolAnnouncement[]>([]);
+  const [classAnalytics, setClassAnalytics] = useState<ClassAnalyticsSummary[]>([]);
+  const [analyticsLoaded, setAnalyticsLoaded] = useState(false);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<Tab>('overview');
   const [showAddTeacher, setShowAddTeacher] = useState(false);
@@ -179,6 +217,15 @@ export default function SchoolAdminDashboard() {
   useEffect(() => {
     loadAll();
   }, []);
+
+  useEffect(() => {
+    if (activeTab === 'analytics' && school && !analyticsLoaded) {
+      getSchoolClassAnalytics(school.id).then(data => {
+        setClassAnalytics(data);
+        setAnalyticsLoaded(true);
+      });
+    }
+  }, [activeTab, school, analyticsLoaded]);
 
   async function loadAll() {
     setLoading(true);
@@ -257,6 +304,7 @@ export default function SchoolAdminDashboard() {
     { id: 'teachers',      label: 'Teachers',      labelKin: 'Abarimu',      icon: <Users size={15} /> },
     { id: 'students',      label: 'Students',      labelKin: 'Abanyeshuri',  icon: <BookOpen size={15} /> },
     { id: 'engagement',    label: 'Engagement',    labelKin: 'Gukoresha',    icon: <Clock size={15} /> },
+    { id: 'analytics',     label: 'Analytics',     labelKin: 'Imibare',      icon: <TrendingUp size={15} /> },
     { id: 'announcements', label: 'Announcements', labelKin: 'Inkuru',       icon: <Megaphone size={15} /> },
   ];
 
@@ -575,6 +623,94 @@ export default function SchoolAdminDashboard() {
                   ))}
                 </div>
               </>
+            )}
+          </div>
+        )}
+
+        {/* ── Analytics ── */}
+        {activeTab === 'analytics' && (
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
+              <div>
+                <h2 style={{ fontSize: 14, fontWeight: 700, color: 'var(--text)', marginBottom: 2 }}>
+                  {isKin ? 'Imibare y\'Amashuri (Classes)' : 'Class-by-Class Analytics'}
+                </h2>
+                <p style={{ fontSize: 12, color: 'var(--text-3)' }}>
+                  {isKin ? 'Reba uko buri shuri rikora' : 'Progress, challenges, grades and activity per class'}
+                </p>
+              </div>
+              {analyticsLoaded && (
+                <button className="btn btn-tertiary sm" onClick={() => { setAnalyticsLoaded(false); }}>
+                  Refresh
+                </button>
+              )}
+            </div>
+
+            {!analyticsLoaded ? (
+              <div style={{ display: 'flex', justifyContent: 'center', padding: 64 }}>
+                <Loader size={20} className="animate-spin" style={{ color: 'var(--text-3)' }} />
+              </div>
+            ) : classAnalytics.length === 0 ? (
+              <div className="card pad-lg" style={{ textAlign: 'center', padding: '64px 24px' }}>
+                <TrendingUp size={32} style={{ color: 'var(--text-3)', margin: '0 auto 12px' }} />
+                <p style={{ fontSize: 14, color: 'var(--text-3)' }}>
+                  {isKin ? 'Nta data ihari. Abarimu bakeneye gusubirana abanyeshuri mbere.' : 'No data yet. Teachers need to enroll students in classes first.'}
+                </p>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                {classAnalytics.map(cls => {
+                  const challengePct = cls.challenges_attempted > 0
+                    ? Math.round((cls.challenges_passed / cls.challenges_attempted) * 100) : null;
+                  const activityPct = cls.student_count > 0
+                    ? Math.round((cls.active_this_week / cls.student_count) * 100) : 0;
+                  return (
+                    <div key={cls.class_id} className="card pad-lg">
+                      {/* Class header */}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20, gap: 12, flexWrap: 'wrap' }}>
+                        <div>
+                          <p style={{ fontSize: 15, fontWeight: 700, color: 'var(--text)', marginBottom: 2 }}>{cls.class_name}</p>
+                          <p style={{ fontSize: 12, color: 'var(--text-3)' }}>{isKin ? 'Umwarimu' : 'Teacher'}: {cls.teacher_name} · {cls.student_count} {isKin ? 'abanyeshuri' : 'students'}</p>
+                        </div>
+                        <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
+                          <div style={{ textAlign: 'center' }}>
+                            <DonutChart pct={cls.avg_progress_pct} color="#7eb8cf" />
+                            <p style={{ fontSize: 10, color: 'var(--text-3)', marginTop: 2 }}>{isKin ? 'Aho bageze' : 'Progress'}</p>
+                          </div>
+                          <div style={{ textAlign: 'center' }}>
+                            <DonutChart pct={cls.avg_grade_pct} color="#9eaa84" />
+                            <p style={{ fontSize: 10, color: 'var(--text-3)', marginTop: 2 }}>{isKin ? 'Amanota' : 'Avg grade'}</p>
+                          </div>
+                          <div style={{ textAlign: 'center' }}>
+                            <DonutChart pct={challengePct} color="#cda86a" />
+                            <p style={{ fontSize: 10, color: 'var(--text-3)', marginTop: 2 }}>{isKin ? 'Challenges' : 'Challenges'}</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Metric bars */}
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px 24px' }}>
+                        <ProgressBar pct={cls.avg_progress_pct} color="#7eb8cf"
+                          label={isKin ? 'Aho bageze muri mfunguzo' : 'Curriculum progress'} />
+                        <ProgressBar pct={cls.avg_grade_pct} color="#9eaa84"
+                          label={isKin ? 'Amanota y\'ikigereranyo' : 'Average grade'} />
+                        <ProgressBar pct={cls.submission_rate_pct} color="#cda86a"
+                          label={isKin ? 'Imishinga yatanzwe' : 'Assignment submission rate'} />
+                        <ProgressBar pct={activityPct} color={activityPct >= 60 ? '#9eaa84' : activityPct >= 30 ? '#cda86a' : 'var(--error)'}
+                          label={isKin ? 'Bakoze muri iki cyumweru' : 'Active this week'} />
+                      </div>
+
+                      {/* Challenge counts */}
+                      {cls.challenges_attempted > 0 && (
+                        <p style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 14, paddingTop: 12, borderTop: '1px solid var(--line)' }}>
+                          {isKin ? 'Challenges' : 'Challenges'}: {cls.challenges_passed}/{cls.challenges_attempted} {isKin ? 'byaranguye' : 'passed'} ({challengePct ?? 0}%)
+                          · {cls.active_this_week}/{cls.student_count} {isKin ? 'bakoze iki cyumweru' : 'active this week'}
+                        </p>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
             )}
           </div>
         )}

@@ -2180,3 +2180,96 @@ export async function getStudentAttendanceForClass(classId: string): Promise<{ p
   const pct = total > 0 ? Math.round(((present + late) / total) * 100) : 0;
   return { present, absent, late, excused, total, pct };
 }
+
+// ── School Admin: per-class analytics ─────────────────────────────────────────
+
+export interface ClassAnalyticsSummary {
+  class_id: string;
+  class_name: string;
+  teacher_name: string;
+  teacher_id: string;
+  student_count: number;
+  avg_progress_pct: number | null;
+  challenges_passed: number;
+  challenges_attempted: number;
+  submission_rate_pct: number | null;
+  active_this_week: number;
+  avg_grade_pct: number | null;
+}
+
+export async function getSchoolClassAnalytics(schoolId: string): Promise<ClassAnalyticsSummary[]> {
+  const authError = await assertSchoolAdminOwnsSchool(schoolId);
+  if (authError) return [];
+
+  const { data: teachers } = await supabase
+    .from('profiles')
+    .select('id, full_name')
+    .eq('school_id', schoolId)
+    .eq('user_type', 'teacher');
+  if (!teachers?.length) return [];
+
+  const teacherIds = (teachers as Array<{ id: string; full_name: string }>).map(t => t.id);
+  const teacherMap = Object.fromEntries((teachers as Array<{ id: string; full_name: string }>).map(t => [t.id, t.full_name]));
+
+  const { data: classes } = await supabase
+    .from('classes')
+    .select('id, name, teacher_id')
+    .in('teacher_id', teacherIds);
+  if (!classes?.length) return [];
+
+  const classIds = (classes as Array<{ id: string; name: string; teacher_id: string }>).map(c => c.id);
+  const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
+  const [
+    { data: enrollments },
+    { data: signals },
+    { data: assignments },
+    { data: recentLogins },
+  ] = await Promise.all([
+    supabase.from('class_enrollments').select('class_id, student_id').in('class_id', classIds),
+    supabase.from('cohort_signals').select('class_id, student_id, progress_pct, challenges_passed, challenges_attempted').in('class_id', classIds),
+    supabase.from('assignments').select('id, class_id, total_marks').in('class_id', classIds),
+    supabase.from('daily_logins').select('student_id').gte('login_date', weekAgo),
+  ]);
+
+  const assignmentIds = (assignments ?? []).map((a: { id: string }) => a.id);
+  const { data: submissions } = assignmentIds.length > 0
+    ? await supabase.from('student_submissions').select('assignment_id, marks_earned').in('assignment_id', assignmentIds).not('marks_earned', 'is', null)
+    : { data: [] };
+
+  const recentStudentIds = new Set((recentLogins ?? []).map((l: { student_id: string }) => l.student_id));
+
+  return (classes as Array<{ id: string; name: string; teacher_id: string }>).map(cls => {
+    const enrolled = (enrollments ?? []).filter((e: { class_id: string; student_id: string }) => e.class_id === cls.id);
+    const studentIds = new Set(enrolled.map((e: { student_id: string }) => e.student_id));
+    const classSignals = (signals ?? []).filter((s: { class_id: string }) => s.class_id === cls.id) as Array<{ student_id: string; progress_pct: number | null; challenges_passed: number; challenges_attempted: number }>;
+    const classAssignments = (assignments ?? []).filter((a: { class_id: string }) => a.class_id === cls.id) as Array<{ id: string; total_marks: number }>;
+    const asgMap = Object.fromEntries(classAssignments.map(a => [a.id, a.total_marks]));
+    const classSubs = (submissions ?? []).filter((s: { assignment_id: string }) => asgMap[s.assignment_id] !== undefined) as Array<{ assignment_id: string; marks_earned: number }>;
+
+    const avgProgress = classSignals.length > 0
+      ? Math.round(classSignals.reduce((s, r) => s + (r.progress_pct ?? 0), 0) / classSignals.length)
+      : null;
+    const challengesPassed = classSignals.reduce((s, r) => s + (r.challenges_passed ?? 0), 0);
+    const challengesAttempted = classSignals.reduce((s, r) => s + (r.challenges_attempted ?? 0), 0);
+
+    const totalPossible = classSubs.reduce((s, sub) => s + (asgMap[sub.assignment_id] ?? 0), 0);
+    const totalEarned = classSubs.reduce((s, sub) => s + (sub.marks_earned ?? 0), 0);
+
+    return {
+      class_id: cls.id,
+      class_name: cls.name,
+      teacher_name: teacherMap[cls.teacher_id] ?? '—',
+      teacher_id: cls.teacher_id,
+      student_count: studentIds.size,
+      avg_progress_pct: avgProgress,
+      challenges_passed: challengesPassed,
+      challenges_attempted: challengesAttempted,
+      submission_rate_pct: classAssignments.length > 0 && studentIds.size > 0
+        ? Math.round((classSubs.length / (classAssignments.length * studentIds.size)) * 100)
+        : null,
+      active_this_week: [...studentIds].filter(id => recentStudentIds.has(id)).length,
+      avg_grade_pct: totalPossible > 0 ? Math.round((totalEarned / totalPossible) * 100) : null,
+    };
+  });
+}

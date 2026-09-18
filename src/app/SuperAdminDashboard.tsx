@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import {
-  Loader, Plus, Download, Building2, X, Check, Inbox, Users, BarChart2,
-  Search, RefreshCw, ShieldAlert, ShieldCheck, UserX, UserCheck, ChevronDown,
+  Loader, Plus, Building2, X, Check, Inbox, Users, BarChart2,
+  Search, RefreshCw, ShieldAlert, ShieldCheck, UserX, UserCheck, ChevronDown, ClipboardList,
 } from 'lucide-react';
 import { AppNav } from './components/AppNav';
 import { usePageTitle } from '../hooks/usePageTitle';
@@ -19,7 +19,21 @@ interface Lead { id: string; school_name: string; contact_name: string; role: st
 interface UserRow { id: string; full_name: string; email: string; user_type: string; school_id: string | null; last_active: string | null; created_at: string; is_deactivated: boolean | null; }
 interface Stats { totalSchools: number; totalTeachers: number; totalStudents: number; totalSelfLearners: number; activeThisWeek: number; newLeads: number; }
 
-type Tab = 'overview' | 'schools' | 'users' | 'leads';
+interface SurveyRow {
+  id: string;
+  student_id: string;
+  full_name: string;
+  overall_rating: number | null;
+  helped_learning: number | null;
+  mwarimu_helpfulness: string | null;
+  language_preference: string | null;
+  ease_of_use: number | null;
+  liked_most: string | null;
+  would_change: string | null;
+  created_at: string;
+}
+
+type Tab = 'overview' | 'schools' | 'users' | 'leads' | 'surveys';
 
 // ── Modals ────────────────────────────────────────────────────────────────────
 
@@ -154,6 +168,9 @@ export default function SuperAdminDashboard() {
   const [schools, setSchools] = useState<School[]>([]);
   const [leads, setLeads] = useState<Lead[]>([]);
   const [users, setUsers] = useState<UserRow[]>([]);
+  const [surveys, setSurveys] = useState<SurveyRow[]>([]);
+  const [surveysLoaded, setSurveysLoaded] = useState(false);
+  const [surveysLoading, setSurveysLoading] = useState(false);
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
   const [usersLoading, setUsersLoading] = useState(false);
@@ -162,9 +179,11 @@ export default function SuperAdminDashboard() {
   const [showCreateSchool, setShowCreateSchool] = useState(false);
   const [showCreateAdmin, setShowCreateAdmin] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [expandedSurvey, setExpandedSurvey] = useState<string | null>(null);
 
   useEffect(() => { loadAll(); }, []);
   useEffect(() => { if (tab === 'users' && users.length === 0) loadUsers(); }, [tab]);
+  useEffect(() => { if (tab === 'surveys' && !surveysLoaded) loadSurveys(); }, [tab, surveysLoaded]);
 
   async function loadAll() {
     setLoading(true);
@@ -197,6 +216,22 @@ export default function SuperAdminDashboard() {
     setUsersLoading(false);
   }
 
+  async function loadSurveys() {
+    setSurveysLoading(true);
+    // Join pilot_survey_responses with profiles to get student name
+    const { data } = await supabase
+      .from('pilot_survey_responses')
+      .select('*, profiles(full_name)')
+      .order('created_at', { ascending: false });
+    const rows = (data ?? []).map((r: Record<string, unknown>) => {
+      const prof = (Array.isArray(r.profiles) ? r.profiles[0] : r.profiles) as { full_name: string } | null;
+      return { ...r, full_name: prof?.full_name ?? 'Unknown' };
+    });
+    setSurveys(rows as SurveyRow[]);
+    setSurveysLoaded(true);
+    setSurveysLoading(false);
+  }
+
   async function toggleDeactivate(user: UserRow) {
     setActionLoading(user.id);
     const newVal = !user.is_deactivated;
@@ -224,6 +259,7 @@ export default function SuperAdminDashboard() {
     { id: 'schools', label: 'Schools', icon: <Building2 size={15} /> },
     { id: 'users', label: 'All Users', icon: <Users size={15} /> },
     { id: 'leads', label: 'Enquiries', icon: <Inbox size={15} /> },
+    { id: 'surveys', label: 'Surveys', icon: <ClipboardList size={15} /> },
   ];
 
   return (
@@ -517,6 +553,81 @@ export default function SuperAdminDashboard() {
 
           </>
         )}
+
+        {/* ── SURVEYS ── */}
+        {tab === 'surveys' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <p style={{ fontSize: 14, fontWeight: 700, color: 'var(--text)', marginBottom: 2 }}>Pilot Survey Responses</p>
+                <p style={{ fontSize: 12, color: 'var(--text-3)' }}>
+                  {surveysLoaded ? `${surveys.length} response${surveys.length !== 1 ? 's' : ''}` : 'Loading…'}
+                </p>
+              </div>
+              <button className="btn btn-tertiary sm" onClick={() => { setSurveysLoaded(false); }}>
+                <RefreshCw size={13} /> Refresh
+              </button>
+            </div>
+
+            {surveysLoading && (
+              <div style={{ display: 'flex', justifyContent: 'center', padding: 48 }}>
+                <Loader size={20} style={{ animation: 'spin 1s linear infinite', color: 'var(--text-3)' }} />
+              </div>
+            )}
+
+            {surveysLoaded && surveys.length === 0 && (
+              <div className="card pad-lg" style={{ textAlign: 'center', color: 'var(--text-3)', fontSize: 14, padding: '48px 24px' }}>
+                No survey responses yet. Students are prompted after completing their first challenge session.
+              </div>
+            )}
+
+            {surveysLoaded && surveys.map(sv => {
+              const expanded = expandedSurvey === sv.id;
+              const stars = (n: number | null) => n ? '★'.repeat(n) + '☆'.repeat(5 - n) : '—';
+              return (
+                <div key={sv.id} className="card pad-lg" style={{ cursor: 'pointer' }}
+                  onClick={() => setExpandedSurvey(expanded ? null : sv.id)}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
+                    <div style={{ flex: 1 }}>
+                      <p style={{ fontWeight: 600, fontSize: 14, color: 'var(--text)', marginBottom: 4 }}>{sv.full_name}</p>
+                      <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+                        <span style={{ fontSize: 12, color: '#cda86a' }}>Overall: {stars(sv.overall_rating)}</span>
+                        <span style={{ fontSize: 12, color: 'var(--text-3)' }}>Ease of use: {stars(sv.ease_of_use)}</span>
+                        <span style={{ fontSize: 12, color: 'var(--text-3)' }}>
+                          {sv.language_preference ? `Language: ${sv.language_preference}` : ''}
+                        </span>
+                        <span style={{ fontSize: 12, color: 'var(--text-3)' }}>
+                          {new Date(sv.created_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                        </span>
+                      </div>
+                    </div>
+                    <ChevronDown size={16} style={{ color: 'var(--text-3)', transform: expanded ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s', flexShrink: 0 }} />
+                  </div>
+
+                  {expanded && (
+                    <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid var(--line)', display: 'flex', flexDirection: 'column', gap: 12 }}>
+                      {[
+                        { label: 'Overall rating', value: stars(sv.overall_rating) },
+                        { label: 'Helped learning', value: stars(sv.helped_learning) },
+                        { label: 'Ease of use', value: stars(sv.ease_of_use) },
+                        { label: 'Mwarimu helpfulness', value: sv.mwarimu_helpfulness ?? '—' },
+                        { label: 'Language preference', value: sv.language_preference ?? '—' },
+                        { label: 'Liked most', value: sv.liked_most || '(no answer)' },
+                        { label: 'Would change', value: sv.would_change || '(no answer)' },
+                      ].map(f => (
+                        <div key={f.label} style={{ display: 'grid', gridTemplateColumns: '160px 1fr', gap: 8 }}>
+                          <p style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-3)' }}>{f.label}</p>
+                          <p style={{ fontSize: 13, color: 'var(--text-2)', lineHeight: 1.5 }}>{f.value}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+
       </div>
 
       {showCreateSchool && (

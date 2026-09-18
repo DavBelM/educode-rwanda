@@ -23,6 +23,7 @@ export interface QuizSet {
   description_kin: string | null;
   order_index: number;
   xp_reward: number;
+  rqf_level: number; // 1-5: RQF level this set belongs to
 }
 
 export interface QuizChallenge {
@@ -62,13 +63,106 @@ export interface ErrorLogEntry {
   total_tests: number;
 }
 
-export async function getQuizSets(): Promise<QuizSet[]> {
-  const { data, error } = await supabase
+export async function getQuizSets(rqfLevel?: number): Promise<QuizSet[]> {
+  let query = supabase
     .from('quiz_sets')
     .select('*')
-    .order('order_index');
+    .order('rqf_level', { ascending: true })
+    .order('order_index', { ascending: true });
+  if (rqfLevel !== undefined) query = query.eq('rqf_level', rqfLevel);
+  const { data, error } = await query;
   if (error) return [];
-  return data ?? [];
+  return (data ?? []).map(s => ({ ...s, rqf_level: s.rqf_level ?? 1 }));
+}
+
+// Teacher-only: read challenge attempts for a specific student (teacher must have that student enrolled)
+export interface TeacherStudentChallengeRow {
+  session_id: string;
+  set_title: string;
+  set_level: number;
+  challenge_id: string;
+  challenge_title: string;
+  passed: boolean;
+  attempts_count: number;
+  hint_used: boolean;
+  time_taken_seconds: number | null;
+  final_code: string | null;
+  error_log: ErrorLogEntry[];
+  completed_at: string | null;
+}
+
+export async function getStudentChallengeAttempts(studentId: string): Promise<TeacherStudentChallengeRow[]> {
+  // Teachers can read this after the schema-v2-patches RLS is applied
+  const { data, error } = await supabase
+    .from('quiz_attempts')
+    .select(`
+      session_id, challenge_id, passed, attempts_count, hint_used,
+      time_taken_seconds, final_code, error_log, completed_at,
+      quiz_sessions!inner(set_id, quiz_sets(title, rqf_level)),
+      quiz_challenges!inner(title)
+    `)
+    .eq('student_id', studentId)
+    .order('completed_at', { ascending: false })
+    .limit(50);
+
+  if (error || !data) return [];
+
+  return data.map((r: Record<string, unknown>) => {
+    const session = (Array.isArray(r.quiz_sessions) ? r.quiz_sessions[0] : r.quiz_sessions) as { set_id: string; quiz_sets: { title: string; rqf_level: number } | null } | null;
+    const qs = session?.quiz_sets ?? null;
+    const ch = (Array.isArray(r.quiz_challenges) ? r.quiz_challenges[0] : r.quiz_challenges) as { title: string } | null;
+    return {
+      session_id: r.session_id as string,
+      set_title: qs?.title ?? '—',
+      set_level: qs?.rqf_level ?? 1,
+      challenge_id: r.challenge_id as string,
+      challenge_title: ch?.title ?? '—',
+      passed: r.passed as boolean,
+      attempts_count: r.attempts_count as number,
+      hint_used: r.hint_used as boolean,
+      time_taken_seconds: r.time_taken_seconds as number | null,
+      final_code: r.final_code as string | null,
+      error_log: (r.error_log as ErrorLogEntry[]) ?? [],
+      completed_at: r.completed_at as string | null,
+    };
+  });
+}
+
+// Save a persisted AI assessment for a student
+export async function saveStudentAssessment(params: {
+  studentId: string;
+  teacherId: string;
+  classId: string | null;
+  assessment: string;
+  metadata?: Record<string, unknown>;
+}): Promise<{ error: string | null }> {
+  const { error } = await supabase.from('student_assessments').insert({
+    student_id: params.studentId,
+    teacher_id: params.teacherId,
+    class_id: params.classId,
+    assessment: params.assessment,
+    metadata: params.metadata ?? {},
+  });
+  return { error: error?.message ?? null };
+}
+
+// Get assessment history for a student (teacher-readable after RLS patch)
+export interface AssessmentRecord {
+  id: string;
+  assessment: string;
+  metadata: Record<string, unknown>;
+  created_at: string;
+}
+
+export async function getStudentAssessmentHistory(studentId: string): Promise<AssessmentRecord[]> {
+  const { data, error } = await supabase
+    .from('student_assessments')
+    .select('id, assessment, metadata, created_at')
+    .eq('student_id', studentId)
+    .order('created_at', { ascending: false })
+    .limit(10);
+  if (error || !data) return [];
+  return data as AssessmentRecord[];
 }
 
 export async function getSetChallenges(setId: string): Promise<QuizChallenge[]> {
