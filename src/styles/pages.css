@@ -332,7 +332,7 @@ footer.site-footer { border-top: 1px solid var(--line); margin-top: 40px; paddin
 .readprog { position: sticky; top: var(--nav-h); z-index: 30; height: 2px; background: transparent; }
 .readprog > i { display: block; height: 100%; background: var(--text-2); }
 
-.lwrap { display: grid; grid-template-columns: 190px minmax(0, 1fr) var(--rail-w, 360px); gap: clamp(14px, 1.6vw, 24px); max-width: 1600px; margin: 0 auto; padding: clamp(24px, 3vw, 48px) clamp(20px, 2.5vw, 40px) clamp(72px, 8vw, 120px); align-items: start; }
+.lwrap { display: grid; grid-template-columns: 190px minmax(0, 1fr) var(--rail-w, 360px); gap: clamp(14px, 1.6vw, 24px); max-width: 1400px; margin: 0 auto; padding: clamp(24px, 3vw, 48px) clamp(16px, 2.5vw, 40px) clamp(72px, 8vw, 120px); align-items: start; }
 @media (min-width: 1400px) { .lwrap { grid-template-columns: 210px minmax(0, 1fr) var(--rail-w, 420px); gap: clamp(18px, 2vw, 32px); } }
 
 .outline { position: sticky; top: calc(var(--nav-h) + 28px); }
