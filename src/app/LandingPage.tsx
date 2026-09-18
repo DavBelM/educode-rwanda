@@ -502,22 +502,49 @@ export default function LandingPage({ onLogin, onSignup }: Props) {
       {showDemo && <DemoModal onClose={() => setShowDemo(false)} />}
 
       <footer className="site-footer">
-        <div className="wrap foot">
+        <div className="wrap" style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr 1fr', gap: 40, paddingBottom: 40 }}>
+          {/* Brand */}
           <div>
-            <div className="logo" style={{ marginBottom: 8 }}><span className="edu">EduCode</span><span style={{ fontSize: 11, color: 'var(--text-3)', marginLeft: 6 }}>Rwanda</span></div>
-            <p style={{ fontSize: 13, color: 'var(--text-3)', lineHeight: 1.6 }}>Digital learning for Rwandan TVET schools.<br/>RTB RQF Level 1–3 aligned.</p>
+            <div className="logo" style={{ marginBottom: 10 }}>
+              <span className="edu">EduCode</span>
+              <span style={{ fontSize: 11, color: 'var(--text-3)', marginLeft: 6 }}>Rwanda</span>
+            </div>
+            <p style={{ fontSize: 13, color: 'var(--text-3)', lineHeight: 1.7, maxWidth: '26ch' }}>
+              Digital learning for Rwandan TVET schools.<br />RTB RQF Level 1–3 aligned.
+            </p>
+            <p style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 12 }}>
+              <a href="mailto:belamitali@gmail.com" style={{ color: 'inherit' }}>belamitali@gmail.com</a>
+            </p>
           </div>
-          <div className="foot-links">
-            <a href="#for-schools">For schools</a>
-            <a href="#pricing">Pricing</a>
-            <button style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'inherit', fontSize: 'inherit', padding: 0 }} onClick={onLogin}>Log in</button>
-            <button style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'inherit', fontSize: 'inherit', padding: 0 }} onClick={onSignup}>Sign up</button>
-            <Link to="/terms">Terms</Link>
-            <Link to="/privacy">Privacy</Link>
+
+          {/* Platform links */}
+          <div>
+            <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-3)', marginBottom: 14 }}>Platform</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <a className="foot-link" href="#for-schools">For schools</a>
+              <a className="foot-link" href="#curriculum">Curriculum</a>
+              <a className="foot-link" href="#how-it-works">How it works</a>
+              <a className="foot-link" href="#pricing">Pricing</a>
+              <button className="foot-link-btn" onClick={() => setShowDemo(true)}>Request a demo</button>
+            </div>
+          </div>
+
+          {/* Account + legal */}
+          <div>
+            <p style={{ fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--text-3)', marginBottom: 14 }}>Account</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              <button className="foot-link-btn" onClick={onLogin}>Log in</button>
+              <button className="foot-link-btn" onClick={onSignup}>Sign up as student</button>
+              <button className="foot-link-btn" onClick={() => setShowDemo(true)}>Sign up as school</button>
+              <div style={{ height: 1, background: 'var(--line)', margin: '4px 0' }} />
+              <Link className="foot-link" to="/terms">Terms of use</Link>
+              <Link className="foot-link" to="/privacy">Privacy policy</Link>
+            </div>
           </div>
         </div>
-        <div style={{ borderTop: '1px solid var(--line)', marginTop: 32, paddingTop: 20, textAlign: 'center', fontSize: 12, color: 'var(--text-3)' }}>
-          © {new Date().getFullYear()} EduCode Rwanda · belamitali@gmail.com
+
+        <div style={{ borderTop: '1px solid var(--line)', padding: '20px clamp(16px, 1.8vw, 28px)', textAlign: 'center', fontSize: 12, color: 'var(--text-3)' }}>
+          © {new Date().getFullYear()} EduCode Rwanda
         </div>
       </footer>
     </>
