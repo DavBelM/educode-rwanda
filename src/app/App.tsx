@@ -1,34 +1,47 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router';
-import Dashboard from './Dashboard';
-import TeacherDashboard from './TeacherDashboard';
-import CodingWorkspace from './CodingWorkspace';
-import TheoreticalAssignment from './TheoreticalAssignment';
-import CoursesPage from './CoursesPage';
-import LessonViewer from './LessonViewer';
+import { useAuth } from '../lib/auth';
+import { getResumeLesson, type Assignment, type CourseLesson } from '../lib/db';
+
+// ── Eagerly loaded (tiny, always needed on first paint) ───────────────────────
 import LandingPage from './LandingPage';
 import LoginPage from './LoginPage';
 import SignupPage from './SignupPage';
-import SchoolSignupPage from './SchoolSignupPage';
-import AboutPage from './AboutPage';
-import ContactPage from './ContactPage';
-import PrivacyPolicyPage from './PrivacyPolicyPage';
-import TermsPage from './TermsPage';
-import LegalLandingPage from './LegalLandingPage';
 import ForgotPasswordPage from './ForgotPasswordPage';
 import ResetPasswordPage from './ResetPasswordPage';
-import MyResultsPage from './MyResultsPage';
-import OnboardingModal from './OnboardingModal';
-import EthicsModal from './EthicsModal';
-import SchoolAdminDashboard from './SchoolAdminDashboard';
-import SuperAdminDashboard from './SuperAdminDashboard';
-import SelfLearnerDashboard from './SelfLearnerDashboard';
 import SetPasswordPage from './SetPasswordPage';
-import ChallengePage from './ChallengePage';
-import ChallengeRunner from './ChallengeRunner';
 import JoinPage from './JoinPage';
-import { useAuth } from '../lib/auth';
-import { getResumeLesson, type Assignment, type CourseLesson } from '../lib/db';
+import TermsPage from './TermsPage';
+import PrivacyPolicyPage from './PrivacyPolicyPage';
+import LegalLandingPage from './LegalLandingPage';
+
+// ── Lazily loaded (split into separate chunks, loaded on demand) ──────────────
+const Dashboard            = lazy(() => import('./Dashboard'));
+const TeacherDashboard     = lazy(() => import('./TeacherDashboard'));
+const CodingWorkspace      = lazy(() => import('./CodingWorkspace'));
+const TheoreticalAssignment= lazy(() => import('./TheoreticalAssignment'));
+const CoursesPage          = lazy(() => import('./CoursesPage'));
+const LessonViewer         = lazy(() => import('./LessonViewer'));
+const MyResultsPage        = lazy(() => import('./MyResultsPage'));
+const OnboardingModal      = lazy(() => import('./OnboardingModal'));
+const EthicsModal          = lazy(() => import('./EthicsModal'));
+const SchoolAdminDashboard = lazy(() => import('./SchoolAdminDashboard'));
+const SuperAdminDashboard  = lazy(() => import('./SuperAdminDashboard'));
+const SelfLearnerDashboard = lazy(() => import('./SelfLearnerDashboard'));
+const SchoolSignupPage     = lazy(() => import('./SchoolSignupPage'));
+const AboutPage            = lazy(() => import('./AboutPage'));
+const ContactPage          = lazy(() => import('./ContactPage'));
+const ChallengePage        = lazy(() => import('./ChallengePage'));
+const ChallengeRunner      = lazy(() => import('./ChallengeRunner'));
+
+// ── Fallback shown while a lazy chunk is loading ──────────────────────────────
+function PageSpinner() {
+  return (
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg)' }}>
+      <div style={{ width: 32, height: 32, border: '2px solid var(--line-strong)', borderTopColor: 'var(--text-2)', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />
+    </div>
+  );
+}
 
 // ── Route wrappers that read complex objects from location.state ──────────────
 
@@ -91,12 +104,14 @@ export default function App() {
   // These pages are always public — bypass auth routing entirely
   if (['/terms', '/privacy', '/legal', '/join'].includes(location.pathname)) {
     return (
-      <Routes>
-        <Route path="/join"    element={<JoinPage />} />
-        <Route path="/terms"   element={<TermsPage />} />
-        <Route path="/privacy" element={<PrivacyPolicyPage />} />
-        <Route path="/legal"   element={<LegalLandingPage />} />
-      </Routes>
+      <Suspense fallback={<PageSpinner />}>
+        <Routes>
+          <Route path="/join"    element={<JoinPage />} />
+          <Route path="/terms"   element={<TermsPage />} />
+          <Route path="/privacy" element={<PrivacyPolicyPage />} />
+          <Route path="/legal"   element={<LegalLandingPage />} />
+        </Routes>
+      </Suspense>
     );
   }
   const [showEthics, setShowEthics] = useState(false);
@@ -195,9 +210,14 @@ export default function App() {
       />
     ) : null;
 
-    if (profile.user_type === 'super_admin') return <SuperAdminDashboard />;
-    if (profile.user_type === 'school_admin') return <SchoolAdminDashboard />;
-    if (profile.user_type === 'teacher') return <>{<TeacherDashboard />}{onboardingModal}</>;
+    if (profile.user_type === 'super_admin') return <Suspense fallback={<PageSpinner />}><SuperAdminDashboard /></Suspense>;
+    if (profile.user_type === 'school_admin') return <Suspense fallback={<PageSpinner />}><SchoolAdminDashboard /></Suspense>;
+    if (profile.user_type === 'teacher') return (
+      <Suspense fallback={<PageSpinner />}>
+        <TeacherDashboard />
+        {onboardingModal}
+      </Suspense>
+    );
 
     const sharedCourseProps = {
       language,
@@ -207,7 +227,7 @@ export default function App() {
 
     if (profile.user_type === 'self_learner') {
       return (
-        <>
+        <Suspense fallback={<PageSpinner />}>
           {ethicsModal}
           {onboardingModal}
           <Routes>
@@ -235,13 +255,13 @@ export default function App() {
               />
             } />
           </Routes>
-        </>
+        </Suspense>
       );
     }
 
     // Student
     return (
-      <>
+      <Suspense fallback={<PageSpinner />}>
         {ethicsModal}
         {onboardingModal}
         <Routes>
@@ -279,24 +299,26 @@ export default function App() {
             />
           } />
         </Routes>
-      </>
+      </Suspense>
     );
   }
 
   // ── Public ─────────────────────────────────────────────────────────────────
   return (
-    <Routes>
-      <Route path="/join" element={<JoinPage />} />
-      <Route path="/login" element={<LoginPage onSuccess={() => {}} onSignupClick={() => navigate('/signup')} onForgotPassword={() => navigate('/forgot-password')} />} />
-      <Route path="/forgot-password" element={<ForgotPasswordPage onBack={() => navigate('/login')} />} />
-      <Route path="/signup" element={<SignupPage onSuccess={() => navigate('/login')} onLoginClick={() => navigate('/login')} />} />
-      <Route path="/school-signup" element={<SchoolSignupPage />} />
-      <Route path="/about" element={<AboutPage />} />
-      <Route path="/contact" element={<ContactPage />} />
-      <Route path="/privacy" element={<PrivacyPolicyPage />} />
-      <Route path="/terms"   element={<TermsPage />} />
-      <Route path="/legal"   element={<LegalLandingPage />} />
-      <Route path="*" element={<LandingPage onLogin={() => navigate('/login')} onSignup={() => navigate('/signup')} onSchoolSignup={() => navigate('/school-signup')} />} />
-    </Routes>
+    <Suspense fallback={<PageSpinner />}>
+      <Routes>
+        <Route path="/join" element={<JoinPage />} />
+        <Route path="/login" element={<LoginPage onSuccess={() => {}} onSignupClick={() => navigate('/signup')} onForgotPassword={() => navigate('/forgot-password')} />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage onBack={() => navigate('/login')} />} />
+        <Route path="/signup" element={<SignupPage onSuccess={() => navigate('/login')} onLoginClick={() => navigate('/login')} />} />
+        <Route path="/school-signup" element={<SchoolSignupPage />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/contact" element={<ContactPage />} />
+        <Route path="/privacy" element={<PrivacyPolicyPage />} />
+        <Route path="/terms"   element={<TermsPage />} />
+        <Route path="/legal"   element={<LegalLandingPage />} />
+        <Route path="*" element={<LandingPage onLogin={() => navigate('/login')} onSignup={() => navigate('/signup')} onSchoolSignup={() => navigate('/school-signup')} />} />
+      </Routes>
+    </Suspense>
   );
 }
