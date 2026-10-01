@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
 import { useAuth } from '../../lib/auth';
 import { useTheme } from '../../lib/theme';
-import { requestAccountDeletion, getStudentNotifications, markAssignmentsSeen, markGradesSeen, markAnnouncementsSeen, getStudentAssignments, getStudentGrades, getStudentAnnouncements, type StudentNotifications } from '../../lib/db';
+import { requestAccountDeletion, getStudentNotifications, markAssignmentsSeen, markGradesSeen, markAnnouncementsSeen, getStudentAssignments, getStudentGrades, getStudentAnnouncements, getTeacherAlerts, dismissTeacherAlert, type StudentNotifications, type TeacherAlert } from '../../lib/db';
 
 interface AppNavProps {
   /** Current streak count. Shown when > 0; hidden when undefined or 0. */
@@ -179,6 +179,98 @@ function NotificationBell({ userId }: { userId: string }) {
   );
 }
 
+// ─── Teacher Alert Bell ───────────────────────────────────────────────────────
+
+function TeacherAlertBell() {
+  const [alerts, setAlerts] = useState<TeacherAlert[]>([]);
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    getTeacherAlerts().then(setAlerts).catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    if (!open) return;
+    const handle = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener('mousedown', handle);
+    return () => document.removeEventListener('mousedown', handle);
+  }, [open]);
+
+  const handleDismiss = async (studentId: string, alertType: string) => {
+    await dismissTeacherAlert(studentId, alertType);
+    setAlerts(prev => prev.filter(a => !(a.student_id === studentId && a.alert_type === alertType)));
+  };
+
+  const alertColor = (type: string) => type === 'never_logged_in' || type === 'inactive_14' ? 'var(--error)' : '#cda86a';
+
+  return (
+    <div ref={ref} style={{ position: 'relative' }}>
+      <button
+        className="iconbtn"
+        onClick={() => setOpen(o => !o)}
+        aria-label={`Student alerts${alerts.length > 0 ? ` (${alerts.length})` : ''}`}
+        style={{ position: 'relative' }}
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+          <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+        </svg>
+        {alerts.length > 0 && (
+          <span style={{
+            position: 'absolute', top: 2, right: 2, width: 16, height: 16,
+            borderRadius: '50%', background: 'var(--error)', color: '#fff',
+            fontSize: 9, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center',
+            pointerEvents: 'none',
+          }}>{alerts.length > 9 ? '9+' : alerts.length}</span>
+        )}
+      </button>
+      {open && (
+        <div style={{
+          position: 'absolute', top: 'calc(100% + 6px)', right: 0,
+          width: 300, maxHeight: 360, overflowY: 'auto',
+          background: 'var(--surface)', border: '1px solid var(--line)',
+          borderRadius: 'var(--radius-lg)', boxShadow: 'var(--shadow-lg)', zIndex: 200,
+        }}>
+          <div style={{ padding: '10px 14px', borderBottom: '1px solid var(--line)', fontSize: 12, fontWeight: 700, color: 'var(--text)' }}>
+            Student Alerts
+          </div>
+          {alerts.length === 0 ? (
+            <div style={{ padding: '16px 14px', fontSize: 13, color: 'var(--text-3)', textAlign: 'center' }}>
+              All students are active!
+            </div>
+          ) : (
+            alerts.map(a => (
+              <div key={`${a.student_id}-${a.alert_type}`} style={{
+                padding: '10px 14px', borderBottom: '1px solid var(--line)',
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8,
+              }}>
+                <div>
+                  <p style={{ fontSize: 12.5, fontWeight: 600, color: 'var(--text)' }}>{a.full_name}</p>
+                  <p style={{ fontSize: 11, color: alertColor(a.alert_type), marginTop: 1 }}>
+                    {a.alert_type === 'never_logged_in' ? 'Never logged in'
+                      : a.alert_type === 'inactive_14' ? `${a.days_since_attempt} days inactive`
+                      : `${a.days_since_attempt} days inactive`}
+                    {' · '}{a.class_name}
+                  </p>
+                </div>
+                <button
+                  onClick={() => handleDismiss(a.student_id, a.alert_type)}
+                  style={{ fontSize: 11, color: 'var(--text-3)', background: 'none', border: 'none', cursor: 'pointer', padding: '2px 4px', flexShrink: 0 }}
+                >
+                  Dismiss
+                </button>
+              </div>
+            ))
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function AppNav({ streak }: AppNavProps) {
   const { profile, user, signOut } = useAuth();
   const { theme, toggleTheme } = useTheme();
@@ -279,6 +371,11 @@ export function AppNav({ streak }: AppNavProps) {
           {/* Notification bell — students only */}
           {isStudent && user && (
             <NotificationBell userId={user.id} />
+          )}
+
+          {/* Alert bell — teachers only */}
+          {isTeacher && (
+            <TeacherAlertBell />
           )}
 
           {/* Theme toggle */}

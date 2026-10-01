@@ -33,6 +33,10 @@ const AboutPage            = lazy(() => import('./AboutPage'));
 const ContactPage          = lazy(() => import('./ContactPage'));
 const ChallengePage        = lazy(() => import('./ChallengePage'));
 const ChallengeRunner      = lazy(() => import('./ChallengeRunner'));
+const SolutionsPage        = lazy(() => import('./SolutionsPage'));
+const CertificatePage      = lazy(() => import('./CertificatePage'));
+const ChallengeBuilderPage = lazy(() => import('./ChallengeBuilderPage'));
+const LiveClassPage        = lazy(() => import('./LiveClassPage'));
 
 // ── Fallback shown while a lazy chunk is loading ──────────────────────────────
 function PageSpinner() {
@@ -214,8 +218,11 @@ export default function App() {
     if (profile.user_type === 'school_admin') return <Suspense fallback={<PageSpinner />}><SchoolAdminDashboard /></Suspense>;
     if (profile.user_type === 'teacher') return (
       <Suspense fallback={<PageSpinner />}>
-        <TeacherDashboard />
-        {onboardingModal}
+        <Routes>
+          <Route path="/challenge-builder" element={<ChallengeBuilderPage language={language} />} />
+          <Route path="/live" element={<LiveClassPage language={language} />} />
+          <Route path="*" element={<><TeacherDashboard />{onboardingModal}</>} />
+        </Routes>
       </Suspense>
     );
 
@@ -239,8 +246,15 @@ export default function App() {
               />
             } />
             <Route path="/lesson" element={<LessonRoute language={language} />} />
+            <Route path="/solutions" element={
+              <SolutionsPage
+                language={language}
+                onBack={() => navigate('/learn')}
+              />
+            } />
             <Route path="/challenges" element={<ChallengePage language={language} />} />
             <Route path="/challenges/:setId" element={<ChallengeRunner language={language} />} />
+            <Route path="/certificate/:setId" element={<CertificatePage language={language} />} />
             <Route path="*" element={
               <SelfLearnerDashboard
                 {...sharedCourseProps}
@@ -280,8 +294,16 @@ export default function App() {
               onBack={() => navigate('/dashboard')}
             />
           } />
+          <Route path="/solutions" element={
+            <SolutionsPage
+              language={language}
+              onBack={() => navigate('/dashboard')}
+            />
+          } />
           <Route path="/challenges" element={<ChallengePage language={language} />} />
           <Route path="/challenges/:setId" element={<ChallengeRunner language={language} />} />
+          <Route path="/certificate/:setId" element={<CertificatePage language={language} />} />
+          <Route path="/live" element={<LiveClassPage language={language} />} />
           <Route path="*" element={
             <Dashboard
               language={language}
@@ -291,6 +313,7 @@ export default function App() {
               onOpenCourses={() => navigate('/courses')}
               onOpenResults={() => navigate('/results')}
               onOpenChallenges={() => navigate('/challenges')}
+              onOpenSolutions={() => navigate('/solutions')}
               onContinueLearning={async () => {
                 const resume = await getResumeLesson();
                 if (resume) navigate('/lesson', { state: resume });

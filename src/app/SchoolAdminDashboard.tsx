@@ -1,6 +1,6 @@
 import { AppNav } from './components/AppNav';
-import { useState, useEffect } from 'react';
-import { Users, BookOpen, BarChart2, Megaphone, X, Plus, Trash2, Pin, AlertCircle, Loader, Mail, MapPin, Copy, Check, UserMinus, UserPlus, Clock, TrendingUp } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Users, BookOpen, BarChart2, Megaphone, X, Plus, Trash2, Pin, AlertCircle, Loader, Mail, MapPin, Copy, Check, UserMinus, UserPlus, Clock, TrendingUp, Upload, FileText } from 'lucide-react';
 import {
   getMySchool, getSchoolOverview, getSchoolTeachers, getSchoolStudents,
   addTeacherToSchool, removeTeacherFromSchool,
@@ -8,6 +8,7 @@ import {
   getSchoolClassAnalytics,
   type School, type SchoolOverview, type SchoolTeacher, type SchoolStudent, type SchoolAnnouncement, type ClassAnalyticsSummary,
 } from '../lib/db';
+import { supabase } from '../lib/supabase';
 import { usePageTitle } from '../hooks/usePageTitle';
 
 type Tab = 'overview' | 'teachers' | 'students' | 'engagement' | 'analytics' | 'announcements';
@@ -214,6 +215,16 @@ export default function SchoolAdminDashboard() {
   const [removingId, setRemovingId] = useState<string | null>(null);
   const [deletingAnnId, setDeletingAnnId] = useState<string | null>(null);
 
+  // CSV Import state
+  const [showCsvImport, setShowCsvImport] = useState(false);
+  const [csvText, setCsvText] = useState('');
+  const [csvClassId, setCsvClassId] = useState('');
+  const [csvClasses, setCsvClasses] = useState<{ id: string; name: string }[]>([]);
+  const [csvImporting, setCsvImporting] = useState(false);
+  const [csvResults, setCsvResults] = useState<{ name: string; email: string; password: string }[] | null>(null);
+  const [csvError, setCsvError] = useState('');
+  const csvFileRef = useRef<HTMLInputElement>(null);
+
   useEffect(() => {
     loadAll();
   }, []);
@@ -266,6 +277,51 @@ export default function SchoolAdminDashboard() {
     setCodeCopied(true);
     setTimeout(() => setCodeCopied(false), 2000);
   };
+
+  async function openCsvImport() {
+    setCsvText('');
+    setCsvClassId('');
+    setCsvResults(null);
+    setCsvError('');
+    if (school) {
+      const { data } = await supabase
+        .from('classes')
+        .select('id, name')
+        .eq('school_id', school.id)
+        .order('name');
+      setCsvClasses(data ?? []);
+      if (data && data.length > 0) setCsvClassId(data[0].id);
+    }
+    setShowCsvImport(true);
+  }
+
+  async function handleCsvImport() {
+    const names = csvText.split('\n').map(l => l.trim()).filter(Boolean);
+    if (names.length === 0) { setCsvError('Enter at least one student name.'); return; }
+    if (!csvClassId) { setCsvError('Select a class first.'); return; }
+    setCsvImporting(true);
+    setCsvError('');
+    try {
+      const res = await fetch('/api/create-roster', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ class_id: csvClassId, students: names.map(name => ({ name })) }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error ?? 'Import failed');
+      setCsvResults(json.created ?? []);
+    } catch (e: unknown) {
+      setCsvError(e instanceof Error ? e.message : 'Import failed');
+    } finally {
+      setCsvImporting(false);
+    }
+  }
+
+  function handleCsvFile(file: File) {
+    const reader = new FileReader();
+    reader.onload = e => setCsvText((e.target?.result as string) ?? '');
+    reader.readAsText(file);
+  }
 
   // Engagement segments
   const atRisk = students.filter(s => s.days_inactive >= 7);
@@ -507,9 +563,22 @@ export default function SchoolAdminDashboard() {
               <h2 className="text-sm font-bold" style={{ color: 'var(--text)' }}>
                 {isKin ? `Abanyeshuri (${students.length})` : `Students (${students.length})`}
               </h2>
-              <span className="text-xs dim">
-                {isKin ? 'Bitondekanyijwe: Abadakoresha cyane nibo baza mbere' : 'Sorted: least active first'}
-              </span>
+              <div className="flex items-center gap-3">
+                <span className="text-xs dim">
+                  {isKin ? 'Bitondekanyijwe: Abadakoresha cyane nibo baza mbere' : 'Sorted: least active first'}
+                </span>
+                <button
+                  onClick={openCsvImport}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 6,
+                    padding: '6px 12px', borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: 'pointer',
+                    background: 'var(--surface-2)', border: '1px solid var(--line)', color: 'var(--text-2)',
+                  }}
+                >
+                  <Upload size={13} />
+                  {isKin ? 'Injiza CSV' : 'Import CSV'}
+                </button>
+              </div>
             </div>
 
             {students.length === 0 ? (
@@ -780,6 +849,180 @@ export default function SchoolAdminDashboard() {
           onClose={() => setShowAnnouncement(false)}
           onCreated={() => getSchoolAnnouncements(school.id).then(setAnnouncements)}
         />
+      )}
+
+      {/* CSV Import Modal */}
+      {showCsvImport && (
+        <div style={{
+          position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(4px)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 16,
+        }}>
+          <div className="card" style={{ width: '100%', maxWidth: 520, maxHeight: '90vh', overflow: 'auto', padding: 24 }}>
+            <div className="flex items-center justify-between mb-5">
+              <div>
+                <h2 style={{ fontSize: 16, fontWeight: 700, color: 'var(--text)' }}>
+                  {isKin ? 'Injiza Abanyeshuri benshi' : 'Bulk Student Import'}
+                </h2>
+                <p style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 2 }}>
+                  {isKin ? 'Injiza amazina, umwe ku murongo' : 'Paste names, one per line, or upload a .csv file'}
+                </p>
+              </div>
+              <button className="iconbtn" onClick={() => setShowCsvImport(false)}><X size={16} /></button>
+            </div>
+
+            {!csvResults ? (
+              <>
+                {/* Class selector */}
+                <div className="mb-4">
+                  <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-2)', display: 'block', marginBottom: 6 }}>
+                    {isKin ? 'Shyira mu ishuri' : 'Assign to class'}
+                  </label>
+                  {csvClasses.length === 0 ? (
+                    <p style={{ fontSize: 12, color: 'var(--text-3)' }}>
+                      {isKin ? 'Nta makilasi arahari — abarimu bakeneye gushyiraho amakirasi mbere.' : 'No classes found — teachers must create classes first.'}
+                    </p>
+                  ) : (
+                    <select
+                      value={csvClassId}
+                      onChange={e => setCsvClassId(e.target.value)}
+                      style={{
+                        width: '100%', padding: '8px 10px', borderRadius: 8, fontSize: 13,
+                        border: '1px solid var(--line)', background: 'var(--surface)', color: 'var(--text)',
+                      }}
+                    >
+                      {csvClasses.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                    </select>
+                  )}
+                </div>
+
+                {/* File upload */}
+                <div className="mb-3">
+                  <input
+                    ref={csvFileRef}
+                    type="file"
+                    accept=".csv,.txt"
+                    style={{ display: 'none' }}
+                    onChange={e => { if (e.target.files?.[0]) handleCsvFile(e.target.files[0]); }}
+                  />
+                  <button
+                    onClick={() => csvFileRef.current?.click()}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 6,
+                      padding: '7px 12px', borderRadius: 8, fontSize: 12, fontWeight: 500,
+                      border: '1.5px dashed var(--line)', background: 'var(--surface-2)', color: 'var(--text-2)',
+                      cursor: 'pointer', width: '100%', justifyContent: 'center',
+                    }}
+                  >
+                    <FileText size={14} />
+                    {isKin ? 'Tanga dosiye ya CSV' : 'Upload .csv file'}
+                  </button>
+                </div>
+
+                {/* Textarea */}
+                <div className="mb-4">
+                  <label style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-2)', display: 'block', marginBottom: 6 }}>
+                    {isKin ? 'Cyangwa bandika amazina hano (umwe ku murongo)' : 'Or paste names here (one per line)'}
+                  </label>
+                  <textarea
+                    value={csvText}
+                    onChange={e => setCsvText(e.target.value)}
+                    rows={8}
+                    placeholder={isKin
+                      ? 'Ineza Uwimana\nJean Paul Habimana\nMarie Claire Mukamana'
+                      : 'Alice Uwimana\nJean Paul Habimana\nMarie Claire Mukamana'}
+                    style={{
+                      width: '100%', padding: '10px 12px', borderRadius: 8, fontSize: 13, lineHeight: 1.6,
+                      border: '1px solid var(--line)', background: 'var(--surface)', color: 'var(--text)',
+                      fontFamily: 'inherit', resize: 'vertical', boxSizing: 'border-box',
+                    }}
+                  />
+                  <p style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 4 }}>
+                    {csvText.split('\n').filter(l => l.trim()).length} {isKin ? 'amazina' : 'names'}
+                  </p>
+                </div>
+
+                {csvError && (
+                  <p style={{ fontSize: 12, color: 'var(--error)', marginBottom: 12 }}>{csvError}</p>
+                )}
+
+                <div className="flex gap-3">
+                  <button className="btn btn-secondary" onClick={() => setShowCsvImport(false)} style={{ flex: 1 }}>
+                    {isKin ? 'Reka' : 'Cancel'}
+                  </button>
+                  <button
+                    className="btn btn-primary"
+                    onClick={handleCsvImport}
+                    disabled={csvImporting || csvClasses.length === 0}
+                    style={{ flex: 2 }}
+                  >
+                    {csvImporting
+                      ? <><Loader size={13} className="animate-spin" /> {isKin ? 'Birakora...' : 'Importing...'}</>
+                      : <><Upload size={13} /> {isKin ? 'Injiza' : 'Import students'}</>}
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div style={{
+                  display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', borderRadius: 8,
+                  background: '#9eaa8420', border: '1px solid #9eaa8460', marginBottom: 16,
+                }}>
+                  <Check size={15} style={{ color: '#9eaa84' }} />
+                  <p style={{ fontSize: 13, fontWeight: 600, color: '#9eaa84' }}>
+                    {csvResults.length} {isKin ? 'abanyeshuri bashyizweho neza' : 'students created successfully'}
+                  </p>
+                </div>
+
+                <p style={{ fontSize: 12, color: 'var(--text-3)', marginBottom: 10 }}>
+                  {isKin
+                    ? 'Bika amakuru y\'ufunguro mbere yo gufunga. Ayo makuru ntazongera kugaragara.'
+                    : 'Save these credentials now — they will not be shown again.'}
+                </p>
+
+                <div style={{ overflowX: 'auto', marginBottom: 16 }}>
+                  <table style={{ width: '100%', fontSize: 12, borderCollapse: 'collapse' }}>
+                    <thead>
+                      <tr style={{ borderBottom: '1px solid var(--line)' }}>
+                        {['Name', 'Email / Login', 'Password'].map(h => (
+                          <th key={h} style={{ textAlign: 'left', padding: '6px 10px', color: 'var(--text-3)', fontWeight: 600 }}>{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {csvResults.map((r, i) => (
+                        <tr key={i} style={{ borderBottom: '1px solid var(--line)' }}>
+                          <td style={{ padding: '7px 10px', color: 'var(--text)' }}>{r.name}</td>
+                          <td style={{ padding: '7px 10px', color: 'var(--text-2)', fontFamily: 'monospace', fontSize: 11 }}>{r.email}</td>
+                          <td style={{ padding: '7px 10px', color: 'var(--text-2)', fontFamily: 'monospace', fontSize: 11 }}>{r.password}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                <div className="flex gap-3">
+                  <button
+                    className="btn btn-secondary"
+                    onClick={() => {
+                      const text = csvResults.map(r => `${r.name}\t${r.email}\t${r.password}`).join('\n');
+                      navigator.clipboard.writeText(text).catch(() => {});
+                    }}
+                    style={{ flex: 1 }}
+                  >
+                    <Copy size={13} /> {isKin ? 'Kopa byose' : 'Copy all'}
+                  </button>
+                  <button
+                    className="btn btn-primary"
+                    onClick={() => { setShowCsvImport(false); loadAll(); }}
+                    style={{ flex: 1 }}
+                  >
+                    {isKin ? 'Rangiza' : 'Done'}
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
       )}
     </div>
   );

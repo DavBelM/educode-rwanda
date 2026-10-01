@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
-import { Lock, ChevronRight, BookOpen } from 'lucide-react';
+import { Lock, ChevronRight, BookOpen, PlayCircle } from 'lucide-react';
 import { getQuizSets, getStudentSetProgress, getStudentSetPassedCounts, type QuizSet } from '../lib/quiz-db';
 import { AppNav } from './components/AppNav';
 import { usePageTitle } from '../hooks/usePageTitle';
@@ -212,9 +212,30 @@ export default function ChallengePage({ language }: Props) {
                             <p style={{ color: 'var(--text-3)', fontSize: 13.5, lineHeight: 1.5, marginBottom: 4 }}>
                               {isKin && set.description_kin ? set.description_kin : set.description}
                             </p>
-                            <p style={{ color: 'var(--text-3)', fontSize: 12 }}>
-                              {set.xp_reward} XP
-                            </p>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                              <p style={{ color: 'var(--text-3)', fontSize: 12 }}>
+                                {set.xp_reward} XP
+                              </p>
+                              {set.video_url && (
+                                <a
+                                  href={set.video_url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  onClick={e => e.stopPropagation()}
+                                  style={{
+                                    display: 'flex', alignItems: 'center', gap: 4,
+                                    fontSize: 11, color: 'var(--text-3)', textDecoration: 'none',
+                                    padding: '2px 8px', borderRadius: 99,
+                                    background: 'var(--surface-2)', border: '1px solid var(--line)',
+                                  }}
+                                >
+                                  <PlayCircle size={10} />
+                                  {isKin
+                                    ? (set.video_title_kin ?? set.video_title ?? 'Vide')
+                                    : (set.video_title ?? 'Watch intro')}
+                                </a>
+                              )}
+                            </div>
                           </div>
 
                           <div style={{ color: 'var(--text-3)', flexShrink: 0 }}>

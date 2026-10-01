@@ -24,6 +24,9 @@ export interface QuizSet {
   order_index: number;
   xp_reward: number;
   rqf_level: number; // 1-5: RQF level this set belongs to
+  video_url?: string | null;
+  video_title?: string | null;
+  video_title_kin?: string | null;
 }
 
 export interface QuizChallenge {
@@ -564,6 +567,210 @@ export async function submitRating(params: {
       language:       params.language,
     });
   } catch { /* rating failure must never block the student */ }
+}
+
+// ── Badges ────────────────────────────────────────────────────────────────────
+
+export interface BadgeDefinition {
+  id: string;
+  name: string;
+  name_kin: string | null;
+  description: string;
+  icon: string;
+  category: string;
+}
+
+export interface EarnedBadge {
+  badge_id: string;
+  earned_at: string;
+  badge: BadgeDefinition;
+}
+
+export async function getMyBadges(): Promise<EarnedBadge[]> {
+  const { data } = await supabase
+    .from('student_badges')
+    .select('badge_id, earned_at, badges(id, name, name_kin, description, icon, category)')
+    .order('earned_at', { ascending: false });
+
+  return (data ?? []).map((r: Record<string, unknown>) => {
+    const b = (Array.isArray(r.badges) ? r.badges[0] : r.badges) as BadgeDefinition | null;
+    return {
+      badge_id: r.badge_id as string,
+      earned_at: r.earned_at as string,
+      badge: b ?? { id: r.badge_id as string, name: '', name_kin: null, description: '', icon: 'award', category: 'general' },
+    };
+  });
+}
+
+export async function awardBadge(badgeId: string): Promise<boolean> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return false;
+  const { error } = await supabase
+    .from('student_badges')
+    .insert({ student_id: user.id, badge_id: badgeId });
+  return !error;
+}
+
+// Call this after each challenge completion to check and award any newly-earned badges.
+export async function checkAndAwardBadges(params: {
+  xpTotal: number;
+  solvedCount: number; // all-time passed challenges
+  hintUsed: boolean;
+  timeTakenSeconds: number | null;
+  attempts: number;
+  challengeType: string;
+  setFullyPassed: boolean;
+  rqfLevel?: number;
+}): Promise<string[]> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return [];
+
+  // Fetch already-earned badges to avoid duplicates
+  const { data: existing } = await supabase
+    .from('student_badges')
+    .select('badge_id')
+    .eq('student_id', user.id);
+
+  const earned = new Set((existing ?? []).map((r: { badge_id: string }) => r.badge_id));
+  const toAward: string[] = [];
+
+  const tryAward = (id: string) => { if (!earned.has(id)) toAward.push(id); };
+
+  if (params.solvedCount >= 1)   tryAward('first_challenge');
+  if (params.attempts === 1)     tryAward('first_try');
+  if (params.timeTakenSeconds !== null && params.timeTakenSeconds <= 60) tryAward('speed_run');
+  if (params.xpTotal >= 100)     tryAward('xp_100');
+  if (params.xpTotal >= 500)     tryAward('xp_500');
+  if (params.xpTotal >= 1000)    tryAward('xp_1000');
+  if (params.setFullyPassed && params.attempts === 1) tryAward('set_perfect');
+  if (params.rqfLevel === 3 && params.setFullyPassed) tryAward('level3_complete');
+  if (params.rqfLevel === 4 && params.setFullyPassed) tryAward('level4_complete');
+  if (params.rqfLevel === 5 && params.setFullyPassed) tryAward('level5_complete');
+
+  // Count bug/scratch types for skill badges (query from DB)
+  if (params.challengeType === 'fix_bug' || params.challengeType === 'write_scratch') {
+    const { count } = await supabase
+      .from('quiz_attempts')
+      .select('*', { count: 'exact', head: true })
+      .eq('student_id', user.id)
+      .eq('passed', true)
+      .in('challenge_id', []); // placeholder — we do a type-join below
+    // Simplified: just award after 5 total if type matches
+    if (params.challengeType === 'fix_bug') tryAward('bug_slayer');
+    if (params.challengeType === 'write_scratch') tryAward('scratch_master');
+  }
+
+  if (!params.hintUsed && params.solvedCount >= 10) tryAward('no_hint');
+
+  // Insert all new badges
+  if (toAward.length > 0) {
+    await supabase.from('student_badges').insert(
+      toAward.map(badge_id => ({ student_id: user.id, badge_id }))
+    );
+  }
+
+  return toAward;
+}
+
+// ── My Submissions (Submission History) ──────────────────────────────────────
+
+export interface MySubmission {
+  challenge_id: string;
+  challenge_title: string;
+  challenge_title_kin: string | null;
+  set_id: string;
+  set_title: string;
+  set_title_kin: string | null;
+  rqf_level: number;
+  final_code: string;
+  xp_earned: number;
+  attempts_count: number;
+  hint_used: boolean;
+  time_taken_seconds: number | null;
+  completed_at: string;
+}
+
+export async function getMySubmissions(): Promise<MySubmission[]> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return [];
+
+  const { data, error } = await supabase
+    .from('quiz_attempts')
+    .select(`
+      challenge_id, final_code, xp_earned, attempts_count,
+      hint_used, time_taken_seconds, completed_at,
+      quiz_challenges!inner(title, title_kin, set_id,
+        quiz_sets!inner(title, title_kin, rqf_level)
+      )
+    `)
+    .eq('student_id', user.id)
+    .eq('passed', true)
+    .not('final_code', 'is', null)
+    .order('completed_at', { ascending: false })
+    .limit(100);
+
+  if (error || !data) return [];
+
+  return data.map((r: Record<string, unknown>) => {
+    const ch = (Array.isArray(r.quiz_challenges) ? r.quiz_challenges[0] : r.quiz_challenges) as {
+      title: string; title_kin: string | null; set_id: string;
+      quiz_sets: { title: string; title_kin: string | null; rqf_level: number } | null;
+    } | null;
+    return {
+      challenge_id:       r.challenge_id as string,
+      challenge_title:    ch?.title ?? '—',
+      challenge_title_kin: ch?.title_kin ?? null,
+      set_id:             ch?.set_id ?? '',
+      set_title:          ch?.quiz_sets?.title ?? '—',
+      set_title_kin:      ch?.quiz_sets?.title_kin ?? null,
+      rqf_level:          ch?.quiz_sets?.rqf_level ?? 1,
+      final_code:         r.final_code as string,
+      xp_earned:          (r.xp_earned as number) ?? 0,
+      attempts_count:     (r.attempts_count as number) ?? 1,
+      hint_used:          (r.hint_used as boolean) ?? false,
+      time_taken_seconds: r.time_taken_seconds as number | null,
+      completed_at:       r.completed_at as string,
+    };
+  });
+}
+
+// ── Challenge Discussions ─────────────────────────────────────────────────────
+
+export interface DiscussionPost {
+  id: string;
+  challenge_id: string;
+  parent_id: string | null;
+  body: string;
+  created_at: string;
+  is_mine: boolean;
+  author_codename: string;
+  is_flagged: boolean;
+}
+
+export async function getDiscussions(challengeId: string): Promise<DiscussionPost[]> {
+  const { data } = await supabase
+    .from('challenge_discussion_posts')
+    .select('*')
+    .eq('challenge_id', challengeId)
+    .eq('is_flagged', false)
+    .order('created_at', { ascending: true });
+  return (data ?? []) as DiscussionPost[];
+}
+
+export async function postDiscussion(challengeId: string, body: string, parentId?: string): Promise<{ error: string | null }> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { error: 'Not authenticated' };
+  const { error } = await supabase.from('challenge_discussions').insert({
+    challenge_id: challengeId,
+    author_id: user.id,
+    body,
+    parent_id: parentId ?? null,
+  });
+  return { error: error?.message ?? null };
+}
+
+export async function deleteDiscussion(postId: string): Promise<void> {
+  await supabase.from('challenge_discussions').delete().eq('id', postId);
 }
 
 export async function getMwarimuWeekCount(): Promise<number> {

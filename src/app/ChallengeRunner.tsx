@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import {
   ArrowLeft, Lightbulb, Play, CheckCircle2, XCircle, Circle,
-  Trophy, RotateCcw, ChevronRight, Bot,
+  Trophy, RotateCcw, ChevronRight, Bot, Award, MessageSquare, Send, Trash2,
 } from 'lucide-react';
 import { CodeEditor } from './components/CodeEditor';
 import { MwarimuPanel } from './components/MwarimuPanel';
@@ -12,7 +12,8 @@ import {
   getSetChallenges, getQuizSets, startQuizSession, upsertQuizAttempt,
   completeQuizSession, markSetCompleted, awardXp, hasCompletedSet,
   getPassedChallengesForSet, getOrCreateMyCodename, postPeerActivity,
-  type QuizSet, type QuizChallenge, type ErrorLogEntry,
+  checkAndAwardBadges, getDiscussions, postDiscussion, deleteDiscussion,
+  type QuizSet, type QuizChallenge, type ErrorLogEntry, type DiscussionPost,
 } from '../lib/quiz-db';
 import { getStudentClasses } from '../lib/db';
 import { usePageTitle } from '../hooks/usePageTitle';
@@ -138,11 +139,16 @@ export default function ChallengeRunner({ language }: Props) {
   const [xpEarned, setXpEarned] = useState(0);
   const [passedCount, setPassedCount] = useState(0);
 
-  const [rightTab, setRightTab] = useState<'challenge' | 'mwarimu'>('challenge');
+  const [rightTab, setRightTab] = useState<'challenge' | 'mwarimu' | 'discuss'>('challenge');
   const [mwarimuLang, setMwarimuLang] = useState<'EN' | 'KIN'>(language);
   const [mwarimuDot, setMwarimuDot] = useState(false);
   const [mwarimuCount, setMwarimuCount] = useState(0);
   const [showRating, setShowRating] = useState(false);
+  const [newBadges, setNewBadges] = useState<string[]>([]);
+  const [discussions, setDiscussions] = useState<DiscussionPost[]>([]);
+  const [discussInput, setDiscussInput] = useState('');
+  const [discussLoading, setDiscussLoading] = useState(false);
+  const [hasPassed, setHasPassed] = useState(false);
 
   const classIdRef = useRef<string | null>(null);
   const codenameRef = useRef<string | null>(null);
@@ -239,9 +245,18 @@ export default function ChallengeRunner({ language }: Props) {
     setAttemptCount(0);
     setRightTab('challenge');
     setMwarimuDot(false);
+    setHasPassed(false);
+    setDiscussions([]);
     errorLogRef.current = [];
     setChallengeStartMs(Date.now());
   }, []);
+
+  // Load discussions when discuss tab opened (only if student has passed)
+  useEffect(() => {
+    if (rightTab === 'discuss' && challenge && hasPassed) {
+      getDiscussions(challenge.id).then(setDiscussions);
+    }
+  }, [rightTab, challenge?.id, hasPassed]);
 
   const handleRun = async () => {
     if (!challenge || running) return;
@@ -292,7 +307,22 @@ export default function ChallengeRunner({ language }: Props) {
       localStorage.removeItem(k + '_html');
 
       setXpEarned(prev => prev + xp);
-      setPassedCount(prev => prev + 1);
+      const newPassed = passedCount + 1;
+      setPassedCount(newPassed);
+      setHasPassed(true);
+
+      // Check for newly earned badges
+      checkAndAwardBadges({
+        xpTotal: xpEarned + xp,
+        solvedCount: newPassed,
+        hintUsed,
+        timeTakenSeconds: Math.round((Date.now() - challengeStartMs) / 1000),
+        attempts: newCount,
+        challengeType: challenge.challenge_type,
+        setFullyPassed: false,
+        rqfLevel: set?.rqf_level,
+      }).then(awarded => { if (awarded.length) setNewBadges(awarded); });
+
       setPhase('success');
     } else {
       if (sessionIdRef.current) {
@@ -475,7 +505,7 @@ export default function ChallengeRunner({ language }: Props) {
             </div>
           </div>
 
-          <div className="flex gap-3">
+          <div className="flex gap-3" style={{ flexWrap: 'wrap' }}>
             <button
               className="btn btn-secondary"
               style={{ flex: 1 }}
@@ -493,6 +523,17 @@ export default function ChallengeRunner({ language }: Props) {
               {isKin ? 'Subiramo' : 'Play again'}
             </button>
           </div>
+          {/* Certificate link — shown if student passed ≥80% */}
+          {set && passedCount >= Math.ceil(challenges.length * 0.8) && (
+            <button
+              className="btn btn-secondary"
+              style={{ width: '100%', marginTop: 10, gap: 8 }}
+              onClick={() => navigate(`/certificate/${set.id}`)}
+            >
+              <Award size={15} />
+              {isKin ? 'Reba certificate yawe' : 'View your certificate'}
+            </button>
+          )}
         </div>
       </div>
     );
@@ -690,30 +731,118 @@ export default function ChallengeRunner({ language }: Props) {
             display: 'flex', borderBottom: '1px solid var(--line)',
             background: 'var(--surface-2)', flexShrink: 0,
           }}>
-            {(['challenge', 'mwarimu'] as const).map(tab => (
-              <button
-                key={tab}
-                onClick={() => { setRightTab(tab); if (tab === 'mwarimu') setMwarimuDot(false); }}
-                style={{
-                  flex: 1, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  gap: 6, fontSize: 14, fontWeight: rightTab === tab ? 600 : 400,
-                  color: rightTab === tab ? 'var(--text)' : 'var(--text-3)',
-                  background: 'none', border: 'none', cursor: 'pointer',
-                  borderBottom: rightTab === tab ? '2px solid var(--text-2)' : '2px solid transparent',
-                  position: 'relative', transition: 'color 0.15s',
-                }}
-              >
-                {tab === 'mwarimu' && <Bot size={14} />}
-                {tab === 'challenge' ? 'Challenge' : (isKin ? 'Baza Mwarimu' : 'Ask Mwarimu')}
-                {tab === 'mwarimu' && mwarimuDot && (
-                  <span style={{
-                    position: 'absolute', top: 8, right: 12,
-                    width: 7, height: 7, borderRadius: '50%', background: 'var(--text-2)',
-                  }} />
-                )}
-              </button>
-            ))}
+            {(['challenge', 'mwarimu', 'discuss'] as const).map(tab => {
+              if (tab === 'discuss' && !hasPassed) return null;
+              return (
+                <button
+                  key={tab}
+                  onClick={() => { setRightTab(tab); if (tab === 'mwarimu') setMwarimuDot(false); }}
+                  style={{
+                    flex: 1, height: 40, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    gap: 6, fontSize: 13, fontWeight: rightTab === tab ? 600 : 400,
+                    color: rightTab === tab ? 'var(--text)' : 'var(--text-3)',
+                    background: 'none', border: 'none', cursor: 'pointer',
+                    borderBottom: rightTab === tab ? '2px solid var(--text-2)' : '2px solid transparent',
+                    position: 'relative', transition: 'color 0.15s',
+                  }}
+                >
+                  {tab === 'mwarimu' && <Bot size={14} />}
+                  {tab === 'discuss' && <MessageSquare size={14} />}
+                  {tab === 'challenge' ? 'Challenge'
+                    : tab === 'mwarimu' ? (isKin ? 'Mwarimu' : 'Ask Mwarimu')
+                    : (isKin ? 'Ibibazo' : 'Discuss')}
+                  {tab === 'mwarimu' && mwarimuDot && (
+                    <span style={{
+                      position: 'absolute', top: 8, right: 12,
+                      width: 7, height: 7, borderRadius: '50%', background: 'var(--text-2)',
+                    }} />
+                  )}
+                </button>
+              );
+            })}
           </div>
+
+          {/* Discussion panel */}
+          {rightTab === 'discuss' && hasPassed && (
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+              <div style={{ flex: 1, overflowY: 'auto', padding: '12px 16px' }}>
+                {discussions.length === 0 ? (
+                  <p style={{ color: 'var(--text-3)', fontSize: 14, marginTop: 24, textAlign: 'center' }}>
+                    {isKin ? 'Nta magambo arabonetse. Oba wa mbere!' : 'No discussion yet. Be the first to share!'}
+                  </p>
+                ) : discussions.map(d => (
+                  <div key={d.id} style={{
+                    marginBottom: 12, padding: '10px 12px',
+                    background: d.is_mine ? 'var(--surface-2)' : 'var(--surface)',
+                    border: '1px solid var(--line)', borderRadius: 8,
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                      <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-3)' }}>
+                        {d.author_codename} · {new Date(d.created_at).toLocaleDateString()}
+                      </span>
+                      {d.is_mine && (
+                        <button
+                          onClick={async () => { await deleteDiscussion(d.id); setDiscussions(prev => prev.filter(x => x.id !== d.id)); }}
+                          style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-3)' }}
+                        >
+                          <Trash2 size={11} />
+                        </button>
+                      )}
+                    </div>
+                    <p style={{ fontSize: 13, color: 'var(--text)', lineHeight: 1.5, margin: 0 }}>{d.body}</p>
+                  </div>
+                ))}
+              </div>
+              <div style={{ padding: '10px 12px', borderTop: '1px solid var(--line)', display: 'flex', gap: 8 }}>
+                <input
+                  value={discussInput}
+                  onChange={e => setDiscussInput(e.target.value)}
+                  onKeyDown={async e => {
+                    if (e.key === 'Enter' && !e.shiftKey && challenge) {
+                      e.preventDefault();
+                      const body = discussInput.trim();
+                      if (!body || discussLoading) return;
+                      setDiscussLoading(true);
+                      const { error } = await postDiscussion(challenge.id, body);
+                      if (!error) {
+                        setDiscussInput('');
+                        const updated = await getDiscussions(challenge.id);
+                        setDiscussions(updated);
+                      }
+                      setDiscussLoading(false);
+                    }
+                  }}
+                  placeholder={isKin ? 'Sangira uburyo bwawe...' : 'Share your approach...'}
+                  maxLength={1000}
+                  style={{
+                    flex: 1, height: 36, padding: '0 10px',
+                    background: 'var(--surface-2)', border: '1px solid var(--line)',
+                    borderRadius: 8, fontSize: 13, color: 'var(--text)', outline: 'none',
+                  }}
+                />
+                <button
+                  className="btn btn-primary"
+                  style={{ padding: '0 12px', height: 36, flexShrink: 0 }}
+                  disabled={!discussInput.trim() || discussLoading}
+                  onClick={async () => {
+                    if (!challenge) return;
+                    const body = discussInput.trim();
+                    if (!body) return;
+                    setDiscussLoading(true);
+                    const { error } = await postDiscussion(challenge.id, body);
+                    if (!error) {
+                      setDiscussInput('');
+                      const updated = await getDiscussions(challenge.id);
+                      setDiscussions(updated);
+                    }
+                    setDiscussLoading(false);
+                  }}
+                >
+                  <Send size={13} />
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Mwarimu panel */}
           <div style={{ display: rightTab === 'mwarimu' ? 'flex' : 'none', flex: 1, flexDirection: 'column', overflow: 'hidden' }}>
@@ -843,27 +972,44 @@ export default function ChallengeRunner({ language }: Props) {
                   </div>
                 )}
                 {results.map((r, i) => (
-                  <div key={i} className="flex items-start gap-2 mb-2.5">
-                    {r.passed
-                      ? <CheckCircle2 size={15} style={{ color: 'var(--text)', flexShrink: 0, marginTop: 1 }} />
-                      : <XCircle size={15} style={{ color: 'var(--text-3)', flexShrink: 0, marginTop: 1 }} />
-                    }
-                    <div>
-                      <span style={{ color: r.passed ? 'var(--text)' : 'var(--text-2)', fontSize: 14 }}>
-                        {isKin && challenge.test_cases[i]?.description_kin
-                          ? challenge.test_cases[i].description_kin
-                          : r.description}
-                      </span>
-                      {r.error && (
-                        <div style={{ color: 'var(--text-3)', fontSize: 12, fontFamily: 'var(--mono)', marginTop: 2 }}>
-                          {r.error}
-                        </div>
-                      )}
+                  <div key={i} style={{
+                    marginBottom: 10,
+                    borderRadius: 8,
+                    padding: r.passed ? '8px 10px' : '10px 12px',
+                    background: r.passed ? 'transparent' : 'color-mix(in srgb, var(--bg) 60%, transparent)',
+                    border: r.passed ? 'none' : '1px solid var(--line)',
+                  }}>
+                    <div className="flex items-start gap-2">
+                      {r.passed
+                        ? <CheckCircle2 size={15} style={{ color: '#22c55e', flexShrink: 0, marginTop: 1 }} />
+                        : <XCircle size={15} style={{ color: '#ef4444', flexShrink: 0, marginTop: 1 }} />
+                      }
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <span style={{ color: r.passed ? 'var(--text)' : 'var(--text)', fontSize: 14, fontWeight: r.passed ? 400 : 500 }}>
+                          {isKin && challenge.test_cases[i]?.description_kin
+                            ? challenge.test_cases[i].description_kin
+                            : r.description}
+                        </span>
+                        {!r.passed && r.error && (
+                          <div style={{
+                            marginTop: 6, padding: '7px 10px',
+                            borderRadius: 6,
+                            background: 'var(--surface-2)',
+                            border: '1px solid var(--line-strong)',
+                            fontSize: 12, color: 'var(--text-2)',
+                            fontFamily: 'var(--mono)',
+                            lineHeight: 1.55,
+                            wordBreak: 'break-word',
+                          }}>
+                            {r.error}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 ))}
 
-                {results.some(r => !r.passed) && attemptCount >= 2 && rightTab !== 'mwarimu' && (
+                {results.some(r => !r.passed) && attemptCount >= 1 && rightTab !== 'mwarimu' && (
                   <button
                     onClick={() => { setRightTab('mwarimu'); setMwarimuDot(false); }}
                     style={{
@@ -945,7 +1091,7 @@ export default function ChallengeRunner({ language }: Props) {
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               gap: 8, padding: '14px',
               background: 'var(--surface)', border: '1px solid var(--line)',
-              borderRadius: 12, marginBottom: 20,
+              borderRadius: 12, marginBottom: newBadges.length ? 12 : 20,
             }}>
               <span style={{ fontSize: 24, fontWeight: 600, color: 'var(--text)' }}>
                 +{computeXp(challenge.xp_reward, attemptCount, hintUsed)} XP
@@ -956,6 +1102,26 @@ export default function ChallengeRunner({ language }: Props) {
                 </span>
               )}
             </div>
+
+            {/* Badge notification */}
+            {newBadges.length > 0 && (
+              <div style={{
+                padding: '10px 14px', borderRadius: 10, marginBottom: 20,
+                background: 'linear-gradient(135deg, #f59e0b22, #f59e0b11)',
+                border: '1px solid #f59e0b44',
+                display: 'flex', alignItems: 'center', gap: 10,
+              }}>
+                <span style={{ fontSize: 20 }}>🏅</span>
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>
+                    {isKin ? 'Badge nshya!' : 'New badge unlocked!'}
+                  </div>
+                  <div style={{ fontSize: 12, color: 'var(--text-3)' }}>
+                    {newBadges.join(', ').replace(/_/g, ' ')}
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Test summary */}
             <div className="flex items-center gap-2 justify-center mb-6" style={{ fontSize: 14, color: 'var(--text-2)' }}>

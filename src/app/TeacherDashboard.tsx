@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import { Users, Plus, Check, X, ChevronDown, BookOpen, Code2, Loader, Megaphone, Pin, Trash2, BarChart2, AlertCircle, Download, Sparkles, Activity, AlertTriangle, UserPlus, Table2, Eye, EyeOff, ClipboardCheck } from 'lucide-react';
+import { useNavigate } from 'react-router';
+import { Users, Plus, Check, X, ChevronDown, BookOpen, Code2, Loader, Megaphone, Pin, Trash2, BarChart2, AlertCircle, Download, Sparkles, Activity, AlertTriangle, UserPlus, Table2, Eye, EyeOff, ClipboardCheck, Hammer, Play } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { generateStudentAssessment, generateClassSummary } from '../lib/ai';
 import { AppNav } from './components/AppNav';
@@ -2510,6 +2511,7 @@ function AttendanceModal({ cls, language, onClose }: {
 
 export default function TeacherDashboard() {
   usePageTitle('Teacher Dashboard · EduCode');
+  const navigate = useNavigate();
   const [language] = useState<'EN' | 'KIN'>('EN');
   const isKin = language === 'KIN';
 
@@ -2878,6 +2880,12 @@ export default function TeacherDashboard() {
                 </button>
                 <button className="btn btn-secondary sm" onClick={() => selectedClass && setAttendanceClass(selectedClass)} title={isKin ? 'Kwandika ibyicaro' : 'Attendance'}>
                   <ClipboardCheck size={14} />
+                </button>
+                <button className="btn btn-secondary sm" onClick={() => navigate('/live')} title={isKin ? 'Inyigisho Nzima' : 'Live Class'}>
+                  <Play size={14} />
+                </button>
+                <button className="btn btn-secondary sm" onClick={() => navigate('/challenge-builder')} title={isKin ? 'Ongera challenge nshya' : 'Challenge Builder'}>
+                  <Hammer size={14} />
                 </button>
                 <button className="btn btn-primary" onClick={() => setShowCreateAssignment(true)}>
                   {isKin ? 'Umukoro mushya' : 'New assignment'}

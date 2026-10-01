@@ -19,6 +19,7 @@ interface Props {
   onOpenResults?: () => void;
   onContinueLearning?: () => void;
   onOpenChallenges?: () => void;
+  onOpenSolutions?: () => void;
 }
 
 // ─── Floating Mwarimu Chat ─────────────────────────────────────────────────────
@@ -238,7 +239,7 @@ function JoinClassModal({ language, onClose, onJoined }: {
 
 // ─── Main Dashboard ────────────────────────────────────────────────────────────
 
-export default function Dashboard({ language, onStartCoding, onOpenAssignment, onOpenCourses, onOpenResults, onContinueLearning, onOpenChallenges }: Props) {
+export default function Dashboard({ language, onStartCoding, onOpenAssignment, onOpenCourses, onOpenResults, onContinueLearning, onOpenChallenges, onOpenSolutions }: Props) {
   usePageTitle('Dashboard · EduCode');
   const { profile } = useAuth();
   const studentName = profile?.full_name ?? 'Student';
@@ -263,6 +264,11 @@ export default function Dashboard({ language, onStartCoding, onOpenAssignment, o
   const [attendancePct, setAttendancePct] = useState<number | null>(null);
   const [surveyDone, setSurveyDone] = useState(true); // default true to avoid flash
   const [showSurvey, setShowSurvey] = useState(false);
+
+  // AI "What to study next" recommendations
+  const [recommendations, setRecommendations] = useState<{ title: string; reason: string; type: string }[]>([]);
+  const [recsLoading, setRecsLoading] = useState(false);
+  const [recsLoaded, setRecsLoaded] = useState(false);
 
   const loadAssignments = async () => {
     setLoadingAssignments(true);
@@ -310,6 +316,35 @@ export default function Dashboard({ language, onStartCoding, onOpenAssignment, o
 
     setLoadingAssignments(false);
   };
+
+  async function loadRecommendations(xp: number, streakDays: number, lessonsCompleted: number, avgScore: number) {
+    if (recsLoaded) return;
+    setRecsLoading(true);
+    try {
+      const res = await fetch('/api/recommend', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          studentData: {
+            xp_points: xp,
+            streak_days: streakDays,
+            lessons_completed: lessonsCompleted,
+            average_score_pct: avgScore,
+            platform: 'EduCode Rwanda (JavaScript, RTB TVET curriculum)',
+          },
+        }),
+      });
+      if (res.ok) {
+        const json = await res.json();
+        setRecommendations(json.recommendations ?? []);
+        setRecsLoaded(true);
+      }
+    } catch {
+      // silently fail — recommendations are optional
+    } finally {
+      setRecsLoading(false);
+    }
+  }
 
   useEffect(() => {
     recordDailyLogin();
@@ -372,6 +407,13 @@ export default function Dashboard({ language, onStartCoding, onOpenAssignment, o
 
   // Level based on profile XP (real accumulated XP)
   const profileXp = profile?.xp_points ?? 0;
+
+  useEffect(() => {
+    if (!loadingAssignments && profile) {
+      const avgScore = totalPossible > 0 ? Math.round((totalEarned / totalPossible) * 100) : 0;
+      loadRecommendations(profileXp, streak, lessonProgress.completed, avgScore);
+    }
+  }, [loadingAssignments, profile]); // eslint-disable-line react-hooks/exhaustive-deps
   const getLevel = (xp: number): string => {
     if (xp >= 500) return isKinyarwanda ? 'Inzobere' : 'Master';
     if (xp >= 200) return isKinyarwanda ? 'Injeniyeri' : 'Engineer';
@@ -635,6 +677,58 @@ export default function Dashboard({ language, onStartCoding, onOpenAssignment, o
               )}
             </section>
 
+            {/* AI "What to study next" */}
+            <section className="card pad-lg rise-3">
+              <div className="card-head">
+                <h3 className="card-title">{isKinyarwanda ? 'Iki gikurikira — Inama za AI' : 'What to Study Next'}</h3>
+                <span className="pill" style={{ background: 'var(--ai-dim, #7c3aed20)', color: '#7c3aed', border: '1px solid #7c3aed40' }}>
+                  AI
+                </span>
+              </div>
+              {recsLoading ? (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, paddingTop: 4 }}>
+                  <Loader size={14} style={{ color: 'var(--text-3)', animation: 'spin 1s linear infinite' }} />
+                  <p style={{ fontSize: 13, color: 'var(--text-3)' }}>{isKinyarwanda ? 'Mwarimu arategura...' : 'Mwarimu is thinking…'}</p>
+                </div>
+              ) : recommendations.length === 0 ? (
+                <p style={{ fontSize: 13.5, color: 'var(--text-3)' }}>
+                  {isKinyarwanda ? 'Komeza ukore challenges kugira ngo Mwarimu aguhe inama.' : 'Keep coding — Mwarimu will personalise recommendations as you progress.'}
+                </p>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 4 }}>
+                  {recommendations.map((rec, i) => {
+                    const typeColors: Record<string, string> = {
+                      challenge: '#9eaa84', lesson: '#7c3aed', review: '#cda86a', practice: '#3b82f6',
+                    };
+                    const color = typeColors[rec.type] ?? 'var(--text-3)';
+                    return (
+                      <div key={i} style={{
+                        display: 'flex', alignItems: 'flex-start', gap: 10,
+                        padding: '10px 12px', borderRadius: 8,
+                        background: 'var(--surface-2)', border: `1px solid ${color}30`,
+                      }}>
+                        <div style={{
+                          width: 28, height: 28, borderRadius: 6, flexShrink: 0,
+                          background: `${color}20`, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        }}>
+                          <span style={{ fontSize: 14 }}>
+                            {rec.type === 'challenge' ? '⚡' : rec.type === 'lesson' ? '📖' : rec.type === 'review' ? '🔄' : '🎯'}
+                          </span>
+                        </div>
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <p style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)', marginBottom: 2 }}>{rec.title}</p>
+                          <p style={{ fontSize: 12, color: 'var(--text-3)', lineHeight: 1.4 }}>{rec.reason}</p>
+                        </div>
+                        <span style={{ fontSize: 10, fontWeight: 700, color, textTransform: 'uppercase', letterSpacing: '0.05em', flexShrink: 0 }}>
+                          {rec.type}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </section>
+
             {/* Mwarimu insights */}
             <section className="card pad-lg rise-3">
               <div className="card-head">
@@ -703,9 +797,14 @@ export default function Dashboard({ language, onStartCoding, onOpenAssignment, o
                   ? 'Gukora challenges za JavaScript kandi ube uronka XP.'
                   : 'Solve challenges, earn XP. Fix bugs, complete code, write from scratch.'}
               </p>
-              <button className="btn btn-secondary btn-block" onClick={() => onOpenChallenges?.()}>
-                {isKinyarwanda ? 'Tangira Challenge' : 'Start challenges'}
-              </button>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <button className="btn btn-secondary btn-block" onClick={() => onOpenChallenges?.()}>
+                  {isKinyarwanda ? 'Tangira Challenge' : 'Start challenges'}
+                </button>
+                <button className="btn btn-tertiary" style={{ flexShrink: 0, fontSize: 13 }} onClick={() => onOpenSolutions?.()}>
+                  {isKinyarwanda ? 'Ibisubizo' : 'My solutions'}
+                </button>
+              </div>
             </section>
 
             {/* Achievements */}

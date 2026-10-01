@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import {
   Loader, Plus, Building2, X, Check, Inbox, Users, BarChart2,
-  Search, RefreshCw, ShieldAlert, ShieldCheck, UserX, UserCheck, ChevronDown, ClipboardList,
+  Search, RefreshCw, ShieldAlert, ShieldCheck, UserX, UserCheck, ChevronDown, ClipboardList, Download,
 } from 'lucide-react';
 import { AppNav } from './components/AppNav';
 import { usePageTitle } from '../hooks/usePageTitle';
@@ -33,7 +33,18 @@ interface SurveyRow {
   created_at: string;
 }
 
-type Tab = 'overview' | 'schools' | 'users' | 'leads' | 'surveys';
+type Tab = 'overview' | 'schools' | 'users' | 'leads' | 'surveys' | 'reporting';
+
+interface SchoolReport {
+  school_id: string;
+  school_name: string;
+  location: string | null;
+  teacher_count: number;
+  student_count: number;
+  active_students_7d: number;
+  challenges_passed: number;
+  avg_score_pct: number | null;
+}
 
 // ── Modals ────────────────────────────────────────────────────────────────────
 
@@ -180,10 +191,14 @@ export default function SuperAdminDashboard() {
   const [showCreateAdmin, setShowCreateAdmin] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [expandedSurvey, setExpandedSurvey] = useState<string | null>(null);
+  const [reportData, setReportData] = useState<SchoolReport[]>([]);
+  const [reportLoaded, setReportLoaded] = useState(false);
+  const [reportLoading, setReportLoading] = useState(false);
 
   useEffect(() => { loadAll(); }, []);
   useEffect(() => { if (tab === 'users' && users.length === 0) loadUsers(); }, [tab]);
   useEffect(() => { if (tab === 'surveys' && !surveysLoaded) loadSurveys(); }, [tab, surveysLoaded]);
+  useEffect(() => { if (tab === 'reporting' && !reportLoaded) loadReport(); }, [tab, reportLoaded]);
 
   async function loadAll() {
     setLoading(true);
@@ -232,6 +247,86 @@ export default function SuperAdminDashboard() {
     setSurveysLoading(false);
   }
 
+  async function loadReport() {
+    setReportLoading(true);
+    const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+
+    // Get all schools
+    const { data: schoolRows } = await supabase.from('schools').select('id, name, location');
+    if (!schoolRows) { setReportLoading(false); return; }
+
+    // Get per-school teacher/student counts from profiles
+    const { data: profileRows } = await supabase
+      .from('profiles')
+      .select('school_id, user_type, last_active');
+
+    // Get challenge pass counts per school (join via class_enrollments -> classes -> schools)
+    const { data: attemptRows } = await supabase
+      .from('quiz_attempts')
+      .select('student_id, passed, completed_at');
+
+    // Get class/school mapping for students
+    const { data: enrollRows } = await supabase
+      .from('class_enrollments')
+      .select('student_id, classes(school_id)');
+
+    // Build school → student set map
+    const schoolStudentMap: Record<string, Set<string>> = {};
+    for (const e of (enrollRows ?? []) as Array<{ student_id: string; classes: { school_id: string } | null }>) {
+      const sid = e.classes?.school_id;
+      if (!sid) continue;
+      (schoolStudentMap[sid] ??= new Set()).add(e.student_id);
+    }
+
+    // Build pass counts per student
+    const studentPassCounts: Record<string, number> = {};
+    for (const a of (attemptRows ?? []) as Array<{ student_id: string; passed: boolean; completed_at: string }>) {
+      if (a.passed) studentPassCounts[a.student_id] = (studentPassCounts[a.student_id] ?? 0) + 1;
+    }
+
+    // Active students by school
+    const activeStudentIds = new Set(
+      (attemptRows ?? [])
+        .filter((a: { completed_at: string }) => a.completed_at > weekAgo)
+        .map((a: { student_id: string }) => a.student_id)
+    );
+
+    const report: SchoolReport[] = (schoolRows as Array<{ id: string; name: string; location: string | null }>).map(school => {
+      const profs = ((profileRows ?? []) as Array<{ school_id: string | null; user_type: string; last_active: string | null }>)
+        .filter(p => p.school_id === school.id);
+      const studentIds = schoolStudentMap[school.id] ?? new Set<string>();
+      const totalPasses = [...studentIds].reduce((sum, sid) => sum + (studentPassCounts[sid] ?? 0), 0);
+      const activeThisWeek = [...studentIds].filter(sid => activeStudentIds.has(sid)).length;
+      return {
+        school_id: school.id,
+        school_name: school.name,
+        location: school.location,
+        teacher_count: profs.filter(p => p.user_type === 'teacher').length,
+        student_count: studentIds.size,
+        active_students_7d: activeThisWeek,
+        challenges_passed: totalPasses,
+        avg_score_pct: studentIds.size > 0 ? Math.round((activeThisWeek / studentIds.size) * 100) : null,
+      };
+    });
+    setReportData(report.sort((a, b) => b.challenges_passed - a.challenges_passed));
+    setReportLoaded(true);
+    setReportLoading(false);
+  }
+
+  function exportReportCSV() {
+    const header = ['School', 'Location', 'Teachers', 'Students', 'Active (7d)', 'Challenges Passed'];
+    const rows = reportData.map(r => [
+      `"${r.school_name}"`, r.location ?? '', r.teacher_count, r.student_count, r.active_students_7d, r.challenges_passed,
+    ]);
+    const csv = [header, ...rows].map(r => r.join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `educode-rtb-report-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
   async function toggleDeactivate(user: UserRow) {
     setActionLoading(user.id);
     const newVal = !user.is_deactivated;
@@ -260,6 +355,7 @@ export default function SuperAdminDashboard() {
     { id: 'users', label: 'All Users', icon: <Users size={15} /> },
     { id: 'leads', label: 'Enquiries', icon: <Inbox size={15} /> },
     { id: 'surveys', label: 'Surveys', icon: <ClipboardList size={15} /> },
+    { id: 'reporting', label: 'RTB Report', icon: <Download size={15} /> },
   ];
 
   return (
@@ -625,6 +721,96 @@ export default function SuperAdminDashboard() {
                 </div>
               );
             })}
+          </div>
+        )}
+
+        {/* RTB National Reporting */}
+        {tab === 'reporting' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12 }}>
+              <div>
+                <p style={{ fontSize: 14, fontWeight: 700, color: 'var(--text)', marginBottom: 2 }}>RTB National Progress Report</p>
+                <p style={{ fontSize: 12, color: 'var(--text-3)' }}>
+                  School-level aggregates for national monitoring. Generated {new Date().toLocaleDateString()}.
+                </p>
+              </div>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <button className="btn btn-tertiary sm" onClick={() => { setReportLoaded(false); }}>
+                  <RefreshCw size={13} /> Refresh
+                </button>
+                <button className="btn btn-secondary sm" onClick={exportReportCSV} disabled={reportData.length === 0}>
+                  <Download size={13} /> Export CSV
+                </button>
+              </div>
+            </div>
+
+            {reportLoading && (
+              <div style={{ display: 'flex', justifyContent: 'center', padding: 48 }}>
+                <Loader size={20} style={{ animation: 'spin 1s linear infinite', color: 'var(--text-3)' }} />
+              </div>
+            )}
+
+            {reportLoaded && reportData.length === 0 && (
+              <div className="card pad-lg" style={{ textAlign: 'center', color: 'var(--text-3)', fontSize: 14, padding: '48px 24px' }}>
+                No schools registered yet.
+              </div>
+            )}
+
+            {reportLoaded && reportData.length > 0 && (
+              <>
+                {/* Summary totals */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 12 }}>
+                  {[
+                    { label: 'Total Schools', value: reportData.length },
+                    { label: 'Total Students', value: reportData.reduce((s, r) => s + r.student_count, 0) },
+                    { label: 'Total Teachers', value: reportData.reduce((s, r) => s + r.teacher_count, 0) },
+                    { label: 'Active (7d)', value: reportData.reduce((s, r) => s + r.active_students_7d, 0) },
+                    { label: 'Challenges Passed', value: reportData.reduce((s, r) => s + r.challenges_passed, 0) },
+                  ].map(st => (
+                    <div key={st.label} className="card pad-sm" style={{ textAlign: 'center' }}>
+                      <p style={{ fontSize: 22, fontWeight: 700, color: 'var(--text)', lineHeight: 1 }}>{st.value.toLocaleString()}</p>
+                      <p style={{ fontSize: 11, color: 'var(--text-3)', marginTop: 4 }}>{st.label}</p>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Per-school table */}
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+                    <thead>
+                      <tr style={{ borderBottom: '2px solid var(--line)' }}>
+                        {['School', 'Location', 'Teachers', 'Students', 'Active 7d', 'Challenges Passed', '% Active'].map(h => (
+                          <th key={h} style={{ textAlign: 'left', padding: '8px 12px', fontSize: 11, fontWeight: 700, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {reportData.map(r => {
+                        const activePct = r.student_count > 0 ? Math.round((r.active_students_7d / r.student_count) * 100) : 0;
+                        return (
+                          <tr key={r.school_id} style={{ borderBottom: '1px solid var(--line)' }}>
+                            <td style={{ padding: '10px 12px', fontWeight: 600, color: 'var(--text)' }}>{r.school_name}</td>
+                            <td style={{ padding: '10px 12px', color: 'var(--text-3)' }}>{r.location ?? '—'}</td>
+                            <td style={{ padding: '10px 12px', color: 'var(--text-2)' }}>{r.teacher_count}</td>
+                            <td style={{ padding: '10px 12px', color: 'var(--text-2)' }}>{r.student_count}</td>
+                            <td style={{ padding: '10px 12px', color: 'var(--text-2)' }}>{r.active_students_7d}</td>
+                            <td style={{ padding: '10px 12px', fontWeight: 600, color: r.challenges_passed > 0 ? '#9eaa84' : 'var(--text-3)' }}>{r.challenges_passed}</td>
+                            <td style={{ padding: '10px 12px' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                                <div style={{ width: 60, height: 5, borderRadius: 99, background: 'var(--surface-2)', overflow: 'hidden' }}>
+                                  <div style={{ height: '100%', width: `${activePct}%`, background: activePct >= 60 ? '#9eaa84' : activePct >= 30 ? '#cda86a' : 'var(--error)', borderRadius: 99 }} />
+                                </div>
+                                <span style={{ fontSize: 12, color: 'var(--text-2)' }}>{activePct}%</span>
+                              </div>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </>
+            )}
           </div>
         )}
 

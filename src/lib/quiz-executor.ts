@@ -141,9 +141,17 @@ ${htmlCode}
     for (__i = 0; __i < __testCases.length; __i++) {
       try {
         var __passed = Boolean(eval(__testCases[__i].assertion));
-        __results.push({ passed: __passed, description: __testCases[__i].description });
+        if (__passed) {
+          __results.push({ passed: true, description: __testCases[__i].description });
+        } else {
+          __results.push({
+            passed: false,
+            description: __testCases[__i].description,
+            error: 'Test returned false — your function ran without errors but the result did not match what was expected. Check the return value.',
+          });
+        }
       } catch (__ae) {
-        __results.push({ passed: false, description: __testCases[__i].description, error: __ae.message });
+        __results.push({ passed: false, description: __testCases[__i].description, error: __ae.toString() });
       }
     }
   } catch (__re) {

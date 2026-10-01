@@ -2273,3 +2273,34 @@ export async function getSchoolClassAnalytics(schoolId: string): Promise<ClassAn
     };
   });
 }
+
+// ── Teacher Performance Alerts ───────────────────────────────────────────────
+
+export interface TeacherAlert {
+  student_id: string;
+  full_name: string;
+  class_id: string;
+  class_name: string;
+  days_since_attempt: number;
+  alert_type: 'inactive_7' | 'inactive_14' | 'never_logged_in';
+}
+
+export async function getTeacherAlerts(): Promise<TeacherAlert[]> {
+  const { data } = await supabase
+    .from('teacher_student_alerts')
+    .select('student_id, full_name, class_id, class_name, days_since_attempt, alert_type')
+    .neq('alert_type', 'ok')
+    .order('days_since_attempt', { ascending: false });
+  return (data as TeacherAlert[] | null) ?? [];
+}
+
+export async function dismissTeacherAlert(studentId: string, alertType: string): Promise<void> {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return;
+  await supabase.from('teacher_alert_dismissals').upsert({
+    teacher_id: user.id,
+    student_id: studentId,
+    alert_type: alertType,
+    dismissed_at: new Date().toISOString(),
+  }, { onConflict: 'teacher_id,student_id,alert_type' });
+}
