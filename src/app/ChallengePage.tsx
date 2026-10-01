@@ -137,7 +137,7 @@ export default function ChallengePage({ language }: Props) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 36 }}>
           {Object.entries(grouped).sort(([a], [b]) => Number(a) - Number(b)).map(([lvl, levelSets]) => {
             const level = Number(lvl);
-            const isComingSoon = levelSets.length === 0 || (level >= 4);
+            const isComingSoon = levelSets.length === 0;
             return (
               <div key={lvl}>
                 {/* Level header */}

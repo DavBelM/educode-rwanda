@@ -370,7 +370,47 @@ export default function ChallengeRunner({ language }: Props) {
     setPhase('running');
   };
 
-  if (phase === 'loading' || !challenge || !set) {
+  if (phase === 'loading') {
+    return (
+      <div className="flex items-center justify-center min-h-screen" style={{ background: 'var(--bg)' }}>
+        <div className="w-8 h-8 border-2 rounded-full animate-spin"
+          style={{ borderColor: 'var(--line-strong)', borderTopColor: 'var(--text-2)' }} />
+      </div>
+    );
+  }
+
+  if (!set || challenges.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen p-6" style={{ background: 'var(--bg)' }}>
+        <div className="card" style={{ maxWidth: 440, width: '100%', textAlign: 'center', padding: '40px 32px' }}>
+          <div style={{
+            width: 56, height: 56, borderRadius: 16, marginBottom: 20,
+            background: 'var(--surface-2)', border: '1px solid var(--line)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px',
+          }}>
+            <span style={{ fontSize: 28 }}>🏗️</span>
+          </div>
+          <h2 className="text-xl font-bold mb-2" style={{ color: 'var(--text)' }}>
+            {isKin ? 'Challenges Zitegurwa…' : 'Challenges Coming Soon'}
+          </h2>
+          <p style={{ color: 'var(--text-2)', fontSize: 15, lineHeight: 1.6, marginBottom: 28 }}>
+            {isKin
+              ? `Challenges za set "${set?.title_kin ?? set?.title ?? ''}" zitegurwa. Subira vuba!`
+              : `Challenges for "${set?.title ?? 'this set'}" are being prepared. Check back soon!`}
+          </p>
+          <button
+            className="btn btn-secondary"
+            style={{ width: '100%' }}
+            onClick={() => navigate('/challenges')}
+          >
+            ← {isKin ? 'Garuka ku mazu' : 'Back to all sets'}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!challenge) {
     return (
       <div className="flex items-center justify-center min-h-screen" style={{ background: 'var(--bg)' }}>
         <div className="w-8 h-8 border-2 rounded-full animate-spin"
