@@ -45,6 +45,8 @@ export interface QuizChallenge {
   order_index: number;
   hint: string | null;
   hint_kin: string | null;
+  language?: 'javascript' | 'python' | 'sql';
+  sql_schema?: string | null;
 }
 
 export interface QuizSession {

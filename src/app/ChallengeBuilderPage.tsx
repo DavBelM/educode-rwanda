@@ -3,6 +3,8 @@ import { AppNav } from './components/AppNav';
 import { usePageTitle } from '../hooks/usePageTitle';
 import { supabase } from '../lib/supabase';
 import { runQuizTests, type TestCase } from '../lib/quiz-executor';
+import { runPythonTests } from '../lib/python-executor';
+import { runSqlTests } from '../lib/sql-executor';
 import { Plus, Trash2, Play, Check, AlertCircle, Save, ChevronDown, ChevronUp } from 'lucide-react';
 
 interface Props {
@@ -27,6 +29,8 @@ const emptyTest = (): TestCaseForm => ({
 
 const DIFFICULTY_OPTIONS = ['easy', 'medium', 'hard'] as const;
 const CHALLENGE_TYPE_OPTIONS = ['fix_bug', 'complete_code', 'write_from_scratch'] as const;
+const LANGUAGE_OPTIONS = ['javascript', 'python', 'sql'] as const;
+type ChallengeLanguage = typeof LANGUAGE_OPTIONS[number];
 
 export default function ChallengeBuilderPage({ language }: Props) {
   usePageTitle('Challenge Builder · EduCode Rwanda');
@@ -37,7 +41,9 @@ export default function ChallengeBuilderPage({ language }: Props) {
   const [titleKin, setTitleKin] = useState('');
   const [description, setDescription] = useState('');
   const [descriptionKin, setDescriptionKin] = useState('');
+  const [codeLanguage, setCodeLanguage] = useState<ChallengeLanguage>('javascript');
   const [starterCode, setStarterCode] = useState('// Write your solution here\n');
+  const [sqlSchema, setSqlSchema] = useState('');
   const [solutionCode, setSolutionCode] = useState('');
   const [tests, setTests] = useState<TestCaseForm[]>([emptyTest()]);
   const [difficulty, setDifficulty] = useState<'easy' | 'medium' | 'hard'>('easy');
@@ -81,7 +87,14 @@ export default function ChallengeBuilderPage({ language }: Props) {
     if (validTests.length === 0 || !previewCode.trim()) return;
     setPreviewRunning(true);
     try {
-      const result = await runQuizTests(previewCode, '', validTests);
+      let result;
+      if (codeLanguage === 'python') {
+        result = await runPythonTests(previewCode, validTests);
+      } else if (codeLanguage === 'sql') {
+        result = await runSqlTests(previewCode, sqlSchema, validTests);
+      } else {
+        result = await runQuizTests(previewCode, '', validTests);
+      }
       setPreviewResults(result.results);
     } catch {
       setPreviewResults([{ passed: false, description: 'Execution error', error: 'Runner failed' }]);
@@ -120,6 +133,8 @@ export default function ChallengeBuilderPage({ language }: Props) {
       order_index: orderIndex,
       hint: hint.trim() || null,
       hint_kin: hintKin.trim() || null,
+      language: codeLanguage,
+      sql_schema: codeLanguage === 'sql' ? (sqlSchema.trim() || null) : null,
       is_visible: false, // start hidden until reviewed
     });
 
@@ -134,7 +149,8 @@ export default function ChallengeBuilderPage({ language }: Props) {
     // Reset form
     setTimeout(() => {
       setTitle(''); setTitleKin(''); setDescription(''); setDescriptionKin('');
-      setStarterCode('// Write your solution here\n'); setSolutionCode('');
+      setStarterCode('// Write your solution here\n'); setSolutionCode(''); setSqlSchema('');
+      setCodeLanguage('javascript');
       setTests([emptyTest()]); setHint(''); setHintKin('');
       setPreviewResults(null); setPreviewCode('');
       setSaveSuccess(false);
@@ -246,6 +262,18 @@ export default function ChallengeBuilderPage({ language }: Props) {
                     <label style={labelStyle}>XP Reward</label>
                     <input type="number" style={inputStyle} value={xpReward} min={1} max={100} onChange={e => setXpReward(Number(e.target.value))} />
                   </div>
+                  <div>
+                    <label style={labelStyle}>Language</label>
+                    <select style={inputStyle} value={codeLanguage} onChange={e => {
+                      const lang = e.target.value as ChallengeLanguage;
+                      setCodeLanguage(lang);
+                      if (lang === 'python') setStarterCode('# Write your solution here\n');
+                      else if (lang === 'sql') setStarterCode('SELECT * FROM table_name\n');
+                      else setStarterCode('// Write your solution here\n');
+                    }}>
+                      {LANGUAGE_OPTIONS.map(l => <option key={l} value={l}>{l.charAt(0).toUpperCase() + l.slice(1)}</option>)}
+                    </select>
+                  </div>
                 </div>
               </div>
             )}
@@ -256,8 +284,23 @@ export default function ChallengeBuilderPage({ language }: Props) {
             <SectionHeader id="code" label={isKin ? '2. Kode ya Tangira' : '2. Starter Code'} />
             {expandedSection === 'code' && (
               <div className="card pad-lg" style={{ borderTopLeftRadius: 0, borderTopRightRadius: 0, borderTop: 'none' }}>
-                <label style={labelStyle}>JavaScript starter code shown to students</label>
+                <label style={labelStyle}>
+                  {codeLanguage === 'python' ? 'Python starter code shown to students'
+                    : codeLanguage === 'sql' ? 'SQL starter query shown to students'
+                    : 'JavaScript starter code shown to students'}
+                </label>
                 <textarea style={{ ...textareaStyle, minHeight: 140 }} value={starterCode} onChange={e => setStarterCode(e.target.value)} />
+                {codeLanguage === 'sql' && (
+                  <>
+                    <label style={{ ...labelStyle, marginTop: 14 }}>SQL Schema (CREATE TABLE + seed data — runs before student query)</label>
+                    <textarea
+                      style={{ ...textareaStyle, minHeight: 120 }}
+                      value={sqlSchema}
+                      onChange={e => setSqlSchema(e.target.value)}
+                      placeholder={'CREATE TABLE employees (\n  id INTEGER PRIMARY KEY,\n  name TEXT,\n  salary REAL\n);\nINSERT INTO employees VALUES (1, \'Alice\', 75000), (2, \'Bob\', 60000);'}
+                    />
+                  </>
+                )}
                 <label style={{ ...labelStyle, marginTop: 14 }}>Reference solution (not shown to students — optional)</label>
                 <textarea style={{ ...textareaStyle, minHeight: 100 }} value={solutionCode} onChange={e => setSolutionCode(e.target.value)} placeholder="// Optional: reference solution for internal use" />
               </div>

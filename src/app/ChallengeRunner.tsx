@@ -8,6 +8,8 @@ import { CodeEditor } from './components/CodeEditor';
 import { MwarimuPanel } from './components/MwarimuPanel';
 import { RatingModal } from './components/RatingModal';
 import { runQuizTests, type TestResult } from '../lib/quiz-executor';
+import { runPythonTests, preloadPyodide } from '../lib/python-executor';
+import { runSqlTests } from '../lib/sql-executor';
 import {
   getSetChallenges, getQuizSets, startQuizSession, upsertQuizAttempt,
   completeQuizSession, markSetCompleted, awardXp, hasCompletedSet,
@@ -128,6 +130,7 @@ export default function ChallengeRunner({ language }: Props) {
   const [output, setOutput] = useState('');
   const [runtimeError, setRuntimeError] = useState<string | null>(null);
   const [running, setRunning] = useState(false);
+  const [pythonStatus, setPythonStatus] = useState<string | null>(null);
   const [showHint, setShowHint] = useState(false);
   const [hintUsed, setHintUsed] = useState(false);
 
@@ -258,12 +261,31 @@ export default function ChallengeRunner({ language }: Props) {
     }
   }, [rightTab, challenge?.id, hasPassed]);
 
+  // Warm up Pyodide when a Python challenge is active
+  useEffect(() => {
+    if (challenge?.language === 'python') {
+      setPythonStatus('Loading Python runtime...');
+      preloadPyodide();
+      // Clear status after a reasonable warm-up window
+      const t = setTimeout(() => setPythonStatus(null), 8000);
+      return () => clearTimeout(t);
+    }
+  }, [challenge?.id, challenge?.language]);
+
   const handleRun = async () => {
     if (!challenge || running) return;
     setRunning(true);
     setResults([]);
 
-    const res = await runQuizTests(jsCode, htmlCode, challenge.test_cases);
+    const lang = challenge.language ?? 'javascript';
+    let res;
+    if (lang === 'python') {
+      res = await runPythonTests(jsCode, challenge.test_cases);
+    } else if (lang === 'sql') {
+      res = await runSqlTests(jsCode, challenge.sql_schema ?? '', challenge.test_cases);
+    } else {
+      res = await runQuizTests(jsCode, htmlCode, challenge.test_cases);
+    }
     setResults(res.results);
     setOutput(res.output);
     setRuntimeError(res.runtimeError);
@@ -564,6 +586,17 @@ export default function ChallengeRunner({ language }: Props) {
             <span className="font-semibold" style={{ color: 'var(--text)', fontSize: 14 }}>
               {isKin && challenge.title_kin ? challenge.title_kin : challenge.title}
             </span>
+            {challenge.language && challenge.language !== 'javascript' && (
+              <span style={{
+                fontSize: 11, fontWeight: 600, letterSpacing: '0.04em',
+                padding: '2px 7px', borderRadius: 4,
+                background: challenge.language === 'python' ? 'rgba(59,130,246,0.15)' : 'rgba(34,197,94,0.15)',
+                color: challenge.language === 'python' ? '#60a5fa' : '#4ade80',
+                textTransform: 'uppercase',
+              }}>
+                {challenge.language}
+              </span>
+            )}
           </div>
         </div>
 
@@ -655,12 +688,26 @@ export default function ChallengeRunner({ language }: Props) {
             </div>
           )}
 
+          {pythonStatus && (
+            <div style={{
+              padding: '7px 16px', flexShrink: 0,
+              background: 'var(--surface-2)',
+              borderBottom: '1px solid var(--line)',
+              fontSize: 13, color: 'var(--text-3)',
+              display: 'flex', alignItems: 'center', gap: 8,
+            }}>
+              <span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%', background: 'var(--text-3)', animation: 'pulse 1.4s infinite' }} />
+              {pythonStatus}
+            </div>
+          )}
+
           <CodeEditor
             jsCode={jsCode}
             htmlCode={htmlCode}
             onJsChange={setJsCode}
             onHtmlChange={setHtmlCode}
             language={language}
+            codeLanguage={challenge.language ?? 'javascript'}
             blockPaste
           />
 

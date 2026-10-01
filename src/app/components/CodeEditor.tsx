@@ -2,6 +2,8 @@ import { useState, useEffect, useMemo } from 'react';
 import CodeMirror from '@uiw/react-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { html } from '@codemirror/lang-html';
+import { python } from '@codemirror/lang-python';
+import { sql } from '@codemirror/lang-sql';
 import { EditorView, Decoration, ViewPlugin, ViewUpdate } from '@codemirror/view';
 import { RangeSetBuilder } from '@codemirror/state';
 import { HighlightStyle, syntaxHighlighting } from '@codemirror/language';
@@ -15,6 +17,7 @@ interface CodeEditorProps {
   language: 'EN' | 'KIN';
   errorLine?: number;
   blockPaste?: boolean;
+  codeLanguage?: 'javascript' | 'python' | 'sql';
 }
 
 function errorLinePlugin(line: number) {
@@ -114,7 +117,7 @@ const educodeHighlight = HighlightStyle.define([
 
 type Tab = 'js' | 'html';
 
-export function CodeEditor({ jsCode, htmlCode, onJsChange, onHtmlChange, language, errorLine, blockPaste }: CodeEditorProps) {
+export function CodeEditor({ jsCode, htmlCode, onJsChange, onHtmlChange, language, errorLine, blockPaste, codeLanguage = 'javascript' }: CodeEditorProps) {
   const isKinyarwanda = language === 'KIN';
   const [activeTab, setActiveTab] = useState<Tab>('js');
   const [pasteDenied, setPasteDenied] = useState(false);
@@ -136,8 +139,12 @@ export function CodeEditor({ jsCode, htmlCode, onJsChange, onHtmlChange, languag
     })];
   }, [blockPaste]);
 
+  const primaryLangExtension = codeLanguage === 'python' ? python()
+    : codeLanguage === 'sql' ? sql()
+    : javascript();
+
   const jsExtensions = [
-    javascript(),
+    primaryLangExtension,
     EditorView.lineWrapping,
     educodeTheme,
     syntaxHighlighting(educodeHighlight),
@@ -157,11 +164,13 @@ export function CodeEditor({ jsCode, htmlCode, onJsChange, onHtmlChange, languag
     <div className="flex-1 min-h-0 flex flex-col" style={{ background: 'var(--code-bg)' }}>
       <div className="tabs">
         <span className={`tab${activeTab === 'js' ? ' on' : ''}`} onClick={() => setActiveTab('js')}>
-          script.js
+          {codeLanguage === 'python' ? 'solution.py' : codeLanguage === 'sql' ? 'query.sql' : 'script.js'}
         </span>
-        <span className={`tab${activeTab === 'html' ? ' on' : ''}`} onClick={() => setActiveTab('html')}>
-          index.html
-        </span>
+        {codeLanguage === 'javascript' && (
+          <span className={`tab${activeTab === 'html' ? ' on' : ''}`} onClick={() => setActiveTab('html')}>
+            index.html
+          </span>
+        )}
       </div>
 
       {blockPaste && pasteDenied && (
@@ -196,7 +205,11 @@ export function CodeEditor({ jsCode, htmlCode, onJsChange, onHtmlChange, languag
               allowMultipleSelections: false,
               drawSelection: false,
             }}
-            placeholder={isKinyarwanda ? '// Andika JavaScript yawe hano...' : '// Write your JavaScript here...'}
+            placeholder={
+              codeLanguage === 'python' ? (isKinyarwanda ? '# Andika Python yawe hano...' : '# Write your Python here...')
+              : codeLanguage === 'sql' ? (isKinyarwanda ? '-- Andika SQL yawe hano...' : '-- Write your SQL query here...')
+              : (isKinyarwanda ? '// Andika JavaScript yawe hano...' : '// Write your JavaScript here...')
+            }
           />
         ) : (
           <CodeMirror

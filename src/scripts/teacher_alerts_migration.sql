@@ -40,7 +40,7 @@ SELECT
   END              AS alert_type
 FROM public.classes cl
 JOIN public.class_enrollments ce ON ce.class_id = cl.id
-JOIN public.student_profiles sp  ON sp.id = ce.student_id
+JOIN public.profiles sp          ON sp.id = ce.student_id
 LEFT JOIN public.quiz_attempts qa ON qa.student_id = sp.id
 WHERE cl.teacher_id = auth.uid()
 GROUP BY cl.teacher_id, sp.id, sp.full_name, cl.id, cl.name
