@@ -9,6 +9,9 @@ dist/
 .env.local
 .env.*.local
 
+# Software development manuals (local reference only)
+softwareDevelopmentManuals/
+
 # Research data (local only — not for GitHub)
 GoogleFormsData/
 Machine_Learnin_Proposal_mission_Capstone.pdf
